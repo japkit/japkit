@@ -3,5 +3,5 @@ org.eclipse.jdt.apt.aptEnabled=true
 org.eclipse.jdt.apt.genSrcDir=target\\src\\main\\generated-sources
 org.eclipse.jdt.apt.processorOptions/annotations=de.stefanocke.japkit.roo.japkit.*
 org.eclipse.jdt.apt.processorOptions/diagnosticMessages=true
-org.eclipse.jdt.apt.processorOptions/projectDirectory=C\:\\Java\\workspaces\\annotationprocessors_maven\\japkit\\japkit-roo-quickstart-example
-org.eclipse.jdt.apt.processorOptions/templateDir=C\:\\Java\\workspaces\\annotationprocessors_maven\\japkit\\japkit-roo-quickstart-example/src/main/resources
+org.eclipse.jdt.apt.processorOptions/projectDirectory=C\:\\Java\\github\\japkit\\japkit-roo-quickstart-example
+org.eclipse.jdt.apt.processorOptions/templateDir=C\:\\Java\\github\\japkit\\japkit-roo-quickstart-example/src/main/resources
