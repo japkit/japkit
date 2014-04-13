@@ -1,0 +1,16 @@
+application_name=Sample Application
+<%controllerAnnotations.each{ 
+	def fqnId = it.fqnId
+	def shortId = it.shortId
+	def name = it.fboName
+	def pluralName = it.fboPluralName
+	def propertyNames = it.propertyNames
+%>
+label_${fqnId}=${name}
+label_${fqnId}_plural=${pluralName}
+<%propertyNames.each{ %>label_${fqnId}_${it.toLowerCase()}=${it.toFirstUpper}
+<%}%>
+menu_category_${shortId}_label=${name}
+menu_item_${shortId}_list_label=${pluralName}
+menu_item_${shortId}_new_label=${name}
+<%}%>

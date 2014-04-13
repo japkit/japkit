@@ -1,0 +1,39 @@
+package de.stefanocke.japkit.metaannotations.classselectors;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+
+@Target(ElementType.TYPE)
+public @interface ClassSelector {
+	/**
+	 * 
+	 * @return the kind of the class selector.
+	 */
+	ClassSelectorKind kind() default ClassSelectorKind.TYPE_MIRROR;
+
+	/**
+	 * 
+	 * @return the name of the annotation value of the trigger annotation or meta annotation. 
+	 * TODO: Add AV to specify the meta annotation. Currently, it is ambiguous. In some cases GenerateClass meta-anntoation is considered.
+	 *         <p>
+	 *         In case of ClassSelectorKind.TYPE_MIRROR that annotation value
+	 *         must be of type Class<?>.
+	 *         <p>
+	 *         In case of ClassSelectorKind.INNER_CLASS_NAME it must be of type
+	 *         String.
+	 *         <p>
+	 *         In case of ClassSelectorKind.SPECIAL it depends on the selector.
+	 *         Usually, it is ignored at all.
+	 *         <p>
+	 *         If empty, the annotation value name defaults to the simple class
+	 *         name of the class annotated with ClassSelector with first
+	 *         character converted to lower case.
+	 */
+	String avName() default "";
+	
+	String expr() default "";
+	
+	String lang() default "";
+	
+	
+}

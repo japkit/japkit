@@ -1,0 +1,3 @@
+moduleName=japkit-elextensions-module
+moduleVersion=1.0
+extensionClasses=de.stefanocke.japkit.support.el.ElExtensions

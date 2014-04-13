@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" id="menu" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <menu:menu id="_menu" z="0">       
+        
+        <menu:category id="c_owner" z="0">
+            <menu:item id="i_owner_new" messageCode="global_menu_new" url="/owners?form" z="0"/>
+            <menu:item id="i_owner_list" messageCode="global_menu_list" url="/owners?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
+        </menu:category>
+        
+        <menu:category id="c_pet" z="0">
+            <menu:item id="i_pet_new" messageCode="global_menu_new" url="/pets?form" z="0"/>
+            <menu:item id="i_pet_list" messageCode="global_menu_list" url="/pets?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
+        </menu:category>
+        
+        <menu:category id="c_visit" z="0">
+            <menu:item id="i_visit_new" messageCode="global_menu_new" url="/visits?form" z="0"/>
+            <menu:item id="i_visit_list" messageCode="global_menu_list" url="/visits?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
+        </menu:category>
+        
+        <menu:category id="c_vet" z="0">
+            <menu:item id="i_vet_new" messageCode="global_menu_new" url="/vets?form" z="0"/>
+            <menu:item id="i_vet_list" messageCode="global_menu_list" url="/vets?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
+        </menu:category>
+        
+        <menu:category id="c_timer3" z="0">
+            <menu:item id="i_timer3_new" messageCode="global_menu_new" url="/timers3?form" z="0"/>
+            <menu:item id="i_timer3_list" messageCode="global_menu_list" url="/timers3?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
+        </menu:category>
+        
+        <menu:category id="c_timer2" z="0">
+            <menu:item id="i_timer2_new" messageCode="global_menu_new" url="/timers2?form" z="0"/>
+            <menu:item id="i_timer2_list" messageCode="global_menu_list" url="/timers2?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
+        </menu:category>
+        
+    </menu:menu>
+</div>
