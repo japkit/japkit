@@ -55,6 +55,11 @@ class ElExtensions {
 		val extension TypesExtensions = get(TypesExtensions)
 		type1.isSameType(type2)
 	}
+	
+	def static hasType(Element e, CharSequence fqn){
+		val extension TypesExtensions = get(TypesExtensions)
+		e.asType.qualifiedName.contentEquals(fqn)
+	}
 
 	def static getSingleValueType(Element e) {
 		val extension ElementsExtensions = get(ElementsExtensions)
@@ -178,6 +183,8 @@ class ElExtensions {
 		elExtensions.registerMethod(TypeMirror, "asElement", [context, type, paramTypes, params|type.asElement])
 		
 		elExtensions.registerMethod(TypeMirror, "isSame", [context, type, paramTypes, params|type.isSame((params as Object[]).get(0) as TypeMirror)])
+		
+		elExtensions.registerMethod(Element, "hasType", [context, e, paramTypes, params|e.hasType((params as Object[]).get(0) as CharSequence)])
 		
 //		elExtensions.registerMethod(String, "findAllTypeElementsWithTrigger", [context, triggerFqn, paramTypes, params|
 //			findAllTypeElementsWithTrigger(triggerFqn, (params as Object[]).get(0) as Boolean, context)
