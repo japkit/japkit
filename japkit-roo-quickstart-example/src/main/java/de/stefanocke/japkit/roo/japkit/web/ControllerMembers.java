@@ -61,6 +61,7 @@ public abstract class ControllerMembers {
 
 	@Method(bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", crudOperations().find(id));\n"
 			+ "uiModel.addAttribute(\"itemId\", id);\n"
+			+ "addDateTimeFormatPatterns(uiModel);\n" 
 			+ "return \"#{path}/show\";")
 	@ParamNames({ "id", "uiModel" })
 	@RequestMapping(produces = "text/html", value = "/{id}")
@@ -75,6 +76,7 @@ public abstract class ControllerMembers {
 			+ "} else {\n"
 			+ "\tuiModel.addAttribute(\"#{modelAttribute}s\", crudOperations().findAll(sortFieldName, sortOrder));\n"
 			+ "}"
+			+ "addDateTimeFormatPatterns(uiModel);\n" 
 			+ "return \"#{path}/list\";\n")
 	@RequestMapping(produces = "text/html")
 	@ParamNames({ "page", "size", "sortFieldName", "sortOrder", "uiModel" })

@@ -5,7 +5,18 @@
     <page:list id="pl_${fboFqnId}" items="\${${modelAttribute}s}" z="0">
         <table:table data="\${${modelAttribute}s}" id="l_${fboFqnId}" path="/${path}" z="0">
          <%viewProperties.each {
-    	 %>  <table:column id="c_${fboFqnId}_${it.name}" property="${it.name}" z="0"/> <!-- TODO: sort -->
+        	 //Code duplication with show.jspx!
+        	 def attrMap = [:]	
+    			    if(isDatetime.matches(it)){
+    			    	attrMap.dateTimePattern= "\${${fboShortId}_${it.name.toLowerCase()}_date_format}"
+    			    	if(it.hasType('java.util.Date')){
+    			    		attrMap.date = true
+    			    	} else if(it.hasType('java.util.Calendar')) {
+    			    		attrMap.calendar = true
+    			    	}
+    			    }
+    			    def attr = attrMap.collect{"$it.key=\"$it.value\""}.join(' ')
+    	 %>  <table:column id="c_${fboFqnId}_${it.name}" property="${it.name}" <%=attr%> z="0"/> <!-- TODO: sort -->
          <%}%>
         </table:table>
     </page:list>

@@ -3,8 +3,8 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <page:show id="ps_de_stefanocke_japkit_roo_quickstart_timer3" object="${timer}" path="/timers3" z="0">
-      <field:display field="bar" id="s_de_stefanocke_japkit_roo_quickstart_timer3_bar" object="${timer}" z="0"/>
-      <field:display field="foo" id="s_de_stefanocke_japkit_roo_quickstart_timer3_foo" object="${timer}" z="0"/>
+    <field:display field="bar" id="s_de_stefanocke_japkit_roo_quickstart_timer3_bar" object="${timer}"  z="0"/>
+    <field:display field="foo" id="s_de_stefanocke_japkit_roo_quickstart_timer3_foo" object="${timer}"  z="0"/>
             
     </page:show>
 </div>

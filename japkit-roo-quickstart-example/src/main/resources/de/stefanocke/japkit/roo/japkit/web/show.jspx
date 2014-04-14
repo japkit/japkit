@@ -4,7 +4,17 @@
     <jsp:output omit-xml-declaration="yes"/>
     <page:show id="ps_${fboFqnId}" object="\${${modelAttribute}}" path="/${path}" z="0">
     <%viewProperties.each {
-    %>  <field:display field="${it.name}" id="s_${fboFqnId}_${it.name}" object="\${${modelAttribute}}" z="0"/>
+    def attrMap = [:]	
+    if(isDatetime.matches(it)){
+    	attrMap.dateTimePattern= "\${${fboShortId}_${it.name.toLowerCase()}_date_format}"
+    	if(it.hasType('java.util.Date')){
+    		attrMap.date = true
+    	} else if(it.hasType('java.util.Calendar')) {
+    		attrMap.calendar = true
+    	}
+    }
+    def attr = attrMap.collect{"$it.key=\"$it.value\""}.join(' ')
+    %><field:display field="${it.name}" id="s_${fboFqnId}_${it.name}" object="\${${modelAttribute}}" <%=attr%> z="0"/>
     <%}%>        
     </page:show>
 </div>

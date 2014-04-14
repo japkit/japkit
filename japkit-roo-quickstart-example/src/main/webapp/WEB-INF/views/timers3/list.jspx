@@ -4,8 +4,8 @@
     <jsp:output omit-xml-declaration="yes"/>
     <page:list id="pl_de_stefanocke_japkit_roo_quickstart_timer3" items="${timers}" z="0">
         <table:table data="${timers}" id="l_de_stefanocke_japkit_roo_quickstart_timer3" path="/timers3" z="0">
-           <table:column id="c_de_stefanocke_japkit_roo_quickstart_timer3_bar" property="bar" z="0"/> <!-- TODO: sort -->
-           <table:column id="c_de_stefanocke_japkit_roo_quickstart_timer3_foo" property="foo" z="0"/> <!-- TODO: sort -->
+           <table:column id="c_de_stefanocke_japkit_roo_quickstart_timer3_bar" property="bar"  z="0"/> <!-- TODO: sort -->
+           <table:column id="c_de_stefanocke_japkit_roo_quickstart_timer3_foo" property="foo"  z="0"/> <!-- TODO: sort -->
          
         </table:table>
     </page:list>

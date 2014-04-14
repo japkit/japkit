@@ -16,7 +16,8 @@
     	%><field:checkbox field="${it.name}" id="c_${fboFqnId}_${it.name}"  z="0"/>
     	<%} else if(isDatetime.matches(it)){
         def past = it.at['javax.validation.constraints.Past'] != null
-        %><field:datetime field="${it.name}" id="c_${fboFqnId}_${it.name}" dateTimePattern="\${${fboShortId}_${it.name.toLowerCase()}_date_format}" past="${past}" required="${required}" z="0"/>
+        def dtf = "${fboShortId}_${it.name.toLowerCase()}_date_format"
+        %><field:datetime field="${it.name}" id="c_${fboFqnId}_${it.name}" dateTimePattern="\${$dtf}" past="${past}" required="${required}" z="0"/>
         <%} else if(isEnum.matches(it)){
      	%><field:select field="${it.name}" id="c_${fboFqnId}_${it.name}" items="\${${it.name}s}" path="${it.name}s" required="${required}" z="0"/>
      	<%} else {

@@ -3,10 +3,10 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <page:show id="ps_de_stefanocke_japkit_roo_petclinic_domain_visit" object="${visit}" path="/visits" z="0">
-      <field:display field="description" id="s_de_stefanocke_japkit_roo_petclinic_domain_visit_description" object="${visit}" z="0"/>
-      <field:display field="pet" id="s_de_stefanocke_japkit_roo_petclinic_domain_visit_pet" object="${visit}" z="0"/>
-      <field:display field="vet" id="s_de_stefanocke_japkit_roo_petclinic_domain_visit_vet" object="${visit}" z="0"/>
-      <field:display field="visitDate" id="s_de_stefanocke_japkit_roo_petclinic_domain_visit_visitDate" object="${visit}" z="0"/>
+    <field:display field="description" id="s_de_stefanocke_japkit_roo_petclinic_domain_visit_description" object="${visit}"  z="0"/>
+    <field:display field="pet" id="s_de_stefanocke_japkit_roo_petclinic_domain_visit_pet" object="${visit}"  z="0"/>
+    <field:display field="vet" id="s_de_stefanocke_japkit_roo_petclinic_domain_visit_vet" object="${visit}"  z="0"/>
+    <field:display field="visitDate" id="s_de_stefanocke_japkit_roo_petclinic_domain_visit_visitDate" object="${visit}" dateTimePattern="${visit_visitdate_date_format}" date="true" z="0"/>
             
     </page:show>
 </div>
