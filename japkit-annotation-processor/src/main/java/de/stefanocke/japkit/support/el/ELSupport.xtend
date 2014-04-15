@@ -121,10 +121,26 @@ class ELSupport {
 
 	def <T> T eval(ValueStack valueStack, String expr, String lang, Class<T> expectedType) {
 
-		//nicht schön hier.
-		putShadowAnnotation(valueStack)
+		var ValueStack oldValueStackTL = null
+		if (valueStack != getValueStack) {
+			oldValueStackTL = getValueStack
 
-		return getElProvider(lang).eval(valueStack as Map<String, Object>, expr, expectedType, lang)	as T
+			//Make an explicitely set value stack available to EL Var functions called within the expression
+			ExtensionRegistry.register(ValueStack, valueStack)
+		}
+
+		try {
+
+			//nicht schön hier.
+			putShadowAnnotation(valueStack)
+			return getElProvider(lang).eval(valueStack as Map<String, Object>, expr, expectedType, lang) as T
+		} finally {
+
+			if (oldValueStackTL != null) {
+				ExtensionRegistry.register(ValueStack, oldValueStackTL)
+			}
+
+		}
 	}
 
 	//nicht schön hier.

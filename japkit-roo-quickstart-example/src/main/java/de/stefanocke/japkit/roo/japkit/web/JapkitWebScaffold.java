@@ -72,6 +72,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		@Var(name = "datetimeProperties", expr="#{isDatetime.filter(viewProperties)}"),
 		@Var(name = "hasDatetimeProperties",  expr="#{!datetimeProperties.isEmpty()}"),
 		@Var(name = "enumProperties",  expr="#{isEnum.filter(viewProperties)}"),
+		@Var(name = "dtfModelAttr", isFunction=true, expr="#{fboShortId}_#{element.name.toLowerCase()}_date_format")
 		
 })
 @GenerateClass(classSuffixToRemove = "Def",

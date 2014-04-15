@@ -8,7 +8,7 @@
         	 //Code duplication with show.jspx!
         	 def attrMap = [:]	
     			    if(isDatetime.matches(it)){
-    			    	attrMap.dateTimePattern= "\${${fboShortId}_${it.name.toLowerCase()}_date_format}"
+    			    	attrMap.dateTimePattern= "\${${dtfModelAttr.eval(it)}}"
     			    	if(it.hasType('java.util.Date')){
     			    		attrMap.date = true
     			    	} else if(it.hasType('java.util.Calendar')) {

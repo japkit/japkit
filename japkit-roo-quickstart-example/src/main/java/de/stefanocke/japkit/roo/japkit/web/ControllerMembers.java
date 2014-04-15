@@ -19,7 +19,6 @@ import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 
-@Template(vars=@Var(name="dateTimeFormatAnnotations", expr="#{datetimeProperties}", annotation=DateTimeFormat.class))
 public abstract class ControllerMembers {
 	@Method(imports = ControllerUtil.class,
 			bodyExpr = "if (bindingResult.hasErrors()) {\n"
@@ -35,7 +34,7 @@ public abstract class ControllerMembers {
 			HttpServletRequest httpServletRequest);
 	
 	@Method(imports = ControllerUtil.class, /* activation=@Matcher(condition="#{hasDatetimeProperties}"),*/ 
-			bodyExpr="<%datetimeProperties.each{%>uiModel.addAttribute(\"${fboShortId}_${it.name.toLowerCase()}_date_format\", ControllerUtil.patternForStyle(getDateTimeFormat${it.name.toFirstUpper}()));\n<%}%>", 
+			bodyExpr="<%datetimeProperties.each{%>uiModel.addAttribute(\"${dtfModelAttr.eval(it)}\", ControllerUtil.patternForStyle(getDateTimeFormat${it.name.toFirstUpper}()));\n<%}%>", 
 			bodyLang="GStringTemplateInline")
 	@ParamNames("uiModel") 
 	abstract void addDateTimeFormatPatterns(Model uiModel);
