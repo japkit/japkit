@@ -27,9 +27,9 @@ class ELVariableRule {
 	extension TypesExtensions types = ExtensionRegistry.get(TypesExtensions)
 	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	extension ELSupport =  ExtensionRegistry.get(ELSupport)
+	extension ELSupport = ExtensionRegistry.get(ELSupport)
 	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	
+
 	AnnotationMirror elVarAnnotation
 	String name
 	boolean isFunction
@@ -38,18 +38,19 @@ class ELVariableRule {
 	String lang
 	Class<?> type
 	boolean setInShadowAnnotation
-	
+
 	//TODO: Das könnten auch direkt PropertyFilter sein, aber im Moment ist die Trigger Anntoation Teil ihres State...
 	AnnotationMirror[] propertyFilterAnnotations
+
 	//TODO: TypeQuery Rule?
 	AnnotationMirror typeQuery
 	TypeMirror annotationToRetrieve
 	ElementMatcher matcher
 	SwitchRule switcher
-	
-	new (AnnotationMirror elVarAnnotation){
+
+	new(AnnotationMirror elVarAnnotation) {
 		_elVarAnnotation = elVarAnnotation
-		
+
 		_name = elVarAnnotation.value("name", String);
 		_isFunction = elVarAnnotation.value("isFunction", Boolean);
 		_triggerAv = elVarAnnotation.value("triggerAV", String);
@@ -63,20 +64,39 @@ class ELVariableRule {
 		_propertyFilterAnnotations = elVarAnnotation.value("propertyFilter", typeof(AnnotationMirror[]))
 
 		_typeQuery = elVarAnnotation.value("typeQuery", AnnotationMirror)
-		
-		_annotationToRetrieve = elVarAnnotation.value("annotation", TypeMirror) 
-		
-		
-		_matcher = elVarAnnotation.value("matcher", typeof(AnnotationMirror[])).map[createElementMatcher].singleValue  
-		
+
+		_annotationToRetrieve = elVarAnnotation.value("annotation", TypeMirror)
+
+		_matcher = elVarAnnotation.value("matcher", typeof(AnnotationMirror[])).map[createElementMatcher].singleValue
+
 		//TODO: Use Rulefactory
 		_switcher = elVarAnnotation.value("switcher", typeof(AnnotationMirror[])).map[new SwitchRule(it)].singleValue
 	}
-	
-	
+
 	def void putELVariable(ValueStack vs, Element element, AnnotationMirror triggerAnnotation) {
+		try {
+			if (isFunction) {
+				vs.put(name, this)
+			} else {
+				val value = eval(vs, element, triggerAnnotation)
+				vs.put(name, value)
+			}
+		} catch (TypeElementNotFoundException tenfe) {
+			ExtensionRegistry.get(TypesRegistry).handleTypeElementNotFound(tenfe, currentAnnotatedClass)
+		} catch (Exception e) {
+			//Idee: Hier auf dem ValueStack speziell markieren, dass es mit der Varaiable einen Fehler gab
+			//Der ValueStack kann dann beim Zugriff auf die Variable eine spezielle Exception werfen, die 
+			//dann dazu genutzt werden kann die Flut an gemeldeten Folgefehlern einzudämmen. 
+			reportError(
+				'''Could not evaluate EL variable «name»: «e.message» EL expression: «expr», Property Filter: «propertyFilterAnnotations».''',
+				e, element, elVarAnnotation, null)
+		}
+	}
 
-
+	def Object eval(Element element) {
+		eval(valueStack, element, currentAnnotation)
+	}
+	def Object eval(ValueStack vs, Element element, AnnotationMirror triggerAnnotation) {
 
 		pushCurrentMetaAnnotation(elVarAnnotation)
 		try {
@@ -93,21 +113,23 @@ class ELVariableRule {
 					val exprResult = vs.scope(element) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
 						eval(vs, expr, lang, type);
 					]
-					if(matcher!=null){
-						if(exprResult instanceof Iterable<?>){
-							matcher.filter(exprResult as Iterable<?>)	
+					if (matcher != null) {
+						if (exprResult instanceof Iterable<?>) {
+							matcher.filter(exprResult as Iterable<?>)
 						} else {
-							throw new IllegalArgumentException('''If expr and matcher are set, expr must yield an element collection, but not «exprResult»''');
+							throw new IllegalArgumentException(
+								'''If expr and matcher are set, expr must yield an element collection, but not «exprResult»''');
 						}
 					} else {
 						exprResult
 					}
 
-				} else if(matcher!=null){
+				} else if (matcher != null) {
 					matcher //The matcher itself is put on value stack
-				} else if(switcher!=null){
+				} else if (switcher != null) {
 					switcher
 				} else if (!propertyFilterAnnotations.nullOrEmpty) {
+
 					//TODO: Rule caching?
 					val propertyFilters = propertyFilterAnnotations.map[new PropertyFilter(triggerAnnotation, it)]
 					propertyFilters.map[getFilteredProperties(currentAnnotatedClass, currentGeneratedClass)].flatten.
@@ -119,50 +141,45 @@ class ELVariableRule {
 					throw new IllegalArgumentException("Either expr or propertyFilter must be set for the variable.");
 
 				}
-				
-			val valueForVariable = if(annotationToRetrieve==null){
-				value
-			} else {
-				value.retrieveAnnotationMirrors(annotationToRetrieve.qualifiedName)
-			}
-			
-			vs.put(name, valueForVariable)
+
+			val valueForVariable = if (annotationToRetrieve == null) {
+					value
+				} else {
+					value.retrieveAnnotationMirrors(annotationToRetrieve.qualifiedName)
+				}
+
+			//Das hier funktioniert so nicht, wenn isFunction true ist. Macht aber nichts.
 			if (setInShadowAnnotation && !triggerAv.nullOrEmpty) {
+
 				//TODO: Es fürfte ungewöhnlich sein, hier einen AnnotationMirror zu setzen. Daher nehmen wir value anstatt valueForVariable.
 				//Ist das sinnvoll oder eher verwirrend? 
 				vs.getVariablesForShadowAnnotation().put(triggerAv, value)
 			}
 
-		} catch (TypeElementNotFoundException tenfe) {
-			ExtensionRegistry.get(TypesRegistry).handleTypeElementNotFound(tenfe, currentAnnotatedClass)
-		} catch (Exception e) {
-			reportError(
-				'''Could not evaluate EL variable «name»: «e.message» EL expression: «expr», Property Filter: «propertyFilterAnnotations».''',
-				e, element, elVarAnnotation, null)
+			valueForVariable
+
 		} finally {
 			popCurrentMetaAnnotation()
 		}
 
 	//TODO: handle TENFE here?
 	}
-	
+
 	def private dispatch Object retrieveAnnotationMirrors(Iterable<?> iterable, String annotationFqn) {
-		new ArrayList(iterable.map[retrieveAnnotationMirrors(annotationFqn)].filter[it!=null].toList) 
+		new ArrayList(iterable.map[retrieveAnnotationMirrors(annotationFqn)].filter[it != null].toList)
 	}
-	
+
 	def private dispatch AnnotationMirror retrieveAnnotationMirrors(TypeMirror t, String annotationFqn) {
 		t.asElement.annotationMirror(annotationFqn)
 	}
-	
+
 	def private dispatch AnnotationMirror retrieveAnnotationMirrors(Element e, String annotationFqn) {
 		e.annotationMirror(annotationFqn)
 	}
-	
+
 	def private dispatch Object retrieveAnnotationMirrors(Object object, String annotationFqn) {
 		throw new IllegalArgumentException('''Cannot retrieve annotation «annotationFqn» for «object»''')
 	}
-	
-	
 
 	def evalTypeQuery(ValueStack vs, AnnotationMirror typeQuery, Element element) {
 		val triggerAnnotation = typeQuery.value("annotation", TypeMirror);
