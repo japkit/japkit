@@ -13,5 +13,18 @@ hs_err_pid*
 
 # ignore all target directories
 target/
+bin/
+
+.project
+.classpath
+.factorypath
 
 generated-sources/
+# /japkit-ddd-example
+
+org.eclipse.core.resources.prefs
+org.eclipse.jdt.apt.core.prefs
+org.eclipse.jdt.core.prefs
+org.eclipse.wst.common.component
+org.eclipse.wst.common.project.facet.core.xml
+org.eclipse.wst.validation.prefs
