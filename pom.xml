@@ -10,6 +10,7 @@
     <name>Japkit Parent</name>
 
     <modules>
+		<module>japkit-xtend-parent</module>
         <module>japkit-active-annotations</module>
         <module>japkit-annotation-processor</module>
         <module>japkit-annotations</module>
