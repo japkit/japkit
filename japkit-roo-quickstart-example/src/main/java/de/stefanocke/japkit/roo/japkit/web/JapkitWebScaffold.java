@@ -5,6 +5,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.persistence.Id;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -68,6 +70,8 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		@Var(name = "isDatetime", isFunction=true, matcher= @Matcher(srcSingleValueTypeCategory=TypeCategory.TEMPORAL)),
 		@Var(name = "isBoolean", isFunction=true, matcher= @Matcher(srcSingleValueType=boolean.class)),
 		@Var(name = "isEnum", isFunction=true, matcher= @Matcher(srcSingleValueTypeCategory=TypeCategory.ENUM)),
+		@Var(name = "isRequired", isFunction=true, matcher = @Matcher(srcAnnotations=NotNull.class)),
+		@Var(name = "isPast", isFunction=true, matcher = @Matcher(srcAnnotations=Past.class)),
 		//The view properties that have a date or time type
 		@Var(name = "datetimeProperties", expr="#{isDatetime.filter(viewProperties)}"),
 		@Var(name = "hasDatetimeProperties",  expr="#{!datetimeProperties.isEmpty()}"),

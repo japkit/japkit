@@ -10,12 +10,12 @@
   	%><form:create id="fc_${fboFqnId}" modelAttribute="${modelAttribute}" path="/${path}" render="\${empty dependencies}" z="0">
     <%}
     viewProperties.each {   	
-    	def required = it.at['javax.validation.constraints.NotNull'] != null			
+    	def required = isRequired.eval(it)			
     	//TODO: At first, generate some intermediate annotation based model of the view ?
     	if(isBoolean.eval(it)){
     	%><field:checkbox field="${it.name}" id="c_${fboFqnId}_${it.name}"  z="0"/>
     	<%} else if(isDatetime.eval(it)){
-        def past = it.at['javax.validation.constraints.Past'] != null
+        def past = isPast.eval(it)
         def dtf = "${dtfModelAttr.eval(it)}"
         %><field:datetime field="${it.name}" id="c_${fboFqnId}_${it.name}" dateTimePattern="\${$dtf}" past="${past}" required="${required}" z="0"/>
         <%} else if(isEnum.eval(it)){
