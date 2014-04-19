@@ -5,7 +5,7 @@
     <page:show id="ps_${fboFqnId}" object="\${${modelAttribute}}" path="/${path}" z="0">
     <%viewProperties.each {
     def attrMap = [:]	
-    if(isDatetime.matches(it)){
+    if(isDatetime.eval(it)){
     	attrMap.dateTimePattern= "\${${dtfModelAttr.eval(it)}}"
     	if(it.hasType('java.util.Date')){
     		attrMap.date = true

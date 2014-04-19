@@ -65,9 +65,9 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 				setInShadowAnnotation = true),
 
 		//Some matchers for categorize properties		
-		@Var(name = "isDatetime", matcher= @Matcher(srcSingleValueTypeCategory=TypeCategory.TEMPORAL)),
-		@Var(name = "isBoolean", matcher= @Matcher(srcSingleValueType=boolean.class)),
-		@Var(name = "isEnum", matcher= @Matcher(srcSingleValueTypeCategory=TypeCategory.ENUM)),
+		@Var(name = "isDatetime", isFunction=true, matcher= @Matcher(srcSingleValueTypeCategory=TypeCategory.TEMPORAL)),
+		@Var(name = "isBoolean", isFunction=true, matcher= @Matcher(srcSingleValueType=boolean.class)),
+		@Var(name = "isEnum", isFunction=true, matcher= @Matcher(srcSingleValueTypeCategory=TypeCategory.ENUM)),
 		//The view properties that have a date or time type
 		@Var(name = "datetimeProperties", expr="#{isDatetime.filter(viewProperties)}"),
 		@Var(name = "hasDatetimeProperties",  expr="#{!datetimeProperties.isEmpty()}"),

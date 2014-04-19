@@ -96,13 +96,26 @@ class ELVariableRule {
 	def Object eval(Element element) {
 		eval(valueStack, element, currentAnnotation)
 	}
+	
+	def Object filter(Iterable<? extends Element> collection) {
+		collection.filter[eval(it) as Boolean]
+	}
+	
+	def Object map(Iterable<? extends Element> collection) {
+		collection.map[eval(it)]
+	}
+	
 	def Object eval(ValueStack vs, Element element, AnnotationMirror triggerAnnotation) {
 
 		pushCurrentMetaAnnotation(elVarAnnotation)
 		try {
 
 			var Object av
-			val value = if (!triggerAv.nullOrEmpty && {
+			
+			//Be default, the value is the current element. This is useful for matcher and retrieveAV
+			var Object value = element
+			
+			value = if (!triggerAv.nullOrEmpty && {
 					av = currentAnnotation.value(triggerAv, type);
 					!av.nullOrEmptyAV
 				}) {
@@ -110,24 +123,10 @@ class ELVariableRule {
 					av
 
 				} else if (!expr.nullOrEmpty) {
-					val exprResult = vs.scope(element) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
+					vs.scope(element) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
 						eval(vs, expr, lang, type);
-					]
-					if (matcher != null) {
-						if (exprResult instanceof Iterable<?>) {
-							matcher.filter(exprResult as Iterable<?>)
-						} else {
-							throw new IllegalArgumentException(
-								'''If expr and matcher are set, expr must yield an element collection, but not «exprResult»''');
-						}
-					} else {
-						exprResult
-					}
+					]					
 
-				} else if (matcher != null) {
-					matcher //The matcher itself is put on value stack
-				} else if (switcher != null) {
-					switcher
 				} else if (!propertyFilterAnnotations.nullOrEmpty) {
 
 					//TODO: Rule caching?
@@ -138,8 +137,20 @@ class ELVariableRule {
 				} else if (typeQuery != null) {
 					evalTypeQuery(vs, typeQuery, element)
 				} else {
-					throw new IllegalArgumentException("Either expr or propertyFilter must be set for the variable.");
-
+					value
+				}
+				
+			value = if (matcher != null) {
+					if (value instanceof Iterable<?>) {
+						matcher.filter(value as Iterable<?>)
+					} else if(value instanceof Element) {
+						matcher.matches(value as Element)
+					} else {
+						throw new IllegalArgumentException(
+							'''If matcher is set, expr must yield an element collection or an element, but not «value»''');
+					}
+				} else {
+					value
 				}
 
 			val valueForVariable = if (annotationToRetrieve == null) {
@@ -162,7 +173,6 @@ class ELVariableRule {
 			popCurrentMetaAnnotation()
 		}
 
-	//TODO: handle TENFE here?
 	}
 
 	def private dispatch Object retrieveAnnotationMirrors(Iterable<?> iterable, String annotationFqn) {

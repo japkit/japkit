@@ -7,7 +7,7 @@
          <%viewProperties.each {
         	 //Code duplication with show.jspx!
         	 def attrMap = [:]	
-    			    if(isDatetime.matches(it)){
+    			    if(isDatetime.eval(it)){
     			    	attrMap.dateTimePattern= "\${${dtfModelAttr.eval(it)}}"
     			    	if(it.hasType('java.util.Date')){
     			    		attrMap.date = true
