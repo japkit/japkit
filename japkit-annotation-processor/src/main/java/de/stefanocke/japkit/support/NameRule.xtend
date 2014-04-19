@@ -45,7 +45,7 @@ class NameRule {
 			}
 		
 		} else if(!expr.nullOrEmpty) {
-			eval(orgElement, expr, lang, String, '''Error when evaluating expression for name.''', orgName.toString)
+			eval(orgElement, expr, lang, String)
 		} else {
 			orgName.toString
 		}

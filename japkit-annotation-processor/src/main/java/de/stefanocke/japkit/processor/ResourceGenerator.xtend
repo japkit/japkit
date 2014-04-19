@@ -93,14 +93,14 @@ class ResourceGenerator {
 				} finally {
 					writer.flush
 					writer.close
-					printDiagnosticMessage['''Processed resource template. Duration: «System.currentTimeMillis - start»''']
+					printDiagnosticMessage['''Resource file written «resourceFile». Duration: «System.currentTimeMillis - start»''']
 				}
 			} catch (TypeElementNotFoundException tenfe) { 
 				handleTypeElementNotFound(
 					'''Type element not found when processing resource template «templateName» for «annotatedClass».''',
 					tenfe.fqn, annotatedClass)
 			} catch (Exception e) {
-				printDiagnosticMessage['''Error when processing resource template «templateName» for «annotatedClass».''']
+				printDiagnosticMessage['''Error when processing resource template «templateName» for «annotatedClass». «e»''']
 				reportError('''Error when processing resource template  «templateName».''', e, annotatedClass, triggerAnnotation, null)
 			} finally {
 				popCurrentMetaAnnotation
