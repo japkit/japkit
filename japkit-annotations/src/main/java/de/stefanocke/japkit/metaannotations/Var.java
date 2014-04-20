@@ -6,11 +6,10 @@ public @interface Var {
 	String name();
 
 	/**
-	 * If true, the EL-Varaibale is not evaluated immediately. Instead, it is
+	 * If true, the EL-Variabale is not evaluated immediately. Instead, it is
 	 * put as a function on the value stack and can be evaluated later by
-	 * calling its apply method. If called without parameter, the "element" is
-	 * the current one set on value stack. If calles with parameter, then thsi
-	 * parameter is used as the "element" to evaluate the function for.
+	 * calling its eval, filter or map method. The parameter to this methods must
+	 * be the element or list of elements to apply the function for.
 	 * 
 	 * @return
 	 */
@@ -19,7 +18,7 @@ public @interface Var {
 	/**
 	 * If this is set, the current trigger annotation value with this name is
 	 * retrieved. If it is set (TODO: What does this exactly mean?), it is used
-	 * as value for the variable and the expression won't be evaluated.
+	 * as value for the variable and the expression, property filter or type query won't be evaluated.
 	 * 
 	 * @return the trigger annotation value name
 	 */
@@ -37,8 +36,17 @@ public @interface Var {
 	 */
 	boolean setInShadowAnnotation() default false;
 
+	/**
+	 * The expression to be evaluated.
+	 * 
+	 * @return
+	 */
 	String expr() default "";
 
+	/**
+	 * The language for the expression.
+	 * @return
+	 */
 	String lang() default "";
 
 	Class<?> type() default Object.class;
@@ -51,23 +59,18 @@ public @interface Var {
 	 */
 	Properties[] propertyFilter() default {};
 
-	TypeQuery[] typeQuery() default {};
-
 	/**
-	 * If set, and expr is not set, this matcher is put on value stack for later
-	 * re-use. If set, and expr is set, the matcher is applied to the result of
-	 * expr and ther result is put on value stack. Expr is supposed to be an
-	 * element collection.
-	 */
-	Matcher[] matcher() default {};
-
-	/**
-	 * If set, and expr is not set, this switch is put on value stack for later
-	 * re-use.
+	 * If this value is set, the expression is ignored and a type query is executed instead.
 	 * 
 	 * @return
 	 */
-	Switch[] switcher() default {};
+	TypeQuery[] typeQuery() default {};
+
+	/**
+	 * If set, and expr is set, the matcher is applied to the result of
+	 * expression and the result (true or false) is put on value stack. 
+	 */
+	Matcher[] matcher() default {};
 
 	/**
 	 * If set, the according annotation of the result of the expression,
