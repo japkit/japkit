@@ -46,7 +46,6 @@ class ELVariableRule {
 	AnnotationMirror typeQuery
 	TypeMirror annotationToRetrieve
 	ElementMatcher matcher
-	SwitchRule switcher
 
 	new(AnnotationMirror elVarAnnotation) {
 		_elVarAnnotation = elVarAnnotation
@@ -69,8 +68,6 @@ class ELVariableRule {
 
 		_matcher = elVarAnnotation.value("matcher", typeof(AnnotationMirror[])).map[createElementMatcher].singleValue
 
-		//TODO: Use Rulefactory
-		_switcher = elVarAnnotation.value("switcher", typeof(AnnotationMirror[])).map[new SwitchRule(it)].singleValue
 	}
 
 	def void putELVariable(ValueStack vs, Element element, AnnotationMirror triggerAnnotation) {
