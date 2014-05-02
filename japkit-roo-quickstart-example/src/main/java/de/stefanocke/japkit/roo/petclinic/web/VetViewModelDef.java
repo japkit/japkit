@@ -9,5 +9,7 @@ import de.stefanocke.japkit.roo.petclinic.domain.Vet;
 public class VetViewModelDef {
 
 	@Size(max = 20, min = 3)
-	private String lastName;
+	String lastName;
+	
+	//boolean nonExistingProperty;
 }

@@ -74,9 +74,8 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 			
 		val overridesMatcher = annotation.valueOrMetaValue("overridesMatcher", AnnotationMirror, propertiesAnnotation).createElementMatcher
 		
-		val overrideElements = overridesSource?.enclosedElements?.filter[overridesMatcher.matches(it)] ?: emptyList
+		val overrideElementsByName = (overridesSource?.enclosedElements?.filter[overridesMatcher.matches(it)] ?: emptyList).toMap[simpleName.toString]
 		
-
 		val immutabilityRules = new ImmutabiltyRules(annotation, propertiesAnnotation)
 		
 		//TODO: Rule caching
@@ -93,10 +92,25 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 			[true]
 		}
 
-		properties.filter(propertiesFromSuperClassFilter).forEach [ p |
+		val propertiesToGenerate = properties.filter(propertiesFromSuperClassFilter)
+		
+		val propertiesToGenerateNames = propertiesToGenerate.map[name].toSet
+		
+		//Validate that an according property exists for each override element 
+		overrideElementsByName.forEach [ oeName, oe |
+			if (!propertiesToGenerateNames.contains(oeName)) {
+				messageCollector.reportError(
+					'''No property exists with name «oeName». Properties from source class are: «propertiesToGenerateNames»''',
+					overrideElementsByName.get(oeName), null, null
+				)
+			}
+		]
+		
+		
+		propertiesToGenerate.forEach [ p |
 			val ruleSourceElement = p.getSourceElement(ruleSource)
 			
-			val overrideElement = overrideElements.findFirst[simpleName.contentEquals(p.name)]
+			val overrideElement = overrideElementsByName.get[p.name]
 			
 			//TODO: Javadoc
 			if (createNameConstants) {
