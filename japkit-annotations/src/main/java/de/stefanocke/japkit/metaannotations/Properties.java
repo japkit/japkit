@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
 import de.stefanocke.japkit.metaannotations.classselectors.None;
@@ -21,10 +22,10 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
 public @interface Properties {
 	enum RuleSource {
 		/**
-		 * The source element is the property. Property is a
-		 * derived element which refers to the field and to the getter as far as
-		 * available. When getting the type, the annotations, the modifiers, ...
-		 * of the property, it will delegate these method calls to the field if
+		 * The source element is the property. Property is a derived element
+		 * which refers to the field and to the getter as far as available. When
+		 * getting the type, the annotations, the modifiers, ... of the
+		 * property, it will delegate these method calls to the field if
 		 * available. Otherwise it will delegate to the getter.
 		 */
 		PROPERTY,
@@ -43,14 +44,14 @@ public @interface Properties {
 	}
 
 	/**
-	 * By default, this Property annotation is active an will generate properties.
-	 * To switch it on or of case by case, a Matcher can be used here. 
-	 * The element on which the matcher is applied is the annotated class.
+	 * By default, this Property annotation is active an will generate
+	 * properties. To switch it on or of case by case, a Matcher can be used
+	 * here. The element on which the matcher is applied is the annotated class.
 	 * 
 	 * @return
 	 */
-	Matcher[] activation() default {};  
-	
+	Matcher[] activation() default {};
+
 	/**
 	 * When the annotated annotation wants to override annotation values of the
 	 * Properties annotation, it must use this prefix
@@ -68,20 +69,21 @@ public @interface Properties {
 
 	/**
 	 * 
-	 * Creates constants for the names of the properties. If we are in an enum, enum constants will be created.
+	 * Creates constants for the names of the properties. If we are in an enum,
+	 * enum constants will be created.
 	 * 
 	 * @return
 	 */
 	boolean createNameConstants() default false;
 
-	
 	/**
-	 * Whether to create properties at all. Can be switched of to only create name constants. See above.
+	 * Whether to create properties at all. Can be switched of to only create
+	 * name constants. See above.
 	 * 
 	 * @return
 	 */
 	boolean createProperties() default true;
-	
+
 	/**
 	 * 
 	 * @return true means, the properties are based on the declared fields of
@@ -113,62 +115,87 @@ public @interface Properties {
 	 */
 	AnnotationMapping[] annotationMappings() default {};
 
-	
+	/**
+	 * A class to customize the properties. So far, you can override the annotations of the properties.
+	 * 
+	 * @return
+	 */
+	Class<?> overrides() default None.class;
+
+	/**
+	 * By default, all fields of the "overrides" class are considered. This can
+	 * be changed by setting another matcher here. For example, only fields with
+	 * some specific annotation could be considered. Or, methods could be
+	 * considered that are named like the properties.
+	 * 
+	 * @return
+	 */
+	Matcher overridesMatcher() default @Matcher(srcKind = ElementKind.FIELD);
+
 	/**
 	 * 
 	 * @return whether to generate getters at all
 	 */
 	boolean generateGetters() default true;
-	
+
 	/**
-	 * Whether getters shall return unmodifiable collections and maps 
+	 * Whether getters shall return unmodifiable collections and maps
 	 * 
 	 * @return
 	 */
 	boolean returnUnmodifiableCollections() default false;
-	
+
 	/**
 	 * Whether getters shall return defensive copies of the properties.
 	 * <p>
-	 * If the property is a collection, and gettersReturnUnmodifiableCollections is set, this option will be ignored.
+	 * If the property is a collection, and gettersReturnUnmodifiableCollections
+	 * is set, this option will be ignored.
 	 * <p>
-	 * If the type of the property is known to be immutable, no defensive copy is created. Types from the following categories are 
-	 * considered immutable: TypeCategory.PRIMITIVE, TypeCatergory.STRING, TypeCategory.MATH, TypeCategory.ENUM
+	 * If the type of the property is known to be immutable, no defensive copy
+	 * is created. Types from the following categories are considered immutable:
+	 * TypeCategory.PRIMITIVE, TypeCatergory.STRING, TypeCategory.MATH,
+	 * TypeCategory.ENUM
 	 * <p>
-	 * There are built in copy mechanisms for the following type categories TypeCategory.TEMPORAL, TypeCategory.COLLECTION, TypeCategory.ARRAY
+	 * There are built in copy mechanisms for the following type categories
+	 * TypeCategory.TEMPORAL, TypeCategory.COLLECTION, TypeCategory.ARRAY
 	 * <p>
-	 * Note: For collections and arrays, only shallow copies are created. 'Deep cloning' is not supported here.
+	 * Note: For collections and arrays, only shallow copies are created. 'Deep
+	 * cloning' is not supported here.
 	 * 
 	 * @return
 	 */
 	boolean returnDefensiveCopies() default false;
-	
+
 	/**
-	 * Whether setters shall create defensive copies before assigning the value to the field.
+	 * Whether setters shall create defensive copies before assigning the value
+	 * to the field.
 	 * <p>
-	 * If the type of the property is known to be immutable, no defensive copy is created. Types from the following categories are 
-	 * considered immutable: TypeCategory.PRIMITIVE, TypeCatergory.STRING, TypeCategory.MATH, TypeCategory.ENUM
+	 * If the type of the property is known to be immutable, no defensive copy
+	 * is created. Types from the following categories are considered immutable:
+	 * TypeCategory.PRIMITIVE, TypeCatergory.STRING, TypeCategory.MATH,
+	 * TypeCategory.ENUM
 	 * <p>
-	 * There are built in copy mechanisms for the following type categories TypeCategory.TEMPORAL, TypeCategory.COLLECTION, TypeCategory.ARRAY
+	 * There are built in copy mechanisms for the following type categories
+	 * TypeCategory.TEMPORAL, TypeCategory.COLLECTION, TypeCategory.ARRAY
 	 * <p>
-	 * Note: For collections and arrays, only shallow copies are created. Deep 'cloning' is not supported here.
+	 * Note: For collections and arrays, only shallow copies are created. Deep
+	 * 'cloning' is not supported here.
 	 * 
 	 * 
 	 * @return
 	 */
 	boolean assignDefensiveCopies() default false;
-	
-	Matcher[]  returnDefensiveCopiesAlsoFor() default {};
-	
-	Matcher[]  assignDefensiveCopiesAlsoFor() default {};
-	
-	
+
+	Matcher[] returnDefensiveCopiesAlsoFor() default {};
+
+	Matcher[] assignDefensiveCopiesAlsoFor() default {};
+
 	@SuppressWarnings("rawtypes")
 	Class<? extends java.util.List> listImpl() default ArrayList.class;
-	
+
 	@SuppressWarnings("rawtypes")
 	Class<? extends java.util.Set> setImpl() default HashSet.class;
-	
+
 	@SuppressWarnings("rawtypes")
 	Class<? extends java.util.Map> mapImpl() default HashMap.class;
 
@@ -179,7 +206,7 @@ public @interface Properties {
 	 * @return the element matchers
 	 */
 	Matcher[] gettersExcludeRules() default {};
-	
+
 	/**
 	 * Maps annotations from source class properties to target class getters.
 	 * 
@@ -187,7 +214,6 @@ public @interface Properties {
 	 */
 	AnnotationMapping[] annotationMappingsForGetters() default {};
 
-	
 	/**
 	 * 
 	 * @return whether to generate setters at all
@@ -237,22 +263,26 @@ public @interface Properties {
 	 * @return
 	 */
 	Matcher[] excludeRules() default {};
-	
+
 	/**
-	 * If true, properties that already exist in the superclass of the generated class, are not generated again. 
+	 * If true, properties that already exist in the superclass of the generated
+	 * class, are not generated again.
+	 * 
 	 * @return
 	 */
 	boolean excludePropertiesFromSuperclass() default true;
-	
+
 	/**
-	 * Methods to create per property. 
-	 * @return 
+	 * Methods to create per property.
+	 * 
+	 * @return
 	 */
-	//Method[] methods() default {};
-	
+	// Method[] methods() default {};
+
 	/**
-	 * Templates to apply per property. 
-	 * @return 
+	 * Templates to apply per property.
+	 * 
+	 * @return
 	 */
 	Class<?>[] templates() default {};
 

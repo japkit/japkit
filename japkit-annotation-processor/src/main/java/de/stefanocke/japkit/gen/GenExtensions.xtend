@@ -104,11 +104,17 @@ class GenExtensions {
 	//do never copy japkit meta-annotations
 	val japkitAnnotationPackages = #{GenerateClass.package.name, Order.package.name}
 	
-	val isNoJapkitAnnotation = [AnnotationMirror am | !(japkitAnnotationPackages.contains(am.annotationAsTypeElement.package.qualifiedName.toString))]	
+	def boolean isJapkitAnnotation(AnnotationMirror am){
+		japkitAnnotationPackages.contains(am.annotationAsTypeElement.package.qualifiedName.toString)
+	}
+	
+	val isNoJapkitAnnotationFilter = [AnnotationMirror am | 
+		!(am.isJapkitAnnotation)
+	]	
 	
 	//Copies all annotations but Japkit metaannotations.
 	def copyAnnotations(Element src){
-		src.copyAnnotations(isNoJapkitAnnotation)
+		src.copyAnnotations(isNoJapkitAnnotationFilter)
 	}
 	
 	def static copyAnnotations(Element src, (AnnotationMirror)=>boolean filter){

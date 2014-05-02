@@ -68,6 +68,14 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 			val templateClass = getTypeElement(asTypeElement.qualifiedName)
 			createTemplateRule(templateClass, null)
 		]
+		
+		val overridesSource = 
+			relatedType(annotatedClass, generatedClass, annotation, "overrides", propertiesAnnotation, annotatedClass)?.asTypeElement
+			
+		val overridesMatcher = annotation.valueOrMetaValue("overridesMatcher", AnnotationMirror, propertiesAnnotation).createElementMatcher
+		
+		val overrideElements = overridesSource?.enclosedElements?.filter[overridesMatcher.matches(it)] ?: emptyList
+		
 
 		val immutabilityRules = new ImmutabiltyRules(annotation, propertiesAnnotation)
 		
@@ -87,6 +95,9 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 
 		properties.filter(propertiesFromSuperClassFilter).forEach [ p |
 			val ruleSourceElement = p.getSourceElement(ruleSource)
+			
+			val overrideElement = overrideElements.findFirst[simpleName.contentEquals(p.name)]
+			
 			//TODO: Javadoc
 			if (createNameConstants) {
 				if (generatedClass.kind == ElementKind.ENUM) {
@@ -110,7 +121,9 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 				generatedClass.add(
 					new GenField(p.name, p.type) => [
 						modifiers = fieldModifiers.toSet
-						annotationMirrors = mapAnnotations(ruleSourceElement, annotationMappingsForFields)
+						
+						annotationMirrors = overrideAnnotations(overrideElement, mapAnnotations(ruleSourceElement, annotationMappingsForFields))
+												
 						comment = srcComment
 					//TODO: Make configurable whether just to use an @see here.
 					])
@@ -142,7 +155,7 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 				}
 
 			}
-			//methodRules.forEach[apply(annotatedClass, generatedClass, annotation, ruleSourceElement)]
+
 			templateRules.forEach[apply(annotatedClass, generatedClass, annotation, ruleSourceElement)]
 		]
 

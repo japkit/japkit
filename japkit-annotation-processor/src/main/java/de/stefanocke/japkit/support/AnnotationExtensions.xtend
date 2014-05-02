@@ -6,6 +6,8 @@ import de.stefanocke.japkit.metaannotations.GenerateClass
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import java.util.ArrayList
+import de.stefanocke.japkit.gen.GenExtensions
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -45,6 +47,20 @@ class AnnotationExtensions {
 			emptyList
 		}
 
+	}
+	
+
+	
+	def List<GenAnnotationMirror> overrideAnnotations(Element overrideElement, List<GenAnnotationMirror> existingAnnotations) {
+		if(overrideElement==null){
+			return existingAnnotations
+		}
+		
+		val result = new ArrayList(existingAnnotations.filter[am | !overrideElement.annotationMirrors.exists[fqn.equals(am.fqn)]].toList)
+		
+		result.addAll(ExtensionRegistry.get(GenExtensions).copyAnnotations(overrideElement))
+		
+		result
 	}
 
 	public val SHADOW_AV = "shadow"

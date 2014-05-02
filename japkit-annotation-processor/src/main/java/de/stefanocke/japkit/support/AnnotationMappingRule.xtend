@@ -85,11 +85,13 @@ class AnnotationMappingRule {
 	
 	private def copyAnnotation(AnnotationMirror am) {
 		GenExtensions.copy(am) => [
+			//TODO: Ist this still necessary here? 
 				if(setShadowOnTriggerAnnotations){setShadowIfAppropriate}
 			]
 	}
 	
 	def private boolean shallCopyAnnotation(AnnotationMirror am){
+		!ExtensionRegistry.get(GenExtensions).isJapkitAnnotation(am) && (
 		copyAnnotationsFqns.contains(am.annotationType.qualifiedName) 
 		|| {
 			val packageFqn = am.annotationType.asElement.package.qualifiedName.toString
@@ -99,7 +101,7 @@ class AnnotationMappingRule {
 				endsWith(".*") && packageFqn.equals(substring(0, it.length-2)) || 
 				endsWith(".**") && packageFqn.startsWith(substring(0, it.length-3))
 			]
-		}
+		})
 	}
 	
 	def private void mapAnnotation(boolean srcElementChanged, Element srcElement, List<GenAnnotationMirror> annotations, Map<String, AnnotationMappingRule> mappingsWithId) {
