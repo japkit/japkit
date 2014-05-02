@@ -32,94 +32,62 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		@Var(name = "fbo", triggerAV = "formBackingObject"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
 		@Var(name = "entityAnnotation", expr = "#{fboElement}", annotation = JapkitEntity.class),
-		@Var(name = "fboName", type = String.class, triggerAV = "fboName",
-				expr = "#{fboElement.simpleName.toString()}",
+		@Var(name = "fboName", type = String.class, triggerAV = "fboName", expr = "#{fboElement.simpleName.toString()}",
 				setInShadowAnnotation = true),
-		@Var(name = "fboPluralName", type = String.class, triggerAV = "fboPluralName",
-				expr = "#{fboName}s",
-				setInShadowAnnotation = true),
-		@Var(name = "path", type = String.class, triggerAV = "path",
-				expr = "#{fboPluralName.toLowerCase()}",
-				setInShadowAnnotation = true),
-		@Var(name = "modelAttribute", type = String.class, triggerAV = "modelAttribute",
-				expr = "#{fboName.toFirstLower}",
+		@Var(name = "fboPluralName", type = String.class, triggerAV = "fboPluralName", expr = "#{fboName}s", setInShadowAnnotation = true),
+		@Var(name = "path", type = String.class, triggerAV = "path", expr = "#{fboPluralName.toLowerCase()}", setInShadowAnnotation = true),
+		@Var(name = "modelAttribute", type = String.class, triggerAV = "modelAttribute", expr = "#{fboName.toFirstLower}",
 				setInShadowAnnotation = true),
 		// For making IDs in JSPs unique
-		@Var(name = "fboFqnId", triggerAV = "fqnId",
-				expr = "#{fboElement.qualifiedName.toString().replace('.','_').toLowerCase()}",
+		@Var(name = "fboFqnId", triggerAV = "fqnId", expr = "#{fboElement.qualifiedName.toString().replace('.','_').toLowerCase()}",
 				setInShadowAnnotation = true),
-		@Var(name = "fboShortId", triggerAV = "shortId",
-				expr = "#{fboName.toLowerCase()}",
-				setInShadowAnnotation = true),
+		@Var(name = "fboShortId", triggerAV = "shortId", expr = "#{fboName.toLowerCase()}", setInShadowAnnotation = true),
 
 		// The properties to show
-		@Var(name = "viewProperties", propertyFilter = @Properties(
-				sourceClass = FormBackingObject.class,
-				includeRules = @Matcher(srcAnnotationsNot = { Id.class, Version.class }))
-		),
+		@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = FormBackingObject.class, includeRules = @Matcher(
+				srcAnnotationsNot = { Id.class, Version.class }))),
 
-		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository",
-				typeQuery = @TypeQuery(annotation = JapJpaRepository.class,
-						shadow = true,
-						unique = true,
-						filterAV = "domainType",
-						inExpr = "#{fbo}"),
+		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository", typeQuery = @TypeQuery(
+				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{fbo}"),
 				setInShadowAnnotation = true),
 
-		//Some matchers for categorize properties		
-		@Var(name = "isDatetime", isFunction=true, matcher= @Matcher(srcSingleValueTypeCategory=TypeCategory.TEMPORAL)),
-		@Var(name = "isBoolean", isFunction=true, matcher= @Matcher(srcSingleValueType=boolean.class)),
-		@Var(name = "isEnum", isFunction=true, matcher= @Matcher(srcSingleValueTypeCategory=TypeCategory.ENUM)),
-		@Var(name = "isRequired", isFunction=true, matcher = @Matcher(srcAnnotations=NotNull.class)),
-		@Var(name = "isPast", isFunction=true, matcher = @Matcher(srcAnnotations=Past.class)),
-		//The view properties that have a date or time type
-		@Var(name = "datetimeProperties", expr="#{isDatetime.filter(viewProperties)}"),
-		@Var(name = "hasDatetimeProperties",  expr="#{!datetimeProperties.isEmpty()}"),
-		@Var(name = "enumProperties",  expr="#{isEnum.filter(viewProperties)}"),
-		@Var(name = "dtfModelAttr", isFunction=true, expr="#{fboShortId}_#{element.name.toLowerCase()}_date_format")
-		
+		// Some matchers for categorize properties
+		@Var(name = "isDatetime", isFunction = true, matcher = @Matcher(srcSingleValueTypeCategory = TypeCategory.TEMPORAL)),
+		@Var(name = "isBoolean", isFunction = true, matcher = @Matcher(srcSingleValueType = boolean.class)),
+		@Var(name = "isEnum", isFunction = true, matcher = @Matcher(srcSingleValueTypeCategory = TypeCategory.ENUM)),
+		@Var(name = "isRequired", isFunction = true, matcher = @Matcher(srcAnnotations = NotNull.class)),
+		@Var(name = "isPast", isFunction = true, matcher = @Matcher(srcAnnotations = Past.class)),
+		// The view properties that have a date or time type
+		@Var(name = "datetimeProperties", expr = "#{isDatetime.filter(viewProperties)}"),
+		@Var(name = "hasDatetimeProperties", expr = "#{!datetimeProperties.isEmpty()}"),
+		@Var(name = "enumProperties", expr = "#{isEnum.filter(viewProperties)}"),
+		@Var(name = "dtfModelAttr", isFunction = true, expr = "#{fboShortId}_#{element.name.toLowerCase()}_date_format")
+
 })
-@GenerateClass(classSuffixToRemove = "Def",
+@GenerateClass(
+		classSuffixToRemove = "Def",
 		classSuffixToAppend = "",
-		modifier= Modifier.PUBLIC,
+		modifier = Modifier.PUBLIC,
 		annotationMappings = {
-				@AnnotationMapping(
-						targetAnnotation = JapkitWebScaffold.class,
-						mode = AnnotationMappingMode.MERGE,
-						valueMappings = {
-								@AVMapping(name = "propertyNames",
-										mode = AVMappingMode.IGNORE,
-										expr = "viewProperties.collect{it.name}",
-										lang = "GroovyScript"),
-						}),
+				@AnnotationMapping(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMappingMode.MERGE,
+						valueMappings = { @AVMapping(name = "propertyNames", mode = AVMappingMode.IGNORE,
+								expr = "viewProperties.collect{it.name}", lang = "GroovyScript"), }),
 				@AnnotationMapping(targetAnnotation = Controller.class),
-				@AnnotationMapping(targetAnnotation = RequestMapping.class,
-						valueMappings = @AVMapping(name = "value", expr = "/#{path}")) },
+				@AnnotationMapping(targetAnnotation = RequestMapping.class, valueMappings = @AVMapping(name = "value", expr = "/#{path}")) },
 		members = {
 				@Members(ControllerMembers.class),
-				@Members(activation = @Matcher(condition = "#{entityAnnotation.activeRecord}"),
-						value = ControllerMembersActiveRecord.class),
+				@Members(activation = @Matcher(condition = "#{entityAnnotation.activeRecord}"), value = ControllerMembersActiveRecord.class),
 				@Members(activation = @Matcher(condition = "#{repository != null && !entityAnnotation.activeRecord}"),
-						value = ControllerMembersJpaRepository.class)
-		})
+						value = ControllerMembersJpaRepository.class) })
 @ResourceTemplate.List({
-		@ResourceTemplate(templateLang = "GStringTemplate",
-				templateName = "createOrUpdate.jspx",
-				pathExpr = "views/#{path}",
-				nameExpr = "create.jspx", location = ResourceLocation.WEBINF,
-				vars = @Var(name = "update", expr = "#{false}")),
-		@ResourceTemplate(templateLang = "GStringTemplate",
-				templateName = "createOrUpdate.jspx",
-				pathExpr = "views/#{path}",
-				nameExpr = "update.jspx", location = ResourceLocation.WEBINF,
-				vars = @Var(name = "update", expr = "#{true}")),
-		@ResourceTemplate(templateLang = "GStringTemplate",
-				templateName = "show.jspx", location = ResourceLocation.WEBINF,
+		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
+				nameExpr = "create.jspx", location = ResourceLocation.WEBINF, vars = @Var(name = "update", expr = "#{false}")),
+		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
+				nameExpr = "update.jspx", location = ResourceLocation.WEBINF, vars = @Var(name = "update", expr = "#{true}")),
+		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "show.jspx", location = ResourceLocation.WEBINF,
 				pathExpr = "views/#{path}"),
-		@ResourceTemplate(templateLang = "GStringTemplate",
-				templateName = "list.jspx", location = ResourceLocation.WEBINF,
-				pathExpr = "views/#{path}")
-})
+		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "list.jspx", location = ResourceLocation.WEBINF,
+				pathExpr = "views/#{path}") })
 public @interface JapkitWebScaffold {
 
 	boolean shadow() default false;
