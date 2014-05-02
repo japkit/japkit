@@ -2,6 +2,7 @@ package de.stefanocke.japkit.metaannotations;
 
 import java.lang.annotation.Annotation;
 
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
 /**
@@ -21,6 +22,12 @@ public @interface Matcher {
 	 * @return the modifiers
 	 */
 	Modifier[] srcModifiers() default {};
+	
+	/**
+	 * If non-empty, the element must have one of the given kinds to match.
+	 * @return
+	 */
+	ElementKind[] srcKind() default {};
 
 	/**
 	 * All of those annotations must be present on the source element for the

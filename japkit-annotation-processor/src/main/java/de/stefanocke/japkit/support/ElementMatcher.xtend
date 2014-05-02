@@ -8,6 +8,8 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
+import javax.lang.model.element.ElementKind
+import java.util.Set
 
 @Data
 class ElementMatcher {
@@ -18,6 +20,7 @@ class ElementMatcher {
 	val extension TypesExtensions typesExtensions = ExtensionRegistry.get(TypesExtensions)
 
 	Modifier[] srcModifiers
+	Set<ElementKind> srcKind
 	DeclaredType[] srcAnnotations
 	DeclaredType[] srcAnnotationsNot
 	DeclaredType[] enclosingAnnotations
@@ -50,6 +53,7 @@ class ElementMatcher {
 
 		//messager.printMessage(Kind.OTHER, '''Element «ve.simpleName». SrcAnnotations: «ve.annotationMirrors.map[fqn]» «allSrcAnnotationsArePresent(ve)» «srcType» «ve.asType.isSubtype(srcType)»''')
 		val result = e.hasAllModifiers(srcModifiers)
+		&& e.hasAnyKind(srcKind)
 		&& e.hasAllAnnotations(srcAnnotations)
 		&& e.hasNotAnnotations(srcAnnotationsNot)
 		&& e.enclosingElement.hasAllAnnotations(enclosingAnnotations)
@@ -76,6 +80,10 @@ class ElementMatcher {
 		}
 		
 		result
+	}
+	
+	def boolean hasAnyKind(Element element, ElementKind[] kinds){
+		kinds.nullOrEmpty || kinds.contains(element.kind) 
 	}
 	
 	
@@ -162,6 +170,7 @@ class ElementMatcher {
 	
 	new(AnnotationMirror am) {
 		_srcModifiers = am.value("srcModifiers", typeof(Modifier[]))
+		_srcKind = am.value("srcKind", typeof(ElementKind[]))?.toSet
 		_srcAnnotations = am.value("srcAnnotations", typeof(DeclaredType[]))
 		_srcAnnotationsNot = am.value("srcAnnotationsNot", typeof(DeclaredType[]))
 		_enclosingAnnotations = am.value("enclosingAnnotations", typeof(DeclaredType[]))
