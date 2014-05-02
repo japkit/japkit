@@ -5,8 +5,8 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <form:create id="fc_de_stefanocke_japkit_roo_quickstart_timer3" modelAttribute="timer" path="/timers3" render="${empty dependencies}" z="0">
-    <field:input field="bar" id="c_de_stefanocke_japkit_roo_quickstart_timer3_bar" required="false" z="0"/>
-    <field:input field="foo" id="c_de_stefanocke_japkit_roo_quickstart_timer3_foo" required="true" z="0"/>
+    <field:input field="bar" id="c_de_stefanocke_japkit_roo_quickstart_timer3_bar" required="false"  z="0"/>
+    <field:input field="foo" id="c_de_stefanocke_japkit_roo_quickstart_timer3_foo" required="true"  z="0"/>
     
     </form:create>
     <form:dependency dependencies="${dependencies}" id="d_de_stefanocke_japkit_roo_quickstart_timer3" render="${not empty dependencies}" z="0"/>
