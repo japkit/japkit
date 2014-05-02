@@ -28,8 +28,8 @@ public class Timer2Def {
 	String message;
 
 	String message2;
-	
+
 	boolean someBoolean;
-	
+
 	Date someDate;
 }

@@ -5,5 +5,5 @@ import de.stefanocke.japkit.roo.petclinic.domain.Owner;
 
 @JapkitWebScaffold(formBackingObject = Owner.class)
 public class OwnerControllerDef {
-	
+
 }

@@ -9,13 +9,11 @@ import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 
-@Template(vars = @Var(name = "toStringProperties",
-		propertyFilter = @Properties(sourceClass = GeneratedClass.class)))
+@Template(vars = @Var(name = "toStringProperties", propertyFilter = @Properties(sourceClass = GeneratedClass.class)))
 public abstract class ToString {
 	@Method(imports = { ToStringBuilder.class, ToStringStyle.class },
-			bodyExpr = "return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).\n" +
-					"<%toStringProperties.each{%>append(\"${it.simpleName}\", ${it.getter.simpleName}()).\n<%}%>" +
-					"toString();\n",
+			bodyExpr = "return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).\n"
+					+ "<%toStringProperties.each{%>append(\"${it.simpleName}\", ${it.getter.simpleName}()).\n<%}%>" + "toString();\n",
 			bodyLang = "GStringTemplateInline")
 	public abstract String toString();
 }

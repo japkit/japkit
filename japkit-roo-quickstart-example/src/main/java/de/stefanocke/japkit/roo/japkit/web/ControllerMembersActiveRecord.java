@@ -20,8 +20,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * de.stefanocke.japkit.roo.japkit.CrudOperations#remove(java.lang.Long)
 	 */
 	@Override
-	@Method(bodyExpr = "#{ec.typeRef(fbo)} fbo = #{ec.typeRef(fbo)}.find#{fboName}(id);\n"
-			+ "fbo.remove();\n")
+	@Method(bodyExpr = "#{ec.typeRef(fbo)} fbo = #{ec.typeRef(fbo)}.find#{fboName}(id);\n" + "fbo.remove();\n")
 	@ParamNames("id")
 	public abstract void remove(Long id);
 
@@ -90,7 +89,6 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	@Override
 	@Method(bodyExpr = "return #{ec.typeRef(fbo)}.find#{fboName}Entries(firstResult, maxResults, sortFieldName, sortOrder);")
 	@ParamNames({ "firstResult", "maxResults", "sortFieldName", "sortOrder" })
-	public abstract List<FormBackingObject> findEntries(Integer firstResult, Integer maxResults, String sortFieldName,
-			String sortOrder);
+	public abstract List<FormBackingObject> findEntries(Integer firstResult, Integer maxResults, String sortFieldName, String sortOrder);
 
 }

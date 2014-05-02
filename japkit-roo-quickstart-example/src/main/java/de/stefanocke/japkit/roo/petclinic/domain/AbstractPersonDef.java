@@ -12,8 +12,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 
-@JapkitEntity(// TODO: Das ist etwas hässlich. Ggf. isAbstract AV. o.ä. Oder modifiers per EL "berechnen"
-		//modifier = { Modifier.PUBLIC, Modifier.ABSTRACT } 
+@JapkitEntity(// TODO: Das ist etwas hässlich. Ggf. isAbstract AV. o.ä. Oder
+				// modifiers per EL "berechnen"
+// modifier = { Modifier.PUBLIC, Modifier.ABSTRACT }
 )
 public abstract class AbstractPersonDef {
 

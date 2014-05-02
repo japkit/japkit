@@ -11,31 +11,31 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 @JapkitEntity
 public class PetDef {
 
-    /**
+	/**
      */
-    @NotNull
-    private boolean sendReminders;
+	@NotNull
+	private boolean sendReminders;
 
-    /**
+	/**
      */
-    @NotNull
-    @Size(min = 1)
-    private String name;
+	@NotNull
+	@Size(min = 1)
+	private String name;
 
-    /**
+	/**
      */
-    @NotNull
-    @Min(0L)
-    private Float weight;
+	@NotNull
+	@Min(0L)
+	private Float weight;
 
-    /**
+	/**
      */
-    @ManyToOne
-    private Owner owner;
+	@ManyToOne
+	private Owner owner;
 
-    /**
+	/**
      */
-    @NotNull
-    @Enumerated
-    private PetType type;
+	@NotNull
+	@Enumerated
+	private PetType type;
 }

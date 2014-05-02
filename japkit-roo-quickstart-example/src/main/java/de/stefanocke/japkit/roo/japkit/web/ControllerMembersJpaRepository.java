@@ -10,14 +10,12 @@ import de.stefanocke.japkit.roo.base.web.RepositoryAdapter;
 
 @Template
 public abstract class ControllerMembersJpaRepository {
-	
+
 	@Field()
-    @Autowired
-    private Repository repository;
-	
-	@Method(imports=RepositoryAdapter.class,			
-			bodyExpr="return new RepositoryAdapter<#{ec.typeRef(fbo)}>(repository);")
+	@Autowired
+	private Repository repository;
+
+	@Method(imports = RepositoryAdapter.class, bodyExpr = "return new RepositoryAdapter<#{ec.typeRef(fbo)}>(repository);")
 	protected abstract CrudOperations<FormBackingObject> crudOperations();
 
-	
 }

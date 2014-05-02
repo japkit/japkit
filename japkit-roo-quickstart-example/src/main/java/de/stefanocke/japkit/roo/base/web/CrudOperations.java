@@ -16,7 +16,6 @@ public interface CrudOperations<T> {
 
 	public abstract List<T> findAll(String sortFieldName, String sortOrder);
 
-	public abstract List<T> findEntries(Integer firstResult, Integer maxResults, String sortFieldName,
-			String sortOrder);
+	public abstract List<T> findEntries(Integer firstResult, Integer maxResults, String sortFieldName, String sortOrder);
 
 }

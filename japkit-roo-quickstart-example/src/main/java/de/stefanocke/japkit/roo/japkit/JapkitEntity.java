@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.roo.japkit;
 
-
 import javax.lang.model.element.Modifier;
 import javax.persistence.Entity;
 
@@ -14,34 +13,30 @@ import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 
-@GenerateClass(classSuffixToRemove = "Def", classSuffixToAppend = "",
-		modifier = Modifier.PUBLIC,
-		annotationMappings = { @AnnotationMapping(targetAnnotation = Entity.class) },
-		superclass = SuperclassSelector.class,
-		//Funzt zur zeit nicht für EXPR class selectors.
-		transformRelatesTypesAccordingToGenClassAnnotation=true,
-		members = {
-				@Members(IdAndVersion.class),
-				@Members,
+@GenerateClass(classSuffixToRemove = "Def", classSuffixToAppend = "", modifier = Modifier.PUBLIC,
+		annotationMappings = { @AnnotationMapping(targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class,
+		// Funzt zur zeit nicht für EXPR class selectors.
+		transformRelatesTypesAccordingToGenClassAnnotation = true, members = { @Members(IdAndVersion.class), @Members,
 				@Members(ToString.class),
-				@Members(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"),
-						value = ActiveRecordMembers.class) })
-@Properties(sourceClass = AnnotatedClass.class, fromFields = true,
-		annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = {
-				"javax.persistence", "javax.validation.constraints", "org.springframework.format.annotation" })
-		/*,templates = PropertyTemplateTest.class*/)
+				@Members(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"), value = ActiveRecordMembers.class) })
+@Properties(sourceClass = AnnotatedClass.class, fromFields = true, annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = {
+		"javax.persistence", "javax.validation.constraints", "org.springframework.format.annotation" })
+/* ,templates = PropertyTemplateTest.class */)
 public @interface JapkitEntity {
-	//Modifier[] modifier() default {};
-	
+	// Modifier[] modifier() default {};
+
 	boolean shadow() default false;
 
 	boolean activeRecord() default false;
 
 	boolean customBehavior() default false;
-	
-	//TODO: Es sollte möglich sein, direkt am Selektor anzugeben, dass das Ergebnis gemäß einer GenClass-Annotation aufgelöst werden soll.
-	//dabei kann man dann auch noch die in frage kommenden Trigger-Annotationen angeben.
-	@ClassSelector(kind=ClassSelectorKind.EXPR, expr="#{currentAnnotatedClass.superclass}")
-	static class SuperclassSelector{};
+
+	// TODO: Es sollte möglich sein, direkt am Selektor anzugeben, dass das
+	// Ergebnis gemäß einer GenClass-Annotation aufgelöst werden soll.
+	// dabei kann man dann auch noch die in frage kommenden Trigger-Annotationen
+	// angeben.
+	@ClassSelector(kind = ClassSelectorKind.EXPR, expr = "#{currentAnnotatedClass.superclass}")
+	static class SuperclassSelector {
+	};
 
 }

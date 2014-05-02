@@ -6,17 +6,17 @@ import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 
-@Template(vars=@Var(expr = "#{element.name.toFirstUpper}", name = "propertyName"))
+@Template(vars = @Var(expr = "#{element.name.toFirstUpper}", name = "propertyName"))
 public class PropertyTemplateTest {
-	@Method(nameExpr="add#{propertyName}")
+	@Method(nameExpr = "add#{propertyName}")
 	@ParamNames("e")
-	void add(SrcElementType e){
-		
+	void add(SrcElementType e) {
+
 	}
-	
-	@Method(nameExpr="remove#{propertyName}")
+
+	@Method(nameExpr = "remove#{propertyName}")
 	@ParamNames("e")
-	void remove(SrcElementType e){
-		
+	void remove(SrcElementType e) {
+
 	}
 }

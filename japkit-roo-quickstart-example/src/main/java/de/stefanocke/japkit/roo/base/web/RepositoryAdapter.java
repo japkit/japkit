@@ -58,7 +58,7 @@ public class RepositoryAdapter<T> implements CrudOperations<T> {
 		if (sortFieldName != null) {
 			sort = new Sort(Direction.fromStringOrNull(sortOrder), sortFieldName);
 		}
-			
+
 		Pageable pageable = new PageRequest(firstResult / maxResults, maxResults, sort);
 		return repository.findAll(pageable).getContent();
 	}

@@ -1,4 +1,5 @@
 package de.stefanocke.japkit.roo.petclinic.domain;
+
 import java.util.Calendar;
 
 import javax.persistence.Enumerated;
@@ -14,16 +15,16 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 @JapkitEntity
 public abstract class VetDef extends AbstractPerson {
 
-    /**
+	/**
      */
-    @NotNull
-    @Past
-    @Temporal(TemporalType.TIMESTAMP)
-    @DateTimeFormat(style = "M-")
-    private Calendar employedSince;
+	@NotNull
+	@Past
+	@Temporal(TemporalType.TIMESTAMP)
+	@DateTimeFormat(style = "M-")
+	private Calendar employedSince;
 
-    /**
+	/**
      */
-    @Enumerated
-    private Specialty specialty;
+	@Enumerated
+	private Specialty specialty;
 }

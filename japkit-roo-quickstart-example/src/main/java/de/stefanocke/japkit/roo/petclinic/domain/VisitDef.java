@@ -1,4 +1,5 @@
 package de.stefanocke.japkit.roo.petclinic.domain;
+
 import java.util.Date;
 
 import javax.persistence.ManyToOne;
@@ -15,27 +16,27 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 @JapkitEntity
 public class VisitDef {
 
-    /**
+	/**
      */
-    @Size(max = 255)
-    private String description;
+	@Size(max = 255)
+	private String description;
 
-    /**
+	/**
      */
-    @NotNull
-    @Past
-    @Temporal(TemporalType.TIMESTAMP)
-    @DateTimeFormat(style = "M-")
-    private Date visitDate;
+	@NotNull
+	@Past
+	@Temporal(TemporalType.TIMESTAMP)
+	@DateTimeFormat(style = "M-")
+	private Date visitDate;
 
-    /**
+	/**
      */
-    @NotNull
-    @ManyToOne
-    private Pet pet;
+	@NotNull
+	@ManyToOne
+	private Pet pet;
 
-    /**
+	/**
      */
-    @ManyToOne
-    private Vet vet;
+	@ManyToOne
+	private Vet vet;
 }
