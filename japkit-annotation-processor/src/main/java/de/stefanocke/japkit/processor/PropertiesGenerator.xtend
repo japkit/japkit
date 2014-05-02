@@ -110,7 +110,7 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 		propertiesToGenerate.forEach [ p |
 			val ruleSourceElement = p.getSourceElement(ruleSource)
 			
-			val overrideElement = overrideElementsByName.get[p.name]
+			val overrideElement = overrideElementsByName.get(p.name)
 			
 			//TODO: Javadoc
 			if (createNameConstants) {

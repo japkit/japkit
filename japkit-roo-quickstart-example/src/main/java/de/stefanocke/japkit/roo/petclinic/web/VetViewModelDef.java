@@ -8,7 +8,7 @@ import de.stefanocke.japkit.roo.petclinic.domain.Vet;
 @ViewModel(formBackingObject = Vet.class)
 public class VetViewModelDef {
 
-	@Size(max = 20, min = 3)
+	@Size(max = 10, min = 3)
 	String lastName;
 	
 	//boolean nonExistingProperty;

@@ -19,6 +19,7 @@ import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 
+@Template
 public abstract class ControllerMembers {
 	@Method(imports = ControllerUtil.class, bodyExpr = "if (bindingResult.hasErrors()) {\n" + "\tpopulateEditForm(uiModel, fbo);\n"
 			+ "\treturn \"#{path}/create\";\n" + "}\n" + "uiModel.asMap().clear();\n" + "crudOperations().persist(fbo);\n"

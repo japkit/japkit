@@ -43,8 +43,12 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 				setInShadowAnnotation = true),
 		@Var(name = "fboShortId", triggerAV = "shortId", expr = "#{fboName.toLowerCase()}", setInShadowAnnotation = true),
 
+		@Var(name = "viewModel", triggerAV = "viewModel", typeQuery = @TypeQuery(
+				annotation = ViewModel.class, shadow = true, unique = true, filterAV = "formBackingObject", inExpr = "#{fbo}"),
+				setInShadowAnnotation = true),
+		
 		// The properties to show
-		@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = FormBackingObject.class, includeRules = @Matcher(
+		@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = ViewModelSelector.class, includeRules = @Matcher(
 				srcAnnotationsNot = { Id.class, Version.class }))),
 
 		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository", typeQuery = @TypeQuery(
@@ -97,6 +101,8 @@ public @interface JapkitWebScaffold {
 	 * form backing object defined here class will be exposed in a RESTful way.
 	 */
 	Class<?> formBackingObject();
+	
+	Class<?>[] viewModel() default {};
 
 	/**
 	 * All view-related artifacts for a specific controller are stored in a
