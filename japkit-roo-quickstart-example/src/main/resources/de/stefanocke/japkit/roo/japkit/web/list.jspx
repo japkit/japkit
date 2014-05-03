@@ -7,8 +7,8 @@
          <%viewProperties.each {
         	 //Code duplication with show.jspx!
         	 def attrMap = [:]	
-    			    if(isDatetime.eval(it)){
-    			    	attrMap.dateTimePattern= "\${${dtfModelAttr.eval(it)}}"
+    			    if(it.isDatetime){
+    			    	attrMap.dateTimePattern= "\${${it.dtfModelAttr}}"
     			    	if(it.hasType('java.util.Date')){
     			    		attrMap.date = true
     			    	} else if(it.hasType('java.util.Calendar')) {

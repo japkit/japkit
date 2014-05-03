@@ -124,6 +124,20 @@ class ElExtensions {
 		am.annotationValuesByNameUnwrapped.apply(avName)
 	}
 	
+	/**
+	 * Allows to apply functions on the values stack like this: element.functionName
+	 */
+	def static get(Element e, String functionName) {
+		val function = context.get(functionName)
+		if(function != null && function instanceof ELVariableRule){
+			(function as ELVariableRule).eval(e)
+		} else {
+			//TODO: Prop Not Found Exception to allow default resolving?
+			//Mit Groovy scheint das zu funktionieren, da die get Methode anscheinden die letzte ist, die aufgerufen wird
+			throw new IllegalArgumentException('''No function with name «functionName» is on values stack and there is also no other property of element «e» with this name.''')
+		}
+	}
+	
 	//TODO: ggf. aus der Properties-Annotation einen "PropertyFilter" herauslösen und allgemein verfügbar machen...
 	def static getProperties(TypeElement e){
 		val extension JavaBeansExtensions = get(JavaBeansExtensions)
