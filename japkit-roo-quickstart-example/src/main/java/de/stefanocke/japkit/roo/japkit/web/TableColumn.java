@@ -5,6 +5,6 @@ package de.stefanocke.japkit.roo.japkit.web;
  * @author stefan
  *
  */
-public @interface ShowInTable {
-
+public @interface TableColumn {
+	boolean sortable() default true; 
 }
