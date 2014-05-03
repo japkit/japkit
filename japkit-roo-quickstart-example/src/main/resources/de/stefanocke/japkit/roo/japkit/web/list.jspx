@@ -15,8 +15,9 @@
     			    		attrMap.calendar = true
     			    	}
     			    }
-    			    def attr = attrMap.collect{"$it.key=\"$it.value\""}.join(' ')
-    	 %>  <table:column id="c_${fboFqnId}_${it.name}" property="${it.name}" <%=attr%> z="0"/> <!-- TODO: sort -->
+        	 		attrMap.sort = it.columnAnnotation?.sortable
+    			    def attr = attrMap.findAll{it.value!=null}.collect{"$it.key=\"$it.value\""}.join(' ')
+    	 %>  <table:column id="c_${fboFqnId}_${it.name}" property="${it.name}" <%=attr%> z="0"/> 
          <%}%>
         </table:table>
     </page:list>
