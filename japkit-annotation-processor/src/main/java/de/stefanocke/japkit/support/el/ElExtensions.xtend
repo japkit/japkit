@@ -127,15 +127,19 @@ class ElExtensions {
 	/**
 	 * Allows to apply functions on the values stack like this: element.functionName
 	 */
-	def static get(Element e, String functionName) {
+	def static get(Element e, String functionName,  Map<String, Object> context) {
 		val function = context.get(functionName)
-		if(function != null && function instanceof ELVariableRule){
+		if(function != null && function instanceof ELVariableRule && (function as ELVariableRule).isFunction){
 			(function as ELVariableRule).eval(e)
 		} else {
 			//TODO: Prop Not Found Exception to allow default resolving?
 			//Mit Groovy scheint das zu funktionieren, da die get Methode anscheinden die letzte ist, die aufgerufen wird
-			throw new IllegalArgumentException('''No function with name «functionName» is on values stack and there is also no other property of element «e» with this name.''')
+			throw new ELPropertyNotFoundException('''No function with name «functionName» is on values stack and there is also no other property of element «e» with this name.''')
 		}
+	}
+	
+	def static get(Element e, String functionName) {
+		get(e, functionName, context)
 	}
 	
 	//TODO: ggf. aus der Properties-Annotation einen "PropertyFilter" herauslösen und allgemein verfügbar machen...
@@ -183,6 +187,8 @@ class ElExtensions {
 		elExtensions.registerGetProperty(Function1, [context, closure, propertyName|closure.get(propertyName)])
 
 		elExtensions.registerGetProperty(AnnotationMirror, [context, am, avName|am.get(avName)])
+		
+		elExtensions.registerGetProperty(Element, [context, e, functionName|e.get(functionName, context)])
 
 		elExtensions.registerProperty(String, "asType", [context, qualName| qualName.getAsType(context)])
 

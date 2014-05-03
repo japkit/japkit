@@ -64,7 +64,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		@Var(name = "isRequired", isFunction = true, matcher = @Matcher(srcAnnotations = NotNull.class)),
 		@Var(name = "isPast", isFunction = true, matcher = @Matcher(srcAnnotations = Past.class)),
 		@Var(name = "patternAnnotation", isFunction = true, annotation=Pattern.class),
-		@Var(name = "regexp", isFunction = true, expr = "#{patternAnnotation.eval(element).regexp}"),
+		@Var(name = "regexp", isFunction = true, expr = "#{element.patternAnnotation.regexp}"),
 		// The view properties that have a date or time type
 		@Var(name = "datetimeProperties", expr = "#{isDatetime.filter(viewProperties)}"),
 		@Var(name = "hasDatetimeProperties", expr = "#{!datetimeProperties.isEmpty()}"),
