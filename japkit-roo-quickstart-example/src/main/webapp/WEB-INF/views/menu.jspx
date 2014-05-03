@@ -24,15 +24,5 @@
             <menu:item id="i_vet_list" messageCode="global_menu_list" url="/vets?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
         </menu:category>
         
-        <menu:category id="c_timer3" z="0">
-            <menu:item id="i_timer3_new" messageCode="global_menu_new" url="/timers3?form" z="0"/>
-            <menu:item id="i_timer3_list" messageCode="global_menu_list" url="/timers3?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
-        </menu:category>
-        
-        <menu:category id="c_timer2" z="0">
-            <menu:item id="i_timer2_new" messageCode="global_menu_new" url="/timers2?form" z="0"/>
-            <menu:item id="i_timer2_list" messageCode="global_menu_list" url="/timers2?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
-        </menu:category>
-        
     </menu:menu>
 </div>
