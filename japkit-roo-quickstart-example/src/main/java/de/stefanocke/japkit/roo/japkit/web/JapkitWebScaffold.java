@@ -52,6 +52,8 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		// The properties to show
 		@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = ViewModelSelector.class, includeRules = @Matcher(
 				srcAnnotationsNot = { Id.class, Version.class }))),
+		@Var(name = "explicitTableProperties", expr = "#{viewProperties}", matcher=@Matcher(srcAnnotations=ShowInTable.class)),
+		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
 
 		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository", typeQuery = @TypeQuery(
 				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{fbo}"),

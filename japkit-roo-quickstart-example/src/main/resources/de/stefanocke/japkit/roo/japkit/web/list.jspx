@@ -4,7 +4,7 @@
     <jsp:output omit-xml-declaration="yes"/>
     <page:list id="pl_${fboFqnId}" items="\${${modelAttribute}s}" z="0">
         <table:table data="\${${modelAttribute}s}" id="l_${fboFqnId}" path="/${path}" z="0">
-         <%viewProperties.each {
+         <%tableProperties.each {
         	 //Code duplication with show.jspx!
         	 def attrMap = [:]	
     			    if(it.isDatetime){
