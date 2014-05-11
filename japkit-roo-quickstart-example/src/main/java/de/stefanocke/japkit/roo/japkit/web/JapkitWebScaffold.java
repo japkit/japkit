@@ -8,7 +8,6 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -18,7 +17,6 @@ import de.stefanocke.japkit.metaannotations.AVMapping;
 import de.stefanocke.japkit.metaannotations.AVMappingMode;
 import de.stefanocke.japkit.metaannotations.AnnotationMapping;
 import de.stefanocke.japkit.metaannotations.AnnotationMappingMode;
-import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.GenerateClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Members;
@@ -27,6 +25,7 @@ import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
 import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
+import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 
@@ -78,6 +77,8 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 @GenerateClass(
 		classSuffixToRemove = "Def",
 		classSuffixToAppend = "",
+		superclassTypeArgs=FormBackingObject.class,
+		
 		modifier = Modifier.PUBLIC,
 		annotationMappings = {
 				@AnnotationMapping(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMappingMode.MERGE,
@@ -89,7 +90,9 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 				@Members(ControllerMembers.class),
 				@Members(activation = @Matcher(condition = "#{entityAnnotation.activeRecord}"), value = ControllerMembersActiveRecord.class),
 				@Members(activation = @Matcher(condition = "#{repository != null && !entityAnnotation.activeRecord}"),
-						value = ControllerMembersJpaRepository.class) })
+						value = ControllerMembersJpaRepository.class) ,
+						@Members(ControllerConverterProviderMembers.class)
+				})
 @ResourceTemplate.List({
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
 				nameExpr = "create.jspx", location = ResourceLocation.WEBINF, vars = @Var(name = "update", expr = "#{false}")),
