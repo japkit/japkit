@@ -55,10 +55,6 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
 		@Var(name = "columnAnnotation", isFunction=true, annotation = TableColumn.class),
 
-		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository", typeQuery = @TypeQuery(
-				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{fbo}"),
-				setInShadowAnnotation = true),
-
 		// Some matchers for categorize properties
 		@Var(name = "isDatetime", isFunction = true, matcher = @Matcher(srcSingleValueTypeCategory = TypeCategory.TEMPORAL)),
 		@Var(name = "isBoolean", isFunction = true, matcher = @Matcher(srcSingleValueType = boolean.class)),
@@ -71,7 +67,18 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		@Var(name = "datetimeProperties", expr = "#{isDatetime.filter(viewProperties)}"),
 		@Var(name = "hasDatetimeProperties", expr = "#{!datetimeProperties.isEmpty()}"),
 		@Var(name = "enumProperties", expr = "#{isEnum.filter(viewProperties)}"),
-		@Var(name = "dtfModelAttr", isFunction = true, expr = "#{fboShortId}_#{element.name.toLowerCase()}_date_format")
+		@Var(name = "dtfModelAttr", isFunction = true, expr = "#{fboShortId}_#{element.name.toLowerCase()}_date_format"),
+		
+		@Var(name = "isEntity", isFunction = true,  matcher = @Matcher(srcSingleValueTypeAnnotations = JapkitEntity.class)),
+		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
+		@Var(name = "relatedEntities", expr = "entityProperties.collect{it.singleValueType.asElement()}", lang="GroovyScript"),
+		
+		//TODO: Etwas unschön, dass bei functions nur Element als Parameter erlaubt ist. Zumindest noch Type zulassen, wenn schon nicht Object.
+		@Var(name = "findRepository", isFunction = true, typeQuery = @TypeQuery(
+				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{element.asType()}")),
+				
+		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository", expr="#{fboElement.findRepository}",
+				setInShadowAnnotation = true),
 
 })
 @GenerateClass(
@@ -89,9 +96,8 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		members = {
 				@Members(ControllerMembers.class),
 				@Members(activation = @Matcher(condition = "#{entityAnnotation.activeRecord}"), value = ControllerMembersActiveRecord.class),
-				@Members(activation = @Matcher(condition = "#{repository != null && !entityAnnotation.activeRecord}"),
-						value = ControllerMembersJpaRepository.class) ,
-						@Members(ControllerConverterProviderMembers.class)
+				@Members(ControllerMembersJpaRepository.class) ,
+				@Members(ControllerConverterProviderMembers.class)
 				})
 @ResourceTemplate.List({
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",

@@ -1,6 +1,7 @@
 package de.stefanocke.japkit.roo.japkit.web;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -47,7 +48,13 @@ public abstract class ControllerMembers {
 			bodyExpr = "<%enumProperties.each{%>uiModel.addAttribute(\"${it.name}s\", Arrays.asList(${ec.typeRef(it.type)}.values()));\n<%}%>",
 			bodyLang = "GStringTemplateInline")
 	@ParamNames("uiModel")
-	abstract void addEnums(Model uiModel);
+	abstract void addEnumChoices(Model uiModel);
+	
+	@Method(// TODO: Eigentlich singleValueType.
+			bodyExpr = "<%entityProperties.each{%>uiModel.addAttribute(\"${it.name}Choices\", get${it.name.toFirstUpper}Choices());\n<%}%>",
+			bodyLang = "GStringTemplateInline")
+	@ParamNames("uiModel")
+	abstract void addEntityChoices(Model uiModel);
 
 	// TODO: Help with escaping here.
 	@Method(bodyExpr = "populateEditForm(uiModel, new ${ec.typeRef(fbo)}());\\n" + "return \\\"${path}/create\\\";", bodyLang = "GString")
@@ -100,7 +107,7 @@ public abstract class ControllerMembers {
 
 	// TODO: Conditional calls to addDateTimeFormatPatterns?
 	@Method(bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", fbo);\n" + "addDateTimeFormatPatterns(uiModel);\n"
-			+ "addEnums(uiModel);\n")
+			+ "addEnumChoices(uiModel);\n")
 	@ParamNames({ "uiModel", "fbo" })
 	abstract void populateEditForm(Model uiModel, FormBackingObject fbo);
 
