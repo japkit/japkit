@@ -5,8 +5,8 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <form:update id="fu_de_stefanocke_japkit_roo_petclinic_domain_owner" modelAttribute="owner" path="/owners" versionField="Version" z="0">
-  	<field:input field="pets" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_pets" required="false"  z="0"/>
-    <field:input field="address" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_address" required="true"  z="0"/>
+  	<field:select field="pets" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_pets" itemValue="id" items="${petsChoices}" path="petss" required="false" z="0"/>
+     	<field:input field="address" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_address" required="true"  z="0"/>
     <field:datetime field="birthDay" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_birthDay" dateTimePattern="${owner_birthday_date_format}" past="false" required="true" z="0"/>
         <field:input field="city" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_city" required="true"  z="0"/>
     <field:input field="email" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_email" required="false"  z="0"/>

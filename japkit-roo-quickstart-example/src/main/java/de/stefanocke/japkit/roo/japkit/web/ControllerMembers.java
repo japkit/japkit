@@ -107,7 +107,9 @@ public abstract class ControllerMembers {
 
 	// TODO: Conditional calls to addDateTimeFormatPatterns?
 	@Method(bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", fbo);\n" + "addDateTimeFormatPatterns(uiModel);\n"
-			+ "addEnumChoices(uiModel);\n")
+			+ "addEnumChoices(uiModel);\n"
+			+ "addEntityChoices(uiModel);\n"
+			)
 	@ParamNames({ "uiModel", "fbo" })
 	abstract void populateEditForm(Model uiModel, FormBackingObject fbo);
 

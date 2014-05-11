@@ -12,16 +12,14 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.base.web.CrudOperations;
 import de.stefanocke.japkit.roo.base.web.RepositoryAdapter;
 
-@Template(vars = {
-		@Var(name = "useFboRepository", matcher = @Matcher(condition = "#{repository != null && !entityAnnotation.activeRecord}")),
-		@Var(name = "relatedEntitiesWithJpaRepositories",
-				expr = "relatedEntities.collectEntries{it->[it, it.findRepository]}.findAll{it.value!=null}", lang = "GroovyScript"),
-		@Var(name = "entityPropertiesWithJpaRepositories",
-				expr = "entityProperties.collectEntries{p -> [p, " +
-						"relatedEntitiesWithJpaRepositories[p.singleValueType.asElement()]" +
-						"]}.findAll{it.value!=null}", lang = "GroovyScript")
-				})
-				
+@Template(
+		vars = {
+				@Var(name = "useFboRepository", matcher = @Matcher(condition = "#{repository != null && !entityAnnotation.activeRecord}")),
+				@Var(name = "relatedEntitiesWithJpaRepositories",
+						expr = "relatedEntities.collectEntries{it->[it, it.findRepository]}.findAll{it.value!=null}", lang = "GroovyScript"),
+				@Var(name = "entityPropertiesWithJpaRepositories", expr = "entityProperties.collectEntries{p -> [p, "
+						+ "relatedEntitiesWithJpaRepositories[p.singleValueType.asElement()]" + "]}.findAll{it.value!=null}",
+						lang = "GroovyScript") })
 public abstract class ControllerMembersJpaRepository {
 
 	@Field(activation = @Matcher(condition = "#{useFboRepository}"))
@@ -37,10 +35,10 @@ public abstract class ControllerMembersJpaRepository {
 			bodyExpr = "return new RepositoryAdapter<#{ec.typeRef(fbo)}>(repository);")
 	protected abstract CrudOperations<FormBackingObject> crudOperations();
 
-	@Method(iterator = "#{entityPropertiesWithJpaRepositories.keySet()}", 
-			nameExpr = "get#{element.name.toFirstUpper}Choices", 
-			vars = @Var(name = "relatedEntity", expr = "#{element.singleValueType}"),
-			bodyExpr = "return null;")
+	@Method(iterator = "#{entityPropertiesWithJpaRepositories.keySet()}", nameExpr = "get#{element.name.toFirstUpper}Choices", vars = {
+			@Var(name = "relatedEntity", expr = "#{element.singleValueType}"),
+			@Var(name = "relatedEntityRepositoryName", expr = "#{relatedEntity.asElement.simpleName.toFirstLower}Repository") },
+			bodyExpr = "return #{relatedEntityRepositoryName}.findAll();")
 	protected abstract List<RelatedEntity> getEntityChoices();
 
 }

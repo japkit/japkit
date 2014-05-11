@@ -6,8 +6,8 @@
     <jsp:output omit-xml-declaration="yes"/>
     <form:create id="fc_de_stefanocke_japkit_roo_petclinic_domain_pet" modelAttribute="pet" path="/pets" render="${empty dependencies}" z="0">
     <field:input field="name" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_name" required="true"  z="0"/>
-    <field:input field="owner" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_owner" required="false"  z="0"/>
-    <field:checkbox field="sendReminders" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_sendReminders"  z="0"/>
+    <field:select field="owner" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_owner" itemValue="id" items="${ownerChoices}" path="owners" required="false" z="0"/>
+     	<field:checkbox field="sendReminders" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_sendReminders"  z="0"/>
     	<field:select field="type" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_type" items="${types}" path="types" required="true" z="0"/>
      	<field:input field="weight" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_weight" required="true"  z="0"/>
     

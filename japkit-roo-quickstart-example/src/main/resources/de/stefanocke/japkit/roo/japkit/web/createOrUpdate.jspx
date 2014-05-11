@@ -24,6 +24,8 @@
         %><field:datetime field="${it.name}" id="c_${fboFqnId}_${it.name}" dateTimePattern="\${$dtf}" past="${past}" required="${required}" z="0"/>
         <%} else if(it.isEnum){
      	%><field:select field="${it.name}" id="c_${fboFqnId}_${it.name}" items="\${${it.name}s}" path="${it.name}s" required="${required}" z="0"/>
+     	<%} else if(it.isEntity){
+     	%><field:select field="${it.name}" id="c_${fboFqnId}_${it.name}" itemValue="id" items="\${${it.name}Choices}" path="${it.name}s" required="${required}" z="0"/>
      	<%} else {
     	%><field:input field="${it.name}" id="c_${fboFqnId}_${it.name}" required="${required}" <%=attr%> z="0"/>
     <%	}

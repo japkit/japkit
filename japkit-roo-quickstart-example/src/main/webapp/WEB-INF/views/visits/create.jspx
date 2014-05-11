@@ -6,9 +6,9 @@
     <jsp:output omit-xml-declaration="yes"/>
     <form:create id="fc_de_stefanocke_japkit_roo_petclinic_domain_visit" modelAttribute="visit" path="/visits" render="${empty dependencies}" z="0">
     <field:input field="description" id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_description" required="false"  z="0"/>
-    <field:input field="pet" id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_pet" required="true"  z="0"/>
-    <field:input field="vet" id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_vet" required="false"  z="0"/>
-    <field:datetime field="visitDate" id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_visitDate" dateTimePattern="${visit_visitdate_date_format}" past="true" required="true" z="0"/>
+    <field:select field="pet" id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_pet" itemValue="id" items="${petChoices}" path="pets" required="true" z="0"/>
+     	<field:select field="vet" id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_vet" itemValue="id" items="${vetChoices}" path="vets" required="false" z="0"/>
+     	<field:datetime field="visitDate" id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_visitDate" dateTimePattern="${visit_visitdate_date_format}" past="true" required="true" z="0"/>
         
     </form:create>
     <form:dependency dependencies="${dependencies}" id="d_de_stefanocke_japkit_roo_petclinic_domain_visit" render="${not empty dependencies}" z="0"/>
