@@ -22,7 +22,8 @@ public abstract class ControllerConverterProviderMembers implements ConverterPro
 	}
 	
 	
-	@Method(bodyExpr="return \"foobar\";")
+	//TODO
+	@Method(bodyExpr="return \"ID: \" + entity.getId();")
 	@Override
 	@ParamNames("entity")
 	public String getLabel(FormBackingObject entity) {

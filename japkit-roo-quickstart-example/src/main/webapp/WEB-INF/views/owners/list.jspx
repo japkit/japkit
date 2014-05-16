@@ -4,15 +4,8 @@
     <jsp:output omit-xml-declaration="yes"/>
     <page:list id="pl_de_stefanocke_japkit_roo_petclinic_domain_owner" items="${owners}" z="0">
         <table:table data="${owners}" id="l_de_stefanocke_japkit_roo_petclinic_domain_owner" path="/owners" z="0">
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_pets" property="pets"  z="0"/> 
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_address" property="address"  z="0"/> 
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_birthDay" property="birthDay" dateTimePattern="${owner_birthday_date_format}" date="true" z="0"/> 
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_city" property="city"  z="0"/> 
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_email" property="email"  z="0"/> 
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_firstName" property="firstName"  z="0"/> 
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_homePage" property="homePage"  z="0"/> 
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_lastName" property="lastName"  z="0"/> 
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_telephone" property="telephone"  z="0"/> 
+           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_firstName" property="firstName" sort="true" z="0"/> 
+           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_lastName" property="lastName" sort="true" z="0"/> 
          
         </table:table>
     </page:list>
