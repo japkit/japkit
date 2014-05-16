@@ -17,6 +17,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.support.DelegateMethodsRule
 
 class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
@@ -58,9 +59,9 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 			propertiesAnnotation)
 
 		
-		//val methodRules = annotation.valueOrMetaValue("methods", typeof(AnnotationMirror[]), propertiesAnnotation).map [
-		//	new MethodRule(it, null)
-		//]
+		val delegateMethodRules = annotation.valueOrMetaValue("delegateMethods", typeof(AnnotationMirror[]), propertiesAnnotation).map [
+			new DelegateMethodsRule(it, null)
+		]
 
 		//TODO: Rule caching
 		val templateRules = annotation.valueOrMetaValue("templates", typeof(TypeMirror[]), propertiesAnnotation).map [
@@ -169,8 +170,9 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 				}
 
 			}
-
+			
 			templateRules.forEach[apply(annotatedClass, generatedClass, annotation, ruleSourceElement)]
+			delegateMethodRules.forEach[apply(annotatedClass, generatedClass, annotation, p)]
 		]
 
 	}

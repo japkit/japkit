@@ -273,11 +273,11 @@ public @interface Properties {
 	boolean excludePropertiesFromSuperclass() default true;
 
 	/**
-	 * Methods to create per property.
+	 * The delegate methods to create. The delegate is the property.
 	 * 
 	 * @return
 	 */
-	// Method[] methods() default {};
+	DelegateMethods[] delegateMethods() default {};
 
 	/**
 	 * Templates to apply per property.

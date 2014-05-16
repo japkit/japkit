@@ -65,7 +65,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 
 	}
 
-	protected def Iterable<Element> getSrcElements(AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+	protected def Iterable<? extends Element> getSrcElements(AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		val iteratorExpr = triggerAnnotation.valueOrMetaValue("iterator", String, metaAnnotation)
 		val iteratorLang = triggerAnnotation.valueOrMetaValue("iteratorLang", String, metaAnnotation)
 
