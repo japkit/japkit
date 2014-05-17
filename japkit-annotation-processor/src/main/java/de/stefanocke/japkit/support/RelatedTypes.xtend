@@ -166,6 +166,8 @@ class RelatedTypes {
 						resolvedSelector.type = generatedClass?.asType
 					case ClassSelectorKind.SRC_ELEMENT_TYPE:
 						resolvedSelector.type = ruleSourceElement.asType
+					case ClassSelectorKind.SRC_ELEMENT_SINGLE_VALUE_TYPE:
+						resolvedSelector.type = ruleSourceElement.asType.singleValueType
 					case ClassSelectorKind.TYPE_MIRROR: {
 						resolvedSelector.type = am.valueOrMetaValue(classSelectorAnnotation.getClassSelectorAvName(te),
 							TypeMirror, metaAnnotation)

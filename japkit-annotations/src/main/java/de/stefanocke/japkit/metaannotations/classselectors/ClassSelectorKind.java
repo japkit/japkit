@@ -29,6 +29,11 @@ public enum ClassSelectorKind{
 	SRC_ELEMENT_TYPE,
 	
 	/**
+	 * To refer to the type of the current rule source element. In case of a collection, the element type is used. In case of a map, the value type is used.
+	 */
+	SRC_ELEMENT_SINGLE_VALUE_TYPE,
+	
+	/**
 	 * An EL expression is used to determine the type.
 	 */
 	EXPR
