@@ -12,40 +12,41 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 	}
-	
+
 	override protected getSrcElements(AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		valueStack.put("delegate", ruleSrcElement)
-		
+
 		val delegateTypeElement = ruleSrcElement.asType.asTypeElement
-		
-		val methodFilter = triggerAnnotation.elementMatchers("methodFilter", metaAnnotation)		
-		delegateTypeElement.allMethods.filter[m | methodFilter.nullOrEmpty || methodFilter.exists[matches(m)]]
+
+		val methodFilter = triggerAnnotation.elementMatchers("methodFilter", metaAnnotation)
+		delegateTypeElement.allMethods.filter[m|methodFilter.nullOrEmpty || methodFilter.exists[matches(m)]]
 	}
 
 	protected override createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		
+
 		val delegateMethod = ruleSrcElement as ExecutableElement
 		val method = genExtensions.copyFrom(delegateMethod, false);
-		
-		
-		val customMethodName = getNameFromMetaAnnotation(triggerAnnotation, delegateMethod) 
-		if(!customMethodName.nullOrEmpty){
+
+		val customMethodName = getNameFromMetaAnnotation(triggerAnnotation, delegateMethod)
+		if (!customMethodName.nullOrEmpty) {
 			method.simpleName = customMethodName
 		}
-					
+
 		mapAnnotations(method, triggerAnnotation, delegateMethod)
-		
+
 		val delegate = valueStack.get("delegate") as Element
-		
-		method.body = [ec | '''
-		«ec.typeRef(delegate.asType)» delegate = «delegate.simpleName»«IF delegate instanceof ExecutableElement»()«ENDIF»;
-		«IF !delegateMethod.returnType.void»return «ENDIF»delegate.«delegateMethod.simpleName»(«delegateMethod.parametersWithSrcNames.map[simpleName].join(", ")»);
-		''']
-		
+
+		method.body = [ec|
+			val getDelegate = '''this.«delegate.simpleName»«IF delegate instanceof ExecutableElement»()«ENDIF»'''
+			val delegateMethodArgs = delegateMethod.parametersWithSrcNames.map[simpleName].join(", ")
+			val delegateMethodName = '''«delegateMethod.simpleName»''' 
+			val returnIfRequired = if(delegateMethod.returnType.void) '' else 'return '
+			'''
+				«returnIfRequired»«getDelegate».«delegateMethodName»(«delegateMethodArgs»);
+			''']
+
 		method
 	}
-
-	
 
 }
