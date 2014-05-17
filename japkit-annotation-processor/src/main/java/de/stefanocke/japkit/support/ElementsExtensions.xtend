@@ -79,6 +79,8 @@ class ElementsExtensions {
 	}
 
 	public val ORDER_ANNOTATION_NAME = Order.name
+	
+	public val PARAM_NAMES_ANNOTATION_NAME = ParamNames.name
 
 	def Integer getOrdinalNumber(Element e) {
 		val am = e.annotationMirror(ORDER_ANNOTATION_NAME)

@@ -38,6 +38,8 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
+import javax.lang.model.element.ExecutableElement
+import de.stefanocke.japkit.gen.GenExecutableElement
 
 class ClassGenerator {
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -85,6 +87,8 @@ class ClassGenerator {
 			generatedClasses.forEach[markAsGenerated(it, annotatedClass)]
 
 			generatedClasses.forEach[addOrderAnnotations]
+			
+			generatedClasses.forEach[addParamNamesAnnotations]
 
 			generatedClasses
 
@@ -131,6 +135,24 @@ class ClassGenerator {
 	}
 
 	def dispatch void addOrderAnnotation(Element element, Integer integer) {
+	}
+	
+	
+	def dispatch void addParamNamesAnnotations(GenTypeElement typeElement) {
+		typeElement.enclosedElements.forEach[it.addParamNamesAnnotations]
+	}
+	
+	def dispatch void addParamNamesAnnotations(GenExecutableElement element) {
+		if(!element.parameters.nullOrEmpty){
+			element.addAnnotationMirror(
+				new GenAnnotationMirror(elementUtils.getTypeElement(PARAM_NAMES_ANNOTATION_NAME).asType as DeclaredType) => [
+					setValue("value", [new GenAnnotationValue(element.parameters.map[simpleName.toString].map[new GenAnnotationValue(it)].toList)])
+				]
+			)		
+		}
+	}
+	def dispatch void addParamNamesAnnotations(Element element) {
+		
 	}
 
 	def mapTypeAnnotations(TypeElement annotatedClass, AnnotationMirror am, AnnotationMirror genClassAnnotation, 
