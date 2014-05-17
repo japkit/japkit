@@ -68,6 +68,17 @@ public @interface AnnotationMapping {
 	Class<? extends Annotation>[] enclosingAnnotationsNot() default {};
 
 	/**
+	 * If the source element is declared by any of those classes, the rule does
+	 * not apply.
+	 * <p>
+	 * For example, this is useful , when considering a collection of inherited
+	 * elements to filter out the ones that come from some common superclasses.
+	 * 
+	 * @return
+	 */
+	Class<?>[] notDeclaredBy() default {};
+	
+	/**
 	 * The source elements type must be a subtype of this type for the rule to
 	 * apply.
 	 * <p>

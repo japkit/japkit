@@ -22,7 +22,7 @@ public @interface Matcher {
 	 * @return the modifiers
 	 */
 	Modifier[] srcModifiers() default {};
-	
+
 	/**
 	 * If any of those modifiers is present on the source element, the rule is
 	 * not applied.
@@ -30,9 +30,10 @@ public @interface Matcher {
 	 * @return
 	 */
 	Modifier[] srcModifiersNot() default {};
-	
+
 	/**
 	 * If non-empty, the element must have one of the given kinds to match.
+	 * 
 	 * @return
 	 */
 	ElementKind[] srcKind() default {};
@@ -70,6 +71,17 @@ public @interface Matcher {
 	Class<? extends Annotation>[] enclosingAnnotationsNot() default {};
 
 	/**
+	 * If the source element is declared by any of those classes, the rule does
+	 * not apply.
+	 * <p>
+	 * For example, this is useful , when considering a collection of inherited
+	 * elements to filter out the ones that come from some common superclasses.
+	 * 
+	 * @return
+	 */
+	Class<?>[] notDeclaredBy() default {};
+
+	/**
 	 * The source element's type must be a subtype of this type for the rule to
 	 * apply.
 	 * <p>
@@ -80,19 +92,20 @@ public @interface Matcher {
 	 * @return the type
 	 */
 	Class<?> srcType() default Object.class;
-	
+
 	/**
-	 * Same semantics as srcType, but in case of a generic collection, the collection's element type is considered.
-	 * In case of a map, the map's value type is considered. If it is neither a collection nor a map, the source
-	 * element's type is considered as is.
-	 *  
+	 * Same semantics as srcType, but in case of a generic collection, the
+	 * collection's element type is considered. In case of a map, the map's
+	 * value type is considered. If it is neither a collection nor a map, the
+	 * source element's type is considered as is.
+	 * 
 	 * @return the type
 	 */
 	Class<?> srcSingleValueType() default Object.class;
-	
+
 	/**
-	 * The source element's type must belong to at least one of the given categories.
-	 * An empty list means, all types match. 
+	 * The source element's type must belong to at least one of the given
+	 * categories. An empty list means, all types match.
 	 * <p>
 	 * For fields, the type of the field is considered. For methods, the return
 	 * type is considered. For other elements, the type as provided by
@@ -101,18 +114,19 @@ public @interface Matcher {
 	 * @return the categories
 	 */
 	TypeCategory[] srcTypeCategory() default {};
-	
+
 	/**
-	 * Same semantics as srcTypeCategory, but in case of a generic collection, the collection's element type is considered.
-	 * In case of a map, the map's value type is considered. If it is neither a collection nor a map, the source
-	 * element's type is considered as is.
-	 *  
+	 * Same semantics as srcTypeCategory, but in case of a generic collection,
+	 * the collection's element type is considered. In case of a map, the map's
+	 * value type is considered. If it is neither a collection nor a map, the
+	 * source element's type is considered as is.
+	 * 
 	 * @return the type categories
 	 */
 	TypeCategory[] srcSingleValueTypeCategory() default {};
 
 	/**
-	 * The source element's must not belong to any of the given categories. 
+	 * The source element's must not belong to any of the given categories.
 	 * <p>
 	 * For fields, the type of the field is considered. For methods, the return
 	 * type is considered. For other elements, the type as provided by
@@ -121,16 +135,17 @@ public @interface Matcher {
 	 * @return the type categories
 	 */
 	TypeCategory[] srcTypeCategoryNot() default {};
-	
+
 	/**
-	 * Same semantics as srcTypeCategoryNot, but in case of a generic collection, the collection's element type is considered.
-	 * In case of a map, the map's value type is considered. If it is neither a collection nor a map, the source
-	 * element's type is considered as is.
-	 *  
+	 * Same semantics as srcTypeCategoryNot, but in case of a generic
+	 * collection, the collection's element type is considered. In case of a
+	 * map, the map's value type is considered. If it is neither a collection
+	 * nor a map, the source element's type is considered as is.
+	 * 
 	 * @return the type categories
 	 */
 	TypeCategory[] srcSingleValueTypeCategoryNot() default {};
-	
+
 	/**
 	 * The source element's type must have those annotations for the rule to
 	 * apply
@@ -144,16 +159,16 @@ public @interface Matcher {
 	 * @return the annotations
 	 */
 	Class<? extends Annotation>[] srcTypeAnnotations() default {};
-	
+
 	/**
-	 * Same semantics as srcTypeAnnotations, but in case of a generic collection, the collection's element type is considered.
-	 * In case of a map, the map's value type is considered. If it is neither a collection nor a map, the source
-	 * element's type is considered as is.
-	 *  
+	 * Same semantics as srcTypeAnnotations, but in case of a generic
+	 * collection, the collection's element type is considered. In case of a
+	 * map, the map's value type is considered. If it is neither a collection
+	 * nor a map, the source element's type is considered as is.
+	 * 
 	 * @return the annotations
 	 */
 	Class<? extends Annotation>[] srcSingleValueTypeAnnotations() default {};
-	
 
 	/**
 	 * The source element's type must have at least one type argument and the
@@ -186,18 +201,18 @@ public @interface Matcher {
 	/**
 	 * Condition expression. If not empty, it must evaluate to true for the rule
 	 * to apply. The ELContext provides the source element as the variable
-	 * "element". 
+	 * "element".
 	 * 
 	 * @return the expression.
 	 */
 	String condition() default "";
-	
+
 	/**
 	 * 
 	 * @return language for the condition expression. Defaults to Java EL.
 	 */
 	String conditionLang() default "";
-	
+
 	/**
 	 * Constraints to be evaluated when the matcher matches an element.
 	 */

@@ -10,6 +10,7 @@ import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.element.ElementKind
 import java.util.Set
+import javax.lang.model.element.TypeElement
 
 @Data
 class ElementMatcher {
@@ -26,6 +27,7 @@ class ElementMatcher {
 	DeclaredType[] srcAnnotationsNot
 	DeclaredType[] enclosingAnnotations
 	DeclaredType[] enclosingAnnotationsNot
+	Set<String> notDeclaredBy //FQNs
 	TypeMirror srcType
 	TypeCategory[] srcTypeCategory
 	TypeCategory[] srcTypeCategoryNot
@@ -60,7 +62,7 @@ class ElementMatcher {
 		&& e.hasNotAnnotations(srcAnnotationsNot)
 		&& e.enclosingElement.hasAllAnnotations(enclosingAnnotations)
 		&& e.enclosingElement.hasNotAnnotations(enclosingAnnotationsNot)
-		
+		&& e.isNotDeclaredBy(notDeclaredBy)
 		
 		&& e.srcType.hasAllAnnotations(srcTypeAnnotations)		
 		&& e.srcType.isSubtype(srcType)
@@ -82,6 +84,10 @@ class ElementMatcher {
 		}
 		
 		result
+	}
+	
+	def boolean isNotDeclaredBy(Element element, Set<String> notDeclaredByFqns){
+		notDeclaredByFqns.nullOrEmpty || !notDeclaredByFqns.contains((element.enclosingElement as TypeElement).qualifiedName.toString)
 	}
 	
 	def boolean hasAnyKind(Element element, ElementKind[] kinds){
@@ -182,6 +188,7 @@ class ElementMatcher {
 		_srcAnnotationsNot = am.value("srcAnnotationsNot", typeof(DeclaredType[]))
 		_enclosingAnnotations = am.value("enclosingAnnotations", typeof(DeclaredType[]))
 		_enclosingAnnotationsNot = am.value("enclosingAnnotationsNot", typeof(DeclaredType[]))
+		_notDeclaredBy = am.value("notDeclaredBy", typeof(DeclaredType[]))?.map[asTypeElement.qualifiedName.toString].toSet
 		_srcType = am.value("srcType", TypeMirror)
 		_srcTypeCategory = am.value("srcTypeCategory", typeof(TypeCategory[]))	
 		_srcTypeCategoryNot = am.value("srcTypeCategoryNot", typeof(TypeCategory[]))	
