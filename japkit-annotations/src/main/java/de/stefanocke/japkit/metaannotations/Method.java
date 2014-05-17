@@ -127,6 +127,13 @@ public @interface Method {
 	 * @return the language of the body expression. Default is Java EL.
 	 */
 	String bodyLang() default "";
+	
+	/**
+	 * The delegate methods to create. The delegate is the return value of the generated method.
+	 * 
+	 * @return
+	 */
+	DelegateMethods[] delegateMethods() default {};
 
 	@interface List {
 		Method[] value();

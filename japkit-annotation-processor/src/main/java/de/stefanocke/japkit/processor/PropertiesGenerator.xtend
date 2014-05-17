@@ -3,11 +3,13 @@ package de.stefanocke.japkit.processor
 import de.stefanocke.japkit.annotations.BeforeSet
 import de.stefanocke.japkit.gen.CodeBody
 import de.stefanocke.japkit.gen.GenEnumConstant
+import de.stefanocke.japkit.gen.GenExecutableElement
 import de.stefanocke.japkit.gen.GenField
 import de.stefanocke.japkit.gen.GenMethod
 import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Properties
+import de.stefanocke.japkit.support.DelegateMethodsRule
 import de.stefanocke.japkit.support.ImmutabiltyRules
 import de.stefanocke.japkit.support.MethodRule
 import de.stefanocke.japkit.support.Property
@@ -17,7 +19,6 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.support.DelegateMethodsRule
 
 class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
@@ -130,49 +131,59 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 
 			}
 			if (createProperties) {
+			
 
 				//TODO: In case of getter, extract the @return
 				val srcComment = p.fieldOrGetter.docComment?.toString?.trim
-				generatedClass.add(
-					new GenField(p.name, p.type) => [
+				
+				val genField = new GenField(p.name, p.type) => [
 						modifiers = fieldModifiers.toSet
 						
 						annotationMirrors = overrideAnnotations(overrideElement, mapAnnotations(ruleSourceElement, annotationMappingsForFields))
 												
 						comment = srcComment
 					//TODO: Make configurable whether just to use an @see here.
-					])
-				if (generateGetters && !gettersExcludeRules.exists[matches(ruleSourceElement)]) {
-					generatedClass.add(
-						new GenMethod(p.getterName) => [
-							modifiers = getterModifiers.toSet
-							returnType = p.type
-							annotationMirrors = mapAnnotations(ruleSourceElement, annotationMappingsForGetters)
-							val b = getterBody(generatedClass, p, immutabilityRules)
-							body = b
-							comment = '''@return «srcComment»'''
-						])
+					]
+				generatedClass.add(genField)
+				
+				
+				val genGetter = if (generateGetters && !gettersExcludeRules.exists[matches(ruleSourceElement)]) {
+					val method = new GenMethod(p.getterName) => [
+												modifiers = getterModifiers.toSet
+												returnType = p.type
+												annotationMirrors = mapAnnotations(ruleSourceElement, annotationMappingsForGetters)
+												val b = getterBody(generatedClass, p, immutabilityRules)
+												body = b
+												comment = '''@return «srcComment»'''
+											]
+					generatedClass.add(method)
+					method
+					
 				}
-				if (generateSetters && !settersExcludeRules.exists[matches(ruleSourceElement)]) {
-					generatedClass.add(
-						new GenMethod(p.setterName) => [
-							modifiers = setterModifiers.toSet
-							addParameter(new GenParameter(p.name, p.type))
-							val wrapped = immutabilityRules.wrapAssignment(generatedClass, p, p.name)
-							body = [
-								'''
-									«beforeSet(p, annotatedClass, annotation, propertiesAnnotation)»
-									this.«p.name» = «wrapped.code(it)»;
-								''']
-							comment = '''@param «p.name» «srcComment»'''
-						]
-					)
+				val genSetter = if (generateSetters && !settersExcludeRules.exists[matches(ruleSourceElement)]) {
+					val method = new GenMethod(p.setterName) => [
+												modifiers = setterModifiers.toSet
+												addParameter(new GenParameter(p.name, p.type))
+												val wrapped = immutabilityRules.wrapAssignment(generatedClass, p, p.name)
+												body = [
+													'''
+														«beforeSet(p, annotatedClass, annotation, propertiesAnnotation)»
+														this.«p.name» = «wrapped.code(it)»;
+													''']
+												comment = '''@param «p.name» «srcComment»'''
+											]
+					generatedClass.add(method)
+					method
 				}
+				
+				val genProperty = new Property(genField, genGetter, genSetter)
+				
 
+				delegateMethodRules.forEach[apply(annotatedClass, generatedClass, annotation, genProperty)]
 			}
 			
 			templateRules.forEach[apply(annotatedClass, generatedClass, annotation, ruleSourceElement)]
-			delegateMethodRules.forEach[apply(annotatedClass, generatedClass, annotation, p)]
+			
 		]
 
 	}

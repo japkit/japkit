@@ -34,6 +34,14 @@ class Property implements VariableElement {
 		_setter = setter
 		_field = field
 	}
+	
+	new(VariableElement field, ExecutableElement getter, ExecutableElement setter) {
+		this(field.asType, field.simpleName.toString, getter, setter, field)
+	}
+	
+	new(VariableElement field) {
+		this(field.asType, field.simpleName.toString, null, null, field)
+	}
 
 	new(TypeMirror type, String name) {
 		this(type, name, null, null, null)

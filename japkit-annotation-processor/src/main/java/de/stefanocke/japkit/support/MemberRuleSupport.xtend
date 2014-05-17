@@ -55,7 +55,10 @@ public abstract class MemberRuleSupport<E extends Element> {
 				valueStack.scope(e)	[	
 					valueStack.putELVariables(e, triggerAnnotation, metaAnnotation)		
 					val member = createMember(annotatedClass, generatedClass, triggerAnnotation, e)
-					generatedClass.add(member)				
+					generatedClass.add(member)	
+					
+					//Create delegate methods that use the generated member to retrieve the object to delegate to
+					createDelegateMethods(member, annotatedClass, generatedClass, triggerAnnotation)			
 				]
 			]
 
@@ -202,5 +205,13 @@ public abstract class MemberRuleSupport<E extends Element> {
 			]
 
 		}
+	}
+	
+	protected def void createDelegateMethods(GenElement genElement, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation){
+		if(metaAnnotation == null) return
+		val delegateMethodRules = triggerAnnotation.valueOrMetaValue("delegateMethods", typeof(AnnotationMirror[]), metaAnnotation)?.map [
+			new DelegateMethodsRule(it, null)
+		]
+		delegateMethodRules?.forEach[apply(annotatedClass, generatedClass, triggerAnnotation, genElement)]
 	}
 }

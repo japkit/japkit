@@ -115,6 +115,14 @@ public @interface Field {
 	 */
 	String initLang() default "";
 	
+	/**
+	 * The delegate methods to create. The delegate generated field.
+	 * 
+	 * @return
+	 */
+	DelegateMethods[] delegateMethods() default {};
+
+	
 	@interface List {
 		Field[] value();
 	}
