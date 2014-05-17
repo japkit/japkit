@@ -56,7 +56,7 @@ class ValueStack implements Map<String, Object> {
 	}
 	
 	override containsKey(Object key) {
-		current.containsKey(key) || (parent != null && parent.containsKey(key)) 
+		current.containsKey(key) || (parent != null && parent.containsKey(key)) || (parent != null && key=="parent" )
 	}
 	
 	override containsValue(Object value) {

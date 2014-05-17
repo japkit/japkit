@@ -13,9 +13,11 @@ import de.stefanocke.japkit.support.el.ELProviderException
 import java.io.Writer
 import java.net.URL
 import de.stefanocke.japkit.support.el.ElExtensions
+import javax.el.CompositeELResolver
 
 class JuelELProvider implements ELProvider {
 	val ExpressionFactory ef = ExtensionRegistry.get(ExpressionFactory, [|new ExpressionFactoryImpl])
+	
 	
 
 	override eval(Map contextMap, String expr, Class expectedType, String language) {
@@ -28,10 +30,14 @@ class JuelELProvider implements ELProvider {
 	}
 
 	def private createElContext(Map<String, ? extends Object> contextMap, ElExtensionPropertiesAndMethods elExtensions) {
-		val resolver = new ELResolver(elExtensions)
+		val resolver = new CompositeELResolver();
+		
+		//TODO: Ggf zu einem Resolver zusammenfassen.
+		resolver.add(new MapRootResolver(contextMap))
+		resolver.add(new ELResolver(ElExtensions.extensions, contextMap));
+		
 		val context = new SimpleContext(resolver)
-		val rootResolver = resolver.rootPropertyResolver
-		contextMap.forEach[k, v|rootResolver.setProperty(k, v)]
+
 
 		//Force the use of the same context. For example, when the ELResolver internally calls getExpressionFactory(context)
 		//Otherwise we run into some class loading issues..

@@ -4,25 +4,29 @@ import de.odysseus.el.util.SimpleResolver
 import javax.el.ELContext
 import de.stefanocke.japkit.support.el.ElExtensionPropertiesAndMethods
 import de.stefanocke.japkit.support.el.ELPropertyNotFoundException
+import java.util.Map
 
 class ELResolver extends SimpleResolver {
 
 	val extension ElExtensionPropertiesAndMethods elExtensionPropertiesAndMethods
+	
+	val Map<String, Object> contextMap
 
 	
 
-	new(ElExtensionPropertiesAndMethods elExtensionPropertiesAndMethods) {
+	new(ElExtensionPropertiesAndMethods elExtensionPropertiesAndMethods, Map<String, ? extends Object> contextMap) {
 		this.elExtensionPropertiesAndMethods = elExtensionPropertiesAndMethods
+		this.contextMap = contextMap as Map<String, Object>
+		
 	}
 
 	override getValue(ELContext context, Object base, Object property) {
 		val closure = if(property instanceof String) findPropertyClosure(base, property as String) else null
 
-		//Etwas ineffizient, jedesmal eine map zu bauen...
-		val rootProperties = getRootPropertyResolver().properties.toInvertedMap[getRootPropertyResolver().getProperty(it)]
+		val rootProperties = contextMap
 
 		if (closure != null) {
-			context.setPropertyResolved(true)
+			context.setPropertyResolved(true);
 			return closure.apply(rootProperties, base)
 		}
 
@@ -44,8 +48,7 @@ class ELResolver extends SimpleResolver {
 
 	override invoke(ELContext context, Object base, Object method, Class[] paramTypes, Object[] params) {
 
-		//Etwas ineffizient, jedesmal eine map zu bauen...
-		val rootProperties = getRootPropertyResolver().properties.toInvertedMap[getRootPropertyResolver().getProperty(it)]
+		val rootProperties = contextMap
 		
 		val closure = if(method instanceof String) findMethodClosure(base, method as String) else null
 
