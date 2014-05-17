@@ -26,6 +26,14 @@ public @interface AnnotationMapping {
 	 * @return the modifiers
 	 */
 	Modifier[] srcModifiers() default {};
+	
+	/**
+	 * If any of those modifiers is present on the source element, the rule is
+	 * not applied.
+	 * 
+	 * @return
+	 */
+	Modifier[] srcModifiersNot() default {};
 
 	/**
 	 * All of those annotations must be present on the source element for the

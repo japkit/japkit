@@ -40,7 +40,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 		
 		method.body = [ec | '''
 		«ec.typeRef(delegate.asType)» delegate = «delegate.simpleName»«IF delegate instanceof ExecutableElement»()«ENDIF»;
-		«IF !delegateMethod.returnType.void»return «ENDIF»delegate.«delegateMethod.simpleName»(«delegateMethod.parametersWithSrcNames.join(", ")»);
+		«IF !delegateMethod.returnType.void»return «ENDIF»delegate.«delegateMethod.simpleName»(«delegateMethod.parametersWithSrcNames.map[simpleName].join(", ")»);
 		''']
 		
 		method

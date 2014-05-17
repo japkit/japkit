@@ -20,6 +20,7 @@ class ElementMatcher {
 	val extension TypesExtensions typesExtensions = ExtensionRegistry.get(TypesExtensions)
 
 	Modifier[] srcModifiers
+	Modifier[] srcModifiersNot
 	Set<ElementKind> srcKind
 	DeclaredType[] srcAnnotations
 	DeclaredType[] srcAnnotationsNot
@@ -49,10 +50,11 @@ class ElementMatcher {
 		]
 	}
 
-	def matches(Element e) {
+	def boolean matches(Element e) {
 
 		//messager.printMessage(Kind.OTHER, '''Element «ve.simpleName». SrcAnnotations: «ve.annotationMirrors.map[fqn]» «allSrcAnnotationsArePresent(ve)» «srcType» «ve.asType.isSubtype(srcType)»''')
 		val result = e.hasAllModifiers(srcModifiers)
+		&& e.hasNotModifiers(srcModifiersNot)
 		&& e.hasAnyKind(srcKind)
 		&& e.hasAllAnnotations(srcAnnotations)
 		&& e.hasNotAnnotations(srcAnnotationsNot)
@@ -88,7 +90,11 @@ class ElementMatcher {
 	
 	
 	def boolean hasAllModifiers(Element e, Modifier[] modifiers){
-		modifiers.forall[e.modifiers.contains(it)]
+		modifiers.nullOrEmpty || modifiers.forall[e.modifiers.contains(it)]
+	}
+	
+	def boolean hasNotModifiers(Element e, Modifier[] modifiers){
+		modifiers.nullOrEmpty || modifiers.forall[!e.modifiers.contains(it)]
 	}
 	
 	def isSubtype(TypeMirror t1, TypeMirror type) {
@@ -170,6 +176,7 @@ class ElementMatcher {
 	
 	new(AnnotationMirror am) {
 		_srcModifiers = am.value("srcModifiers", typeof(Modifier[]))
+		_srcModifiersNot = am.value("srcModifiersNot", typeof(Modifier[]))
 		_srcKind = am.value("srcKind", typeof(ElementKind[]))?.toSet
 		_srcAnnotations = am.value("srcAnnotations", typeof(DeclaredType[]))
 		_srcAnnotationsNot = am.value("srcAnnotationsNot", typeof(DeclaredType[]))

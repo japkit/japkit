@@ -24,6 +24,14 @@ public @interface Matcher {
 	Modifier[] srcModifiers() default {};
 	
 	/**
+	 * If any of those modifiers is present on the source element, the rule is
+	 * not applied.
+	 * 
+	 * @return
+	 */
+	Modifier[] srcModifiersNot() default {};
+	
+	/**
 	 * If non-empty, the element must have one of the given kinds to match.
 	 * @return
 	 */
