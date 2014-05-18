@@ -234,9 +234,9 @@ public abstract class MemberRuleSupport<E extends Element> {
 									]»
 									«ENDFOR»
 								'''	
-							} else {
+							} else {								
 								eval(vs, emptyExpr, lang, String, '''Error in code body empty expression.''',
-									'throw new UnsupportedOperationException();')
+										'throw new UnsupportedOperationException();')
 							}
 						}
 					]

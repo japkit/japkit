@@ -22,8 +22,11 @@ import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 
 @Template
 public abstract class ControllerMembers {
-	@Method(imports = ControllerUtil.class, bodyExpr = "if (bindingResult.hasErrors()) {\n" + "\tpopulateEditForm(uiModel, fbo);\n"
-			+ "\treturn \"#{path}/create\";\n" + "}\n" + "uiModel.asMap().clear();\n" + "crudOperations().persist(fbo);\n"
+	@Method(imports = ControllerUtil.class, bodyExpr = "if (bindingResult.hasErrors()) {\n" 
+			+ "\tpopulateEditForm(uiModel, fbo);\n"
+			+ "\treturn \"#{path}/create\";\n" + "}\n" 
+			+ "uiModel.asMap().clear();\n" 
+			+ "crudOperations().persist(fbo);\n"
 			+ "return \"redirect:/#{path}/\" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);\n")
 	@ParamNames({ "fbo", "bindingResult", "uiModel", "httpServletRequest" })
 	@RequestMapping(method = RequestMethod.POST, produces = "text/html")
@@ -32,8 +35,10 @@ public abstract class ControllerMembers {
 
 	@Method(
 			imports = ControllerUtil.class, 
-			bodyExpr = "<%datetimeProperties.each{%>uiModel.addAttribute(\"${dtfModelAttr.eval(it)}\", ControllerUtil.patternForStyle(getDateTimeFormat${it.name.toFirstUpper}()));\n<%}%>",
-			bodyLang = "GStringTemplateInline")
+			bodyIterator = "#{datetimeProperties}",
+			bodyExpr = "uiModel.addAttribute(\"#{dtfModelAttr.eval(element)}\", " +
+					"ControllerUtil.patternForStyle(getDateTimeFormat#{element.name.toFirstUpper}()));\n"
+			)
 	@ParamNames("uiModel")
 	abstract void addDateTimeFormatPatterns(Model uiModel);
 
@@ -44,15 +49,18 @@ public abstract class ControllerMembers {
 
 	@Method(
 			imports = { Arrays.class }, 
+			bodyIterator="#{enumProperties}",
 			// TODO: Eigentlich singleValueType.
-			bodyExpr = "<%enumProperties.each{%>uiModel.addAttribute(\"${it.name}s\", Arrays.asList(${ec.typeRef(it.type)}.values()));\n<%}%>",
-			bodyLang = "GStringTemplateInline")
+			bodyExpr = "uiModel.addAttribute(\"${element.name}s\", Arrays.asList(${ec.typeRef(element.type)}.values()));\n"
+			)
 	@ParamNames("uiModel")
 	abstract void addEnumChoices(Model uiModel);
 	
-	@Method(// TODO: Eigentlich singleValueType.
-			bodyExpr = "<%entityProperties.each{%>uiModel.addAttribute(\"${it.name}Choices\", get${it.name.toFirstUpper}Choices());\n<%}%>",
-			bodyLang = "GStringTemplateInline")
+	@Method(
+			bodyIterator="#{enumProperties}",
+			// TODO: Eigentlich singleValueType.
+			bodyExpr = "uiModel.addAttribute(\"${element.name}Choices\", get${element.name.toFirstUpper}Choices());\n"
+			)
 	@ParamNames("uiModel")
 	abstract void addEntityChoices(Model uiModel);
 
@@ -84,8 +92,13 @@ public abstract class ControllerMembers {
 			required = false) Integer size, @RequestParam(value = "sortFieldName", required = false) String sortFieldName, @RequestParam(
 			value = "sortOrder", required = false) String sortOrder, Model uiModel);
 
-	@Method(imports = ControllerUtil.class, bodyExpr = "if (bindingResult.hasErrors()) {\n" + "\tpopulateEditForm(uiModel, fbo);\n"
-			+ "\treturn \"#{path}/update\";\n" + "}\n" + "uiModel.asMap().clear();\n" + "crudOperations().merge(fbo);\n"
+	@Method(imports = ControllerUtil.class, 
+			bodyExpr = "if (bindingResult.hasErrors()) {\n" 
+			+ "\tpopulateEditForm(uiModel, fbo);\n"
+			+ "\treturn \"#{path}/update\";\n" 
+			+ "}\n" 
+			+ "uiModel.asMap().clear();\n" 
+			+ "crudOperations().merge(fbo);\n"
 			+ "return \"redirect:/#{path}/\" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);\n")
 	@ParamNames({ "fbo", "bindingResult", "uiModel", "httpServletRequest" })
 	@RequestMapping(produces = "text/html", method = RequestMethod.PUT)
@@ -97,7 +110,8 @@ public abstract class ControllerMembers {
 	@RequestMapping(value = "/{id}", params = "form", produces = "text/html")
 	public abstract String updateForm(@PathVariable("id") Long id, Model uiModel);
 
-	@Method(bodyExpr = "crudOperations().remove(id);\n" + "uiModel.asMap().clear();\n"
+	@Method(bodyExpr = "crudOperations().remove(id);\n" 
+			+ "uiModel.asMap().clear();\n"
 			+ "uiModel.addAttribute(\"page\", (page == null) ? \"1\" : page.toString());\n"
 			+ "uiModel.addAttribute(\"size\", (size == null) ? \"10\" : size.toString());\n" + "return \"redirect:/#{path}\";")
 	@ParamNames({ "id", "page", "size", "uiModel" })
@@ -106,7 +120,8 @@ public abstract class ControllerMembers {
 			required = false, value = "size") Integer size, Model uiModel);
 
 	// TODO: Conditional calls to addDateTimeFormatPatterns?
-	@Method(bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", fbo);\n" + "addDateTimeFormatPatterns(uiModel);\n"
+	@Method(bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", fbo);\n" 
+			+ "addDateTimeFormatPatterns(uiModel);\n"
 			+ "addEnumChoices(uiModel);\n"
 			+ "addEntityChoices(uiModel);\n"
 			)

@@ -120,6 +120,9 @@ class ELSupport {
 	}
 
 	def <T> T eval(ValueStack valueStack, String expr, String lang, Class<T> expectedType) {
+		if(expr.nullOrEmpty && expectedType == String){
+			return ("" as Object) as T //WTF!?!
+		}
 
 		var ValueStack oldValueStackTL = null
 		if (valueStack != getValueStack) {
