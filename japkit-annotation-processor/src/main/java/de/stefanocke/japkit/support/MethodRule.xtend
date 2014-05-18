@@ -25,8 +25,7 @@ class MethodRule extends MemberRuleSupport<ExecutableElement> {
 
 		setParametersFromMetaAnnotation(method, triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement)
 
-		val codeBody = getCodeBodyFromMetaAnnotation(method, triggerAnnotation, "bodyExpr", "bodyLang", "bodyIterator",
-			"bodyIteratorLang", "bodySeparator", "bodyBeforeExpr", "bodyAfterExpr", "bodyEmptyExpr" )
+		val codeBody = getCodeBodyFromMetaAnnotation(method, triggerAnnotation, "body" )
 		if (codeBody != null) {
 			method.removeModifier(Modifier.ABSTRACT)
 			method.body = codeBody

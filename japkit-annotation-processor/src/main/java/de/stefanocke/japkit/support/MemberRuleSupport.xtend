@@ -169,23 +169,24 @@ public abstract class MemberRuleSupport<E extends Element> {
 		active
 	}
 
-	protected def getCodeBodyFromMetaAnnotation(GenElement element, AnnotationMirror triggerAnnotation, String avName,
-		String langAvName, String iteratorAv, String iteratorLangAv, String separatorAv, String beforeAv, String afterAv, String emptyAv) {
+//"initExpr", "initLang", "initIterator", "initIteratorLang", "initSeparator", "initBeforeExpr", "initAfterExpr", "initEmptyExpr"
+//"bodyExpr", "bodyLang", "bodyIterator", "bodyIteratorLang", "bodySeparator", "bodyBeforeExpr", "bodyAfterExpr", "bodyEmptyExpr"
+	protected def getCodeBodyFromMetaAnnotation(GenElement element, AnnotationMirror triggerAnnotation, String avPrefix) {
 		if(metaAnnotation == null) return null
 
 		//the body expression
-		val bodyExpr = triggerAnnotation.valueOrMetaValue(avName, String, metaAnnotation)
-		val lang = triggerAnnotation.valueOrMetaValue(langAvName, String, metaAnnotation)
+		val bodyExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»Expr''', String, metaAnnotation)
+		val lang = triggerAnnotation.valueOrMetaValue('''«avPrefix»Lang''', String, metaAnnotation)
 
-		val beforeExpr = triggerAnnotation.valueOrMetaValue(beforeAv, String, metaAnnotation)
-		val afterExpr = triggerAnnotation.valueOrMetaValue(afterAv, String, metaAnnotation)
-		val emptyExpr = triggerAnnotation.valueOrMetaValue(emptyAv, String, metaAnnotation)
+		val beforeExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»BeforeExpr''', String, metaAnnotation)
+		val afterExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»AfterExpr''', String, metaAnnotation)
+		val emptyExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»EmptyExpr''', String, metaAnnotation)
 
 		//body iterator
-		val iteratorExpr = triggerAnnotation.valueOrMetaValue(iteratorAv, String, metaAnnotation)
-		val iteratorLang = triggerAnnotation.valueOrMetaValue(iteratorLangAv, String, metaAnnotation)
+		val iteratorExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»Iterator''', String, metaAnnotation)
+		val iteratorLang = triggerAnnotation.valueOrMetaValue('''«avPrefix»IteratorLang''', String, metaAnnotation)
 
-		val separator = triggerAnnotation.valueOrMetaValue(separatorAv, String, metaAnnotation)
+		val separator = triggerAnnotation.valueOrMetaValue('''«avPrefix»Separator''', String, metaAnnotation)
 
 		val imports = triggerAnnotation.valueOrMetaValue("imports", typeof(DeclaredType[]), metaAnnotation)
 		getCodeBodyFromMetaAnnotation(element, triggerAnnotation, bodyExpr, lang, beforeExpr, afterExpr, emptyExpr, iteratorExpr,
