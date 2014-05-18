@@ -57,7 +57,7 @@ public abstract class ControllerMembers {
 	abstract void addEnumChoices(Model uiModel);
 	
 	@Method(
-			bodyIterator="#{enumProperties}",
+			bodyIterator="#{entityProperties}",
 			// TODO: Eigentlich singleValueType.
 			bodyExpr = "uiModel.addAttribute(\"${element.name}Choices\", get${element.name.toFirstUpper}Choices());\n"
 			)
