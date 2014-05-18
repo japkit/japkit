@@ -14,6 +14,7 @@ public abstract class ToString {
 	@Method(imports = { ToStringBuilder.class, ToStringStyle.class },
 			
 			bodyIterator="#{toStringProperties}",
+			//bodyIteratorVar="p"
 			bodyBeforeExpr = "return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).\n",
 			bodyExpr = "append(\"#{element.simpleName}\", #{element.getter.simpleName}()).\n",
 			//Idee: Switch-Support.
