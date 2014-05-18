@@ -20,7 +20,8 @@ class FieldRule extends MemberRuleSupport<VariableElement> {
 		field.type = typeFromMetaAnnotationOrTemplate(annotatedClass, generatedClass, triggerAnnotation, "type",
 			"typeArgs", ruleSrcElement, field.asType)
 
-		val cb = getCodeBodyFromMetaAnnotation(field, triggerAnnotation, "initExpr", "initLang")
+		val cb = getCodeBodyFromMetaAnnotation(field, triggerAnnotation, "initExpr", "initLang", "initIterator",
+			"initIteratorLang", "initSeparator", "initBeforeExpr", "initAfterExpr", "initEmptyExpr")
 		if (cb != null) {
 			field.constantExpr = cb
 		}

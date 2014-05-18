@@ -116,20 +116,70 @@ public @interface Method {
 	Class<?>[] imports() default {};
 
 	/**
+	 * If the body shall contain some repetitive code, this expression can be
+	 * used. It determines how often to repeat bodyExpr. The iteration variable
+	 * is provided as "element" on the value stack.
+	 * <p>
+	 * A typical example is to iterate over the properties of the class, to
+	 * generate methods like toString or equals / hashcode.
 	 * 
-	 * @return a Java EL expression to generate the body. The root property
-	 *         "element" refers to the generated method.
+	 * 
+	 * @return
+	 */
+	String bodyIterator() default "";
+
+	/**
+	 * 
+	 * @return the language of the body iterator expression. Default is Java EL.
+	 */
+	String bodyIteratorLang() default "";
+
+	/**
+	 * 
+	 * @return an expression to generate the body. The root property "element"
+	 *         refers to the generated method.
 	 */
 	String bodyExpr() default "";
+
+	/**
+	 * 
+	 * @return if bodyIterator is set, this code is inserted between each
+	 *         iteration of bodyExpr.
+	 */
+	String bodySeparator() default "";
+
+	/**
+	 * 
+	 * @return an expression for the code to be generated before the repetitive
+	 *         bodyExpr. Only rendered, if the iterator expression is set and
+	 *         does not result in an empty iterator.
+	 */
+	String bodyBeforeExpr() default "";
+
+	/**
+	 * 
+	 * @return an expression for the code to be generated after the repetitive
+	 *         bodyExpr. Only rendered, if the iterator expression is set and
+	 *         does not result in an empty iterator.
+	 */
+	String bodyAfterExpr() default "";
+
+	/**
+	 * 
+	 * @return an expression for the code to be generated if the iterator
+	 *         expression is set but does result in an empty iterator.
+	 */
+	String bodyEmptyExpr() default "";
 
 	/**
 	 * 
 	 * @return the language of the body expression. Default is Java EL.
 	 */
 	String bodyLang() default "";
-	
+
 	/**
-	 * The delegate methods to create. The delegate is the return value of the generated method.
+	 * The delegate methods to create. The delegate is the return value of the
+	 * generated method.
 	 * 
 	 * @return
 	 */

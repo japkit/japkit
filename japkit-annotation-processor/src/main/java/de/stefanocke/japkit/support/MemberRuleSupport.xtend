@@ -52,13 +52,12 @@ public abstract class MemberRuleSupport<E extends Element> {
 			val srcElements = getSrcElements(triggerAnnotation, ruleSrcElement)
 
 			srcElements.forEach [ e |
-				valueStack.scope(e)	[	
-					valueStack.putELVariables(e, triggerAnnotation, metaAnnotation)		
+				valueStack.scope(e) [
+					valueStack.putELVariables(e, triggerAnnotation, metaAnnotation)
 					val member = createMember(annotatedClass, generatedClass, triggerAnnotation, e)
-					generatedClass.add(member)	
-					
+					generatedClass.add(member)
 					//Create delegate methods that use the generated member to retrieve the object to delegate to
-					createDelegateMethods(member, annotatedClass, generatedClass, triggerAnnotation)			
+					createDelegateMethods(member, annotatedClass, generatedClass, triggerAnnotation)
 				]
 			]
 
@@ -171,23 +170,38 @@ public abstract class MemberRuleSupport<E extends Element> {
 	}
 
 	protected def getCodeBodyFromMetaAnnotation(GenElement element, AnnotationMirror triggerAnnotation, String avName,
-		String langAvName) {
+		String langAvName, String iteratorAv, String iteratorLangAv, String separatorAv, String beforeAv, String afterAv, String emptyAv) {
 		if(metaAnnotation == null) return null
-		val bodyExpr = triggerAnnotation.valueOrMetaValue(avName, String, metaAnnotation)
 
-		//The language used for the expression
+		//the body expression
+		val bodyExpr = triggerAnnotation.valueOrMetaValue(avName, String, metaAnnotation)
 		val lang = triggerAnnotation.valueOrMetaValue(langAvName, String, metaAnnotation)
+
+		val beforeExpr = triggerAnnotation.valueOrMetaValue(beforeAv, String, metaAnnotation)
+		val afterExpr = triggerAnnotation.valueOrMetaValue(afterAv, String, metaAnnotation)
+		val emptyExpr = triggerAnnotation.valueOrMetaValue(emptyAv, String, metaAnnotation)
+
+		//body iterator
+		val iteratorExpr = triggerAnnotation.valueOrMetaValue(iteratorAv, String, metaAnnotation)
+		val iteratorLang = triggerAnnotation.valueOrMetaValue(iteratorLangAv, String, metaAnnotation)
+
+		val separator = triggerAnnotation.valueOrMetaValue(separatorAv, String, metaAnnotation)
+
 		val imports = triggerAnnotation.valueOrMetaValue("imports", typeof(DeclaredType[]), metaAnnotation)
-		getCodeBodyFromMetaAnnotation(element, triggerAnnotation, bodyExpr, lang, imports)
+		getCodeBodyFromMetaAnnotation(element, triggerAnnotation, bodyExpr, lang, beforeExpr, afterExpr, emptyExpr, iteratorExpr,
+			iteratorLang, separator, imports)
 	}
 
 	protected def getCodeBodyFromMetaAnnotation(Element enclosingElement, AnnotationMirror triggerAnnotation,
-		String bodyExpr, String lang, DeclaredType[] imports) {
+		String bodyExpr, String lang, String beforeExpr, String afterExpr, String emptyExpr, String iteratorExpr, String iteratorLang,
+		String separator, DeclaredType[] imports) {
 
 		if (bodyExpr.nullOrEmpty)
 			null
 		else {
-			val valueStack = new ValueStack(valueStack); //deep copy current state of value stack
+
+			//deep copy current state of value stack, since body is evaluated later (in JavaEmitter)
+			val valueStack = new ValueStack(valueStack);
 			[ EmitterContext ec |
 				imports.forEach [
 					if (!ec.importIfPossible(it)) {
@@ -198,18 +212,44 @@ public abstract class MemberRuleSupport<E extends Element> {
 				valueStack.scope(enclosingElement) [ vs |
 					vs.put("ec", ec)
 					handleTypeElementNotFound(null, '''Code body «bodyExpr» could not be generated''') [
-						eval(vs, bodyExpr, lang, String, '''Code body could not be generated''',
-							'throw new UnsupportedOperationException();')
+						
+						
+						if (iteratorExpr.nullOrEmpty) {
+							eval(vs, bodyExpr, lang, String, '''Error in code body expression.''',
+									'throw new UnsupportedOperationException();')
+						} else {
+							val bodyIterator = eval(vs, iteratorExpr, iteratorLang, Iterable,
+								'''Error in code body iterator expression.''', emptyList)
+							if(!bodyIterator.nullOrEmpty){	
+								val before = eval(vs, beforeExpr, lang, String,
+									'''Error in code body before expression.''', '')
+								val after = eval(vs, afterExpr, lang, String,
+									'''Error in code body after expression.''', '')
+								'''
+									«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
+										«valueStack.scope(e as Element) [ vsInIteration |
+										eval(vsInIteration, bodyExpr, lang, String, '''Error in code body expression.''',
+											'')
+									]»
+									«ENDFOR»
+								'''	
+							} else {
+								eval(vs, emptyExpr, lang, String, '''Error in code body empty expression.''',
+									'throw new UnsupportedOperationException();')
+							}
+						}
 					]
 				]
 			]
 
 		}
 	}
-	
-	protected def void createDelegateMethods(GenElement genElement, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation){
+
+	protected def void createDelegateMethods(GenElement genElement, TypeElement annotatedClass,
+		GenTypeElement generatedClass, AnnotationMirror triggerAnnotation) {
 		if(metaAnnotation == null) return
-		val delegateMethodRules = triggerAnnotation.valueOrMetaValue("delegateMethods", typeof(AnnotationMirror[]), metaAnnotation)?.map [
+		val delegateMethodRules = triggerAnnotation.valueOrMetaValue("delegateMethods", typeof(AnnotationMirror[]),
+			metaAnnotation)?.map [
 			new DelegateMethodsRule(it, null)
 		]
 		delegateMethodRules?.forEach[apply(annotatedClass, generatedClass, triggerAnnotation, genElement)]
