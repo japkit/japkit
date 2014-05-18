@@ -16,7 +16,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 	override protected getSrcElements(AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		valueStack.put("delegate", ruleSrcElement)
 
-		val delegateTypeElement = ruleSrcElement.asType.asTypeElement
+		val delegateTypeElement = ruleSrcElement.srcType.asTypeElement
 
 		val methodFilter = triggerAnnotation.elementMatchers("methodFilter", metaAnnotation)
 		delegateTypeElement.allMethods.filter[m|methodFilter.nullOrEmpty || methodFilter.exists[matches(m)]]
