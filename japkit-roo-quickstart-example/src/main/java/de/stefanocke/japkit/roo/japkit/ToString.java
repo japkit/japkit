@@ -18,10 +18,10 @@ public abstract class ToString {
 			bodyBeforeExpr = "return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).\n",
 			bodyExpr = "append(\"#{element.simpleName}\", #{element.getter.simpleName}()).\n",
 			//Idee: Switch-Support.
-			//bodyExpr1Activation =
-			//bodyExpr1=
-			//bodyExpr1Activation =
-			//bodyExpr1=
+			//bodyCase1 =
+			//bodyExpr1 =
+			//bodyCase2 =
+			//bodyExpr2 =
 			bodyAfterExpr = "toString();\n",
 			bodyEmptyExpr = "return super.toString();" 
 			)
