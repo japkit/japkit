@@ -9,12 +9,14 @@ import de.stefanocke.japkit.support.el.ELSupport
 import de.stefanocke.japkit.support.el.ValueStack
 import java.util.ArrayList
 import java.util.Collections
+import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
+import org.eclipse.xtext.xbase.lib.Pair
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
@@ -177,6 +179,11 @@ public abstract class MemberRuleSupport<E extends Element> {
 		//the body expression
 		val bodyExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»Expr''', String, metaAnnotation)
 		val lang = triggerAnnotation.valueOrMetaValue('''«avPrefix»Lang''', String, metaAnnotation)
+		
+		val bodyExprSwitch = (1..10).map[triggerAnnotation.elementMatchers('''«avPrefix»Case«it»''', metaAnnotation) 
+			-> triggerAnnotation.valueOrMetaValue('''«avPrefix»Expr«it»''', String, metaAnnotation)
+		].toList
+
 
 		val beforeExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»BeforeExpr''', String, metaAnnotation)
 		val afterExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»AfterExpr''', String, metaAnnotation)
@@ -189,12 +196,14 @@ public abstract class MemberRuleSupport<E extends Element> {
 		val separator = triggerAnnotation.valueOrMetaValue('''«avPrefix»Separator''', String, metaAnnotation)
 
 		val imports = triggerAnnotation.valueOrMetaValue("imports", typeof(DeclaredType[]), metaAnnotation)
-		getCodeBodyFromMetaAnnotation(element, triggerAnnotation, bodyExpr, lang, beforeExpr, afterExpr, emptyExpr, iteratorExpr,
+		getCodeBodyFromMetaAnnotation(element, triggerAnnotation, bodyExpr, bodyExprSwitch, 
+			lang, beforeExpr, afterExpr, emptyExpr, iteratorExpr,
 			iteratorLang, separator, imports)
 	}
 
 	protected def getCodeBodyFromMetaAnnotation(Element enclosingElement, AnnotationMirror triggerAnnotation,
-		String bodyExpr, String lang, String beforeExpr, String afterExpr, String emptyExpr, String iteratorExpr, String iteratorLang,
+		String bodyExpr, List<Pair<List<ElementMatcher>, String>> bodyExprSwitch, 
+		String lang, String beforeExpr, String afterExpr, String emptyExpr, String iteratorExpr, String iteratorLang,
 		String separator, DeclaredType[] imports) {
 
 		if (bodyExpr.nullOrEmpty)
@@ -215,9 +224,8 @@ public abstract class MemberRuleSupport<E extends Element> {
 					handleTypeElementNotFound(null, '''Code body «bodyExpr» could not be generated''') [
 						
 						
-						if (iteratorExpr.nullOrEmpty) {
-							eval(vs, bodyExpr, lang, String, '''Error in code body expression.''',
-									'throw new UnsupportedOperationException();')
+						if (iteratorExpr.nullOrEmpty) {							
+							evalBodyExpr(vs, enclosingElement, bodyExprSwitch, bodyExpr, lang, 'throw new UnsupportedOperationException();')
 						} else {
 							val bodyIterator = eval(vs, iteratorExpr, iteratorLang, Iterable,
 								'''Error in code body iterator expression.''', emptyList)
@@ -229,9 +237,8 @@ public abstract class MemberRuleSupport<E extends Element> {
 								'''
 									«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
 										«valueStack.scope(e as Element) [ vsInIteration |
-										eval(vsInIteration, bodyExpr, lang, String, '''Error in code body expression.''',
-											'')
-									]»
+											evalBodyExpr(vsInIteration, e as Element, bodyExprSwitch, bodyExpr, lang, '')
+										]»
 									«ENDFOR»
 								'''	
 							} else {								
@@ -244,6 +251,16 @@ public abstract class MemberRuleSupport<E extends Element> {
 			]
 
 		}
+	}
+	
+	protected def evalBodyExpr(ValueStack vs, Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyExprSwitch, String bodyExpr, String lang, String errorResult) {
+		val bodyExprToUse = bodyExprSwitch.findFirst[
+			val matcher = key
+			!matcher.nullOrEmpty && matcher.exists[matches(ruleSrcElement)]
+		]?.value ?: bodyExpr
+		
+		eval(vs, bodyExprToUse, lang, String, '''Error in code body expression.''',
+				errorResult)
 	}
 
 	protected def void createDelegateMethods(GenElement genElement, TypeElement annotatedClass,

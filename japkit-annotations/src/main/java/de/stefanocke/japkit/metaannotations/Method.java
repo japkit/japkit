@@ -51,6 +51,8 @@ public @interface Method {
 	 * By default, this method annotation is active an will generate a method.
 	 * To switch it on or of case by case, a Matcher can be used here. The
 	 * element on which the matcher is applied is the annotated class.
+	 * <p>
+	 * In case of multiple matchers, at least one must match to activate the rule.
 	 * 
 	 * @return
 	 */
@@ -137,9 +139,37 @@ public @interface Method {
 	/**
 	 * 
 	 * @return an expression to generate the body. The root property "element"
-	 *         refers to the generated method.
+	 *         refers to the generated method or, if a bodyIterator is used, the current iterator element.
 	 */
 	String bodyExpr() default "";
+	
+	
+	/**
+	 * If there is at least one of the given matchers, that matches, bodyExpr1 is use instead of bodyExpr. If there are no matchers
+	 * or none of them match, the bodyCase2 matchers are evaluated and so on.
+	 * That is, you can use bodyCaseN and bodyExprN for a switch-case-like rule. If nothing matches, the default is bodyExpr.
+	 * 
+	 * @return
+	 */
+	Matcher[] bodyCase1() default {};
+	
+	String bodyExpr1() default "";
+	
+	Matcher[] bodyCase2() default {};
+	
+	String bodyExpr2() default "";
+	
+	Matcher[] bodyCase3() default {};
+	
+	String bodyExpr3() default "";
+	
+	Matcher[] bodyCase4() default {};
+	
+	String bodyExpr4() default "";
+	
+	Matcher[] bodyCase5() default {};
+	
+	String bodyExpr5() default "";
 
 	/**
 	 * 

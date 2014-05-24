@@ -51,6 +51,8 @@ public @interface Field {
 	 * By default, this method annotation is active and will generate a field.
 	 * To switch it on or of case by case, a Matcher can be used here. The
 	 * element on which the matcher is applied is the enclosing class.
+	 * <p>
+	 * In case of multiple matchers, at least one must match to activate the rule.
 	 * 
 	 * @return
 	 */

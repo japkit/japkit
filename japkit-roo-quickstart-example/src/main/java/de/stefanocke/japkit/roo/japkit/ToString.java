@@ -3,6 +3,8 @@ package de.stefanocke.japkit.roo.japkit;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import de.stefanocke.japkit.metaannotations.Matcher;
+import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Properties;
@@ -16,6 +18,9 @@ public abstract class ToString {
 			bodyIterator="#{toStringProperties}",
 			//bodyIteratorVar="p"
 			bodyBeforeExpr = "return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).\n",
+			bodyCase1 = @Matcher(srcTypeCategory=TypeCategory.COLLECTION),
+			//Only summary for collections
+			bodyExpr1 = "append(\"#{element.simpleName}\", #{element.getter.simpleName}(), false).\n",
 			bodyExpr = "append(\"#{element.simpleName}\", #{element.getter.simpleName}()).\n",
 			//Idee: Switch-Support.
 			//bodyCase1 =
