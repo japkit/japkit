@@ -22,11 +22,6 @@ public abstract class ToString {
 			//Only summary for collections
 			bodyExpr1 = "append(\"#{element.simpleName}\", #{element.getter.simpleName}(), false).\n",
 			bodyExpr = "append(\"#{element.simpleName}\", #{element.getter.simpleName}()).\n",
-			//Idee: Switch-Support.
-			//bodyCase1 =
-			//bodyExpr1 =
-			//bodyCase2 =
-			//bodyExpr2 =
 			bodyAfterExpr = "toString();\n",
 			bodyEmptyExpr = "return super.toString();" 
 			)
