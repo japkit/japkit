@@ -15,6 +15,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
+import java.util.ArrayList
 
 class GenExtensions {
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -125,7 +126,7 @@ class GenExtensions {
 	}
 	
 	def static copyAnnotations(Element src, (AnnotationMirror)=>boolean filter){
-		src.annotationMirrors.filter(filter).map[copy].toList
+		new ArrayList(src.annotationMirrors.filter(filter).map[copy].toList)
 	}
 	
 	def static GenAnnotationMirror copy(AnnotationMirror am){
@@ -139,7 +140,7 @@ class GenExtensions {
 	}
 	
 	def static dispatch copyAvValue(List<? extends AnnotationValue> values){
-		values.map[copy]
+		new ArrayList(values.map[copy])
 	}
 	
 	def static dispatch copyAvValue(AnnotationMirror v){
