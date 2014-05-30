@@ -85,12 +85,6 @@ class RelatedTypes {
 			var resolved =  resolveClassSelector(selector, annotatedClass, generatedClass, am, metaAnnotation, annotationValueName, ruleSourceElement, true)
 			
 			var type = resolved.type
-			var selectorKind = resolved.kind
-			
-			//if(selectorKind == null || selectorKind == ClassSelectorKind.TYPE_MIRROR){
-			//	//Do not transform inner classes and special SelectorKinds. For example, AnnotatedClass shall always refer to the annotated class.
-			//	type = tansformAccordingToGenClassAnnotationIfRequested(type, annotatedClass, am, annotationValueName,metaAnnotation)	
-			//}
 			
 			if (type != null) {
 				annotatedClass.registerTypeDependencyForAnnotatedClass(type)
