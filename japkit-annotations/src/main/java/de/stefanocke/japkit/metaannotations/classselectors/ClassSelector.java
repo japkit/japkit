@@ -13,8 +13,7 @@ public @interface ClassSelector {
 
 	/**
 	 * 
-	 * @return the name of the annotation value of the trigger annotation or meta annotation. 
-	 * TODO: Add AV to specify the meta annotation. Currently, it is ambiguous. In some cases GenerateClass meta-anntoation is considered.
+	 * @return the name of the annotation value of the trigger annotation.
 	 *         <p>
 	 *         In case of ClassSelectorKind.TYPE_MIRROR that annotation value
 	 *         must be of type Class<?>.
@@ -31,6 +30,10 @@ public @interface ClassSelector {
 	 */
 	String avName() default "";
 	
+	/**
+	 * 
+	 * @return for {@link ClassSelectorKind#EXPR} and as fallback for TYPE_MIRROR and INNER_CLASS_NAME, if the AV does not exist.
+	 */
 	String expr() default "";
 	
 	String lang() default "";

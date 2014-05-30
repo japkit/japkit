@@ -82,7 +82,7 @@ class RelatedTypes {
 
 		
 		try {
-			var resolved =  resolveClassSelector(selector, annotatedClass, generatedClass, am, metaAnnotation, annotationValueName, ruleSourceElement, true)
+			var resolved =  resolveClassSelector(selector, annotatedClass, generatedClass, am, annotationValueName, ruleSourceElement, true)
 			
 			var type = resolved.type
 			
@@ -132,7 +132,7 @@ class RelatedTypes {
 	 * If the type element is annotated with @ClassSelector, the selector is resolved.
 	 */
 	def private resolveClassSelector(TypeMirror type, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am,
-		AnnotationMirror metaAnnotation, CharSequence annotationValueName, Element ruleSourceElement, boolean throwTypeElementNotFound) {
+		CharSequence annotationValueName, Element ruleSourceElement, boolean throwTypeElementNotFound) {
 
 		val resolvedSelector = new ResolvedClassSelector
 		resolvedSelector.type = type
@@ -164,24 +164,26 @@ class RelatedTypes {
 					case ClassSelectorKind.SRC_ELEMENT_SINGLE_VALUE_TYPE:
 						resolvedSelector.type = ruleSourceElement.asType.singleValueType
 					case ClassSelectorKind.TYPE_MIRROR: {
-						resolvedSelector.type = am.valueOrMetaValue(classSelectorAnnotation.getClassSelectorAvName(te),
-							TypeMirror, metaAnnotation)
+						resolvedSelector.type = am.value(classSelectorAnnotation.getClassSelectorAvName(te),
+							TypeMirror)
+						if(resolvedSelector.type == null){
+							resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, TypeMirror)
+						}	
 					}
 					case ClassSelectorKind.INNER_CLASS_NAME: {
-						resolvedSelector.innerClassName = am.valueOrMetaValue(annotatedClass,
-							classSelectorAnnotation.getClassSelectorAvName(te), String, true, metaAnnotation)
-
-						resolvedSelector.typeElement = findInnerClass(annotatedClass, resolvedSelector.innerClassName,
-							throwTypeElementNotFound)
-						resolvedSelector.type = resolvedSelector.typeElement?.asType	
+						resolvedSelector.innerClassName = am.value(annotatedClass,
+							classSelectorAnnotation.getClassSelectorAvName(te), String)
+							
+						if(resolvedSelector.innerClassName == null){
+							resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, String)
+						} 
+						resolvedSelector.typeElement = findInnerClass(annotatedClass, resolvedSelector.innerClassName, throwTypeElementNotFound)
+						resolvedSelector.type = resolvedSelector.typeElement?.asType							
+						
 
 					}
 					case ClassSelectorKind.EXPR : {
-						val expr = classSelectorAnnotation.value("expr", String);
-						val lang = classSelectorAnnotation.value("lang", String);
-						resolvedSelector.type = ExtensionRegistry.get(ELSupport).eval(annotatedClass, expr, lang, TypeMirror,
-							'''Error when evaluating class selector expression '«expr»'  ''', null			
-						)
+						resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, TypeMirror)
 					}
 					default: {
 						resolvedSelector.type = null
@@ -196,6 +198,14 @@ class RelatedTypes {
 		}
 
 		resolvedSelector
+	}
+	
+	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, TypeElement annotatedClass, Class<T> targetType) {
+		val expr = classSelectorAnnotation.value("expr", String);
+		val lang = classSelectorAnnotation.value("lang", String);
+		ExtensionRegistry.get(ELSupport).eval(annotatedClass, expr, lang, targetType,
+			'''Error when evaluating class selector expression '«expr»'  ''', null			
+		)
 	}
 	
 	
@@ -229,7 +239,7 @@ class RelatedTypes {
 		AnnotationMirror metaAnnotation, CharSequence annotationValueName) {
 		try {
 
-			var resolved = resolveClassSelector(selector, annotatedClass, null, am, metaAnnotation, annotationValueName, annotatedClass, false)
+			var resolved = resolveClassSelector(selector, annotatedClass, null, am, annotationValueName, annotatedClass, false)
 
 			var tm = resolved.type
 			var selectorKind = resolved.kind
