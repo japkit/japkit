@@ -229,7 +229,7 @@ class ClassGenerator {
 					else
 						triggerAnnotation.annotationAsTypeElement
 				printDiagnosticMessage(['''Process member annotations on «te»'''])
-				te.annotationMirrors.filter[hasMetaAnnotation(MemberGeneratorAnnotation.name)].forEach [
+				te.annotationMirrors.forEach [
 					processMemberGenerator(te, annotatedClass, generatedClass, triggerAnnotation, genClassMetaAnnotation)
 				]
 
@@ -269,6 +269,11 @@ class ClassGenerator {
 				} else {
 					annoTypeElement
 				}
+				
+			if(triggerAnnotationTypeElement.annotationMirror(MemberGeneratorAnnotation) == null){
+				//No Member generator annotation
+				return
+			}
 
 			val triggerFqn = triggerAnnotationTypeElement.qualifiedName.toString
 			val MemberGenerator mg = getMemberGenerator(triggerFqn);
