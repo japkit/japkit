@@ -19,6 +19,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * 
  */
 @Retention(RetentionPolicy.CLASS)
+@MemberGeneratorAnnotation
 public @interface Properties {
 	enum RuleSource {
 		/**

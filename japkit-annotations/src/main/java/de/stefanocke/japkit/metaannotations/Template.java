@@ -5,6 +5,7 @@ package de.stefanocke.japkit.metaannotations;
  * @author stefan
  *
  */
+@MemberGeneratorAnnotation
 public @interface Template {
 	Var[] vars() default {};
 }

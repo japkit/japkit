@@ -40,6 +40,7 @@ import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
 import javax.lang.model.element.ExecutableElement
 import de.stefanocke.japkit.gen.GenExecutableElement
+import de.stefanocke.japkit.metaannotations.MemberGeneratorAnnotation
 
 class ClassGenerator {
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -228,7 +229,7 @@ class ClassGenerator {
 					else
 						triggerAnnotation.annotationAsTypeElement
 				printDiagnosticMessage(['''Process member annotations on «te»'''])
-				te.annotationMirrors.forEach [
+				te.annotationMirrors.filter[hasMetaAnnotation(MemberGeneratorAnnotation.name)].forEach [
 					processMemberGenerator(te, annotatedClass, generatedClass, triggerAnnotation, genClassMetaAnnotation)
 				]
 

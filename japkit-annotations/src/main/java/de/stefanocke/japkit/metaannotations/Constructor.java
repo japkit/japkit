@@ -14,6 +14,7 @@ import de.stefanocke.japkit.metaannotations.Properties.RuleSource;
  * @author stefan
  * 
  */
+@MemberGeneratorAnnotation
 public @interface Constructor {
 	/**
 	 * When the annotated annotation wants to override annotation values of the

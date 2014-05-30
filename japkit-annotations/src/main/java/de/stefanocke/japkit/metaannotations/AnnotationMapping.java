@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 
 import javax.lang.model.element.Modifier;
 
+@MemberGeneratorAnnotation
 public @interface AnnotationMapping {
 
 	/**

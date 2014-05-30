@@ -11,6 +11,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * @author stefan
  * 
  */
+@MemberGeneratorAnnotation
 public @interface Field {
 	/**
 	 * When the annotated annotation wants to override annotation values of the
