@@ -3,10 +3,13 @@ package de.stefanocke.japkit.support
 import com.google.common.cache.CacheBuilder
 import de.stefanocke.japkit.annotations.Order
 import de.stefanocke.japkit.gen.GenAnnotationMirror
+import de.stefanocke.japkit.gen.GenAnnotationValue
 import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenName
 import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.metaannotations.GenerateClass
 import de.stefanocke.japkit.metaannotations.ParamNames
+import de.stefanocke.japkit.metaannotations.RequiredTriggerAnnotation
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.lang.annotation.Annotation
@@ -29,13 +32,13 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
+import javax.lang.model.type.ErrorType
 import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
-import de.stefanocke.japkit.gen.GenAnnotationValue
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -327,6 +330,7 @@ class ElementsExtensions {
 
 	//Ist das legal? GGf. auf eine Runde beschränken...
 	static val annotationValuesCache = CacheBuilder.newBuilder.maximumSize(1000).weakKeys.<AnnotationMirror, Map<String, AnnotationValue>>build
+	
 
 	def AnnotationValue value(AnnotationMirror annotationMirror, CharSequence name) {
 		loadAnnotationValues(annotationMirror).get(name.toString)
@@ -416,6 +420,7 @@ class ElementsExtensions {
 		if (!avType.array && value instanceof Iterable<?>) {	
 			return av.mapAs(singleAV(value as Iterable<AnnotationValue>), annotationMirror, annotatedElement, name, avType)
 		}
+		
 
 		if (avType == TypeElement) {
 			val tm = av.cast(value, annotationMirror, annotatedElement, name, TypeMirror)
@@ -450,6 +455,13 @@ class ElementsExtensions {
 			av.cast(value, annotationMirror, annotatedElement, name, avType)
 		}
 	}
+	
+	
+	
+	//TODO: Cache?
+	private def annotationValueDeclaration(AnnotationMirror annotationMirror, CharSequence name) {
+		annotationMirror.annotationAsTypeElement.declaredMethods.findFirst[simpleName.contentEquals(name)]
+	}
 
 	def singleAV(Iterable<AnnotationValue> values) {		
 		(MoreCollectionExtensions.singleValue(values) as AnnotationValue)?.value
@@ -479,6 +491,11 @@ class ElementsExtensions {
 		val prefixedAvName = getPrefixedAvName(metaAnnotation, name)
 
 		var value = value(annotationMirror, annotatedElement, prefixedAvName, avType, false);
+		
+		//TODO: Das wirkt nicht überall. z.B. nicht in annotationValuesByNameUnwrapped
+		if(value!=null){
+			value = transformTypeToGeneratedType(value, annotationMirror, name) as T	
+		}
 
 		//If the annotation does not provide the value, take it from the meta annotation
 		if (value == null && metaAnnotation != null) {
@@ -487,6 +504,8 @@ class ElementsExtensions {
 		}
 		value
 	}
+
+		
 
 	def getPrefixedAvName(AnnotationMirror metaAnnotation, CharSequence name) {
 		if (metaAnnotation == null) {
@@ -791,6 +810,106 @@ class ElementsExtensions {
 
 	def printElements(Writer w, Element... elements) {
 		elementUtils.printElements(w, elements)
+	}
+	
+	
+	//TODO: Das ist ziemlich high level für ElementsExtensions. Ggf. als "Plugin" bereitstellen.
+		//Transform annotated types to their generated counterparts, if the annotation value decl. has an according metanannotation
+	
+	private def dispatch transformTypeToGeneratedType(TypeMirror value, AnnotationMirror annotationMirror, CharSequence name) {		
+			val triggerAnnotationTypes = getAVTriggerAnnotationTypes(annotationMirror, name)			
+			generatedTypeAccordingToTriggerAnnotation(value, triggerAnnotationTypes, false)			
+	}
+	
+	private def dispatch transformTypeToGeneratedType(TypeElement value, AnnotationMirror annotationMirror, CharSequence name) {		
+			val triggerAnnotationTypes = getAVTriggerAnnotationTypes(annotationMirror, name)			
+			generatedTypeElementAccordingToTriggerAnnotation(value, triggerAnnotationTypes, false)			
+	}
+	
+	private def dispatch transformTypeToGeneratedType(Iterable<?> value, AnnotationMirror annotationMirror, CharSequence name) {		
+		if(!value.nullOrEmpty && (value.head instanceof TypeMirror)){
+			val triggerAnnotationTypes = getAVTriggerAnnotationTypes(annotationMirror, name)
+			value.map[generatedTypeAccordingToTriggerAnnotation(it as TypeMirror, triggerAnnotationTypes, false)]
+		} else if(!value.nullOrEmpty && value.head instanceof TypeElement){
+			val triggerAnnotationTypes = getAVTriggerAnnotationTypes(annotationMirror, name)
+			value.map[generatedTypeElementAccordingToTriggerAnnotation(it as TypeElement, triggerAnnotationTypes, false)]
+		} else {
+			value
+		}
+	}
+	
+	private def dispatch transformTypeToGeneratedType(Object value, AnnotationMirror annotationMirror, CharSequence name) {
+		value
+	}
+	
+	
+	private def getAVTriggerAnnotationTypes(AnnotationMirror annotationMirror, CharSequence name) {
+		val am = annotationValueDeclaration(annotationMirror, name).annotationMirror(RequiredTriggerAnnotation)
+		am?.value("value", typeof(TypeMirror[]))
+	}
+	
+	/**
+	 * Validates if the type has (at most) one of the given trigger annotations. If so , and it is not a generated type, 
+	 * the according generated type is determined and returned.  
+	 */
+	def TypeMirror generatedTypeAccordingToTriggerAnnotation(TypeMirror type, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger
+	) {
+		var typeCandidate = type
+		
+		if (typeCandidate instanceof DeclaredType && !(typeCandidate instanceof ErrorType)) {
+			
+			
+			val typeElement = typeCandidate.asTypeElement
+			typeCandidate = 
+			generatedTypeElementAccordingToTriggerAnnotation(typeElement, triggerAnnotationTypes, mustHaveTrigger)?.asType
+		}
+		typeCandidate
+	}
+	
+	def TypeElement generatedTypeElementAccordingToTriggerAnnotation(TypeElement typeElement, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger) {
+		if(triggerAnnotationTypes.nullOrEmpty){
+			return typeElement
+		}
+		val triggerAnnotationTypeFqns = triggerAnnotationTypes.map[qualifiedName].toSet
+		val annotations = typeElement.annotationMirrors.filter[triggerAnnotationTypeFqns.contains(annotationType.qualifiedName)] 
+		
+		if (annotations.empty) {
+			if (mustHaveTrigger) {
+				mc.reportError(
+					'''Related type «typeElement.qualifiedName» must have one of the trigger annotations «triggerAnnotationTypeFqns».''',
+					null, null, null);
+				null
+
+			} else {
+				typeElement
+			}
+		}
+		
+		else if (annotations.size > 1) {
+		
+			mc.reportError(
+				'''Related type «typeElement.qualifiedName» has more than one of the trigger annotations «triggerAnnotationTypeFqns».
+				 Thus, the generated type to use is not unique.''',
+				null, null, null);
+			null
+		}
+		else if(!typeElement.generated) {  //Only apply the transformation if it is not a generated class 
+				
+			//TODO: Zumindest Teile davon können in die Type Registry
+			val triggerAnnotation = annotations.head
+			val nameRule = new ClassNameRule(triggerAnnotation,
+				triggerAnnotation.metaAnnotation(GenerateClass))
+			val fqn = nameRule.generateQualifiedName(typeElement)
+			val generatedTypeElement = findTypeElement(fqn)
+			if (generatedTypeElement == null) {
+				throw new TypeElementNotFoundException(fqn, '')  
+			} else {
+				generatedTypeElement				
+			}
+				
+		} else {
+			typeElement
+		}
 	}
 
 }

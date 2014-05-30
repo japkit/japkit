@@ -1,18 +1,19 @@
 package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenClass
+import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.GenerateClass
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind
+import de.stefanocke.japkit.support.el.ELSupport
+import java.util.List
+import java.util.Set
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.gen.GenTypeElement
-import javax.lang.model.element.Element
-import java.util.List
-import de.stefanocke.japkit.support.el.ELSupport
 
 class RelatedTypes {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -21,12 +22,12 @@ class RelatedTypes {
 	extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 	MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	
-	
+	//Closure to resolve all type selectors in a given type
 	def relatedTypesTransformation(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		[ TypeMirror t |
 			//TODO: Das Konzept bzgl meta-annotations ist bei relatedType noch nicht ganz durchdacht.
-			//Meist bezieht sich der selecto auf die Trigger annotation. Nur bei "BehaviorInnerClass" ist das bisher anders. 
-			//Da bezieht er sic hauf GenClass.
+			//Meist bezieht sich der selector auf die Trigger annotation. Nur bei "BehaviorInnerClass" ist das bisher anders. 
+			//Da bezieht er sich auf GenClass.
 			//Vorläufig setzten wir hier null als metaannotation, damit es überhaupt funzt.
 			t.relatedType(annotatedClass, generatedClass, triggerAnnotation, null, null, ruleSrcElement)
 		]
@@ -86,10 +87,10 @@ class RelatedTypes {
 			var type = resolved.type
 			var selectorKind = resolved.kind
 			
-			if(selectorKind == null || selectorKind == ClassSelectorKind.TYPE_MIRROR){
-				//Do not transform inner classes and special SelectorKinds. For example, AnnotatedClass shall always refer to the annotated class.
-				type = tansformAccordingToGenClassAnnotationIfRequested(type, annotatedClass, am, annotationValueName,metaAnnotation)	
-			}
+			//if(selectorKind == null || selectorKind == ClassSelectorKind.TYPE_MIRROR){
+			//	//Do not transform inner classes and special SelectorKinds. For example, AnnotatedClass shall always refer to the annotated class.
+			//	type = tansformAccordingToGenClassAnnotationIfRequested(type, annotatedClass, am, annotationValueName,metaAnnotation)	
+			//}
 			
 			if (type != null) {
 				annotatedClass.registerTypeDependencyForAnnotatedClass(type)
@@ -119,7 +120,7 @@ class RelatedTypes {
 			//Beispiel: Kind-Entität verweist in ihren Annotationen auf Aggregat-Root. Aggregat-Root enthält liste der Kinder.
 			//Ggf kann man hier immer einen Zyklus "vermuten". Aber welche Elemente sind in diesem enthalten?
 			//
-			//Man kann das evtl umgehen, in dem in relatedTypes immer auf die annotierte Klasse verwieden wird und nicht auf 
+			//Man kann das evtl umgehen, in dem in relatedTypes immer auf die annotierte Klasse verwiesen wird und nicht auf 
 			//die daraus generierte Klasse.
 			//
 			//Vermutlich ein JDK-Bug. Anstatt eine ErrorType zu liefern, wird hier eine Instanz von com.sun.tools.javac.code.Attribute.Error
@@ -213,49 +214,7 @@ class RelatedTypes {
 		avName
 	}
 	
-	def private tansformAccordingToGenClassAnnotationIfRequested(TypeMirror type, TypeElement annotatedClass, AnnotationMirror am, CharSequence annotationValueName, AnnotationMirror metaAnnotation) {
-		var typeCandidate = type
-		
-		//TODO: Move out of here? Maybe, the class selector annotation is a better place for this...
-		val transformAccordingToGenClassAnnotation = am.valueOrMetaValue(
-			"transformRelatesTypesAccordingToGenClassAnnotation", Boolean, metaAnnotation) ?: false;
-			
-		//am.valueOrMetaValue(selector.getAnnotationValueName, TypeMirror, genClass)
-		if (transformAccordingToGenClassAnnotation && typeCandidate instanceof DeclaredType &&
-			!(typeCandidate instanceof ErrorType)) {
-			val typeElement = typeCandidate.asTypeElement
-			val annotations = typeElement.annotationsWithMetaAnnotation(GenerateClass).filter[
-				!shadowAnnotation]
-			if (annotations.size > 1) {
-		
-				//Idee: Zu jedem related type könnte man optional noch eine Trigger-Annotation angeben. 
-				//Dies würde dann hier nicht nur zur disambiguation dienen, sondern auch als Validierung, dass die referenzierte Klasse diese Anntoation trägt.
-				messageCollector.reportError(
-					'''Related type «typeCandidate» has more than one trigger annotation. Thus, generated type is not unique.''',
-					annotatedClass, am, annotationValueName);
-				typeCandidate = null
-			}
-			if (!annotations.empty) {
-		
-				//TODO: Zumindest Teile davon können in die Type Registry
-				val triggerAnnotation = annotations.head
-				val nameRule = new ClassNameRule(triggerAnnotation,
-					triggerAnnotation.metaAnnotation(GenerateClass))
-				val fqn = nameRule.generateQualifiedName(typeElement)
-				val generatedTypeElement = findTypeElement(fqn)
-				if (generatedTypeElement == null) {
-					typeCandidate = null  //TODO: Instead, we could create some error type here
-					handleTypeElementNotFound(
-						'''Generated class «fqn» for «typeElement.qualifiedName» not found when determining related type for «annotatedClass»''',
-						fqn, annotatedClass)
-				} else {
-					typeCandidate = generatedTypeElement.asType				
-				}
-		
-			}
-		}
-		typeCandidate
-	}
+	
 
 	/**
 	 * If some generated code refers to a type element that is expected to be created by the user, this method can be used.

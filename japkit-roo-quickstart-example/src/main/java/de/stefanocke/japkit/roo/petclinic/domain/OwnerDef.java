@@ -9,7 +9,7 @@ import javax.persistence.OneToMany;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 
 @JapkitEntity
-public class OwnerDef extends AbstractPerson {
+public class OwnerDef extends AbstractPersonDef {
 
 	/**
      */

@@ -1,12 +1,12 @@
 package de.stefanocke.japkit.support.el
 
+import de.stefanocke.japkit.support.ElementMatcher
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.PropertyFilter
 import de.stefanocke.japkit.support.RuleFactory
-import de.stefanocke.japkit.support.SwitchRule
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypesExtensions
 import de.stefanocke.japkit.support.TypesRegistry
@@ -18,7 +18,9 @@ import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.support.ElementMatcher
+import java.util.Set
+import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.support.RelatedTypes
 
 @Data
 class ELVariableRule {
@@ -29,6 +31,7 @@ class ELVariableRule {
 	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	extension ELSupport = ExtensionRegistry.get(ELSupport)
 	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	val extension RelatedTypes = ExtensionRegistry.get(RelatedTypes)
 
 	AnnotationMirror elVarAnnotation
 	String name
@@ -38,6 +41,7 @@ class ELVariableRule {
 	String lang
 	Class<?> type
 	boolean setInShadowAnnotation
+	Set<TypeMirror> requiredTriggerAnnotation
 
 	//TODO: Das könnten auch direkt PropertyFilter sein, aber im Moment ist die Trigger Anntoation Teil ihres State...
 	AnnotationMirror[] propertyFilterAnnotations
@@ -67,6 +71,8 @@ class ELVariableRule {
 		_annotationToRetrieve = elVarAnnotation.value("annotation", TypeMirror)
 
 		_matcher = elVarAnnotation.value("matcher", typeof(AnnotationMirror[])).map[createElementMatcher].singleValue
+		
+		_requiredTriggerAnnotation = elVarAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
 
 	}
 
@@ -149,6 +155,15 @@ class ELVariableRule {
 				} else {
 					value
 				}
+				
+			if(!requiredTriggerAnnotation.nullOrEmpty){
+				if(value instanceof TypeElement){
+					value = generatedTypeElementAccordingToTriggerAnnotation(value as TypeElement, requiredTriggerAnnotation, false)
+				} else if(value instanceof TypeMirror){
+					value = generatedTypeAccordingToTriggerAnnotation(value as TypeMirror, requiredTriggerAnnotation, false)
+				}
+				
+			}
 
 			val valueForVariable = if (annotationToRetrieve == null) {
 					value

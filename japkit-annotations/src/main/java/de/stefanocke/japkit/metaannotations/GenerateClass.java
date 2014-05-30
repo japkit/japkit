@@ -66,19 +66,6 @@ public @interface GenerateClass {
 	Class<?>[] interface2TypeArgs() default {};
 	
 	/**
-	 * If set to true, it will be checked for each relates type, if it has an annotation with a GenerateClass meta annotation.
-	 * Where this is the case, the original type will be transformed to the class that will be generates by that a GenerateClass meta annotation.
-	 * <p>
-	 * By referring to annotated classes instead of generated classes, some issues with not yet existing types can be avoided.
-	 * It is strongly suggested to use this approach. (f.e. javac's annotation processing implementation gives the String "<error>" if a non-existing type is used 
-	 * as annotation value. This is simply not enough information to properly resolve the type dependency during code generation, especially
-	 * in case of cyclic dependencies between generated classes.)
-	 * 
-	 * @return
-	 */
-	boolean transformRelatesTypesAccordingToGenClassAnnotation() default false;
-
-	/**
 	 * 
 	 * @return the modifiers for the generated class
 	 */

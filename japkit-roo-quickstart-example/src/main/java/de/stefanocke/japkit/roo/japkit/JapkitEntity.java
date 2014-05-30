@@ -8,6 +8,7 @@ import de.stefanocke.japkit.metaannotations.GenerateClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Members;
 import de.stefanocke.japkit.metaannotations.Properties;
+import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.AnnotatedClass;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
@@ -15,13 +16,14 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 
 @GenerateClass(classSuffixToRemove = "Def", classSuffixToAppend = "", modifier = Modifier.PUBLIC,
 		annotationMappings = { @AnnotationMapping(targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class,
-		// Funzt zur zeit nicht für EXPR class selectors.
-		transformRelatesTypesAccordingToGenClassAnnotation = true, members = { @Members(IdAndVersion.class), @Members,
+		members = { @Members(IdAndVersion.class), 
+				@Members,
 				@Members(ToString.class),
 				@Members(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"), value = ActiveRecordMembers.class) })
 @Properties(sourceClass = AnnotatedClass.class, fromFields = true, annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = {
 		"javax.persistence", "javax.validation.constraints", "org.springframework.format.annotation" })
 /* ,templates = PropertyTemplateTest.class */)
+@Var(name = "superclass", expr = "#{currentAnnotatedClass.superclass}", requiredTriggerAnnotation=JapkitEntity.class)
 public @interface JapkitEntity {
 	// Modifier[] modifier() default {};
 
@@ -35,7 +37,7 @@ public @interface JapkitEntity {
 	// Ergebnis gemäß einer GenClass-Annotation aufgelöst werden soll.
 	// dabei kann man dann auch noch die in frage kommenden Trigger-Annotationen
 	// angeben.
-	@ClassSelector(kind = ClassSelectorKind.EXPR, expr = "#{currentAnnotatedClass.superclass}")
+	@ClassSelector(kind = ClassSelectorKind.EXPR, expr = "#{superclass}")
 	static class SuperclassSelector {
 	};
 
