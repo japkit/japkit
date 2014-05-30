@@ -77,8 +77,7 @@ class TemplateRule {
 	def addInterfaces(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		templateClass.interfaces.forEach [
-			val resolvedType = relatedType(it, annotatedClass, generatedClass, triggerAnnotation, null, null,
-				ruleSrcElement)
+			val resolvedType = relatedType(it, annotatedClass, generatedClass, triggerAnnotation, null, ruleSrcElement)
 			generatedClass.addInterface(resolvedType) //TODO: Check , if interface already exists? 
 		]
 	}

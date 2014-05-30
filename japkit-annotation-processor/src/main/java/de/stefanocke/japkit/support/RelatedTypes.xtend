@@ -25,11 +25,7 @@ class RelatedTypes {
 	//Closure to resolve all type selectors in a given type
 	def relatedTypesTransformation(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		[ TypeMirror t |
-			//TODO: Das Konzept bzgl meta-annotations ist bei relatedType noch nicht ganz durchdacht.
-			//Meist bezieht sich der selector auf die Trigger annotation. Nur bei "BehaviorInnerClass" ist das bisher anders. 
-			//Da bezieht er sich auf GenClass.
-			//Vorläufig setzten wir hier null als metaannotation, damit es überhaupt funzt.
-			t.relatedType(annotatedClass, generatedClass, triggerAnnotation, null, null, ruleSrcElement)
+			t.relatedType(annotatedClass, generatedClass, triggerAnnotation, null, ruleSrcElement)
 		]
 	}
 	
@@ -59,25 +55,21 @@ class RelatedTypes {
 	def relatedType(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am, CharSequence annotationValueName,
 		AnnotationMirror metaAnnotation,  Element ruleSourceElement) {
 
-		//TODO: Reconsider which metaannotation to use here.
-		val genClass = am.metaAnnotation(GenerateClass)
 		val selector = am.valueOrMetaValue(annotationValueName, TypeMirror, metaAnnotation)
-		relatedType(selector, annotatedClass, generatedClass, am, genClass, annotationValueName, ruleSourceElement)
+		relatedType(selector, annotatedClass, generatedClass, am, annotationValueName, ruleSourceElement)
 
 	}
 
 	def relatedTypes(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am, CharSequence annotationValueName,
 		AnnotationMirror metaAnnotation, Element ruleSourceElement) {
 
-		//TODO: Reconsider which metaannotation to use here.
-		val genClass = am.metaAnnotation(GenerateClass)
 		val selectors = am.valueOrMetaValue(annotationValueName, typeof(TypeMirror[]), metaAnnotation)
-		selectors.map(s|relatedType(s, annotatedClass, generatedClass, am, genClass, annotationValueName, ruleSourceElement))
+		selectors.map(s|relatedType(s, annotatedClass, generatedClass, am, annotationValueName, ruleSourceElement))
 
 	}
 	
 
-	def TypeMirror relatedType(TypeMirror selector, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am, AnnotationMirror metaAnnotation,
+	def TypeMirror relatedType(TypeMirror selector, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am,
 		CharSequence annotationValueName, Element ruleSourceElement) {
 
 		
@@ -99,7 +91,7 @@ class RelatedTypes {
 					type
 				} else {
 					getDeclaredType(type.asElement, selDecl.typeArguments.map[
-						relatedType(annotatedClass, generatedClass, am, metaAnnotation, annotationValueName, ruleSourceElement)
+						relatedType(annotatedClass, generatedClass, am, annotationValueName, ruleSourceElement)
 					])				
 				}	
 			}
