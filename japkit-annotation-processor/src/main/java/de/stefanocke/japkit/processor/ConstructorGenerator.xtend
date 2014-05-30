@@ -20,7 +20,7 @@ import javax.lang.model.element.TypeElement
 class ConstructorGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror annotation,
-		AnnotationMirror constructorAnnotation, AnnotationMirror genClassMetaAnnotation) {
+		AnnotationMirror constructorAnnotation) {
 			
 		val activation = annotation.elementMatchers("activation", constructorAnnotation)
 		

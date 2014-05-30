@@ -282,8 +282,7 @@ class ClassGenerator {
 					val avList = memberGeneratorMetaAnnotation.value("value", typeof(AnnotationMirror[]))
 					avList.forEach [
 						try {
-							mg.createMembers(membersClass, annotatedClass, generatedClass, triggerAnnotation, it,
-								genClassMetaAnnotation)
+							mg.createMembers(membersClass, annotatedClass, generatedClass, triggerAnnotation, it)
 						} catch (TypeElementNotFoundException e) {
 							handleTypeElementNotFound(
 								'''Error while member generator «mg.class» processes meta annotation «it»: «e.message»''',
@@ -293,7 +292,7 @@ class ClassGenerator {
 				} else {
 					try {
 						mg.createMembers(membersClass, annotatedClass, generatedClass, triggerAnnotation,
-							memberGeneratorMetaAnnotation, genClassMetaAnnotation)
+							memberGeneratorMetaAnnotation)
 					} catch (TypeElementNotFoundException e) {
 						handleTypeElementNotFound(
 							'''Error while member generator «mg.class» processes meta annotation «memberGeneratorMetaAnnotation»: «e.

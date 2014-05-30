@@ -3,7 +3,6 @@ package de.stefanocke.japkit.processor
 import de.stefanocke.japkit.annotations.BeforeSet
 import de.stefanocke.japkit.gen.CodeBody
 import de.stefanocke.japkit.gen.GenEnumConstant
-import de.stefanocke.japkit.gen.GenExecutableElement
 import de.stefanocke.japkit.gen.GenField
 import de.stefanocke.japkit.gen.GenMethod
 import de.stefanocke.japkit.gen.GenParameter
@@ -11,7 +10,6 @@ import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Properties
 import de.stefanocke.japkit.support.DelegateMethodsRule
 import de.stefanocke.japkit.support.ImmutabiltyRules
-import de.stefanocke.japkit.support.MethodRule
 import de.stefanocke.japkit.support.Property
 import de.stefanocke.japkit.support.PropertyFilter
 import javax.lang.model.element.AnnotationMirror
@@ -23,7 +21,7 @@ import javax.lang.model.type.TypeMirror
 class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror annotation, AnnotationMirror propertiesAnnotation, AnnotationMirror genClassMetaAnnotation) {
+		AnnotationMirror annotation, AnnotationMirror propertiesAnnotation) {
 
 		val activation = annotation.elementMatchers("activation", propertiesAnnotation)
 

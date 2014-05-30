@@ -17,7 +17,7 @@ class AnnotationGenerator extends MemberGeneratorSupport implements MemberGenera
 val extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror annotation,
-		AnnotationMirror annotationMappingAnnotation, AnnotationMirror genClassMetaAnnotation) {
+		AnnotationMirror annotationMappingAnnotation) {
 		
 		//Das lässt sich sicher optimieren indem eine Variante der Methode angeboten wird, die mehrere AMs entgegen nimmt.
 		//Die default impl würde einfach eine schleife drehen. 

@@ -9,11 +9,11 @@ import javax.lang.model.element.TypeElement
 class MethodGenerator extends MemberGeneratorSupport implements MemberGenerator {
 	
 
-	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror annotation,
-		AnnotationMirror methodAnnotation, AnnotationMirror genClassMetaAnnotation) {
+	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
+		AnnotationMirror methodAnnotation) {
 		
 		//TODO: Cache MethodRules by methodAnnotation
-		new MethodRule(methodAnnotation, null).apply(annotatedClass, generatedClass, annotation, generatedClass)
+		new MethodRule(methodAnnotation, null).apply(annotatedClass, generatedClass, triggerAnnotation, generatedClass)
 	}
 
 	override getSupportedMetaAnnotation() {

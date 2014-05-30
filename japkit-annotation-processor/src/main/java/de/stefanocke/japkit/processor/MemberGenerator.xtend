@@ -9,7 +9,7 @@ interface MemberGenerator {
 	 * @param membersClass the class that carries the members meta-annotation
 	 * @param annotatedClass the annotated class with the trigger annotation
 	 * @param generatedClass the generated class or interface to which to contribute members to 
-	 * @param annotation the annotation to be processed
+	 * @param triggerAnnotation the trigger annotation
 	 * @param metaAnnotationToBeProcessed the meta annotation to be processed
 	 * @param genClassMetaAnnotation the GenClass meta annotation which triggered the creation of the generatedClass.
 	 * @param env Callback interface RFU
@@ -17,9 +17,8 @@ interface MemberGenerator {
 	def void createMembers(
 		TypeElement membersClass,
 		TypeElement annotatedClass,
-			GenTypeElement generatedClass, AnnotationMirror annotation,
-			AnnotationMirror metaAnnotationToBeProcessed,
-			AnnotationMirror genClassMetaAnnotation)
+			GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
+			AnnotationMirror metaAnnotationToBeProcessed)
 	
 	/**
 	 * 
