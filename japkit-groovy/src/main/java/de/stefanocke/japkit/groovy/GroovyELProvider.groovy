@@ -151,7 +151,7 @@ class GroovyELProvider implements ELProvider {
 				
 				def t = templatesStatic.get(templateUrl)
 				def ProcessingEnvironment pe = ExtensionRegistry.get(ProcessingEnvironment)
-				pe.messager.printMessage(Diagnostic.Kind.WARNING, "Groovy template for ${templateUrl} in static cache: ${t}. Last modified: ${templateLastModified}");
+				//pe.messager.printMessage(Diagnostic.Kind.WARNING, "Groovy template for ${templateUrl} in static cache: ${t}. Last modified: ${templateLastModified}");
 				if(t!=null && templateLastModified<=t.key){
 					template = t.value
 					templates.put(templateUrl, template)
@@ -160,7 +160,7 @@ class GroovyELProvider implements ELProvider {
 
 			if (template == null){
 				def ProcessingEnvironment pe = ExtensionRegistry.get(ProcessingEnvironment)
-				pe.messager.printMessage(Diagnostic.Kind.WARNING, "Create Groovy template for ${templateUrl}. Cache: ${templates}");
+				//pe.messager.printMessage(Diagnostic.Kind.WARNING, "Create Groovy template for ${templateUrl}. Cache: ${templates}");
 				
 				switch(templateLanguage){
 					case "GStringTemplate": template = gstringTemplateEngine.createTemplate(templateUrl); break

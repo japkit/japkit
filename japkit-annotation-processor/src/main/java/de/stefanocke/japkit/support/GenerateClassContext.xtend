@@ -49,18 +49,18 @@ class GenerateClassContext {
 	}
 	
 	def void pushCurrentMetaAnnotation(AnnotationMirror am){
-		ExtensionRegistry.get(MessageCollector).printDiagnosticMessage['''Start processing Meta Annotation «am»''']
+		//ExtensionRegistry.get(MessageCollector).printDiagnosticMessage['''Start processing Meta Annotation «am»''']
 		metaAnnotations.push(am)
-		millis.push(System.currentTimeMillis)
+		//millis.push(System.currentTimeMillis)
 		
 	}
 	
 	def void popCurrentMetaAnnotation(){
 		val am = metaAnnotations.pop()
-		val startMillis = millis.pop
-		ExtensionRegistry.get(MessageCollector).printDiagnosticMessage[
-			'''Finished processing Meta Annotation «am». Duration: «System.currentTimeMillis-startMillis»'''
-		]
+		//val startMillis = millis.pop
+		//ExtensionRegistry.get(MessageCollector).printDiagnosticMessage[
+		//	'''Finished processing Meta Annotation «am». Duration: «System.currentTimeMillis-startMillis»'''
+		//]
 	}
 	
 	GenTypeElement currentGeneratedClass

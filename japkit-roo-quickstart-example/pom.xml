@@ -327,7 +327,7 @@
 								<annotations>de.stefanocke.japkit.roo.japkit.*</annotations>
 								<projectDirectory>${project.basedir}</projectDirectory>
 								<templateDir>${project.basedir}/src/main/resources</templateDir>
-								<diagnosticMessages>true</diagnosticMessages>
+								<diagnosticMessages>false</diagnosticMessages>
 							</options>
 						</configuration>
 					</execution>

@@ -37,7 +37,7 @@ public final class ExtensionRegistry {
 		if (t == null) {
 			t = createInstance(clazz, factory, t);
 			register(clazz, t);
-			get(ProcessingEnvironment.class).getMessager().printMessage(Kind.NOTE,  "ExtensionRegistry created "+clazz);
+			//get(ProcessingEnvironment.class).getMessager().printMessage(Kind.NOTE,  "ExtensionRegistry created "+clazz);
 		}
 		return t;
 	}
