@@ -38,10 +38,16 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 		this(name, GenPackage.forName(packageName))
 	}
 	
-	new(String name, PackageElement p) {
+	new(String name, Element enclosingElement) {
 		super(name)
-		setEnclosingElement(p)
-		setNestingKind(NestingKind.TOP_LEVEL)
+		setEnclosingElement(enclosingElement)
+		if (enclosingElement instanceof PackageElement) {
+			setNestingKind(NestingKind.TOP_LEVEL)
+		} else if (enclosingElement instanceof TypeElement) {
+			setNestingKind(NestingKind.MEMBER)
+		} else
+			throw new IllegalArgumentException(
+				"Enclosing element of a class must be a PackageElement or a TypeElement, but not " + enclosingElement)
 	}
 
 	/**
