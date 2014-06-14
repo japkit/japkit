@@ -19,8 +19,8 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * @author stefan
  * 
  */
+@MemberGeneratorAnnotation
 @Retention(RetentionPolicy.CLASS)
-@Target(ElementType.ANNOTATION_TYPE)
 public @interface InnerClass {
 	
 	/**
@@ -100,9 +100,9 @@ public @interface InnerClass {
 	
 	/**
 	 * 
-	 * @return the members to be generated for this class. By default, the trigger annotation itself is searched for member annotations.
+	 * @return the members to be generated for this class. 
 	 */
-	Members[] members() default @Members;
+	Members[] members() default {};
 
 	/**
 	 * If true, a custom behavior delegation mechanism is generated. Woohaa...
@@ -118,7 +118,7 @@ public @interface InnerClass {
 	 * @author stefan
 	 *
 	 */
-	@ClassSelector(kind=ClassSelectorKind.INNER_CLASS_NAME, avName="behaviorInnerClassName", expr="#{simpleName}Behavior")
+	@ClassSelector(kind=ClassSelectorKind.INNER_CLASS_NAME, avName="behaviorInnerClassName", expr="#{currentGenClass.simpleName}Behavior")
 	public interface InnerClassBehaviorInnerClass{}
 
 

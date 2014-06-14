@@ -48,8 +48,8 @@ abstract class GenElement implements Element{
  		}
  		val enclosed = enclosedEl as GenElement
  		
- 		if(enclosed.getEnclosingElement!=null){
- 			throw new IllegalStateException('''Element «enclosed» has already an enclosing element:«enclosed.getEnclosingElement»''')
+ 		if(enclosed.getEnclosingElement!=null && enclosed.getEnclosingElement != this){
+ 			throw new IllegalStateException('''Element «enclosed» has already a different enclosing element:«enclosed.getEnclosingElement»''')
  		}
  		if(enclosedElementComparator==null){
  			enclosedElements.add(enclosed)
