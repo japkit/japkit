@@ -25,6 +25,9 @@ import javax.lang.model.element.Element
 import javax.lang.model.type.ExecutableType
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.gen.GenTypeMirror
+import javax.annotation.processing.ProcessingEnvironment
+import javax.tools.Diagnostic
+import javax.tools.Diagnostic.Kind
 
 class TypesExtensions /**implements Types*/{
 	Types typeUtils = ExtensionRegistry.get(Types)
@@ -166,7 +169,9 @@ class TypesExtensions /**implements Types*/{
 	}
 
 	def isJavaLangObject(TypeMirror type) {
-		type.toString == Object.name
+		val typeFqn = type.toString 
+		
+		typeFqn== Object.name
 	}
 
 	def dispatch erasure(GenDeclaredType type) {
