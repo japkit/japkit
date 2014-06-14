@@ -80,11 +80,31 @@ class ELSupport {
 			vs.pop
 		}
 	}
+	
+	def <T> T scope(ValueStack vs, (ValueStack)=>T closure) {
+		try {
+			vs.push
+			closure.apply(vs)
+
+		} finally {
+			vs.pop
+		}
+	}
 
 	def void scope(ValueStack vs, Element e, (ValueStack)=>void closure) {
 		try {
 			vs.push
 			vs.put("element", e)
+			closure.apply(vs)
+
+		} finally {
+			vs.pop
+		}
+	}
+	
+	def void scope(ValueStack vs, (ValueStack)=>void closure) {
+		try {
+			vs.push
 			closure.apply(vs)
 
 		} finally {

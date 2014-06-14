@@ -5,12 +5,13 @@ import de.stefanocke.japkit.metaannotations.Method
 import de.stefanocke.japkit.support.MethodRule
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import java.util.Set
 
 class MethodGenerator extends MemberGeneratorSupport implements MemberGenerator {
 	
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
-		AnnotationMirror methodAnnotation) {
+		AnnotationMirror methodAnnotation, Set<GenTypeElement> generatedClasses) {
 		
 		//TODO: Cache MethodRules by methodAnnotation
 		new MethodRule(methodAnnotation, null).apply(annotatedClass, generatedClass, triggerAnnotation, generatedClass)

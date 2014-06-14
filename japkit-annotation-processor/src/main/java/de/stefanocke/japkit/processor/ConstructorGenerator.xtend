@@ -16,11 +16,12 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
+import java.util.Set
 
 class ConstructorGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror annotation,
-		AnnotationMirror constructorAnnotation) {
+		AnnotationMirror constructorAnnotation, Set<GenTypeElement> generatedClasses) {
 			
 		val activation = annotation.elementMatchers("activation", constructorAnnotation)
 		

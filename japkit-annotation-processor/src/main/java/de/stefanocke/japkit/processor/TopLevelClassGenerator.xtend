@@ -9,14 +9,14 @@ import javax.lang.model.element.TypeElement
 class TopLevelClassGenerator extends ClassGeneratorSupport{
 	
 
-	def Set<GenTypeElement> processGenClassAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation) {
+	def GenTypeElement processGenClassAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation, Set<GenTypeElement> generatedClasses) {
 
 		val genClass = triggerAnnotation.metaAnnotation(GenerateClass)
-		if(genClass == null) return emptySet;
+		if(genClass == null) return null;
 		
 		val GenTypeElement enclosingClass = null
 	
-		generateClass(annotatedClass, enclosingClass, triggerAnnotation, genClass)
+		generateClass(annotatedClass, enclosingClass, triggerAnnotation, genClass, generatedClasses)
 	}
 		
 }

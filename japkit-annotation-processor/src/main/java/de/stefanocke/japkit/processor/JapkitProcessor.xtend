@@ -509,7 +509,7 @@ class JapkitProcessor extends AbstractProcessor {
 					putELVariable(valueStack, annotatedClass, triggerAnnotation, it)]
 
 				//@GenerateClass
-				generatedClasses.addAll(classGenerator.processGenClassAnnotation(annotatedClass, triggerAnnotation))
+				classGenerator.processGenClassAnnotation(annotatedClass, triggerAnnotation, generatedClasses)
 
 				//@ResourceTemplate
 				resourceGenerator.processResourceTemplatesAnnotation(annotatedClass, triggerAnnotation)

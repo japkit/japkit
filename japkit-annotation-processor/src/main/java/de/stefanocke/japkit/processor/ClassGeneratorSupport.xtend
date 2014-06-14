@@ -55,7 +55,14 @@ class ClassGeneratorSupport {
 	
 	protected BehaviorDelegationGenerator behaviorDelegationGenerator = new BehaviorDelegationGenerator
 	
-	def Set<GenTypeElement> generateClass(TypeElement annotatedClass, GenTypeElement enclosingClass, AnnotationMirror triggerAnnotation, AnnotationMirror genClass) {
+	/**
+	 * Generates a top level or inner class and potentially some auxillary classes.
+	 * 
+	 * @return the set of generated top level classes. 
+	 */
+	def GenTypeElement generateClass(TypeElement annotatedClass, GenTypeElement enclosingClass, AnnotationMirror triggerAnnotation, 
+		AnnotationMirror genClass, Set<GenTypeElement> generatedTopLevelClasses
+	) {
 		try {
 			val isTopLevelClass = enclosingClass == null
 			pushCurrentMetaAnnotation(genClass)
@@ -81,21 +88,28 @@ class ClassGeneratorSupport {
 			generatedClass.annotationMirrors = mapTypeAnnotations(annotatedClass, triggerAnnotation, genClass, 
 				new ArrayList(generatedClass.annotationMirrors)
 			)
-			processMemberGenerators(annotatedClass, generatedClass, triggerAnnotation, genClass)
-		
 			val Set<GenTypeElement> generatedClasses = newHashSet
+			
+			processMemberGenerators(annotatedClass, generatedClass, triggerAnnotation, genClass, generatedClasses)
+		
+			
 			generatedClasses.addAll(
 				behaviorDelegationGenerator.createBehaviorDelegation(annotatedClass, triggerAnnotation, generatedClass,
 					genClass));
-			generatedClasses.add(generatedClass)
+			
+			if(isTopLevelClass){
+				generatedClasses.add(generatedClass)	
+			}
 		
 			if(isTopLevelClass){
 				generatedClasses.forEach[markAsGenerated(it, annotatedClass)]
 				generatedClasses.forEach[addOrderAnnotations]				
 				generatedClasses.forEach[addParamNamesAnnotations]		
 			}
+			
+			generatedTopLevelClasses.addAll(generatedClasses)
 		
-			generatedClasses
+			generatedClass
 		
 		} finally {
 			popCurrentMetaAnnotation
@@ -218,7 +232,7 @@ class ClassGeneratorSupport {
 	}
 
 	def protected processMemberGenerators(TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, AnnotationMirror genClassMetaAnnotation) {
+		AnnotationMirror triggerAnnotation, AnnotationMirror genClassMetaAnnotation, Set<GenTypeElement> generatedClasses) {
 
 		val membersAnnotationRefs = triggerAnnotation.valueOrMetaValue(annotatedClass, "members",
 			typeof(AnnotationMirror[]), genClassMetaAnnotation)
@@ -234,7 +248,7 @@ class ClassGeneratorSupport {
 						triggerAnnotation.annotationAsTypeElement
 				printDiagnosticMessage(['''Process member annotations on «te»'''])
 				te.annotationMirrors.forEach [
-					processMemberGenerator(te, annotatedClass, generatedClass, triggerAnnotation, genClassMetaAnnotation)
+					processMemberGenerator(te, annotatedClass, generatedClass, triggerAnnotation, genClassMetaAnnotation, generatedClasses)
 				]
 
 			}
@@ -248,7 +262,8 @@ class ClassGeneratorSupport {
 		TypeElement annotatedClass,
 		GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation,
-		AnnotationMirror genClassMetaAnnotation
+		AnnotationMirror genClassMetaAnnotation,
+		Set<GenTypeElement> generatedClasses
 	) {
 		if (memberGeneratorMetaAnnotation.equals(genClassMetaAnnotation)) {
 			return;
@@ -286,7 +301,7 @@ class ClassGeneratorSupport {
 					val avList = memberGeneratorMetaAnnotation.value("value", typeof(AnnotationMirror[]))
 					avList.forEach [
 						try {
-							mg.createMembers(membersClass, annotatedClass, generatedClass, triggerAnnotation, it)
+							mg.createMembers(membersClass, annotatedClass, generatedClass, triggerAnnotation, it, generatedClasses)
 						} catch (TypeElementNotFoundException e) {
 							handleTypeElementNotFound(
 								'''Error while member generator «mg.class» processes meta annotation «it»: «e.message»''',
@@ -296,7 +311,7 @@ class ClassGeneratorSupport {
 				} else {
 					try {
 						mg.createMembers(membersClass, annotatedClass, generatedClass, triggerAnnotation,
-							memberGeneratorMetaAnnotation)
+							memberGeneratorMetaAnnotation, generatedClasses)
 					} catch (TypeElementNotFoundException e) {
 						handleTypeElementNotFound(
 							'''Error while member generator «mg.class» processes meta annotation «memberGeneratorMetaAnnotation»: «e.
@@ -317,16 +332,17 @@ class ClassGeneratorSupport {
 		}
 	}
 
-	static val builtInMemberGenerators = #{
+	val builtInMemberGenerators = #{
 		PropertiesGenerator,
 		ConstructorGenerator,
 		MethodGenerator,
 		FromTemplateGenerator,
-		AnnotationGenerator
+		AnnotationGenerator, 
+		InnerClassGenerator
 	}
-	static var Map<String, MemberGenerator> memberGenerators;
+	var Map<String, MemberGenerator> memberGenerators;
 
-	def static MemberGenerator getMemberGenerator(String metaAnnotationFqn) {
+	def MemberGenerator getMemberGenerator(String metaAnnotationFqn) {
 		if (memberGenerators == null) {
 			memberGenerators = new HashMap();
 			ServiceLoader.load(MemberGenerator, MemberGenerator.classLoader).forEach[

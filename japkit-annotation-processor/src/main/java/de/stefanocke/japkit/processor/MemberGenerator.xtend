@@ -3,6 +3,7 @@ package de.stefanocke.japkit.processor
 import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.gen.GenTypeElement
 import javax.lang.model.element.AnnotationMirror
+import java.util.Set
 
 interface MemberGenerator {
 	/**
@@ -12,13 +13,15 @@ interface MemberGenerator {
 	 * @param triggerAnnotation the trigger annotation
 	 * @param metaAnnotationToBeProcessed the meta annotation to be processed
 	 * @param genClassMetaAnnotation the GenClass meta annotation which triggered the creation of the generatedClass.
+	 * @param generatedClasses a member generator may generate auxiliary top-level classes as a by-product. if so, it must add them to this set
 	 * @param env Callback interface RFU
 	 */
 	def void createMembers(
 		TypeElement membersClass,
 		TypeElement annotatedClass,
 			GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
-			AnnotationMirror metaAnnotationToBeProcessed)
+			AnnotationMirror metaAnnotationToBeProcessed,
+			Set<GenTypeElement> generatedClasses)
 	
 	/**
 	 * 
