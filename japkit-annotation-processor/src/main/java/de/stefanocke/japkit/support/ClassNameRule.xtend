@@ -83,13 +83,13 @@ class ClassNameRule {
 	new (AnnotationMirror am, AnnotationMirror metaAnnotation){
 		//this(suffixToAppend, suffixToRemove, prefixToPrepend, prefixToRemove, regEx, regExReplace, packageRegEx, packageRegExReplace)
 		
-		_classSuffixToAppend = am.valueOrMetaValue("classSuffixToAppend", String, metaAnnotation)
-		_classSuffixToRemove = am.valueOrMetaValue("classSuffixToRemove", String, metaAnnotation)
-		_classPrefixToPrepend = am.valueOrMetaValue("classPrefixToPrepend", String, metaAnnotation)
-		_classPrefixToRemove = am.valueOrMetaValue("classPrefixToRemove", String, metaAnnotation)
+		_classSuffixToAppend = am.valueOrMetaValue("nameSuffixToAppend", String, metaAnnotation)
+		_classSuffixToRemove = am.valueOrMetaValue("nameSuffixToRemove", String, metaAnnotation)
+		_classPrefixToPrepend = am.valueOrMetaValue("namePrefixToPrepend", String, metaAnnotation)
+		_classPrefixToRemove = am.valueOrMetaValue("namePrefixToRemove", String, metaAnnotation)
 		
-		_classNameRule = new NameRule(am, metaAnnotation, "class")
-		_packageNameRule = new NameRule(am, metaAnnotation, "package")	
+		_classNameRule = new NameRule(am, metaAnnotation, "name")
+		_packageNameRule = new NameRule(am, metaAnnotation, "packageName")	
 		
 	}
 	

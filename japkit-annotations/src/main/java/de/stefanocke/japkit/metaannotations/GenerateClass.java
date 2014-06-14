@@ -71,21 +71,21 @@ public @interface GenerateClass {
 	 */
 	Modifier[] modifier() default {};
 
-	String classSuffixToRemove() default "";
+	String nameSuffixToRemove() default "";
 
-	String classSuffixToAppend() default "Gen";
+	String nameSuffixToAppend() default "Gen";
 
-	String classPrefixToRemove() default "";
+	String namePrefixToRemove() default "";
 
-	String classPrefixToPrepend() default "";
+	String namePrefixToPrepend() default "";
 
-	String classRegEx() default "";
+	String nameRegEx() default "";
 
-	String classRegExReplace() default "";
+	String nameRegExReplace() default "";
 
-	String packageRegEx() default "";
+	String packageNameRegEx() default "";
 
-	String packageRegExReplace() default "";
+	String packageNameExReplace() default "";
 	
 	
 	/**

@@ -85,9 +85,9 @@ public @interface InnerClass {
 	/**
 	 * The expression for the class name. TODO: Rename to nameExpr . Refactor NameRule and ClassNameRule.
 	 */
-	String classExpr() default "";
+	String nameExpr() default "";
 
-	String classLang() default "";
+	String nameLang() default "";
 
 
 	/**

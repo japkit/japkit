@@ -82,8 +82,8 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 
 })
 @GenerateClass(
-		classSuffixToRemove = "Def",
-		classSuffixToAppend = "",
+		nameSuffixToRemove = "Def",
+		nameSuffixToAppend = "",
 		//superclassTypeArgs=FormBackingObject.class,
 		
 		modifier = Modifier.PUBLIC,

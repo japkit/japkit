@@ -14,7 +14,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 
-@GenerateClass(classSuffixToRemove = "Def", classSuffixToAppend = "", modifier = Modifier.PUBLIC,
+@GenerateClass(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifier = Modifier.PUBLIC,
 		annotationMappings = { @AnnotationMapping(targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class,
 		members = { @Members(IdAndVersion.class), 
 				@Members,
