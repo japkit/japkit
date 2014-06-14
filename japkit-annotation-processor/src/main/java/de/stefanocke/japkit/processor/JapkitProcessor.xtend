@@ -57,7 +57,7 @@ class JapkitProcessor extends AbstractProcessor {
 	extension ELSupport elSupport
 
 	ResourceGenerator resourceGenerator
-	ClassGenerator classGenerator
+	TopLevelClassGenerator classGenerator
 
 	//annotated classes that have to be re-considered in a later round
 	val Map<String, TypeElementNotFoundException> deferredClasses = new HashMap
@@ -88,7 +88,7 @@ class JapkitProcessor extends AbstractProcessor {
 		elSupport = ExtensionRegistry.get(ELSupport)
 
 		resourceGenerator = new ResourceGenerator
-		classGenerator = new ClassGenerator
+		classGenerator = new TopLevelClassGenerator
 
 	}
 

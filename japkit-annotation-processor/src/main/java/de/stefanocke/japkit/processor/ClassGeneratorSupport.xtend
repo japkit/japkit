@@ -1,14 +1,11 @@
 package de.stefanocke.japkit.processor
 
 import de.stefanocke.japkit.gen.GenAnnotationMirror
-import de.stefanocke.japkit.gen.GenAnnotationValue
 import de.stefanocke.japkit.gen.GenClass
-import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenEnum
-import de.stefanocke.japkit.gen.GenExtensions
 import de.stefanocke.japkit.gen.GenInterface
 import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.metaannotations.GenerateClass
+import de.stefanocke.japkit.metaannotations.MemberGeneratorAnnotation
 import de.stefanocke.japkit.support.AnnotationExtensions
 import de.stefanocke.japkit.support.ClassNameRule
 import de.stefanocke.japkit.support.ElementsExtensions
@@ -22,15 +19,12 @@ import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypesExtensions
 import de.stefanocke.japkit.support.TypesRegistry
 import de.stefanocke.japkit.support.el.ELSupport
-import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import java.util.Map
 import java.util.ServiceLoader
-import java.util.Set
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
@@ -38,131 +32,21 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
-import javax.lang.model.element.ExecutableElement
-import de.stefanocke.japkit.gen.GenExecutableElement
-import de.stefanocke.japkit.metaannotations.MemberGeneratorAnnotation
 
-class ClassGenerator {
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
-	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	val extension RelatedTypes = ExtensionRegistry.get(RelatedTypes)
-	val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-
-	BehaviorDelegationGenerator behaviorDelegationGenerator = new BehaviorDelegationGenerator
-
-	def Set<GenTypeElement> processGenClassAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation) {
-
-		val genClass = triggerAnnotation.metaAnnotation(GenerateClass)
-
-		if(genClass == null) return emptySet;
-		try {
-			pushCurrentMetaAnnotation(genClass)
-
-			//superclass with type args
-			val generatedClass = createClass(annotatedClass, triggerAnnotation, genClass)
-			setCurrentGeneratedClass(generatedClass)
-
-			setSuperClassAndInterfaces(annotatedClass, generatedClass, triggerAnnotation, genClass)
-
-			valueStack.putELVariables(generatedClass, triggerAnnotation, genClass)
-
-			createShadowAnnotation(triggerAnnotation, annotatedClass, genClass, generatedClass)
-			
-			generatedClass.annotationMirrors = mapTypeAnnotations(annotatedClass, triggerAnnotation, genClass, 
-				new ArrayList(generatedClass.annotationMirrors)
-			)
-			processMemberGenerators(annotatedClass, generatedClass, triggerAnnotation, genClass)
-
-			val Set<GenTypeElement> generatedClasses = newHashSet
-			generatedClasses.addAll(
-				behaviorDelegationGenerator.createBehaviorDelegation(annotatedClass, triggerAnnotation, generatedClass,
-					genClass));
-			generatedClasses.add(generatedClass)
-
-			generatedClasses.forEach[markAsGenerated(it, annotatedClass)]
-
-			generatedClasses.forEach[addOrderAnnotations]
-			
-			generatedClasses.forEach[addParamNamesAnnotations]
-
-			generatedClasses
-
-		} finally {
-			popCurrentMetaAnnotation
-		}
-	}
+class ClassGeneratorSupport {
+	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	protected val extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
+	protected val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	protected val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	protected val extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	protected val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	protected val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	protected val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	protected val extension RelatedTypes = ExtensionRegistry.get(RelatedTypes)
+	protected val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 	
-	def createShadowAnnotation(AnnotationMirror triggerAnnotation, TypeElement annotatedClass, AnnotationMirror genClass, GenTypeElement generatedClass) {
-		try{
-			val shallCreateShadowAnnotation = triggerAnnotation.valueOrMetaValue(annotatedClass, "createShadowAnnotation", Boolean, genClass)
-			if(shallCreateShadowAnnotation){
-				val shadowAnnotation = GenExtensions.copy(triggerAnnotation) => [it.setShadowIfAppropriate]
-				
-				valueStack.getVariablesForShadowAnnotation().forEach[name, value |
-					shadowAnnotation.setValue(name, [t| 
-						//TODO: Schicker. In extension o.ä verlagern
-						new GenAnnotationValue(coerceAnnotationValue(value, t))
-					])
-				]
-				
-				generatedClass.addAnnotationMirror(shadowAnnotation)
-			}
-		
-		} catch (RuntimeException re){
-			reportError('''Error when creating shadow annotation:''', re, annotatedClass, triggerAnnotation, null)
-		}
-	}
-
-	private def void addOrderAnnotations(Element e) {
-		val enclosed = e.enclosedElements
-		for (order : 0 ..< enclosed.size) {
-			enclosed.get(order).addOrderAnnotation(order);
-			enclosed.get(order).addOrderAnnotations()
-		}
-	}
-
-	def dispatch void addOrderAnnotation(GenElement element, Integer order) {
-		element.addAnnotationMirror(
-			new GenAnnotationMirror(elementUtils.getTypeElement(ORDER_ANNOTATION_NAME).asType as DeclaredType) => [
-				setValue("value", [new GenAnnotationValue(order)])
-			]
-		)
-	}
-
-	def dispatch void addOrderAnnotation(Element element, Integer integer) {
-	}
+	protected BehaviorDelegationGenerator behaviorDelegationGenerator = new BehaviorDelegationGenerator
 	
-	
-	def dispatch void addParamNamesAnnotations(GenTypeElement typeElement) {
-		typeElement.enclosedElements.forEach[it.addParamNamesAnnotations]
-	}
-	
-	def dispatch void addParamNamesAnnotations(GenExecutableElement element) {
-		if(!element.parameters.nullOrEmpty){
-			element.addAnnotationMirror(
-				new GenAnnotationMirror(elementUtils.getTypeElement(PARAM_NAMES_ANNOTATION_NAME).asType as DeclaredType) => [
-					setValue("value", [new GenAnnotationValue(element.parameters.map[simpleName.toString].map[new GenAnnotationValue(it)].toList)])
-				]
-			)		
-		}
-	}
-	def dispatch void addParamNamesAnnotations(Element element) {
-		
-	}
-
-	def mapTypeAnnotations(TypeElement annotatedClass, AnnotationMirror am, AnnotationMirror genClassAnnotation, 
-		List<GenAnnotationMirror> existingAnnotations) {
-		val annotationMappings = am.valueOrMetaValue(annotatedClass, "annotationMappings", typeof(AnnotationMirror[]),
-			genClassAnnotation).map[createAnnotationMappingRule(it)]
-		mapAnnotations(annotatedClass, annotationMappings, existingAnnotations)
-	}
-
 	def GenTypeElement createClass(TypeElement annotatedClass, AnnotationMirror am, AnnotationMirror genClass) {
 		val nameRule = new ClassNameRule(am, genClass)
 		val genClassName = nameRule.generateClassName(annotatedClass)
@@ -182,23 +66,27 @@ class ClassGenerator {
 					annotatedClass)
 		}
 
-		//Register generated class as early as possible to allow error type resolution in other classes
-		//TODO: Passing am here means the class is supposed to have a shadow annotation. That's not always the case.
-		//Maybe , we should have a boolean flag createShadow in GenerateClass... 
-		//If the dependencies shall be filtered by the filterAV value, the shadow annotation must be available. Or: the according AV value
-		//is taken from the original annotation and not supposed to change in shadow annotation.
-		registerGeneratedTypeElement(generatedClass, annotatedClass, am)
-
-		val modifier = am.valueOrMetaValue("modifier", typeof(Modifier[]), genClass)
-
-		generatedClass => [
-			modifier.forEach[m|addModifier(m)]
-		]
+		setModifiers(generatedClass, am, genClass)
 
 		generatedClass
 	}
-
-	def setSuperClassAndInterfaces(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am,
+	
+	def protected mapTypeAnnotations(TypeElement annotatedClass, AnnotationMirror triggerAnnotation, AnnotationMirror genClassAnnotation, 
+		List<GenAnnotationMirror> existingAnnotations) {
+		val annotationMappings = triggerAnnotation.valueOrMetaValue(annotatedClass, "annotationMappings", typeof(AnnotationMirror[]),
+			genClassAnnotation).map[createAnnotationMappingRule(it)]
+		mapAnnotations(annotatedClass, annotationMappings, existingAnnotations)
+	}
+	
+	def protected setModifiers(GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, AnnotationMirror genClassAnnotation) {
+		val modifier = triggerAnnotation.valueOrMetaValue("modifier", typeof(Modifier[]), genClassAnnotation)
+		
+		generatedClass => [
+			modifier.forEach[m|addModifier(m)]
+		]
+	}
+	
+		def setSuperClassAndInterfaces(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am,
 		AnnotationMirror genClass) {
 		val superclass = relatedType(annotatedClass, generatedClass, am, "superclass", genClass, annotatedClass) as DeclaredType ->
 			relatedTypes(annotatedClass, generatedClass, am, "superclassTypeArgs", genClass, annotatedClass) //interfaces with type args
@@ -213,7 +101,7 @@ class ClassGenerator {
 		]
 	}
 
-	def processMemberGenerators(TypeElement annotatedClass, GenTypeElement generatedClass,
+	def protected processMemberGenerators(TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, AnnotationMirror genClassMetaAnnotation) {
 
 		val membersAnnotationRefs = triggerAnnotation.valueOrMetaValue(annotatedClass, "members",
@@ -238,7 +126,7 @@ class ClassGenerator {
 
 	}
 
-	def void processMemberGenerator(
+	def protected void processMemberGenerator(
 		AnnotationMirror memberGeneratorMetaAnnotation,
 		TypeElement membersClass,
 		TypeElement annotatedClass,
@@ -313,16 +201,16 @@ class ClassGenerator {
 		}
 	}
 
-	val builtInMemberGenerators = #{
+	static val builtInMemberGenerators = #{
 		PropertiesGenerator,
 		ConstructorGenerator,
 		MethodGenerator,
 		FromTemplateGenerator,
 		AnnotationGenerator
 	}
-	var Map<String, MemberGenerator> memberGenerators;
+	static var Map<String, MemberGenerator> memberGenerators;
 
-	def MemberGenerator getMemberGenerator(String metaAnnotationFqn) {
+	def static MemberGenerator getMemberGenerator(String metaAnnotationFqn) {
 		if (memberGenerators == null) {
 			memberGenerators = new HashMap();
 			ServiceLoader.load(MemberGenerator, MemberGenerator.classLoader).forEach[
