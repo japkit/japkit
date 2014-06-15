@@ -21,7 +21,7 @@ import java.util.Set
 class ConstructorGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror annotation,
-		AnnotationMirror constructorAnnotation, Set<GenTypeElement> generatedClasses) {
+		AnnotationMirror constructorAnnotation) {
 			
 		val activation = annotation.elementMatchers("activation", constructorAnnotation)
 		

@@ -40,6 +40,7 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
+import java.util.Collection
 
 class ClassGeneratorSupport {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -88,26 +89,30 @@ class ClassGeneratorSupport {
 			generatedClass.annotationMirrors = mapTypeAnnotations(annotatedClass, triggerAnnotation, genClass, 
 				new ArrayList(generatedClass.annotationMirrors)
 			)
-			val Set<GenTypeElement> generatedClasses = newHashSet
 			
-			processMemberGenerators(annotatedClass, generatedClass, triggerAnnotation, genClass, generatedClasses)
+			
+			processMemberGenerators(annotatedClass, generatedClass, triggerAnnotation, genClass)
 		
 			
-			generatedClasses.addAll(
-				behaviorDelegationGenerator.createBehaviorDelegation(annotatedClass, triggerAnnotation, generatedClass,
-					genClass));
+			
+			behaviorDelegationGenerator.createBehaviorDelegation(annotatedClass, triggerAnnotation, generatedClass,
+					genClass)
 			
 			if(isTopLevelClass){
+				val Set<GenTypeElement> generatedClasses = newHashSet
 				generatedClasses.add(generatedClass)	
-			}
-		
-			if(isTopLevelClass){
+				addAllAuxTopLevelClasses(generatedClasses, generatedClass)
+
 				generatedClasses.forEach[markAsGenerated(it, annotatedClass)]
 				generatedClasses.forEach[addOrderAnnotations]				
 				generatedClasses.forEach[addParamNamesAnnotations]		
-			}
 			
-			generatedTopLevelClasses.addAll(generatedClasses)
+			
+				if(generatedTopLevelClasses!=null){
+					generatedTopLevelClasses.addAll(generatedClasses)			
+				}
+			
+			}
 		
 			generatedClass
 		
@@ -115,6 +120,13 @@ class ClassGeneratorSupport {
 			popCurrentMetaAnnotation
 		}
 	}
+	
+	def void addAllAuxTopLevelClasses(Set<GenTypeElement> result, GenTypeElement typeElement) {
+		result.addAll(typeElement.auxTopLevelClasses)
+		typeElement.declaredTypes.forEach[addAllAuxTopLevelClasses(result, it as GenTypeElement)]
+	}
+	
+	
 	
 	def createShadowAnnotation(AnnotationMirror triggerAnnotation, TypeElement annotatedClass, AnnotationMirror genClass, GenTypeElement generatedClass) {
 		try{
@@ -232,7 +244,7 @@ class ClassGeneratorSupport {
 	}
 
 	def protected processMemberGenerators(TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, AnnotationMirror genClassMetaAnnotation, Set<GenTypeElement> generatedClasses) {
+		AnnotationMirror triggerAnnotation, AnnotationMirror genClassMetaAnnotation) {
 
 		val membersAnnotationRefs = triggerAnnotation.valueOrMetaValue(annotatedClass, "members",
 			typeof(AnnotationMirror[]), genClassMetaAnnotation)
@@ -248,7 +260,7 @@ class ClassGeneratorSupport {
 						triggerAnnotation.annotationAsTypeElement
 				printDiagnosticMessage(['''Process member annotations on «te»'''])
 				te.annotationMirrors.forEach [
-					processMemberGenerator(te, annotatedClass, generatedClass, triggerAnnotation, genClassMetaAnnotation, generatedClasses)
+					processMemberGenerator(te, annotatedClass, generatedClass, triggerAnnotation, genClassMetaAnnotation)
 				]
 
 			}
@@ -262,8 +274,7 @@ class ClassGeneratorSupport {
 		TypeElement annotatedClass,
 		GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation,
-		AnnotationMirror genClassMetaAnnotation,
-		Set<GenTypeElement> generatedClasses
+		AnnotationMirror genClassMetaAnnotation
 	) {
 		if (memberGeneratorMetaAnnotation.equals(genClassMetaAnnotation)) {
 			return;
@@ -301,7 +312,7 @@ class ClassGeneratorSupport {
 					val avList = memberGeneratorMetaAnnotation.value("value", typeof(AnnotationMirror[]))
 					avList.forEach [
 						try {
-							mg.createMembers(membersClass, annotatedClass, generatedClass, triggerAnnotation, it, generatedClasses)
+							mg.createMembers(membersClass, annotatedClass, generatedClass, triggerAnnotation, it)
 						} catch (TypeElementNotFoundException e) {
 							handleTypeElementNotFound(
 								'''Error while member generator «mg.class» processes meta annotation «it»: «e.message»''',
@@ -311,7 +322,7 @@ class ClassGeneratorSupport {
 				} else {
 					try {
 						mg.createMembers(membersClass, annotatedClass, generatedClass, triggerAnnotation,
-							memberGeneratorMetaAnnotation, generatedClasses)
+							memberGeneratorMetaAnnotation)
 					} catch (TypeElementNotFoundException e) {
 						handleTypeElementNotFound(
 							'''Error while member generator «mg.class» processes meta annotation «memberGeneratorMetaAnnotation»: «e.

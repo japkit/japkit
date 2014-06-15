@@ -10,10 +10,10 @@ import de.stefanocke.japkit.metaannotations.InnerClass
 
 class InnerClassGenerator extends ClassGeneratorSupport implements MemberGenerator {
 	
-	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, AnnotationMirror metaAnnotationToBeProcessed, Set<GenTypeElement> generatedClasses) {
+	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, AnnotationMirror metaAnnotationToBeProcessed) {
 		
 		valueStack.scope [  //create new scope to not overwrite "currentGenClass" on VS
-			val innerClass = generateClass(annotatedClass, generatedClass, triggerAnnotation, metaAnnotationToBeProcessed, generatedClasses)
+			val innerClass = generateClass(annotatedClass, generatedClass, triggerAnnotation, metaAnnotationToBeProcessed, null)
 			generatedClass.add(innerClass)		
 		]
 	}

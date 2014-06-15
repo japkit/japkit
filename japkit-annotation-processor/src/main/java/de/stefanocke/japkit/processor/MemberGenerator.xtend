@@ -13,15 +13,13 @@ interface MemberGenerator {
 	 * @param triggerAnnotation the trigger annotation
 	 * @param metaAnnotationToBeProcessed the meta annotation to be processed
 	 * @param genClassMetaAnnotation the GenClass meta annotation which triggered the creation of the generatedClass.
-	 * @param generatedClasses a member generator may generate auxiliary top-level classes as a by-product. if so, it must add them to this set
 	 * @param env Callback interface RFU
 	 */
 	def void createMembers(
 		TypeElement membersClass,
 		TypeElement annotatedClass,
 			GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
-			AnnotationMirror metaAnnotationToBeProcessed,
-			Set<GenTypeElement> generatedClasses)
+			AnnotationMirror metaAnnotationToBeProcessed)
 	
 	/**
 	 * 

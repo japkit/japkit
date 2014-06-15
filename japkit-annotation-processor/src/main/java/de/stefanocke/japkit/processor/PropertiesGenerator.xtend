@@ -22,7 +22,7 @@ import java.util.Set
 class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror annotation, AnnotationMirror propertiesAnnotation, Set<GenTypeElement> generatedClasses) {
+		AnnotationMirror annotation, AnnotationMirror propertiesAnnotation) {
 
 		val activation = annotation.elementMatchers("activation", propertiesAnnotation)
 

@@ -37,12 +37,11 @@ class BehaviorDelegationGenerator {
 		/**
 	 * Creates a mechanism to delegate behavior to a separate class that can be changed manually.
 	 */
-	def Set<GenTypeElement> createBehaviorDelegation(TypeElement annotatedClass, AnnotationMirror am, GenTypeElement c,
+	def void createBehaviorDelegation(TypeElement annotatedClass, AnnotationMirror am, GenTypeElement c,
 		AnnotationMirror genClassAnnotation) {
-		val Set<GenTypeElement> generatedClasses = newHashSet
 
 		if (!am.valueOrMetaValue(annotatedClass, "customBehavior", Boolean, genClassAnnotation)) {
-			return emptySet;
+			return
 		}
 
 		//TODO: Name of interface and base class configurable
@@ -114,7 +113,9 @@ class BehaviorDelegationGenerator {
 				new GenInterface(internalInterfaceName) => [c.add(it);]
 			} else {
 				new GenInterface(c.simpleName + internalInterfaceName, c.package) => [
-					generatedClasses.add(it)
+					//remember that we have created a new top level class so that it can be found
+					//and rendered later.
+					c.auxTopLevelClasses.add(it)
 					registerGeneratedTypeElement(it, annotatedClass, null)
 				]
 			}
@@ -245,7 +246,7 @@ class BehaviorDelegationGenerator {
 			parameters.forEach[(it as GenParameter).annotationMirrors = emptyList]
 		]
 
-		generatedClasses
+		
 
 	}
 

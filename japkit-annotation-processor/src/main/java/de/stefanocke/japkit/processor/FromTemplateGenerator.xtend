@@ -4,13 +4,11 @@ import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Template
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import java.util.Set
 
-//TODO: Verallgemeinern!  Aus so einem Template kann man auch Felder, Annotationen, Initializers, interfaces usw. kopieren!
 class FromTemplateGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
 	override createMembers(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
-		AnnotationMirror templateAnnotation, Set<GenTypeElement> generatedClasses) {
+		AnnotationMirror templateAnnotation) {
 
 		printDiagnosticMessage['''Process Java template «templateClass»''']
 
