@@ -10,6 +10,7 @@ import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.metaannotations.InnerClass
 
 @Data
 class TemplateRule {
@@ -22,6 +23,7 @@ class TemplateRule {
 	AnnotationMirror templateAnnotation
 	List<MethodRule> methodRules
 	List<FieldRule> fieldRules
+	List<InnerClassRule> innerClassRules
 
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
 		_templateClass = templateClass
@@ -33,6 +35,10 @@ class TemplateRule {
 		_fieldRules = templateClass.declaredFields.map [
 			new FieldRule(annotationMirror(Field), it)
 		]
+		
+		_innerClassRules = templateClass.declaredTypes.map[it -> annotationMirror(InnerClass)].filter[value != null].map [
+			new InnerClassRule(value, key)
+		].toList
 
 	}
 
@@ -50,6 +56,8 @@ class TemplateRule {
 			addInterfaces(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			addFields(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			addMethods(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			addInnerClasses(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			
 		} finally {
 			valueStack.pop
 		}
@@ -59,6 +67,13 @@ class TemplateRule {
 	def addMethods(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		methodRules.forEach [
+			apply(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+		]
+	}
+	
+	def addInnerClasses(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
+		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+		innerClassRules.forEach [
 			apply(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 		]
 	}

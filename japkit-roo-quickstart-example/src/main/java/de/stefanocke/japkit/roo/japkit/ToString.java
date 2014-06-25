@@ -3,6 +3,7 @@ package de.stefanocke.japkit.roo.japkit;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import de.stefanocke.japkit.metaannotations.InnerClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.Var;
@@ -26,4 +27,9 @@ public abstract class ToString {
 			bodyEmptyExpr = "return super.toString();" 
 			)
 	public abstract String toString();
+	
+	//TODO: Take name from class if no nameExpr is given...  
+	//TODO: Consider the inner class as a template for them members of the inner class to be generated.
+	@InnerClass(nameExpr="#{currentGenClass.simpleName}InnerClassTest")
+	static class InnerClassTest{}
 }
