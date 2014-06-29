@@ -49,7 +49,7 @@ public @interface Field {
 	Var[] vars() default {};
 
 	/**
-	 * By default, this method annotation is active and will generate a field.
+	 * By default, this field annotation is active and will generate a field.
 	 * To switch it on or of case by case, a Matcher can be used here. The
 	 * element on which the matcher is applied is the enclosing class.
 	 * <p>

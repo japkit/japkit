@@ -30,6 +30,7 @@ public abstract class ToString {
 	
 	//TODO: Take name from class if no nameExpr is given...  
 	//TODO: Consider the inner class as a template for them members of the inner class to be generated.
-	@InnerClass(nameExpr="#{currentGenClass.simpleName}InnerClassTest")
+	//TODO: rule src element for name expression should not always be the annotated class.
+	@InnerClass(iterator="#{toStringProperties}", nameExpr="#{parent.element.simpleName.toFirstUpper}InnerClassTest")
 	static class InnerClassTest{}
 }
