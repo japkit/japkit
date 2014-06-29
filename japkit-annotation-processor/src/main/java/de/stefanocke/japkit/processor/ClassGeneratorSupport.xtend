@@ -62,7 +62,7 @@ class ClassGeneratorSupport {
 	 * @return the set of generated top level classes. 
 	 */
 	def GenTypeElement generateClass(TypeElement annotatedClass, GenTypeElement enclosingClass, AnnotationMirror triggerAnnotation, 
-		AnnotationMirror genClass, Set<GenTypeElement> generatedTopLevelClasses
+		AnnotationMirror genClass, TypeElement templateClass, Set<GenTypeElement> generatedTopLevelClasses
 	) {
 		try {
 			val isTopLevelClass = enclosingClass == null
@@ -92,7 +92,11 @@ class ClassGeneratorSupport {
 			
 			
 			processMemberGenerators(annotatedClass, generatedClass, triggerAnnotation, genClass)
-		
+			
+			//For @InnerClass, the annotated inner class is the template
+			if(templateClass!=null){ 
+				ExtensionRegistry.get(FromTemplateGenerator).createMembers(templateClass, annotatedClass, generatedClass, triggerAnnotation, genClass)
+			}
 			
 			
 			behaviorDelegationGenerator.createBehaviorDelegation(annotatedClass, triggerAnnotation, generatedClass,

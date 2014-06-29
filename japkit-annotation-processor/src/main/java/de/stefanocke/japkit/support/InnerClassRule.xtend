@@ -16,7 +16,7 @@ class InnerClassRule extends MemberRuleSupport<TypeElement> {
 
 	override protected GenElement createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		generateClass(annotatedClass, generatedClass, triggerAnnotation, metaAnnotation , null)
+		generateClass(annotatedClass, generatedClass, triggerAnnotation, metaAnnotation, template, null)
 	}
 
 }
