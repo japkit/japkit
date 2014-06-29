@@ -317,6 +317,9 @@ class ClassGeneratorSupport {
 							handleTypeElementNotFound(
 								'''Error while member generator «mg.class» processes meta annotation «it»: «e.message»''',
 								e.fqn, annotatedClass)
+						} catch (Exception e) {
+							//error in member generator should not blow up whole class
+							reportError('''Error im Member Generator «mg»''', e, null, null, null )
 						}
 					]
 				} else {
@@ -327,6 +330,9 @@ class ClassGeneratorSupport {
 						handleTypeElementNotFound(
 							'''Error while member generator «mg.class» processes meta annotation «memberGeneratorMetaAnnotation»: «e.
 								message»''', e.fqn, annotatedClass)
+					} catch (Exception e) {
+						//error in member generator should not blow up whole class
+						reportError('''Error im Member Generator «mg»''', e, null, null, null )
 					}
 
 				}

@@ -62,7 +62,11 @@ public abstract class MemberRuleSupport<E extends Element> {
 					createDelegateMethods(member, annotatedClass, generatedClass, triggerAnnotation)
 				]
 			]
-
+		} catch(Exception re) {
+			//don't let one member screw up the whole class
+			reportError('''Error in meta annotation «metaAnnotation» «IF template !=null»in template «template» «ENDIF»''', 
+				re, annotatedClass, triggerAnnotation, null
+			)
 		} finally {
 			popCurrentMetaAnnotation
 		}
