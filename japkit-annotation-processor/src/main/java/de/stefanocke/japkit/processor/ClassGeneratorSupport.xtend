@@ -355,7 +355,7 @@ class ClassGeneratorSupport {
 
 	val builtInMemberGenerators = #{
 		PropertiesGenerator,
-		ConstructorGenerator,
+		ConstructorFromPropertiesGenerator,
 		MethodGenerator,
 		FromTemplateGenerator,
 		AnnotationGenerator, 

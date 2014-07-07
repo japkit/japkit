@@ -6,7 +6,7 @@ import de.stefanocke.japkit.gen.GenDeclaredType
 import de.stefanocke.japkit.gen.GenMethod
 import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.metaannotations.Constructor
+import de.stefanocke.japkit.metaannotations.ConstructorFromProperties
 import de.stefanocke.japkit.support.ImmutabiltyRules
 import de.stefanocke.japkit.support.JavadocUtil
 import de.stefanocke.japkit.support.Property
@@ -16,9 +16,8 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
-import java.util.Set
 
-class ConstructorGenerator extends MemberGeneratorSupport implements MemberGenerator {
+class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror annotation,
 		AnnotationMirror constructorAnnotation) {
@@ -193,7 +192,7 @@ class ConstructorGenerator extends MemberGeneratorSupport implements MemberGener
 	}
 
 	override getSupportedMetaAnnotation() {
-		Constructor.name
+		ConstructorFromProperties.name
 	}
 
 }

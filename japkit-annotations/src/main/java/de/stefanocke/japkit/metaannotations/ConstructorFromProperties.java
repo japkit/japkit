@@ -15,7 +15,7 @@ import de.stefanocke.japkit.metaannotations.Properties.RuleSource;
  * 
  */
 @MemberGeneratorAnnotation
-public @interface Constructor {
+public @interface ConstructorFromProperties {
 	/**
 	 * When the annotated annotation wants to override annotation values of the
 	 * Constructor annotation, it must use this prefix
@@ -183,6 +183,6 @@ public @interface Constructor {
 	AnnotationMapping[] annotationMappings() default {};
 
 	@interface List {
-		Constructor[] value();
+		ConstructorFromProperties[] value();
 	}
 }
