@@ -171,7 +171,27 @@ public @interface Method {
 	Matcher[] bodyCase5() default {};
 	
 	String bodyExpr5() default "";
+	
+	Matcher[] bodyCase6() default {};
+	
+	String bodyExpr6() default "";
 
+	Matcher[] bodyCase7() default {};
+	
+	String bodyExpr7() default "";
+	
+	Matcher[] bodyCase8() default {};
+	
+	String bodyExpr8() default "";
+	
+	Matcher[] bodyCase9() default {};
+	
+	String bodyExpr9() default "";
+	
+	Matcher[] bodyCase10() default {};
+	
+	String bodyExpr10() default "";
+	
 	/**
 	 * 
 	 * @return if bodyIterator is set, this code is inserted between each
