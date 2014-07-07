@@ -184,9 +184,12 @@ public abstract class MemberRuleSupport<E extends Element> {
 		val bodyExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»Expr''', String, metaAnnotation)
 		val lang = triggerAnnotation.valueOrMetaValue('''«avPrefix»Lang''', String, metaAnnotation)
 		
-		val bodyExprSwitch = (1..10).map[triggerAnnotation.elementMatchers('''«avPrefix»Case«it»''', metaAnnotation) 
-			-> triggerAnnotation.valueOrMetaValue('''«avPrefix»Expr«it»''', String, metaAnnotation)
-		].toList
+		val bodyCaseAnnotations = triggerAnnotation.valueOrMetaValue('''«avPrefix»Switch''', typeof(AnnotationMirror[]), metaAnnotation) 
+		
+		val bodyCases = bodyCaseAnnotations?.map[
+			elementMatchers('matcher', null) 
+			-> value('expr', String)
+		]?.toList ?: emptyList
 
 
 		val beforeExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»BeforeExpr''', String, metaAnnotation)
@@ -200,13 +203,13 @@ public abstract class MemberRuleSupport<E extends Element> {
 		val separator = triggerAnnotation.valueOrMetaValue('''«avPrefix»Separator''', String, metaAnnotation)
 
 		val imports = triggerAnnotation.valueOrMetaValue("imports", typeof(DeclaredType[]), metaAnnotation)
-		getCodeBodyFromMetaAnnotation(element, triggerAnnotation, bodyExpr, bodyExprSwitch, 
+		getCodeBodyFromMetaAnnotation(element, triggerAnnotation, bodyExpr, bodyCases, 
 			lang, beforeExpr, afterExpr, emptyExpr, iteratorExpr,
 			iteratorLang, separator, imports)
 	}
 
 	protected def getCodeBodyFromMetaAnnotation(Element enclosingElement, AnnotationMirror triggerAnnotation,
-		String bodyExpr, List<Pair<List<ElementMatcher>, String>> bodyExprSwitch, 
+		String bodyExpr, List<Pair<List<ElementMatcher>, String>> bodyCases, 
 		String lang, String beforeExpr, String afterExpr, String emptyExpr, String iteratorExpr, String iteratorLang,
 		String separator, DeclaredType[] imports) {
 
@@ -229,7 +232,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 						
 						
 						if (iteratorExpr.nullOrEmpty) {							
-							evalBodyExpr(vs, enclosingElement, bodyExprSwitch, bodyExpr, lang, 'throw new UnsupportedOperationException();')
+							evalBodyExpr(vs, enclosingElement, bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
 						} else {
 							val bodyIterator = eval(vs, iteratorExpr, iteratorLang, Iterable,
 								'''Error in code body iterator expression.''', emptyList)
@@ -241,7 +244,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 								'''
 									«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
 										«valueStack.scope(e as Element) [ vsInIteration |
-											evalBodyExpr(vsInIteration, e as Element, bodyExprSwitch, bodyExpr, lang, '')
+											evalBodyExpr(vsInIteration, e as Element, bodyCases, bodyExpr, lang, '')
 										]»
 									«ENDFOR»
 								'''	
@@ -257,8 +260,8 @@ public abstract class MemberRuleSupport<E extends Element> {
 		}
 	}
 	
-	protected def evalBodyExpr(ValueStack vs, Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyExprSwitch, String bodyExpr, String lang, String errorResult) {
-		val bodyExprToUse = bodyExprSwitch.findFirst[
+	protected def evalBodyExpr(ValueStack vs, Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
+		val bodyExprToUse = bodyCases.findFirst[
 			val matcher = key
 			!matcher.nullOrEmpty && matcher.exists[matches(ruleSrcElement)]
 		]?.value ?: bodyExpr

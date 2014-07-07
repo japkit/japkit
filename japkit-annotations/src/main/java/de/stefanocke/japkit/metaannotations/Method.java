@@ -146,51 +146,13 @@ public @interface Method {
 	
 	
 	/**
-	 * If there is at least one of the given matchers, that matches, bodyExpr1 is use instead of bodyExpr. If there are no matchers
-	 * or none of them match, the bodyCase2 matchers are evaluated and so on.
-	 * That is, you can use bodyCaseN and bodyExprN for a switch-case-like rule. If nothing matches, the default is bodyExpr.
+	 * If there is at least one of the given cases, where all matcher match, the according expression is use instead of bodyExpr.
+	 * If no case matches, the default is bodyExpr.
 	 * 
 	 * @return
 	 */
-	Matcher[] bodyCase1() default {};
+	Case[] bodySwitch() default{};
 	
-	String bodyExpr1() default "";
-	
-	Matcher[] bodyCase2() default {};
-	
-	String bodyExpr2() default "";
-	
-	Matcher[] bodyCase3() default {};
-	
-	String bodyExpr3() default "";
-	
-	Matcher[] bodyCase4() default {};
-	
-	String bodyExpr4() default "";
-	
-	Matcher[] bodyCase5() default {};
-	
-	String bodyExpr5() default "";
-	
-	Matcher[] bodyCase6() default {};
-	
-	String bodyExpr6() default "";
-
-	Matcher[] bodyCase7() default {};
-	
-	String bodyExpr7() default "";
-	
-	Matcher[] bodyCase8() default {};
-	
-	String bodyExpr8() default "";
-	
-	Matcher[] bodyCase9() default {};
-	
-	String bodyExpr9() default "";
-	
-	Matcher[] bodyCase10() default {};
-	
-	String bodyExpr10() default "";
 	
 	/**
 	 * 
