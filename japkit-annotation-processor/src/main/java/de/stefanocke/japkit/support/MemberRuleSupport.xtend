@@ -19,6 +19,8 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtext.xbase.lib.Pair
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.gen.GenParameter
+import de.stefanocke.japkit.gen.GenExecutableElement
 
 @Data
 public abstract class MemberRuleSupport<E extends Element> {
@@ -108,21 +110,21 @@ public abstract class MemberRuleSupport<E extends Element> {
 	 */
 	protected def <T extends GenElement> T createMember(AnnotationMirror triggerAnnotation, TypeElement annotatedClass,
 		GenTypeElement generatedClass, Element ruleSrcElement, (String)=>T factory) {
-		val methodName = getNameFromMetaAnnotation(triggerAnnotation, ruleSrcElement)
+		val memberName = getNameFromMetaAnnotation(triggerAnnotation, ruleSrcElement)
 
 		val genElement = if (template == null) {
-				factory.apply(methodName)
+				factory.apply(memberName)
 			} else {
 
-				//Copy method from template and transform types (for example, replace "AnnotatedClass")
+				//Copy member from template and transform types (for example, replace "AnnotatedClass")
 				genExtensions.copyFrom(template, true,
 					relatedTypesTransformation(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement))
 			}
 
-		if (!methodName.nullOrEmpty) {
+		if (!memberName.nullOrEmpty) {
 
 			//Override name from template, if requested
-			genElement.simpleName = methodName
+			genElement.simpleName = memberName
 		}
 		genElement as T
 	}
@@ -146,8 +148,8 @@ public abstract class MemberRuleSupport<E extends Element> {
 		val nameExpr = triggerAnnotation.valueOrMetaValue("nameExpr", String, metaAnnotation)
 		val nameLang = triggerAnnotation.valueOrMetaValue("nameLang", String, metaAnnotation)
 		if (!nameExpr.nullOrEmpty) {
-			eval(valueStack, nameExpr, nameLang, String, '''Method name could not be generated''',
-				'invalidMethodName')
+			eval(valueStack, nameExpr, nameLang, String, '''Member name could not be generated''',
+				'invalidMemberName')
 		} else {
 			name
 		}
@@ -268,6 +270,27 @@ public abstract class MemberRuleSupport<E extends Element> {
 		
 		eval(vs, bodyExprToUse, lang, String, '''Error in code body expression.''',
 				errorResult)
+	}
+	
+	def protected void setParametersFromMetaAnnotation(GenExecutableElement executableElement, AnnotationMirror triggerAnnotation,
+		TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement) {
+		if(triggerAnnotation == null) return
+		val params = triggerAnnotation.valueOrMetaValue("parameters", typeof(AnnotationMirror[]), metaAnnotation)
+
+		//TODO: Replace parameters with equal name
+		val methodParams = params.map [
+			val paramName = value("name", String)
+			val paramAnnotationMappings = annotationMappings("annotationMappings")
+			//Ugly: We use the @Param annotation as the meta-annotation here. 
+			//But here, it should not really be allowed that for example a "name" AV from an "@Entity" overrides a parameter name...
+			//TODO: Refactoring of relatedTypes regarding annotation, meta-annotation and selector annotation
+			val paramType = resolveType(triggerAnnotation, annotatedClass, generatedClass, it, "type", "typeArgs",
+				ruleSrcElement)
+			new GenParameter(paramName, paramType) => [
+				annotationMirrors = mapAnnotations(ruleSrcElement, paramAnnotationMappings)
+			]
+		]
+		methodParams.forEach[executableElement.addParameter(it)]
 	}
 
 	protected def void createDelegateMethods(GenElement genElement, TypeElement annotatedClass,

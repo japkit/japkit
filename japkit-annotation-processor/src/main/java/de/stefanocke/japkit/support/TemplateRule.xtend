@@ -11,6 +11,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.metaannotations.InnerClass
+import de.stefanocke.japkit.metaannotations.Constructor
 
 @Data
 class TemplateRule {
@@ -21,6 +22,7 @@ class TemplateRule {
 
 	TypeElement templateClass
 	AnnotationMirror templateAnnotation
+	List<ConstructorRule> constructorRules
 	List<MethodRule> methodRules
 	List<FieldRule> fieldRules
 	List<InnerClassRule> innerClassRules
@@ -30,6 +32,10 @@ class TemplateRule {
 		_templateAnnotation = templateAnnotation ?: templateClass.annotationMirror(Template)
 		_methodRules = templateClass.declaredMethods.map[it -> annotationMirror(Method)].filter[value != null].map [
 			new MethodRule(value, key)
+		].toList
+		
+		_constructorRules = templateClass.declaredConstructors.map[it -> annotationMirror(Constructor)].filter[value != null].map [
+			new ConstructorRule(value, key)
 		].toList
 
 		_fieldRules = templateClass.declaredFields.map [
@@ -55,6 +61,7 @@ class TemplateRule {
 
 			addInterfaces(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			addFields(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			addConstructors(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			addMethods(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			addInnerClasses(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			
@@ -64,6 +71,13 @@ class TemplateRule {
 
 	}
 
+	def addConstructors(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
+		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+		constructorRules.forEach [
+			apply(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+		]
+	}
+	
 	def addMethods(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		methodRules.forEach [

@@ -53,11 +53,23 @@ class GenExtensions {
 	def dispatch copyFrom(ExecutableElement m, boolean copyAnnotations, (TypeMirror)=>TypeMirror typeTransformer) {
 
 		//TODO: Optionally copy Annotations?
-		new GenMethod(m.simpleName) => [
+		val result = if(m.kind == ElementKind.METHOD){ 
+			new GenMethod(m.simpleName) 
+			
+		} else if(m.kind== ElementKind.CONSTRUCTOR) {
+			new GenConstructor
+		} else {
+			throw new IllegalArgumentException('''Copying «m» not supported.''');
+		}
+		
+		result => [
 			if (copyAnnotations) {
 				annotationMirrors = m.copyAnnotations
 			}
-			returnType = typeTransformer.apply(m.returnType)
+			if(m.kind == ElementKind.METHOD){
+				returnType = typeTransformer.apply(m.returnType)
+			
+			}
 			setThrownTypes(m.thrownTypes.map[typeTransformer.apply(it)])
 			setTypeParameters(m.typeParameters.map[tp|getOrCreateTypeParameter(tp)])
 			setVarArgs(m.varArgs)

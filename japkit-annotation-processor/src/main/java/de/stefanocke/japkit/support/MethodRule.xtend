@@ -1,7 +1,6 @@
 package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenMethod
-import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
@@ -33,25 +32,6 @@ class MethodRule extends MemberRuleSupport<ExecutableElement> {
 		method
 	}
 
-	def protected void setParametersFromMetaAnnotation(GenMethod method, AnnotationMirror triggerAnnotation,
-		TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement) {
-		if(triggerAnnotation == null) return
-		val params = triggerAnnotation.valueOrMetaValue("parameters", typeof(AnnotationMirror[]), metaAnnotation)
-
-		//TODO: Replace parameters with equal name
-		val methodParams = params.map [
-			val paramName = value("name", String)
-			val paramAnnotationMappings = annotationMappings("annotationMappings")
-			//Ugly: We use the @Param annotation as the meta-annotation here. 
-			//But here, it should not really be allowed that for example a "name" AV from an "@Entity" overrides a parameter name...
-			//TODO: Refactoring of relatedTypes regarding annotation, meta-annotation and selector annotation
-			val paramType = resolveType(triggerAnnotation, annotatedClass, generatedClass, it, "type", "typeArgs",
-				ruleSrcElement)
-			new GenParameter(paramName, paramType) => [
-				annotationMirrors = mapAnnotations(ruleSrcElement, paramAnnotationMappings)
-			]
-		]
-		methodParams.forEach[method.addParameter(it)]
-	}
+	
 
 }
