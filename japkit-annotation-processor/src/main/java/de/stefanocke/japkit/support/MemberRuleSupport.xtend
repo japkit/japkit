@@ -3,7 +3,9 @@ package de.stefanocke.japkit.support
 import de.stefanocke.japkit.gen.EmitterContext
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenElement
+import de.stefanocke.japkit.gen.GenExecutableElement
 import de.stefanocke.japkit.gen.GenExtensions
+import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.support.el.ELSupport
 import de.stefanocke.japkit.support.el.ValueStack
@@ -19,8 +21,6 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtext.xbase.lib.Pair
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.gen.GenParameter
-import de.stefanocke.japkit.gen.GenExecutableElement
 
 @Data
 public abstract class MemberRuleSupport<E extends Element> {
@@ -143,6 +143,11 @@ public abstract class MemberRuleSupport<E extends Element> {
 	}
 
 	protected def String getNameFromMetaAnnotation(AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+		getNameFromAnnotation(triggerAnnotation, metaAnnotation)
+	}
+	
+	/** Gets a name from an annotation / meta annotation looking for AVs like name and nameExpr */
+	protected def getNameFromAnnotation(AnnotationMirror triggerAnnotation, AnnotationMirror metaAnnotation) {
 		if(metaAnnotation == null) return null
 		val name = triggerAnnotation.valueOrMetaValue("name", String, metaAnnotation)
 		val nameExpr = triggerAnnotation.valueOrMetaValue("nameExpr", String, metaAnnotation)
@@ -277,9 +282,9 @@ public abstract class MemberRuleSupport<E extends Element> {
 		if(triggerAnnotation == null) return
 		val params = triggerAnnotation.valueOrMetaValue("parameters", typeof(AnnotationMirror[]), metaAnnotation)
 
-		//TODO: Replace parameters with equal name
+		//TODO: Replace parameters with equal name?
 		val methodParams = params.map [
-			val paramName = value("name", String)
+			val paramName = getNameFromAnnotation(triggerAnnotation, it)
 			val paramAnnotationMappings = annotationMappings("annotationMappings")
 			//Ugly: We use the @Param annotation as the meta-annotation here. 
 			//But here, it should not really be allowed that for example a "name" AV from an "@Entity" overrides a parameter name...

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.stefanocke.japkit.metaannotations.Param;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.ParamNames;
@@ -120,12 +121,13 @@ public abstract class ControllerMembers {
 			required = false, value = "size") Integer size, Model uiModel);
 
 	// TODO: Conditional calls to addDateTimeFormatPatterns?
-	@Method(bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", fbo);\n" 
+	@Method(parameters={@Param(name="uiModel", type=Model.class), @Param(nameExpr="#{modelAttribute}", type=FormBackingObject.class)},
+			bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", #{modelAttribute});\n" 
 			+ "addDateTimeFormatPatterns(uiModel);\n"
 			+ "addEnumChoices(uiModel);\n"
 			+ "addEntityChoices(uiModel);\n"
 			)
-	@ParamNames({ "uiModel", "fbo" })
-	abstract void populateEditForm(Model uiModel, FormBackingObject fbo);
+	//@ParamNames({ "uiModel", "fbo" })
+	abstract void populateEditForm();
 
 }
