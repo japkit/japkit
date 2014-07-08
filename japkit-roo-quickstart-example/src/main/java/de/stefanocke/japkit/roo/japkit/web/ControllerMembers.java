@@ -121,13 +121,12 @@ public abstract class ControllerMembers {
 			required = false, value = "size") Integer size, Model uiModel);
 
 	// TODO: Conditional calls to addDateTimeFormatPatterns?
-	@Method(parameters={@Param(name="uiModel", type=Model.class), @Param(nameExpr="#{modelAttribute}", type=FormBackingObject.class)},
-			bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", #{modelAttribute});\n" 
+	@Method(bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", #{modelAttribute});\n" 
 			+ "addDateTimeFormatPatterns(uiModel);\n"
 			+ "addEnumChoices(uiModel);\n"
 			+ "addEntityChoices(uiModel);\n"
 			)
-	//@ParamNames({ "uiModel", "fbo" })
-	abstract void populateEditForm();
+	@ParamNames({ "uiModel", "fbo" })
+	abstract void populateEditForm(Model uiModel,  @Param(nameExpr="#{modelAttribute}") FormBackingObject fbo);
 
 }

@@ -7,7 +7,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 
-class ConstructorRule extends MemberRuleSupport<ExecutableElement> {
+class ConstructorRule extends ExecutableElementRule {
 
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)

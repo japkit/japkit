@@ -277,26 +277,6 @@ public abstract class MemberRuleSupport<E extends Element> {
 				errorResult)
 	}
 	
-	def protected void setParametersFromMetaAnnotation(GenExecutableElement executableElement, AnnotationMirror triggerAnnotation,
-		TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement) {
-		if(triggerAnnotation == null) return
-		val params = triggerAnnotation.valueOrMetaValue("parameters", typeof(AnnotationMirror[]), metaAnnotation)
-
-		//TODO: Replace parameters with equal name?
-		val methodParams = params.map [
-			val paramName = getNameFromAnnotation(triggerAnnotation, it)
-			val paramAnnotationMappings = annotationMappings("annotationMappings")
-			//Ugly: We use the @Param annotation as the meta-annotation here. 
-			//But here, it should not really be allowed that for example a "name" AV from an "@Entity" overrides a parameter name...
-			//TODO: Refactoring of relatedTypes regarding annotation, meta-annotation and selector annotation
-			val paramType = resolveType(triggerAnnotation, annotatedClass, generatedClass, it, "type", "typeArgs",
-				ruleSrcElement)
-			new GenParameter(paramName, paramType) => [
-				annotationMirrors = mapAnnotations(ruleSrcElement, paramAnnotationMappings)
-			]
-		]
-		methodParams.forEach[executableElement.addParameter(it)]
-	}
 
 	protected def void createDelegateMethods(GenElement genElement, TypeElement annotatedClass,
 		GenTypeElement generatedClass, AnnotationMirror triggerAnnotation) {

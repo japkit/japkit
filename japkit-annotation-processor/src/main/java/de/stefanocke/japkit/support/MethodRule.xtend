@@ -8,7 +8,7 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 
-class MethodRule extends MemberRuleSupport<ExecutableElement> {
+class MethodRule extends ExecutableElementRule {
 
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)

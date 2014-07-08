@@ -1,5 +1,7 @@
 package de.stefanocke.japkit.metaannotations;
 
+import de.stefanocke.japkit.metaannotations.classselectors.None;
+
 public @interface Param {
 	//TODO: Do we really want to allow overriding for such an "inner" annotation as @Param ?
 	String _prefix() default "<methodParam>";
@@ -30,7 +32,7 @@ public @interface Param {
 	String nameLang() default "";
 	
 	
-	Class<?> type();
+	Class<?> type() default None.class;
 	
 	Class<?>[] typeArgs() default {};
 		

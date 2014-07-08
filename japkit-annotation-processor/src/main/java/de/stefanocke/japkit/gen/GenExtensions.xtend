@@ -5,6 +5,7 @@ import de.stefanocke.japkit.metaannotations.GenerateClass
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.TypeElementNotFoundException
+import java.util.ArrayList
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.AnnotationValue
@@ -15,7 +16,6 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
-import java.util.ArrayList
 
 class GenExtensions {
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -84,11 +84,15 @@ class GenExtensions {
 	
 	def copyParametersFrom(ExecutableElement method, boolean copyAnnotations, (TypeMirror)=>TypeMirror typeTransformer) {
 		method.parametersWithSrcNames.map [ p |
-			new GenParameter(p.simpleName, typeTransformer.apply(p.asType)) => [
-				if (copyAnnotations) {
-					annotationMirrors = p.copyAnnotations
-				}]
+			copyParamFrom(p, copyAnnotations, typeTransformer)
 		]
+	}
+	
+	def copyParamFrom(VariableElement p, boolean copyAnnotations, (TypeMirror)=>TypeMirror typeTransformer) {
+		new GenParameter(p.simpleName, typeTransformer.apply(p.asType)) => [
+			if (copyAnnotations) {
+				annotationMirrors = p.copyAnnotations
+			}]
 	}
 	
 	//Copy a field 
