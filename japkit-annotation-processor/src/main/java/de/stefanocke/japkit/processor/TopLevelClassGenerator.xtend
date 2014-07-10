@@ -16,7 +16,7 @@ class TopLevelClassGenerator extends ClassGeneratorSupport{
 		
 		val GenTypeElement enclosingClass = null
 	
-		generateClass(annotatedClass, enclosingClass, triggerAnnotation, genClass, null, generatedClasses)
+		generateClass(annotatedClass, enclosingClass, triggerAnnotation, genClass, null, null, generatedClasses)
 	}
 		
 }

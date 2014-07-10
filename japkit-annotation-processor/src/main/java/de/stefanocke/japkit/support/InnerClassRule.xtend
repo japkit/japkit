@@ -16,7 +16,15 @@ class InnerClassRule extends MemberRuleSupport<TypeElement> {
 
 	override protected GenElement createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		generateClass(annotatedClass, generatedClass, triggerAnnotation, metaAnnotation, template, null)
+			
+		//The name expression for an inner class is not based on the annotated class but
+		//on the current rule source element. Thus, we apply the same logic here as for other member rules
+		//and then pass the name to the class generator.
+		val name = {
+			val n = getNameFromAnnotation(triggerAnnotation, metaAnnotation)  template?.simpleName
+			if(n.nullOrEmpty) template?.simpleName.toString else n
+		}
+		generateClass(annotatedClass, generatedClass, triggerAnnotation, metaAnnotation, template, name, null)
 	}
 
 }

@@ -62,14 +62,14 @@ class ClassGeneratorSupport {
 	 * @return the set of generated top level classes. 
 	 */
 	def GenTypeElement generateClass(TypeElement annotatedClass, GenTypeElement enclosingClass, AnnotationMirror triggerAnnotation, 
-		AnnotationMirror genClass, TypeElement templateClass, Set<GenTypeElement> generatedTopLevelClasses
+		AnnotationMirror genClass, TypeElement templateClass, String name, Set<GenTypeElement> generatedTopLevelClasses
 	) {
 		try {
 			val isTopLevelClass = enclosingClass == null
 			pushCurrentMetaAnnotation(genClass)
 		
 			//superclass with type args
-			val generatedClass = createClass(annotatedClass, triggerAnnotation, genClass, enclosingClass)
+			val generatedClass = createClass(annotatedClass, triggerAnnotation, genClass, enclosingClass, name)
 			
 			if(isTopLevelClass){
 				//Register generated class as early as possible to allow error type resolution in other classes
@@ -191,22 +191,28 @@ class ClassGeneratorSupport {
 	}
 	
 	
-	def GenTypeElement createClass(TypeElement annotatedClass, AnnotationMirror am, AnnotationMirror genClass, GenTypeElement enclosingClass) {
-		val nameRule = new ClassNameRule(am, genClass)
-		val genClassName = nameRule.generateClassName(annotatedClass)
-		val enclosingElement = if(enclosingClass==null){
-			GenPackage.forName(nameRule.generatePackageName(annotatedClass.packageOf))
-		}  else enclosingClass
+	def GenTypeElement createClass(TypeElement annotatedClass, AnnotationMirror am, AnnotationMirror genClass, GenTypeElement enclosingClass,
+		String name
+	) {
+		
+		val enclosingElAndClassName = if(enclosingClass==null){
+			//For top level classes, apply the name rule to get class and package name
+			val nameRule = new ClassNameRule(am, genClass)
+			GenPackage.forName(nameRule.generatePackageName(annotatedClass.packageOf)) -> nameRule.generateClassName(annotatedClass)
+		} else {
+			//For inner classes, use provided class name
+			enclosingClass -> name
+		}
 
 		val kind = am.valueOrMetaValue(annotatedClass, 'kind', ElementKind, genClass)
 
 		val generatedClass = switch (kind) {
 			case ElementKind.CLASS:
-				new GenClass(genClassName, enclosingElement)
+				new GenClass(enclosingElAndClassName.value, enclosingElAndClassName.key)
 			case ElementKind.ENUM:
-				new GenEnum(genClassName, enclosingElement)
+				new GenEnum(enclosingElAndClassName.value, enclosingElAndClassName.key)
 			case ElementKind.INTERFACE:
-				new GenInterface(genClassName, enclosingElement)
+				new GenInterface(enclosingElAndClassName.value, enclosingElAndClassName.key)
 			default:
 				throw new ProcessingException('''Invalid element kind in GenClass annotation: «kind»''',
 					annotatedClass)
