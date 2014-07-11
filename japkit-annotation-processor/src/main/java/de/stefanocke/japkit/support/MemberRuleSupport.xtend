@@ -3,9 +3,7 @@ package de.stefanocke.japkit.support
 import de.stefanocke.japkit.gen.EmitterContext
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenElement
-import de.stefanocke.japkit.gen.GenExecutableElement
 import de.stefanocke.japkit.gen.GenExtensions
-import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.support.el.ELSupport
 import de.stefanocke.japkit.support.el.ValueStack
@@ -187,100 +185,16 @@ public abstract class MemberRuleSupport<E extends Element> {
 		active
 	}
 
-//"initExpr", "initLang", "initIterator", "initIteratorLang", "initSeparator", "initBeforeExpr", "initAfterExpr", "initEmptyExpr"
-//"bodyExpr", "bodyLang", "bodyIterator", "bodyIteratorLang", "bodySeparator", "bodyBeforeExpr", "bodyAfterExpr", "bodyEmptyExpr"
 	protected def getCodeBodyFromMetaAnnotation(GenElement element, AnnotationMirror triggerAnnotation, String avPrefix) {
 		if(metaAnnotation == null) return null
 
-		//the body expression
-		val bodyExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»Expr''', String, metaAnnotation)
-		val lang = triggerAnnotation.valueOrMetaValue('''«avPrefix»Lang''', String, metaAnnotation)
 		
-		val bodyCaseAnnotations = triggerAnnotation.valueOrMetaValue('''«avPrefix»Switch''', typeof(AnnotationMirror[]), metaAnnotation) 
+		new CodeRule(metaAnnotation, avPrefix).getAsCodeBody(element)
+
 		
-		val bodyCases = bodyCaseAnnotations?.map[
-			elementMatchers('matcher', null) 
-			-> value('expr', String)
-		]?.toList ?: emptyList
-
-
-		val beforeExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»BeforeExpr''', String, metaAnnotation)
-		val afterExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»AfterExpr''', String, metaAnnotation)
-		val emptyExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»EmptyExpr''', String, metaAnnotation)
-
-		//body iterator
-		val iteratorExpr = triggerAnnotation.valueOrMetaValue('''«avPrefix»Iterator''', String, metaAnnotation)
-		val iteratorLang = triggerAnnotation.valueOrMetaValue('''«avPrefix»IteratorLang''', String, metaAnnotation)
-
-		val separator = triggerAnnotation.valueOrMetaValue('''«avPrefix»Separator''', String, metaAnnotation)
-
-		val imports = triggerAnnotation.valueOrMetaValue("imports", typeof(DeclaredType[]), metaAnnotation)
-		getCodeBodyFromMetaAnnotation(element, triggerAnnotation, bodyExpr, bodyCases, 
-			lang, beforeExpr, afterExpr, emptyExpr, iteratorExpr,
-			iteratorLang, separator, imports)
-	}
-
-	protected def getCodeBodyFromMetaAnnotation(Element enclosingElement, AnnotationMirror triggerAnnotation,
-		String bodyExpr, List<Pair<List<ElementMatcher>, String>> bodyCases, 
-		String lang, String beforeExpr, String afterExpr, String emptyExpr, String iteratorExpr, String iteratorLang,
-		String separator, DeclaredType[] imports) {
-
-		if (bodyExpr.nullOrEmpty)
-			null
-		else {
-
-			//deep copy current state of value stack, since body is evaluated later (in JavaEmitter)
-			val valueStack = new ValueStack(valueStack);
-			[ EmitterContext ec |
-				imports.forEach [
-					if (!ec.importIfPossible(it)) {
-						reportError('''Import for «it» not possible since it conflicts with existing import''',
-							enclosingElement, metaAnnotation, 'imports')
-					}
-				]
-				valueStack.scope(enclosingElement) [ vs |
-					vs.put("ec", ec)
-					handleTypeElementNotFound(null, '''Code body «bodyExpr» could not be generated''') [
-						
-						
-						if (iteratorExpr.nullOrEmpty) {							
-							evalBodyExpr(vs, enclosingElement, bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
-						} else {
-							val bodyIterator = eval(vs, iteratorExpr, iteratorLang, Iterable,
-								'''Error in code body iterator expression.''', emptyList)
-							if(!bodyIterator.nullOrEmpty){	
-								val before = eval(vs, beforeExpr, lang, String,
-									'''Error in code body before expression.''', '')
-								val after = eval(vs, afterExpr, lang, String,
-									'''Error in code body after expression.''', '')
-								'''
-									«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
-										«valueStack.scope(e as Element) [ vsInIteration |
-											evalBodyExpr(vsInIteration, e as Element, bodyCases, bodyExpr, lang, '')
-										]»
-									«ENDFOR»
-								'''	
-							} else {								
-								eval(vs, emptyExpr, lang, String, '''Error in code body empty expression.''',
-										'throw new UnsupportedOperationException();')
-							}
-						}
-					]
-				]
-			]
-
-		}
 	}
 	
-	protected def evalBodyExpr(ValueStack vs, Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
-		val bodyExprToUse = bodyCases.findFirst[
-			val matcher = key
-			!matcher.nullOrEmpty && matcher.exists[matches(ruleSrcElement)]
-		]?.value ?: bodyExpr
-		
-		eval(vs, bodyExprToUse, lang, String, '''Error in code body expression.''',
-				errorResult)
-	}
+
 	
 
 	protected def void createDelegateMethods(GenElement genElement, TypeElement annotatedClass,
