@@ -21,6 +21,7 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import java.util.Set
 import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.support.RelatedTypes
+import de.stefanocke.japkit.support.CodeFragmentRule
 
 @Data
 class ELVariableRule {
@@ -42,6 +43,7 @@ class ELVariableRule {
 	Class<?> type
 	boolean setInShadowAnnotation
 	Set<TypeMirror> requiredTriggerAnnotation
+	CodeFragmentRule codeFragment
 
 	//TODO: Das könnten auch direkt PropertyFilter sein, aber im Moment ist die Trigger Anntoation Teil ihres State...
 	AnnotationMirror[] propertyFilterAnnotations
@@ -74,6 +76,7 @@ class ELVariableRule {
 		
 		_requiredTriggerAnnotation = elVarAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
 
+		_codeFragment = elVarAnnotation.value("code", typeof(AnnotationMirror[])).map[new CodeFragmentRule(it)].singleValue
 	}
 
 	def void putELVariable(ValueStack vs, Element element, AnnotationMirror triggerAnnotation) {
@@ -139,6 +142,8 @@ class ELVariableRule {
 
 				} else if (typeQuery != null) {
 					evalTypeQuery(vs, typeQuery, element)
+				} else if (codeFragment!=null){
+					codeFragment
 				} else {
 					value
 				}

@@ -74,6 +74,14 @@ class ValueStack implements Map<String, Object> {
 		current.get(key) ?: parent?.get(key)
 	}
 	
+	def getRequired(Object key){
+		val v = get(key)
+		if(v==null) {
+			throw new IllegalStateException('''No value found on value stack for key «key»''')
+		}
+		v
+	}
+	
 	override isEmpty() {
 		current.empty && (parent==null || parent.empty)
 	}

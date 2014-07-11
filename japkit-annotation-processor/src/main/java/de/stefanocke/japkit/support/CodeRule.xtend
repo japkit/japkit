@@ -34,10 +34,10 @@ class CodeRule {
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
 		_metaAnnotation = metaAnnotation
-		_bodyExpr = metaAnnotation.value('''«avPrefix»Expr''', String)
-		_lang = metaAnnotation.value('''«avPrefix»Lang''', String)
+		_bodyExpr = metaAnnotation.value("expr".withPrefix(avPrefix), String)
+		_lang = metaAnnotation.value("lang".withPrefix(avPrefix), String)
 		
-		val bodyCaseAnnotations = metaAnnotation.value('''«avPrefix»Switch''', typeof(AnnotationMirror[])) 
+		val bodyCaseAnnotations = metaAnnotation.value("switch".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
 		
 		_bodyCases = bodyCaseAnnotations?.map[
 			elementMatchers('matcher', null) 
@@ -45,24 +45,28 @@ class CodeRule {
 		]?.toList ?: emptyList
 
 
-		_beforeExpr = metaAnnotation.value('''«avPrefix»BeforeExpr''', String)
-		_afterExpr = metaAnnotation.value('''«avPrefix»AfterExpr''', String)
-		_emptyExpr = metaAnnotation.value('''«avPrefix»EmptyExpr''', String)
+		_beforeExpr = metaAnnotation.value("beforeExpr".withPrefix(avPrefix), String)
+		_afterExpr = metaAnnotation.value("afterExpr".withPrefix(avPrefix), String)
+		_emptyExpr = metaAnnotation.value("emptyExpr".withPrefix(avPrefix), String)
 
 		//body iterator
-		_iteratorExpr = metaAnnotation.value('''«avPrefix»Iterator''', String)
-		_iteratorLang = metaAnnotation.value('''«avPrefix»IteratorLang''', String)
+		_iteratorExpr = metaAnnotation.value("iterator".withPrefix(avPrefix), String)
+		_iteratorLang = metaAnnotation.value("iteratorLang".withPrefix(avPrefix), String)
 
-		_separator = metaAnnotation.value('''«avPrefix»Separator''', String)
+		_separator = metaAnnotation.value("separator".withPrefix(avPrefix), String)
 
 		_imports = metaAnnotation.value("imports", typeof(DeclaredType[]))
 		
 	}
 	
+	private def withPrefix(String name, String prefix){
+		if(prefix.nullOrEmpty) name else '''«prefix»«name.toFirstUpper»'''
+	}
+	
 	/**
 	 * Gets the code as a closure usable in generated methods, constructors and fields.
 	 */
-	protected def getAsCodeBody(GenElement element) {
+	def getAsCodeBody(GenElement element) {
 		if(metaAnnotation == null) return null
 
 		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
@@ -76,6 +80,19 @@ class CodeRule {
 		]
 
 		
+	}
+	
+	/**
+	 * Gets the code as CharSequence. The EmitterContext an the context element must be available on the thread local value stack.
+	 * This method is aimed to be used to include reusable code fragments into other code expressions.
+	 */
+	public def code(){
+		val vs = valueStack		
+		code(vs.getRequired("element") as Element)
+	}
+	public def code(Element ruleSrcElement){
+		val vs = valueStack		
+		evalBodyExpr(vs.getRequired("ec") as EmitterContext, vs, ruleSrcElement )
 	}
 	
 	private def CharSequence evalBodyExpr(EmitterContext ec, ValueStack vs, Element ruleSrcElement) {

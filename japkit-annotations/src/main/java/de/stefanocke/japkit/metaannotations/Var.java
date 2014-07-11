@@ -6,7 +6,7 @@ public @interface Var {
 	String name();
 
 	/**
-	 * If true, the EL-Variabale is not evaluated immediately. Instead, it is
+	 * If true, the EL-Variable is not evaluated immediately. Instead, it is
 	 * put as a function on the value stack and can be evaluated later by
 	 * calling its eval, filter or map method. The parameter to this methods must
 	 * be the element or list of elements to apply the function for.
@@ -90,6 +90,12 @@ public @interface Var {
 	 */
 	Class<? extends Annotation>[] annotation() default {};
 
+	/**
+	 * Puts a code fragment on the value stack. It can then  be used in code bodies by calling its code() method.
+	 * @return
+	 */
+	CodeFragment[] code() default {}; 
+	
 	@interface List {
 		Var[] value();
 	}
