@@ -1,11 +1,14 @@
 package de.stefanocke.japkit.support.el
 
+import de.stefanocke.japkit.support.CodeFragmentRule
+import de.stefanocke.japkit.support.CodeFragmentRules
 import de.stefanocke.japkit.support.ElementMatcher
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.PropertyFilter
+import de.stefanocke.japkit.support.RelatedTypes
 import de.stefanocke.japkit.support.RuleFactory
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypesExtensions
@@ -13,15 +16,13 @@ import de.stefanocke.japkit.support.TypesRegistry
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.util.ArrayList
 import java.util.Collections
+import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import java.util.Set
-import javax.lang.model.element.TypeElement
-import de.stefanocke.japkit.support.RelatedTypes
-import de.stefanocke.japkit.support.CodeFragmentRule
 
 @Data
 class ELVariableRule {
@@ -43,7 +44,7 @@ class ELVariableRule {
 	Class<?> type
 	boolean setInShadowAnnotation
 	Set<TypeMirror> requiredTriggerAnnotation
-	CodeFragmentRule codeFragment
+	CodeFragmentRules codeFragments
 
 	//TODO: Das könnten auch direkt PropertyFilter sein, aber im Moment ist die Trigger Anntoation Teil ihres State...
 	AnnotationMirror[] propertyFilterAnnotations
@@ -76,7 +77,9 @@ class ELVariableRule {
 		
 		_requiredTriggerAnnotation = elVarAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
 
-		_codeFragment = elVarAnnotation.value("code", typeof(AnnotationMirror[])).map[new CodeFragmentRule(it)].singleValue
+		val codeFragmentAnnotations = elVarAnnotation.value("code", typeof(AnnotationMirror[]))
+		
+		_codeFragments = if(codeFragmentAnnotations.empty) null else new CodeFragmentRules(codeFragmentAnnotations)
 	}
 
 	def void putELVariable(ValueStack vs, Element element, AnnotationMirror triggerAnnotation) {
@@ -142,8 +145,8 @@ class ELVariableRule {
 
 				} else if (typeQuery != null) {
 					evalTypeQuery(vs, typeQuery, element)
-				} else if (codeFragment!=null){
-					codeFragment
+				} else if (codeFragments!=null){
+					codeFragments
 				} else {
 					value
 				}
