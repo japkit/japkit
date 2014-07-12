@@ -13,7 +13,6 @@ public class PetDef {
 
 	/**
      */
-	@NotNull
 	private boolean sendReminders;
 
 	/**
