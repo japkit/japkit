@@ -166,6 +166,14 @@ public @interface Field {
 	 *         property "element" refers to the generated field.
 	 */
 	String initExpr() default "";
+	
+	/**
+	 * If there is at least one of the given cases, where all matcher match, the according expression is use instead of initExpr.
+	 * If no case matches, the default is initExpr.
+	 * 
+	 * @return
+	 */
+	Case[] initCases() default{};
 
 	/**
 	 * 

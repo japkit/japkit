@@ -151,7 +151,7 @@ public @interface Method {
 	 * 
 	 * @return
 	 */
-	Case[] bodySwitch() default{};
+	Case[] bodyCases() default{};
 	
 	
 	/**

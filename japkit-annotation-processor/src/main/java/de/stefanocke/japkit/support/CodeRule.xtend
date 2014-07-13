@@ -37,7 +37,7 @@ class CodeRule {
 		_bodyExpr = metaAnnotation.value("expr".withPrefix(avPrefix), String)
 		_lang = metaAnnotation.value("lang".withPrefix(avPrefix), String)
 		
-		val bodyCaseAnnotations = metaAnnotation.value("switch".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
+		val bodyCaseAnnotations = metaAnnotation.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
 		
 		_bodyCases = bodyCaseAnnotations?.map[
 			elementMatchers('matcher', null) 

@@ -63,13 +63,12 @@ public @interface CodeFragment {
 	
 	
 	/**
-	 * If there is at least one of the given cases, where all matcher match, the according expression is use instead of bodyExpr.
-	 * If no case matches, the default is bodyExpr.
+	 * If there is at least one of the given cases, where all matcher match, the according expression is use instead of expr.
+	 * If no case matches, the default is expr.
 	 * 
 	 * @return
 	 */
-	//TODO
-	Case[] _switch() default{};
+	Case[] cases() default{};
 	
 	
 	/**
