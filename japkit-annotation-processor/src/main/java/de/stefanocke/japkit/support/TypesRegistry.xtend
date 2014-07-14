@@ -27,6 +27,7 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import javax.lang.model.element.Element
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -307,7 +308,7 @@ class TypesRegistry {
 
 	def registerGeneratedTypeElement(GenTypeElement genTypeElement, TypeElement annotatedClass, AnnotationMirror trigger) {
 		val genTypeFqn = genTypeElement.qualifiedName.toString
-		val genTypeSimpleName = genTypeElement.simpleName.toString
+		val genTypeSimpleName = getSimpleOrPartiallyQualifiedName(genTypeElement).toString
 		val acFqn = annotatedClass.qualifiedName.toString
 		annotatedClassForGenTypeElement.put(genTypeFqn, acFqn);
 
@@ -349,6 +350,25 @@ class TypesRegistry {
 		}
 		
 	}
+	
+	/**For top level classes, that method returns the simple name. For inner classes it returns the qualified name without the package name.
+	 * The rationale behind this is, that at least Eclipse annotation processing provides this kind of names for ErrorTypes. 
+	 */
+	def dispatch CharSequence getSimpleOrPartiallyQualifiedName(TypeElement typeElement) {
+		val enclosingName = typeElement.enclosingElement?.simpleOrPartiallyQualifiedName
+			
+		if(enclosingName!=null)
+			'''«enclosingName».«typeElement.simpleName»'''	
+		else
+			typeElement.simpleName
+	}
+	
+	def dispatch CharSequence getSimpleOrPartiallyQualifiedName(Element element) {
+		null
+	}
+	
+	
+
 
 	//Some types might never be resolved since they just don't exist and won't be generated. By setting
 	//the following property to false, such error types are ignored.
