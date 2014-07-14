@@ -162,17 +162,13 @@ class RelatedTypes {
 							resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, TypeMirror)
 						}	
 					}
-					case ClassSelectorKind.INNER_CLASS_NAME: {
-						resolvedSelector.innerClassName = am.value(annotatedClass,
-							classSelectorAnnotation.getClassSelectorAvName(te), String)
-							
-						if(resolvedSelector.innerClassName == null){
-							resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, String)
-						} 
-						resolvedSelector.typeElement = findInnerClass(annotatedClass, resolvedSelector.innerClassName, throwTypeElementNotFound)
-						resolvedSelector.type = resolvedSelector.typeElement?.asType							
-						
-
+					case ClassSelectorKind.INNER_CLASS_NAME:
+					{	val enclosingClass = annotatedClass
+						resolveInnerClassSelector(resolvedSelector, am, annotatedClass, classSelectorAnnotation, te, enclosingClass, throwTypeElementNotFound)	
+					}
+					case ClassSelectorKind.GEN_INNER_CLASS_NAME:
+					{	val enclosingClass = generatedClass
+						resolveInnerClassSelector(resolvedSelector, am, annotatedClass, classSelectorAnnotation, te, enclosingClass, throwTypeElementNotFound)	
 					}
 					case ClassSelectorKind.EXPR : {
 						resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, TypeMirror)
@@ -190,6 +186,17 @@ class RelatedTypes {
 		}
 
 		resolvedSelector
+	}
+	
+	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector, AnnotationMirror am, TypeElement annotatedClass, AnnotationMirror classSelectorAnnotation, TypeElement te, TypeElement enclosingClass, boolean throwTypeElementNotFound) {
+		resolvedSelector.innerClassName = am.value(annotatedClass,
+			classSelectorAnnotation.getClassSelectorAvName(te), String)
+			
+		if(resolvedSelector.innerClassName == null){
+			resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, String)
+		} 
+		resolvedSelector.typeElement = findInnerClass(enclosingClass, resolvedSelector.innerClassName, throwTypeElementNotFound)
+		resolvedSelector.type = resolvedSelector.typeElement?.asType
 	}
 	
 	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, TypeElement annotatedClass, Class<T> targetType) {
@@ -285,12 +292,12 @@ class RelatedTypes {
 
 	}
 
-	def findInnerClass(TypeElement annotatedClass, String innerClassName, boolean mustExist) {
-		val fqn = '''«annotatedClass.qualifiedName».«innerClassName»'''
-		val e = getTypeElement(fqn)
+	def findInnerClass(TypeElement enclosingClass, String innerClassName, boolean mustExist) {
+		
+		val e = enclosingClass.declaredTypes.findFirst[simpleName.contentEquals(innerClassName)]
 
 		if (mustExist && (e == null || !(e instanceof TypeElement))) {
-			throw new TypeElementNotFoundException(fqn);
+			throw new TypeElementNotFoundException('''«enclosingClass».«innerClassName»''');
 		}
 		e
 	}

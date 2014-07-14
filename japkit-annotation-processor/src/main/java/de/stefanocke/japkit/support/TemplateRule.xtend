@@ -60,10 +60,11 @@ class TemplateRule {
 			valueStack.putELVariables(ruleSrcElement, triggerAnnotation, templateAnnotation)
 
 			addInterfaces(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			addInnerClasses(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			addFields(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			addConstructors(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			addMethods(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
-			addInnerClasses(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			
 			
 		} finally {
 			valueStack.pop
@@ -87,6 +88,9 @@ class TemplateRule {
 	
 	def addInnerClasses(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+		//TODO: Zirkuläre Dependencies zwischen inner classes sind gegenwärtig nicht möglicht. Evtl könnte man die 
+		//GenClasses in einem ersten separaten Durchlauf registrieren... Oder ClassSelectors für InnerClasses sind
+		//immer "Proxies" für noch zu erzeugende Klassen.	
 		innerClassRules.forEach [
 			apply(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 		]

@@ -71,10 +71,10 @@ class ClassGeneratorSupport {
 			//superclass with type args
 			val generatedClass = createClass(annotatedClass, triggerAnnotation, genClass, enclosingClass, name)
 			
-			if(isTopLevelClass){
-				//Register generated class as early as possible to allow error type resolution in other classes
-				registerGeneratedTypeElement(generatedClass, annotatedClass, triggerAnnotation)			
-			}
+			
+			//Register generated class as early as possible to allow error type resolution in other classes
+			registerGeneratedTypeElement(generatedClass, annotatedClass, if(isTopLevelClass) triggerAnnotation else null)			
+			
 		
 			setCurrentGeneratedClass(generatedClass)
 		

@@ -8,6 +8,9 @@ public enum ClassSelectorKind{
 	/**The class is an inner class of the annotated class. The annotation value is the name of the inner class*/
 	INNER_CLASS_NAME,
 	
+	/**The class is an inner class of the generated class. The annotation value is the name of the inner class*/
+	GEN_INNER_CLASS_NAME,
+	
 	/**No class selected.
 	 * <p>
 	 * If used for a type argument, a type parameter of the generated class is used. The type parameter is searched in the generated class by the name of the type variable. If it is found, it is used.
