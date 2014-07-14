@@ -63,7 +63,7 @@ public abstract class ValueObjectTemplate {
 	
 	@Constructor(bodyIterator = "#{properties}", 
 			bodyExpr = "#{validationFragment.code()}" +
-			"this.#{element.simpleName} = #{element.simpleName};\n")
+			"this.#{element.simpleName} = builder.#{element.simpleName};\n")
 	private ValueObjectTemplate(Builder builder) {
 	}
 	
