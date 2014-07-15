@@ -21,7 +21,7 @@ class InnerClassRule extends MemberRuleSupport<TypeElement> {
 		//on the current rule source element. Thus, we apply the same logic here as for other member rules
 		//and then pass the name to the class generator.
 		val name = {
-			val n = getNameFromAnnotation(triggerAnnotation, metaAnnotation)  template?.simpleName
+			val n = nameRule.apply
 			if(n.nullOrEmpty) template?.simpleName.toString else n
 		}
 		generateClass(annotatedClass, generatedClass, triggerAnnotation, metaAnnotation, template, name, null)

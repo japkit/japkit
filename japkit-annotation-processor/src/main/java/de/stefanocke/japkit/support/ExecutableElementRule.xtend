@@ -12,9 +12,11 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import org.eclipse.xtext.xbase.lib.Pair
 
+@Data
 abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement> {
 	
-	protected val List<Pair<AnnotationMirror, VariableElement>> paramRules
+	List<Pair<AnnotationMirror, VariableElement>> paramRules
+	CodeRule bodyCodeRule
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
@@ -22,11 +24,12 @@ abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement
 		
 		if(template !=null){
 			//If there is a template, use its parameters. They can optionally have @Param annotation
-			paramRules=template.parameters.map[it.annotationMirror(Param)->it].toList
+			_paramRules=template.parameters.map[it.annotationMirror(Param)->it].toList
 		} else {
 			//No template. Use the params from the @Method or @Constructor annotation
-			paramRules=metaAnnotation.value("parameters", typeof(AnnotationMirror[])).map[it->null].toList
+			_paramRules=metaAnnotation.value("parameters", typeof(AnnotationMirror[])).map[it->null].toList
 		}
+		_bodyCodeRule = new CodeRule(metaAnnotation,"body")
 	}
 	
 	def protected void setParametersFromTemplateAndAnnotation(GenExecutableElement executableElement, AnnotationMirror triggerAnnotation,
@@ -39,9 +42,9 @@ abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement
 		paramRules.forEach [
 			val paramAnnotation = key
 			val template = value;
-			getIteratorFromAnnotation(triggerAnnotation, paramAnnotation, ruleSrcElement).forEach [ e |
+			createIteratorExpressionRule(paramAnnotation).apply(ruleSrcElement).forEach [ e |
 				valueStack.scope(e) [
-					val paramNameFromAnno = getNameFromAnnotation(triggerAnnotation, paramAnnotation)
+					val paramNameFromAnno = createNameExprRule(paramAnnotation).apply
 					val paramTypeFromAnno = if (paramAnnotation == null)
 							null
 						else

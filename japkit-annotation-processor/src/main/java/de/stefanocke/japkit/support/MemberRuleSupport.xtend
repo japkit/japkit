@@ -1,22 +1,17 @@
 package de.stefanocke.japkit.support
 
-import de.stefanocke.japkit.gen.EmitterContext
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenExtensions
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.support.el.ELSupport
-import de.stefanocke.japkit.support.el.ValueStack
 import java.util.ArrayList
 import java.util.Collections
-import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtext.xbase.lib.Pair
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
@@ -34,8 +29,61 @@ public abstract class MemberRuleSupport<E extends Element> {
 	val protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val protected extension RelatedTypes relatedTypes = ExtensionRegistry.get(RelatedTypes)
 
-	protected AnnotationMirror metaAnnotation
-	protected E template
+	AnnotationMirror metaAnnotation
+	E template
+	(Element)=>Iterable<? extends Element> srcElementsRule
+	()=>String nameRule
+	
+	protected static val (Element)=>Iterable<? extends Element> singleSrcElement = [Element e |  Collections.singleton(e)]
+	
+	new(AnnotationMirror metaAnnotation, E template){
+		_metaAnnotation = metaAnnotation
+		_template = template		
+		_srcElementsRule = metaAnnotation?.createSrcElementsRule ?: singleSrcElement
+		_nameRule = createNameRule(metaAnnotation)
+	}
+	
+	protected def (Element)=>Iterable<? extends Element> createSrcElementsRule(AnnotationMirror mirror){
+		createIteratorExpressionRule(metaAnnotation)
+	}
+	
+	protected def (Element)=>Iterable<? extends Element> createIteratorExpressionRule(AnnotationMirror metaAnnotation) {
+		if(metaAnnotation==null) return singleSrcElement
+		
+		val iteratorExpr = metaAnnotation.value("iterator", String)
+		val iteratorLang = metaAnnotation.value("iteratorLang", String);
+
+		[Element ruleSrcElement|
+			val srcElements = if (iteratorExpr.nullOrEmpty) {
+					Collections.singleton(ruleSrcElement)
+				} else {
+					eval(ruleSrcElement, iteratorExpr, iteratorLang, Iterable,
+						'''Iterator expression «iteratorExpr» could not be evaluated''', emptyList).
+						filterInstanceOf(Element)
+				} 
+			srcElements
+		]
+	}
+	
+	protected def ()=>String createNameRule(AnnotationMirror metaAnnotation) {
+		createNameExprRule(metaAnnotation)
+	}
+	/** Gets a name from an annotation / meta annotation looking for AVs like name and nameExpr */
+	protected def ()=>String createNameExprRule(AnnotationMirror metaAnnotation) {
+		if(metaAnnotation == null) return [| null]
+		val name = metaAnnotation.value("name", String)
+		val nameExpr = metaAnnotation.value("nameExpr", String)
+		val nameLang = metaAnnotation.value("nameLang", String);
+
+		[|
+			if (!nameExpr.nullOrEmpty) {
+				eval(valueStack, nameExpr, nameLang, String, '''Member name could not be generated''',
+					'invalidMemberName')
+			} else {
+				name
+			}
+		]
+	}
 
 	protected def getGenExtensions() {
 		ExtensionRegistry.get(GenExtensions)
@@ -51,7 +99,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 		try {
 			pushCurrentMetaAnnotation(metaAnnotation)
 
-			val srcElements = getSrcElements(triggerAnnotation, ruleSrcElement)
+			val srcElements = srcElementsRule.apply(ruleSrcElement) 
 
 			srcElements.forEach [ e |
 				valueStack.scope(e) [
@@ -73,23 +121,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 
 	}
 
-	protected def Iterable<? extends Element> getSrcElements(AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		getIteratorFromAnnotation(triggerAnnotation, metaAnnotation, ruleSrcElement)
-	}
-	
-	protected def getIteratorFromAnnotation(AnnotationMirror triggerAnnotation, AnnotationMirror metaAnnotation, Element ruleSrcElement) {
-		
-		val iteratorExpr = triggerAnnotation.valueOrMetaValue("iterator", String, metaAnnotation)
-		val iteratorLang = triggerAnnotation.valueOrMetaValue("iteratorLang", String, metaAnnotation)
-		
-		val srcElements = if (iteratorExpr.nullOrEmpty) {
-				Collections.singleton(ruleSrcElement)
-			} else {
-				eval(ruleSrcElement, iteratorExpr, iteratorLang, Iterable,
-					'''Iterator expression «iteratorExpr» could not be evaluated''', emptyList).filterInstanceOf(Element)
-			}
-		srcElements
-	}
+
 
 	/**
 	 * To be overridden by subclasses to create the member.
@@ -113,7 +145,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	 */
 	protected def <T extends GenElement> T createMember(AnnotationMirror triggerAnnotation, TypeElement annotatedClass,
 		GenTypeElement generatedClass, Element ruleSrcElement, (String)=>T factory) {
-		val memberName = getNameFromMetaAnnotation(triggerAnnotation, ruleSrcElement)
+		val memberName = nameRule.apply
 
 		val genElement = if (template == null) {
 				factory.apply(memberName)
@@ -145,24 +177,6 @@ public abstract class MemberRuleSupport<E extends Element> {
 		}
 	}
 
-	protected def String getNameFromMetaAnnotation(AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		getNameFromAnnotation(triggerAnnotation, metaAnnotation)
-	}
-	
-	/** Gets a name from an annotation / meta annotation looking for AVs like name and nameExpr */
-	protected def getNameFromAnnotation(AnnotationMirror triggerAnnotation, AnnotationMirror metaAnnotation) {
-		if(metaAnnotation == null) return null
-		val name = triggerAnnotation.valueOrMetaValue("name", String, metaAnnotation)
-		val nameExpr = triggerAnnotation.valueOrMetaValue("nameExpr", String, metaAnnotation)
-		val nameLang = triggerAnnotation.valueOrMetaValue("nameLang", String, metaAnnotation)
-		if (!nameExpr.nullOrEmpty) {
-			eval(valueStack, nameExpr, nameLang, String, '''Member name could not be generated''',
-				'invalidMemberName')
-		} else {
-			name
-		}
-	}
-
 	protected def void mapAnnotations(GenElement element, AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		if(metaAnnotation == null) return
 		val annotationMappings = triggerAnnotation.annotationMappings("annotationMappings", metaAnnotation)
@@ -183,15 +197,6 @@ public abstract class MemberRuleSupport<E extends Element> {
 		val activation = triggerAnnotation.elementMatchers("activation", metaAnnotation)
 		val active = activation.nullOrEmpty || activation.exists[matches(ruleSrcElement)]
 		active
-	}
-
-	protected def getCodeBodyFromMetaAnnotation(GenElement element, AnnotationMirror triggerAnnotation, String avPrefix) {
-		if(metaAnnotation == null) return null
-
-		
-		new CodeRule(metaAnnotation, avPrefix).getAsCodeBody(element)
-
-		
 	}
 	
 

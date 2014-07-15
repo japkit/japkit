@@ -13,13 +13,14 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 		super(metaAnnotation, template)
 	}
 
-	override protected getSrcElements(AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		valueStack.put("delegate", ruleSrcElement)
-
-		val delegateTypeElement = ruleSrcElement.srcType.asTypeElement
-
-		val methodFilter = triggerAnnotation.elementMatchers("methodFilter", metaAnnotation)
-		delegateTypeElement.allMethods.filter[m|methodFilter.nullOrEmpty || methodFilter.exists[matches(m)]]
+	override protected createSrcElementsRule(AnnotationMirror metaAnnotation) {
+		val methodFilter = metaAnnotation.elementMatchers("methodFilter", null);
+		
+		[ Element ruleSrcElement |
+			valueStack.put("delegate", ruleSrcElement)
+			val delegateTypeElement = ruleSrcElement.srcType.asTypeElement
+			delegateTypeElement.allMethods.filter[m|methodFilter.nullOrEmpty || methodFilter.exists[matches(m)]]
+		]
 	}
 
 	protected override createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
@@ -28,7 +29,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 		val delegateMethod = ruleSrcElement as ExecutableElement
 		val method = genExtensions.copyFrom(delegateMethod, false);
 
-		val customMethodName = getNameFromMetaAnnotation(triggerAnnotation, delegateMethod)
+		val customMethodName = nameRule.apply
 		if (!customMethodName.nullOrEmpty) {
 			method.simpleName = customMethodName
 		}

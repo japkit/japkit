@@ -24,7 +24,7 @@ class MethodRule extends ExecutableElementRule {
 
 		setParametersFromTemplateAndAnnotation(method, triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement)
 
-		val codeBody = getCodeBodyFromMetaAnnotation(method, triggerAnnotation, "body" )
+		val codeBody =  bodyCodeRule.getAsCodeBody(method)
 		if (codeBody != null) {
 			method.removeModifier(Modifier.ABSTRACT)
 			method.body = codeBody

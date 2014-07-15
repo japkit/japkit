@@ -21,7 +21,7 @@ class ConstructorRule extends ExecutableElementRule {
 
 		setParametersFromTemplateAndAnnotation(ctor, triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement)
 
-		val codeBody = getCodeBodyFromMetaAnnotation(ctor, triggerAnnotation, "body" )
+		val codeBody = bodyCodeRule.getAsCodeBody(ctor)
 		if (codeBody != null) {
 			ctor.body = codeBody
 		}

@@ -7,10 +7,13 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 
+@Data
 class FieldRule extends MemberRuleSupport<VariableElement> {
-
+	CodeRule initCodeRule
+	
 	new(AnnotationMirror metaAnnotation, VariableElement template) {
 		super(metaAnnotation, template)
+		_initCodeRule = new CodeRule(metaAnnotation,"init")
 	}
 
 	protected override createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
@@ -20,7 +23,7 @@ class FieldRule extends MemberRuleSupport<VariableElement> {
 		field.type = typeFromMetaAnnotationOrTemplate(annotatedClass, generatedClass, triggerAnnotation, "type",
 			"typeArgs", ruleSrcElement, field.asType)
 
-		val cb = getCodeBodyFromMetaAnnotation(field, triggerAnnotation, "init")
+		val cb = initCodeRule.getAsCodeBody(field)
 		if (cb != null) {
 			field.constantExpr = cb
 		}
