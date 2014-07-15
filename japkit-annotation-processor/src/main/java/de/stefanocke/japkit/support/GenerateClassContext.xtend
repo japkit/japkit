@@ -63,14 +63,21 @@ class GenerateClassContext {
 		//]
 	}
 	
-	GenTypeElement currentGeneratedClass
+	val currentGeneratedClasses = new Stack<GenTypeElement>
 	
 	def GenTypeElement getCurrentGeneratedClass(){
-		currentGeneratedClass
+		if(currentGeneratedClasses.empty) null else currentGeneratedClasses.peek
 	}
 	
-	def void setCurrentGeneratedClass(GenTypeElement currentGeneratedClass){
-		this.currentGeneratedClass = currentGeneratedClass
-		ExtensionRegistry.get(ELSupport).valueStack.put("currentGenClass", currentGeneratedClass)
+	def void pushCurrentGeneratedClass(GenTypeElement currentGeneratedClass){
+		currentGeneratedClasses.push(currentGeneratedClass)
+		//new value stack scope for each generated class to handle inner classes properly
+		ExtensionRegistry.get(ELSupport).valueStack.pushAndPutAll(#{"currentGenClass" -> currentGeneratedClass})
+	}
+	
+	def void popCurrentGeneratedClass(){
+		currentGeneratedClasses.pop		
+		ExtensionRegistry.get(ELSupport).valueStack.pop
+		
 	}
 }

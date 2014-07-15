@@ -430,7 +430,7 @@ class JapkitProcessor extends AbstractProcessor {
 	def writeSourceFileAndCommitTypeElement(GenTypeElement genTypeElement, TypeElement original,
 		Set<GenTypeElement> writtenTypeElementsInCurrentRound) {
 		pushCurrentAnnotatedClass(original)
-		setCurrentGeneratedClass(genTypeElement)
+		pushCurrentGeneratedClass(genTypeElement)
 
 		try {
 			if (writeSourceFile(genTypeElement, original)) {
@@ -445,7 +445,7 @@ class JapkitProcessor extends AbstractProcessor {
 
 			throw e
 		} finally {
-			setCurrentGeneratedClass(null)
+			popCurrentGeneratedClass
 			popCurrentAnnotatedClass
 		}
 
@@ -519,7 +519,6 @@ class JapkitProcessor extends AbstractProcessor {
 			} catch (TypeElementNotFoundException tenfe) {
 				handleTypeElementNotFound(tenfe, annotatedClass)
 			} finally {
-				setCurrentGeneratedClass(null)
 				popCurrentAnnotatedClass
 				printDiagnosticMessage
 				[

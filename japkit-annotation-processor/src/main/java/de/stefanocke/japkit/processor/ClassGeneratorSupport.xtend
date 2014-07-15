@@ -76,7 +76,7 @@ class ClassGeneratorSupport {
 			registerGeneratedTypeElement(generatedClass, annotatedClass, if(isTopLevelClass) triggerAnnotation else null)			
 			
 		
-			setCurrentGeneratedClass(generatedClass)
+			pushCurrentGeneratedClass(generatedClass)
 		
 			setSuperClassAndInterfaces(annotatedClass, generatedClass, triggerAnnotation, genClass)
 		
@@ -121,6 +121,7 @@ class ClassGeneratorSupport {
 			generatedClass
 		
 		} finally {
+			popCurrentGeneratedClass
 			popCurrentMetaAnnotation
 		}
 	}
