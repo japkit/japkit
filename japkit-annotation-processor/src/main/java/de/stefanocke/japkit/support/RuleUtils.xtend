@@ -10,6 +10,8 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import javax.lang.model.element.Modifier
+import java.util.Set
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -50,8 +52,9 @@ class RuleUtils {
 	/**
 	 * To set the name of the generated element either statically (AV: name) or dynamically (AV: nameExpr)
 	 */
-	protected def (Object)=>String createNameExprRule(AnnotationMirror metaAnnotation) {
-		if(metaAnnotation == null) return [null]
+	public def (Object)=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template) {
+		val nameFromTemplate = template?.simpleName?.toString
+		if(metaAnnotation == null) return [nameFromTemplate]
 		val name = metaAnnotation.value("name", String)
 		val nameExpr = metaAnnotation.value("nameExpr", String)
 		val nameLang = metaAnnotation.value("nameLang", String);
@@ -59,21 +62,38 @@ class RuleUtils {
 		[
 			if (!nameExpr.nullOrEmpty) {
 				eval(valueStack, nameExpr, nameLang, String, '''Member name could not be generated''',
-					'invalidMemberName')
-			} else {
+					nameFromTemplate ?: 'invalidMemberName')
+			} else if(!name.nullOrEmpty) {
 				name
+			} else {
+				nameFromTemplate
 			}
 		]
 	}
 	
 	// gen element (with annotations copied from template), src element => annotations
-	protected def (GenElement, Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
+	public def (GenElement, Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
 		AnnotationMirror metaAnnotation) {
 		if(metaAnnotation==null) return NO_ANNOTATION_MAPPINGS
 		val mappings = metaAnnotation.annotationMappings("annotationMappings", null);
 		[ GenElement genElement, Element ruleSrcElement |
 			mapAnnotations(ruleSrcElement, mappings,
 				new ArrayList(genElement.annotationMirrors.map[it as GenAnnotationMirror]))
+		]
+	}
+	
+	public def (Object)=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template) {
+		val templateModifiers = template?.modifiers ?: emptySet
+
+		if(metaAnnotation == null) return [template?.modifiers]
+		val modi = metaAnnotation.value("modifiers", typeof(Modifier[]));
+
+		//TODO: Expressions for isPublic , isPrivate etc
+		[
+			if (!modi.nullOrEmpty) {
+				modi.toSet
+			} else
+				templateModifiers
 		]
 	}
 	

@@ -32,7 +32,7 @@ abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement
 	
 	def protected (Element, AnnotationMirror, TypeElement, GenTypeElement)=>Iterable<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template){
 		val srcElementsRule = ru.createIteratorExpressionRule(paramAnnotation)
-		val nameRule = ru.createNameExprRule(paramAnnotation)
+		val nameRule = ru.createNameExprRule(paramAnnotation, template)
 		val annotationMappingRules = ru.createAnnotationMappingRules(paramAnnotation);
 		
 		[ Element ruleSrcElement, AnnotationMirror triggerAnnotation, TypeElement annotatedClass, GenTypeElement generatedClass |

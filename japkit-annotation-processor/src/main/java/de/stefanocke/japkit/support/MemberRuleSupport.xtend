@@ -10,6 +10,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+import java.util.Set
 
 @Data
 public abstract class MemberRuleSupport<E extends Element> {
@@ -30,6 +31,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	E template
 	(Element)=>Iterable<? extends Element> srcElementsRule
 	(Element)=>String nameRule
+	(Element)=>Set<Modifier> modifiersRule
 	(GenElement, Element)=>List<? extends AnnotationMirror> annotationMappingRules
 	
 	new(AnnotationMirror metaAnnotation, E template){
@@ -37,8 +39,12 @@ public abstract class MemberRuleSupport<E extends Element> {
 		_template = template		
 		_srcElementsRule = createSrcElementsRule 
 		_nameRule = createNameRule
-		
+		_modifiersRule = createModifiersRule
 		_annotationMappingRules = createAnnotationMappingRules
+	}
+	
+	protected def (Element)=>Set<Modifier> createModifiersRule(){
+		ru.createModifiersRule(metaAnnotation, template)
 	}
 	
 	protected def (GenElement, Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(){
@@ -51,7 +57,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	
 	
 	protected def (Element)=>String createNameRule() {
-		ru.createNameExprRule(metaAnnotation)
+		ru.createNameExprRule(metaAnnotation, template)
 	}
 	
 
@@ -106,7 +112,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 		TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement, (String)=>T factory) {
 		val member = createMember(triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement, factory)
 		member.annotationMirrors = annotationMappingRules.apply(member, ruleSrcElement)
-		setModifiersFromMetaAnnotation(member, triggerAnnotation)
+		member.modifiers = modifiersRule.apply(ruleSrcElement)
 		member
 	}
 
@@ -144,15 +150,6 @@ public abstract class MemberRuleSupport<E extends Element> {
 			type
 		} else {
 			typeFromTemplate
-		}
-	}
-
-
-	protected def void setModifiersFromMetaAnnotation(GenElement element, AnnotationMirror triggerAnnotation) {
-		if(metaAnnotation == null) return
-		val modi = triggerAnnotation.valueOrMetaValue("modifiers", typeof(Modifier[]), metaAnnotation)
-		if (!modi.nullOrEmpty) {
-			element.modifiers = modi.toSet
 		}
 	}
 
