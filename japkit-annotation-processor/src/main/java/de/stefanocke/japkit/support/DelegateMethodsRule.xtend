@@ -13,7 +13,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 		super(metaAnnotation, template)
 	}
 
-	override protected createSrcElementsRule(AnnotationMirror metaAnnotation) {
+	override protected createSrcElementsRule() {
 		val methodFilter = metaAnnotation.elementMatchers("methodFilter", null);
 		
 		[ Element ruleSrcElement |
