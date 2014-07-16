@@ -1,17 +1,15 @@
 package de.stefanocke.japkit.support
 
-import de.stefanocke.japkit.gen.GenAnnotationMirror
-import de.stefanocke.japkit.gen.GenElement
+import de.stefanocke.japkit.gen.GenExtensions
 import de.stefanocke.japkit.support.el.ELSupport
-import java.util.ArrayList
 import java.util.Collections
 import java.util.List
+import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.Modifier
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import javax.lang.model.element.Modifier
-import java.util.Set
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -22,11 +20,10 @@ class RuleUtils {
 	val protected extension ELSupport = ExtensionRegistry.get(ELSupport)
 	val protected extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	val protected extension AnnotationExtensions  = ExtensionRegistry.get(AnnotationExtensions)
+	val protected extension GenExtensions = ExtensionRegistry.get(GenExtensions)
+	
 	
 	public static val (Element)=>Iterable<? extends Element> SINGLE_SRC_ELEMENT = [Element e |  Collections.singleton(e)]
-	
-	//If there are no annoation mappings, the annotations on the generated element are the ones from the template
-	protected static val NO_ANNOTATION_MAPPINGS = [GenElement gen, Element src |  gen.annotationMirrors]
 	
 	/**
 	 * To iterate over a collection of elements and apply the rule for each element.
@@ -71,14 +68,19 @@ class RuleUtils {
 		]
 	}
 	
-	// gen element (with annotations copied from template), src element => annotations
-	public def (GenElement, Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
-		AnnotationMirror metaAnnotation) {
-		if(metaAnnotation==null) return NO_ANNOTATION_MAPPINGS
+	/**
+	 * Copies annotations from template at first (if there are any ) and then applies the annotation mappings
+	 */
+	public def (Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
+		AnnotationMirror metaAnnotation, Element template) {
+		
+		
+		if(metaAnnotation==null) return [e | template?.copyAnnotations ?: newArrayList]
 		val mappings = metaAnnotation.annotationMappings("annotationMappings", null);
-		[ GenElement genElement, Element ruleSrcElement |
-			mapAnnotations(ruleSrcElement, mappings,
-				new ArrayList(genElement.annotationMirrors.map[it as GenAnnotationMirror]))
+		
+		[ Element ruleSrcElement |
+			val annotationsFromTemplate = template?.copyAnnotations ?: newArrayList;
+			mapAnnotations(ruleSrcElement, mappings, annotationsFromTemplate)
 		]
 	}
 	

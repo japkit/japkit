@@ -36,7 +36,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 		
 		
 
-		method.annotationMirrors = annotationMappingRules.apply(method, delegateMethod)
+		method.annotationMirrors = annotationMappingRules.apply(delegateMethod)
 
 		val delegate = valueStack.get("delegate") as Element
 		

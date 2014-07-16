@@ -32,7 +32,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	(Element)=>Iterable<? extends Element> srcElementsRule
 	(Element)=>String nameRule
 	(Element)=>Set<Modifier> modifiersRule
-	(GenElement, Element)=>List<? extends AnnotationMirror> annotationMappingRules
+	(Element)=>List<? extends AnnotationMirror> annotationMappingRules
 	
 	new(AnnotationMirror metaAnnotation, E template){
 		_metaAnnotation = metaAnnotation
@@ -47,8 +47,8 @@ public abstract class MemberRuleSupport<E extends Element> {
 		ru.createModifiersRule(metaAnnotation, template)
 	}
 	
-	protected def (GenElement, Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(){
-		ru.createAnnotationMappingRules(metaAnnotation)
+	protected def (Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(){
+		ru.createAnnotationMappingRules(metaAnnotation, template)
 	}
 	
 	protected def (Element)=>Iterable<? extends Element> createSrcElementsRule(){
@@ -111,7 +111,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	protected def <T extends GenElement> T createMemberAndSetCommonAttributes(AnnotationMirror triggerAnnotation,
 		TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement, (String)=>T factory) {
 		val member = createMember(triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement, factory)
-		member.annotationMirrors = annotationMappingRules.apply(member, ruleSrcElement)
+		member.annotationMirrors = annotationMappingRules.apply(ruleSrcElement)
 		member.modifiers = modifiersRule.apply(ruleSrcElement)
 		member
 	}
