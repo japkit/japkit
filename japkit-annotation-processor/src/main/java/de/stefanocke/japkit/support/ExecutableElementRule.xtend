@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.support
 
-import de.stefanocke.japkit.gen.GenExecutableElement
 import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Param
@@ -10,41 +9,36 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
-import org.eclipse.xtext.xbase.lib.Pair
 
 @Data
 abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement> {
 	
-	List<Pair<AnnotationMirror, VariableElement>> paramRules
+	val List<(Element, AnnotationMirror, TypeElement, GenTypeElement)=>Iterable<? extends GenParameter>> paramRules
 	CodeRule bodyCodeRule
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 		
 		
-		if(template !=null){
+		_paramRules= if(template !=null){
 			//If there is a template, use its parameters. They can optionally have @Param annotation
-			_paramRules=template.parameters.map[it.annotationMirror(Param)->it].toList
+			template.parameters.map[createParamRule(it.annotationMirror(Param), it)].toList
 		} else {
 			//No template. Use the params from the @Method or @Constructor annotation
-			_paramRules=metaAnnotation.value("parameters", typeof(AnnotationMirror[])).map[it->null].toList
+			metaAnnotation.value("parameters", typeof(AnnotationMirror[])).map[createParamRule(it, null)].toList
 		}
 		_bodyCodeRule = new CodeRule(metaAnnotation,"body")
 	}
 	
-	def protected void setParametersFromTemplateAndAnnotation(GenExecutableElement executableElement, AnnotationMirror triggerAnnotation,
-		TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement) {
-		if(triggerAnnotation == null) return
+	def protected (Element, AnnotationMirror, TypeElement, GenTypeElement)=>Iterable<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template){
+		val srcElementsRule = createIteratorExpressionRule(paramAnnotation)
+		val nameRule = createNameExprRule(paramAnnotation)
+		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation);
 		
-		
-		val List<GenParameter> methodParams = newArrayList()
-
-		paramRules.forEach [
-			val paramAnnotation = key
-			val template = value;
-			createIteratorExpressionRule(paramAnnotation).apply(ruleSrcElement).forEach [ e |
+		[ Element ruleSrcElement, AnnotationMirror triggerAnnotation, TypeElement annotatedClass, GenTypeElement generatedClass |
+			srcElementsRule.apply(ruleSrcElement).map [ e |
 				valueStack.scope(e) [
-					val paramNameFromAnno = createNameExprRule(paramAnnotation).apply
+					val paramNameFromAnno = nameRule.apply(e)
 					val paramTypeFromAnno = if (paramAnnotation == null)
 							null
 						else
@@ -65,15 +59,17 @@ abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement
 								}
 							]
 						}
-					val paramAnnotationMappings = paramAnnotation?.annotationMappings("annotationMappings") ?: emptyList
-					mapAnnotations(e, paramAnnotationMappings).forEach[param.addAnnotationMirror(it)]
-					methodParams.add(param)
+					param.annotationMirrors = annotationMappingRules.apply(param, e)
+					param
 				]
 			]
 		]
-		
-		
-		executableElement.setParameters(methodParams)
+
 	}
+	
+	def protected generateParameters(AnnotationMirror triggerAnnotation, TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement){
+		paramRules.map[apply(ruleSrcElement, triggerAnnotation, annotatedClass, generatedClass)].flatten.toList
+	}
+	
 	
 }

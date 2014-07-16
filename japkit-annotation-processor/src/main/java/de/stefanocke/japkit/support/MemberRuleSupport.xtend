@@ -7,11 +7,14 @@ import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.ArrayList
 import java.util.Collections
+import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+
+import static de.stefanocke.japkit.support.MemberRuleSupport.*
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
@@ -32,15 +35,21 @@ public abstract class MemberRuleSupport<E extends Element> {
 	AnnotationMirror metaAnnotation
 	E template
 	(Element)=>Iterable<? extends Element> srcElementsRule
-	()=>String nameRule
+	(Element)=>String nameRule
+	(GenElement, Element)=>List<? extends AnnotationMirror> annotationMappingRules
 	
-	protected static val (Element)=>Iterable<? extends Element> singleSrcElement = [Element e |  Collections.singleton(e)]
+	protected static val (Element)=>Iterable<? extends Element> SINGLE_SRC_ELEMENT = [Element e |  Collections.singleton(e)]
+	
+	//If there are no annoation mappings, the annotations on the generated element are the ones from the template
+	protected static val NO_ANNOTATION_MAPPINGS = [GenElement gen, Element src |  gen.annotationMirrors]
 	
 	new(AnnotationMirror metaAnnotation, E template){
 		_metaAnnotation = metaAnnotation
 		_template = template		
-		_srcElementsRule = metaAnnotation?.createSrcElementsRule ?: singleSrcElement
+		_srcElementsRule = metaAnnotation?.createSrcElementsRule ?: SINGLE_SRC_ELEMENT
 		_nameRule = createNameRule(metaAnnotation)
+		
+		_annotationMappingRules = metaAnnotation?.createAnnotationMappingRules ?: NO_ANNOTATION_MAPPINGS
 	}
 	
 	protected def (Element)=>Iterable<? extends Element> createSrcElementsRule(AnnotationMirror mirror){
@@ -48,7 +57,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	}
 	
 	protected def (Element)=>Iterable<? extends Element> createIteratorExpressionRule(AnnotationMirror metaAnnotation) {
-		if(metaAnnotation==null) return singleSrcElement
+		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
 		val iteratorExpr = metaAnnotation.value("iterator", String)
 		val iteratorLang = metaAnnotation.value("iteratorLang", String);
@@ -65,23 +74,33 @@ public abstract class MemberRuleSupport<E extends Element> {
 		]
 	}
 	
-	protected def ()=>String createNameRule(AnnotationMirror metaAnnotation) {
+	protected def (Element)=>String createNameRule(AnnotationMirror metaAnnotation) {
 		createNameExprRule(metaAnnotation)
 	}
 	/** Gets a name from an annotation / meta annotation looking for AVs like name and nameExpr */
-	protected def ()=>String createNameExprRule(AnnotationMirror metaAnnotation) {
-		if(metaAnnotation == null) return [| null]
+	protected def (Object)=>String createNameExprRule(AnnotationMirror metaAnnotation) {
+		if(metaAnnotation == null) return [null]
 		val name = metaAnnotation.value("name", String)
 		val nameExpr = metaAnnotation.value("nameExpr", String)
 		val nameLang = metaAnnotation.value("nameLang", String);
 
-		[|
+		[
 			if (!nameExpr.nullOrEmpty) {
 				eval(valueStack, nameExpr, nameLang, String, '''Member name could not be generated''',
 					'invalidMemberName')
 			} else {
 				name
 			}
+		]
+	}
+	
+	protected def (GenElement, Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
+		AnnotationMirror metaAnnotation) {
+		if(metaAnnotation==null) return NO_ANNOTATION_MAPPINGS
+		val mappings = metaAnnotation.annotationMappings("annotationMappings", null);
+		[ GenElement genElement, Element ruleSrcElement |
+			mapAnnotations(ruleSrcElement, mappings,
+				new ArrayList(genElement.annotationMirrors.map[it as GenAnnotationMirror]))
 		]
 	}
 
@@ -135,7 +154,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	protected def <T extends GenElement> T createMemberAndSetCommonAttributes(AnnotationMirror triggerAnnotation,
 		TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement, (String)=>T factory) {
 		val member = createMember(triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement, factory)
-		mapAnnotations(member, triggerAnnotation, ruleSrcElement)
+		member.annotationMirrors = annotationMappingRules.apply(member, ruleSrcElement)
 		setModifiersFromMetaAnnotation(member, triggerAnnotation)
 		member
 	}
@@ -145,7 +164,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	 */
 	protected def <T extends GenElement> T createMember(AnnotationMirror triggerAnnotation, TypeElement annotatedClass,
 		GenTypeElement generatedClass, Element ruleSrcElement, (String)=>T factory) {
-		val memberName = nameRule.apply
+		val memberName = nameRule.apply(ruleSrcElement)
 
 		val genElement = if (template == null) {
 				factory.apply(memberName)
@@ -177,12 +196,6 @@ public abstract class MemberRuleSupport<E extends Element> {
 		}
 	}
 
-	protected def void mapAnnotations(GenElement element, AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		if(metaAnnotation == null) return
-		val annotationMappings = triggerAnnotation.annotationMappings("annotationMappings", metaAnnotation)
-		element.annotationMirrors = mapAnnotations(ruleSrcElement, annotationMappings,
-			new ArrayList(element.annotationMirrors.map[it as GenAnnotationMirror]))
-	}
 
 	protected def void setModifiersFromMetaAnnotation(GenElement element, AnnotationMirror triggerAnnotation) {
 		if(metaAnnotation == null) return

@@ -22,7 +22,7 @@ class MethodRule extends ExecutableElementRule {
 		method.returnType = typeFromMetaAnnotationOrTemplate(annotatedClass, generatedClass, triggerAnnotation,
 			"returnType", "returnTypeArgs", ruleSrcElement, method.returnType)
 
-		setParametersFromTemplateAndAnnotation(method, triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement)
+		method.parameters = generateParameters( triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement)
 
 		val codeBody =  bodyCodeRule.getAsCodeBody(method)
 		if (codeBody != null) {

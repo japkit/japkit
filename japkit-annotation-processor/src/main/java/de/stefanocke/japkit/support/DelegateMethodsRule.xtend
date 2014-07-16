@@ -29,14 +29,14 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 		val delegateMethod = ruleSrcElement as ExecutableElement
 		val method = genExtensions.copyFrom(delegateMethod, false);
 
-		val customMethodName = nameRule.apply
+		val customMethodName = nameRule.apply(ruleSrcElement)
 		if (!customMethodName.nullOrEmpty) {
 			method.simpleName = customMethodName
 		}
 		
 		
 
-		mapAnnotations(method, triggerAnnotation, delegateMethod)
+		method.annotationMirrors = annotationMappingRules.apply(method, delegateMethod)
 
 		val delegate = valueStack.get("delegate") as Element
 		
