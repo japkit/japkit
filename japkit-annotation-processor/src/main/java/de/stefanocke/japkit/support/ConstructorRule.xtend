@@ -13,11 +13,6 @@ class ConstructorRule extends ExecutableElementRule<GenConstructor> {
 
 	protected override createMember(Element ruleSrcElement) {
 		val ctor = createMemberAndSetCommonAttributes(ruleSrcElement, [new GenConstructor])
-
-		val codeBody = bodyCodeRule.getAsCodeBody(ctor)
-		if (codeBody != null) {
-			ctor.body = codeBody
-		}
 		ctor
 	}
 

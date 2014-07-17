@@ -52,6 +52,10 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		afterCreationRules.add(rule.andAssignResult(setter))
 	}
 	
+	protected def addAfterCreationRule((T, Element)=>void rule){
+		afterCreationRules.add(rule)
+	}
+	
 	protected def (Element)=>boolean createActivationRule(){
 		ru.createActivationRule(metaAnnotation)
 	}	

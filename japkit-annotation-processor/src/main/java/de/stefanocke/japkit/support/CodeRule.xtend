@@ -9,6 +9,7 @@ import org.eclipse.xtext.xbase.lib.Pair
 import de.stefanocke.japkit.support.el.ELSupport
 import javax.lang.model.element.AnnotationMirror
 import de.stefanocke.japkit.gen.GenElement
+import de.stefanocke.japkit.gen.CodeBody
 
 @Data
 class CodeRule {
@@ -66,7 +67,7 @@ class CodeRule {
 	/**
 	 * Gets the code as a closure usable in generated methods, constructors and fields.
 	 */
-	def getAsCodeBody(GenElement element) {
+	def CodeBody getAsCodeBody(GenElement element) {
 		if(metaAnnotation == null) return null
 
 		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)

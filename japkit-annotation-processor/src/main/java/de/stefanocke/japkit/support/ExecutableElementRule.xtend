@@ -7,21 +7,37 @@ import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.Modifier
 import javax.lang.model.element.VariableElement
+import de.stefanocke.japkit.gen.CodeBody
 
 @Data
 abstract class ExecutableElementRule<G extends GenExecutableElement> extends MemberRuleSupport<ExecutableElement, G> {
 
-	CodeRule bodyCodeRule
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 		
-		
-		addAfterCreationRule(createParamRules(metaAnnotation, template)) [gen, params| gen.parameters = params]
-		
-		_bodyCodeRule = new CodeRule(metaAnnotation,"body")
+		addAfterCreationRule(createParamRules(metaAnnotation, template)) [ee, params| ee.parameters = params]
+		addAfterCreationRule(createCodeBodyRuleWithAssignment)
 	}
+	
+	def protected (G, Element)=>void createCodeBodyRuleWithAssignment(){
+		val cbr = createCodeBodyRule();
+		[G genElement, Element ruleSourceElement | 
+			val codeBody = cbr.apply(genElement, ruleSourceElement)
+			if (codeBody != null) { 
+				genElement.removeModifier(Modifier.ABSTRACT)
+				genElement.body = codeBody
+			}
+		]
+	}
+	
+	def protected (G, Element)=>CodeBody createCodeBodyRule(){
+		val cr = new CodeRule(metaAnnotation, "body");
+		[G genElement, Element ruleSourceElement | cr.getAsCodeBody(genElement)]
+	}
+	
 	
 	def protected (Element)=>List<? extends GenParameter>  createParamRules(AnnotationMirror metaAnnotation, ExecutableElement template){
 		val rules= if(template !=null){

@@ -17,12 +17,6 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 
 	protected override createMember(Element ruleSrcElement) {
 		val method = createMemberAndSetCommonAttributes(ruleSrcElement, [new GenMethod(it)])
-
-		val codeBody =  bodyCodeRule.getAsCodeBody(method)
-		if (codeBody != null) {
-			method.removeModifier(Modifier.ABSTRACT)
-			method.body = codeBody
-		}
 		method
 	}
 
