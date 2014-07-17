@@ -25,11 +25,7 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	def protected (G, Element)=>void createCodeBodyRuleWithAssignment(){
 		val cbr = createCodeBodyRule();
 		[G genElement, Element ruleSourceElement | 
-			val codeBody = cbr.apply(genElement, ruleSourceElement)
-			if (codeBody != null) { 
-				genElement.removeModifier(Modifier.ABSTRACT)
-				genElement.body = codeBody
-			}
+			genElement.body = cbr.apply(genElement, ruleSourceElement)			
 		]
 	}
 	

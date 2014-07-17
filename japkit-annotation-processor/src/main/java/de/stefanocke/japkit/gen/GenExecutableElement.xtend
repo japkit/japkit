@@ -24,11 +24,12 @@ abstract class GenExecutableElement extends GenParameterizable implements Execut
 		this.body
 	}
 	
-	def setBody(CodeBody body){
+	def setBody(CodeBody body){			
 		this.body = body
 		if(body!=null){
-			removeModifier(Modifier.ABSTRACT)
-		}
+			removeModifier(Modifier.ABSTRACT)	
+		
+		}	
 	}
 	
 	override addModifier(Modifier m){

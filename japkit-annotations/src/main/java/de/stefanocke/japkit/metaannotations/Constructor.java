@@ -122,7 +122,7 @@ public @interface Constructor {
 	 * 
 	 * @return
 	 */
-	Case[] bodySwitch() default{};
+	Case[] bodyCases() default{};
 	
 	
 	/**

@@ -35,12 +35,13 @@ class CodeRule {
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
 		_metaAnnotation = metaAnnotation
+		
 		_bodyExpr = metaAnnotation.value("expr".withPrefix(avPrefix), String)
 		_lang = metaAnnotation.value("lang".withPrefix(avPrefix), String)
 		
 		val bodyCaseAnnotations = metaAnnotation.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
 		
-		_bodyCases = bodyCaseAnnotations?.map[
+		_bodyCases = bodyCaseAnnotations.map[
 			elementMatchers('matcher', null) 
 			-> value('expr', String)
 		]?.toList ?: emptyList
@@ -58,6 +59,8 @@ class CodeRule {
 
 		_imports = metaAnnotation.value("imports", typeof(DeclaredType[]))
 		
+		
+		
 	}
 	
 	private static def withPrefix(String name, String prefix){
@@ -68,7 +71,7 @@ class CodeRule {
 	 * Gets the code as a closure usable in generated methods, constructors and fields.
 	 */
 	def CodeBody getAsCodeBody(GenElement element) {
-		if(metaAnnotation == null) return null
+		if(metaAnnotation == null || (bodyExpr.nullOrEmpty && bodyCases.empty) ) return null
 
 		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
 		val valueStack = new ValueStack(valueStack);
