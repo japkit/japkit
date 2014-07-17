@@ -11,6 +11,7 @@ import javax.lang.model.element.Modifier
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.gen.GenElement
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -134,6 +135,13 @@ class RuleUtils {
 			} else {
 				typeFromTemplate
 			}
+		]
+	}
+	
+	public static def <R, E extends GenElement> andAssignResult((Element)=>R rule, (E, R)=>void setter){
+		[E genElement, Element ruleSrcElement |
+			val result = rule.apply(ruleSrcElement)
+			setter.apply(genElement, result)
 		]
 	}
 	

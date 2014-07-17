@@ -5,8 +5,9 @@ import de.stefanocke.japkit.processor.ClassGeneratorSupport
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.gen.GenTypeElement
 
-class InnerClassRule extends MemberRuleSupport<TypeElement> {
+class InnerClassRule extends MemberRuleSupport<TypeElement, GenTypeElement> {
 	val extension ClassGeneratorSupport = ExtensionRegistry.get(ClassGeneratorSupport)
 
 	new(AnnotationMirror metaAnnotation, TypeElement template) {

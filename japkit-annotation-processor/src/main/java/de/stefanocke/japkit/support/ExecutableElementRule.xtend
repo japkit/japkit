@@ -1,5 +1,6 @@
 package de.stefanocke.japkit.support
 
+import de.stefanocke.japkit.gen.GenExecutableElement
 import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.metaannotations.Param
 import java.util.List
@@ -9,16 +10,16 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
 
 @Data
-abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement> {
-	
-	val (Element)=>List<? extends GenParameter> paramRules
+abstract class ExecutableElementRule<G extends GenExecutableElement> extends MemberRuleSupport<ExecutableElement, G> {
+
 	CodeRule bodyCodeRule
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 		
 		
-		_paramRules= createParamRules(metaAnnotation, template)
+		addAfterCreationRule(createParamRules(metaAnnotation, template)) [gen, params| gen.parameters = params]
+		
 		_bodyCodeRule = new CodeRule(metaAnnotation,"body")
 	}
 	

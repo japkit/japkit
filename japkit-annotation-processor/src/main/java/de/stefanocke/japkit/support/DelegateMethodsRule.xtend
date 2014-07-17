@@ -4,8 +4,9 @@ import java.util.ArrayList
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
+import de.stefanocke.japkit.gen.GenMethod
 
-class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
+class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod> {
 
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
@@ -33,7 +34,8 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 		
 		
 
-		method.annotationMirrors = annotationMappingRules.apply(delegateMethod)
+		//TODO
+		//method.annotationMirrors = annotationMappingRules.apply(delegateMethod)
 
 		val delegate = valueStack.get("delegate") as Element
 		

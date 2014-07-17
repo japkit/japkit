@@ -7,7 +7,7 @@ import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 
 @Data
-class FieldRule extends MemberRuleSupport<VariableElement> {
+class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	CodeRule initCodeRule
 	(Element)=>TypeMirror typeRule
 	

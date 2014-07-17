@@ -5,15 +5,16 @@ import de.stefanocke.japkit.gen.GenExtensions
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
+import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.TypeMirror
-import java.util.Set
+
+import static extension de.stefanocke.japkit.support.RuleUtils.*
 
 @Data
-public abstract class MemberRuleSupport<E extends Element> {
+public abstract class MemberRuleSupport<E extends Element, T extends GenElement> {
 	val protected extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 
 	//val extension RoundEnvironment roundEnv = ExtensionRegistry.get(RoundEnvironment)
@@ -33,8 +34,9 @@ public abstract class MemberRuleSupport<E extends Element> {
 	(Element)=>boolean activationRule
 	(Element)=>Iterable<? extends Element> srcElementsRule
 	(Element)=>String nameRule
-	(Element)=>Set<Modifier> modifiersRule
-	(Element)=>List<? extends AnnotationMirror> annotationMappingRules
+	
+	private List<(T, Element)=>void> afterCreationRules = newArrayList()
+	
 	
 	new(AnnotationMirror metaAnnotation, E template){
 		_metaAnnotation = metaAnnotation
@@ -42,8 +44,12 @@ public abstract class MemberRuleSupport<E extends Element> {
 		_activationRule	= createActivationRule
 		_srcElementsRule = createSrcElementsRule 
 		_nameRule = createNameRule
-		_modifiersRule = createModifiersRule
-		_annotationMappingRules = createAnnotationMappingRules
+		addAfterCreationRule(createModifiersRule) [e, m | e.modifiers = m]
+		addAfterCreationRule(createAnnotationMappingRules) [e, a | e.annotationMirrors = a]
+	}
+	
+	protected def <R> addAfterCreationRule((Element)=>R rule, (T, R)=>void setter){
+		afterCreationRules.add(rule.andAssignResult(setter))
 	}
 	
 	protected def (Element)=>boolean createActivationRule(){
@@ -113,10 +119,9 @@ public abstract class MemberRuleSupport<E extends Element> {
 	/**
 	 * Creates the member from the template or by calling the factory and sets the name, the modifiers and the annotations.
 	 */
-	protected def <T extends GenElement> T createMemberAndSetCommonAttributes(Element ruleSrcElement, (String)=>T factory) {
+	protected def T createMemberAndSetCommonAttributes(Element ruleSrcElement, (String)=>T factory) {
 		val member = createMember(ruleSrcElement, factory)
-		member.annotationMirrors = annotationMappingRules.apply(ruleSrcElement)
-		member.modifiers = modifiersRule.apply(ruleSrcElement)
+		afterCreationRules.forEach[apply(member, ruleSrcElement)]
 		member
 	}
 

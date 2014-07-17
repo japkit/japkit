@@ -5,24 +5,18 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
-import javax.lang.model.type.TypeMirror
 
 @Data
-class MethodRule extends ExecutableElementRule {
+class MethodRule extends ExecutableElementRule<GenMethod> {
 
-	(Element)=>TypeMirror returnTypeRule 
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
-		_returnTypeRule = ru.createTypeRule(metaAnnotation, template?.returnType, "return")
+		addAfterCreationRule(ru.createTypeRule(metaAnnotation, template?.returnType, "return")) [m,t | m.setReturnType(t)]
 	}
 
 	protected override createMember(Element ruleSrcElement) {
 		val method = createMemberAndSetCommonAttributes(ruleSrcElement, [new GenMethod(it)])
-
-		method.returnType = returnTypeRule.apply(ruleSrcElement)
-
-		method.parameters = paramRules.apply(ruleSrcElement)
 
 		val codeBody =  bodyCodeRule.getAsCodeBody(method)
 		if (codeBody != null) {
