@@ -128,22 +128,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	protected def <T extends GenElement> T createMember(AnnotationMirror triggerAnnotation, TypeElement annotatedClass,
 		GenTypeElement generatedClass, Element ruleSrcElement, (String)=>T factory) {
 		val memberName = nameRule.apply(ruleSrcElement)
-
-		val genElement = if (template == null) {
-				factory.apply(memberName)
-			} else {
-
-				//Copy member from template and transform types (for example, replace "AnnotatedClass")
-				genExtensions.copyFrom(template, true,
-					relatedTypesTransformation(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement))
-			}
-
-		if (!memberName.nullOrEmpty) {
-
-			//Override name from template, if requested
-			genElement.simpleName = memberName
-		}
-		genElement as T
+		factory.apply(memberName)			
 	}
 	
 
