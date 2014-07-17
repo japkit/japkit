@@ -10,6 +10,7 @@ import de.stefanocke.japkit.metaannotations.InnerClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Param;
+import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
@@ -64,6 +65,7 @@ public abstract class ValueObjectTemplate {
 	@Constructor(bodyIterator = "#{properties}", 
 			bodyExpr = "#{validationFragment.code()}" +
 			"this.#{element.simpleName} = builder.#{element.simpleName};\n")
+	@ParamNames("builder")
 	private ValueObjectTemplate(Builder builder) {
 	}
 	

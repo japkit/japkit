@@ -22,7 +22,7 @@ abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement
 		
 		_paramRules= if(template !=null){
 			//If there is a template, use its parameters. They can optionally have @Param annotation
-			template.parameters.map[createParamRule(it.annotationMirror(Param), it)].toList
+			template.parametersWithSrcNames.map[createParamRule(it.annotationMirror(Param), it)].toList
 		} else {
 			//No template. Use the params from the @Method or @Constructor annotation
 			metaAnnotation.value("parameters", typeof(AnnotationMirror[])).map[createParamRule(it, null)].toList
