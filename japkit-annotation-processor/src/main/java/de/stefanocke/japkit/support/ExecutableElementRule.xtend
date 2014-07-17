@@ -11,21 +11,27 @@ import javax.lang.model.element.VariableElement
 @Data
 abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement> {
 	
-	val List<(Element)=>Iterable<? extends GenParameter>> paramRules
+	val (Element)=>List<? extends GenParameter> paramRules
 	CodeRule bodyCodeRule
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 		
 		
-		_paramRules= if(template !=null){
+		_paramRules= createParamRules(metaAnnotation, template)
+		_bodyCodeRule = new CodeRule(metaAnnotation,"body")
+	}
+	
+	def protected (Element)=>List<? extends GenParameter>  createParamRules(AnnotationMirror metaAnnotation, ExecutableElement template){
+		val rules= if(template !=null){
 			//If there is a template, use its parameters. They can optionally have @Param annotation
 			template.parametersWithSrcNames.map[createParamRule(it.annotationMirror(Param), it)].toList
 		} else {
 			//No template. Use the params from the @Method or @Constructor annotation
 			metaAnnotation.value("parameters", typeof(AnnotationMirror[])).map[createParamRule(it, null)].toList
 		}
-		_bodyCodeRule = new CodeRule(metaAnnotation,"body")
+		
+		[ Element ruleSrcElement | rules.map[apply(ruleSrcElement)].flatten.toList ]
 	}
 	
 	def protected (Element)=>Iterable<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template){
@@ -48,10 +54,6 @@ abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement
 			]
 		]
 
-	}
-	
-	def protected generateParameters(Element ruleSrcElement){
-		paramRules.map[apply(ruleSrcElement)].flatten.toList
 	}
 	
 	

@@ -1,11 +1,9 @@
 package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenConstructor
-import de.stefanocke.japkit.gen.GenTypeElement
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
 
 class ConstructorRule extends ExecutableElementRule {
 
@@ -13,13 +11,11 @@ class ConstructorRule extends ExecutableElementRule {
 		super(metaAnnotation, template)
 	}
 
-	protected override createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		val ctor = createMemberAndSetCommonAttributes(triggerAnnotation, annotatedClass, generatedClass,
-			ruleSrcElement, [new GenConstructor])
+	protected override createMember(Element ruleSrcElement) {
+		val ctor = createMemberAndSetCommonAttributes(ruleSrcElement, [new GenConstructor])
 
 
-		ctor.parameters = generateParameters(ruleSrcElement)
+		ctor.parameters = paramRules.apply(ruleSrcElement)
 
 		val codeBody = bodyCodeRule.getAsCodeBody(ctor)
 		if (codeBody != null) {

@@ -86,7 +86,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 			srcElements.forEach [ e |
 				valueStack.scope(e) [
 					valueStack.putELVariables(e, triggerAnnotation, metaAnnotation)
-					val member = createMember(annotatedClass, generatedClass, triggerAnnotation, e)
+					val member = createMember(e)
 					generatedClass.add(member)
 					//Create delegate methods that use the generated member to retrieve the object to delegate to
 					createDelegateMethods(member, annotatedClass, generatedClass, triggerAnnotation)
@@ -108,15 +108,13 @@ public abstract class MemberRuleSupport<E extends Element> {
 	/**
 	 * To be overridden by subclasses to create the member.
 	 */
-	protected def GenElement createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, Element ruleSrcElement);
+	protected def GenElement createMember(Element ruleSrcElement);
 
 	/**
 	 * Creates the member from the template or by calling the factory and sets the name, the modifiers and the annotations.
 	 */
-	protected def <T extends GenElement> T createMemberAndSetCommonAttributes(AnnotationMirror triggerAnnotation,
-		TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement, (String)=>T factory) {
-		val member = createMember(triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement, factory)
+	protected def <T extends GenElement> T createMemberAndSetCommonAttributes(Element ruleSrcElement, (String)=>T factory) {
+		val member = createMember(ruleSrcElement, factory)
 		member.annotationMirrors = annotationMappingRules.apply(ruleSrcElement)
 		member.modifiers = modifiersRule.apply(ruleSrcElement)
 		member
@@ -125,8 +123,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	/**
 	 * Creates the member from the template or by calling the factory and sets the name.
 	 */
-	protected def <T extends GenElement> T createMember(AnnotationMirror triggerAnnotation, TypeElement annotatedClass,
-		GenTypeElement generatedClass, Element ruleSrcElement, (String)=>T factory) {
+	protected def <T extends GenElement> T createMember(Element ruleSrcElement, (String)=>T factory) {
 		val memberName = nameRule.apply(ruleSrcElement)
 		factory.apply(memberName)			
 	}

@@ -1,11 +1,9 @@
 package de.stefanocke.japkit.support
 
-import de.stefanocke.japkit.gen.GenTypeElement
 import java.util.ArrayList
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
 
 class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 
@@ -23,8 +21,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement> {
 		]
 	}
 
-	protected override createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+	protected override createMember(Element ruleSrcElement) {
 
 		val delegateMethod = ruleSrcElement as ExecutableElement
 		val method = genExtensions.copyFrom(delegateMethod, false);

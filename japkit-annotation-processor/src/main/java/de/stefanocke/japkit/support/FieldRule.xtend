@@ -1,10 +1,8 @@
 package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenField
-import de.stefanocke.japkit.gen.GenTypeElement
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 
@@ -19,9 +17,8 @@ class FieldRule extends MemberRuleSupport<VariableElement> {
 		_typeRule = ru.createTypeRule(metaAnnotation, template?.asType, null)
 	}
 
-	protected override createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		val field = createMemberAndSetCommonAttributes(triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement, [new GenField(it, null)])
+	protected override createMember(Element ruleSrcElement) {
+		val field = createMemberAndSetCommonAttributes(ruleSrcElement, [new GenField(it, null)])
 
 		field.type = typeRule.apply(ruleSrcElement)
 
