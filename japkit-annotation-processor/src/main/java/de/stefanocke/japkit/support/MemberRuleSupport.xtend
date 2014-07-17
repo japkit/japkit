@@ -29,6 +29,8 @@ public abstract class MemberRuleSupport<E extends Element> {
 
 	AnnotationMirror metaAnnotation
 	E template
+	
+	(Element)=>boolean activationRule
 	(Element)=>Iterable<? extends Element> srcElementsRule
 	(Element)=>String nameRule
 	(Element)=>Set<Modifier> modifiersRule
@@ -36,11 +38,20 @@ public abstract class MemberRuleSupport<E extends Element> {
 	
 	new(AnnotationMirror metaAnnotation, E template){
 		_metaAnnotation = metaAnnotation
-		_template = template		
+		_template = template
+		_activationRule	= createActivationRule
 		_srcElementsRule = createSrcElementsRule 
 		_nameRule = createNameRule
 		_modifiersRule = createModifiersRule
 		_annotationMappingRules = createAnnotationMappingRules
+	}
+	
+	protected def (Element)=>boolean createActivationRule(){
+		ru.createActivationRule(metaAnnotation)
+	}	
+	
+	protected def (Element)=>Iterable<? extends Element> createSrcElementsRule(){
+		ru.createIteratorExpressionRule(metaAnnotation)
 	}
 	
 	protected def (Element)=>Set<Modifier> createModifiersRule(){
@@ -50,11 +61,6 @@ public abstract class MemberRuleSupport<E extends Element> {
 	protected def (Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(){
 		ru.createAnnotationMappingRules(metaAnnotation, template)
 	}
-	
-	protected def (Element)=>Iterable<? extends Element> createSrcElementsRule(){
-		ru.createIteratorExpressionRule(metaAnnotation)
-	}
-	
 	
 	protected def (Element)=>String createNameRule() {
 		ru.createNameExprRule(metaAnnotation, template)
@@ -68,7 +74,7 @@ public abstract class MemberRuleSupport<E extends Element> {
 	def void apply(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
 		Element ruleSrcElement) {
 
-		if (!isActive(triggerAnnotation, ruleSrcElement)) {
+		if (!activationRule.apply(ruleSrcElement)) {
 			return
 		}
 
@@ -139,28 +145,6 @@ public abstract class MemberRuleSupport<E extends Element> {
 		}
 		genElement as T
 	}
-
-	protected def TypeMirror typeFromMetaAnnotationOrTemplate(TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, String typeAvName, String typeArgsAvName, Element ruleSrcElement,
-		TypeMirror typeFromTemplate) {
-		if(metaAnnotation == null) return typeFromTemplate
-		val type = triggerAnnotation.resolveType(annotatedClass, generatedClass, metaAnnotation, typeAvName,
-			typeArgsAvName, ruleSrcElement)
-		if (!type.isVoid) {
-			type
-		} else {
-			typeFromTemplate
-		}
-	}
-
-	protected def boolean isActive(AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		if(metaAnnotation == null) return true
-		val activation = triggerAnnotation.elementMatchers("activation", metaAnnotation)
-		val active = activation.nullOrEmpty || activation.exists[matches(ruleSrcElement)]
-		active
-	}
-	
-
 	
 
 	protected def void createDelegateMethods(GenElement genElement, TypeElement annotatedClass,

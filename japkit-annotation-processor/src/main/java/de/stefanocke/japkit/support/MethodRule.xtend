@@ -7,11 +7,16 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 
+@Data
 class MethodRule extends ExecutableElementRule {
 
+	(Element)=>TypeMirror returnTypeRule 
+	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
+		_returnTypeRule = ru.createTypeRule(metaAnnotation, template?.returnType, "return")
 	}
 
 	protected override createMember(TypeElement annotatedClass, GenTypeElement generatedClass,
@@ -19,8 +24,7 @@ class MethodRule extends ExecutableElementRule {
 		val method = createMemberAndSetCommonAttributes(triggerAnnotation, annotatedClass, generatedClass,
 			ruleSrcElement, [new GenMethod(it)])
 
-		method.returnType = typeFromMetaAnnotationOrTemplate(annotatedClass, generatedClass, triggerAnnotation,
-			"returnType", "returnTypeArgs", ruleSrcElement, method.returnType)
+		method.returnType = returnTypeRule.apply(ruleSrcElement)
 
 		method.parameters = generateParameters( triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement)
 

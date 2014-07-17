@@ -59,7 +59,7 @@ class CodeRule {
 		
 	}
 	
-	private def withPrefix(String name, String prefix){
+	private static def withPrefix(String name, String prefix){
 		if(prefix.nullOrEmpty) name else '''«prefix»«name.toFirstUpper»'''
 	}
 	

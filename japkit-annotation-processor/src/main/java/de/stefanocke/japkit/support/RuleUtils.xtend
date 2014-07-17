@@ -10,6 +10,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import javax.lang.model.type.TypeMirror
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -21,7 +22,14 @@ class RuleUtils {
 	val protected extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	val protected extension AnnotationExtensions  = ExtensionRegistry.get(AnnotationExtensions)
 	val protected extension GenExtensions = ExtensionRegistry.get(GenExtensions)
+	val protected extension RelatedTypes relatedTypes = ExtensionRegistry.get(RelatedTypes)
+	val protected extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	val protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	
+	
+	public static def withPrefix(String name, String prefix){
+		(if(prefix.nullOrEmpty) name else '''«prefix»«name.toFirstUpper»''').toString
+	}
 	
 	public static val (Element)=>Iterable<? extends Element> SINGLE_SRC_ELEMENT = [Element e |  Collections.singleton(e)]
 	
@@ -44,6 +52,18 @@ class RuleUtils {
 				} 
 			srcElements
 		]
+	}
+	
+	public static val ALWAYS_ACTIVE = [Element e | true]
+	/**
+	 * AV "activation" to enable or disable a rule
+	 */
+	public def (Element)=>boolean createActivationRule(AnnotationMirror metaAnnotation) {
+
+		val activation = metaAnnotation?.elementMatchers("activation", null)
+		if(activation.nullOrEmpty) return ALWAYS_ACTIVE;
+
+		[Element ruleSrcElement|activation.exists[matches(ruleSrcElement)]]
 	}
 	
 	/**
@@ -96,6 +116,24 @@ class RuleUtils {
 				modi.toSet
 			} else
 				templateModifiers
+		]
+	}
+	
+	//TODO: AV-overriding überdenken. 
+	public def (Element)=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template,
+		String avPrefix) {
+
+		[ Element ruleSrcElement |
+			val typeFromTemplate = template?.relatedType(currentAnnotatedClass, currentGeneratedClass, currentAnnotation,
+				null, ruleSrcElement)
+			if(metaAnnotation == null) return typeFromTemplate
+			val type = currentAnnotation.resolveType(currentAnnotatedClass, currentGeneratedClass, metaAnnotation,
+				"type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix), ruleSrcElement)
+			if (!type.isVoid) {
+				type
+			} else {
+				typeFromTemplate
+			}
 		]
 	}
 	
