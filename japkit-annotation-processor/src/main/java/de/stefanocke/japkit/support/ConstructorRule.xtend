@@ -19,7 +19,7 @@ class ConstructorRule extends ExecutableElementRule {
 			ruleSrcElement, [new GenConstructor])
 
 
-		ctor.parameters = generateParameters( triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement)
+		ctor.parameters = generateParameters(ruleSrcElement)
 
 		val codeBody = bodyCodeRule.getAsCodeBody(ctor)
 		if (codeBody != null) {

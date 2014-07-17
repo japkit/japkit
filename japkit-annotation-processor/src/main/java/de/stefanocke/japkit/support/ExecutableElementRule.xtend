@@ -1,19 +1,17 @@
 package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenParameter
-import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Param
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 
 @Data
 abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement> {
 	
-	val List<(Element, AnnotationMirror, TypeElement, GenTypeElement)=>Iterable<? extends GenParameter>> paramRules
+	val List<(Element)=>Iterable<? extends GenParameter>> paramRules
 	CodeRule bodyCodeRule
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
@@ -30,35 +28,20 @@ abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement
 		_bodyCodeRule = new CodeRule(metaAnnotation,"body")
 	}
 	
-	def protected (Element, AnnotationMirror, TypeElement, GenTypeElement)=>Iterable<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template){
+	def protected (Element)=>Iterable<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template){
 		val srcElementsRule = ru.createIteratorExpressionRule(paramAnnotation)
 		val nameRule = ru.createNameExprRule(paramAnnotation, template)
-		val annotationMappingRules = ru.createAnnotationMappingRules(paramAnnotation, template);
+		val annotationMappingRules = ru.createAnnotationMappingRules(paramAnnotation, template)
+		val typeRule = ru.createTypeRule(paramAnnotation, template?.asType, null);
 		
-		[ Element ruleSrcElement, AnnotationMirror triggerAnnotation, TypeElement annotatedClass, GenTypeElement generatedClass |
+		[ Element ruleSrcElement |
 			srcElementsRule.apply(ruleSrcElement).map [ e |
 				valueStack.scope(e) [
-					val paramNameFromAnno = nameRule.apply(e)
-					val paramTypeFromAnno = if (paramAnnotation == null)
-							null
-						else
-							resolveType(triggerAnnotation, annotatedClass, generatedClass, paramAnnotation, "type",
-								"typeArgs", e)
-					val param = if (template == null) {
-							new GenParameter(paramNameFromAnno, paramTypeFromAnno)
-						} else {
-
-							//Copy param from template and transform types (for example, replace "AnnotatedClass")
-							genExtensions.copyParamFrom(template, true,
-								relatedTypesTransformation(annotatedClass, generatedClass, triggerAnnotation, e)) => [
-								if (!paramNameFromAnno.nullOrEmpty) {
-									simpleName = paramNameFromAnno
-								}
-								if (paramTypeFromAnno != null) {
-									type = paramTypeFromAnno
-								}
-							]
-						}
+					val name = nameRule.apply(e)
+					val type = typeRule.apply(e)
+					
+					val param = new GenParameter(name, type)
+						
 					param.annotationMirrors = annotationMappingRules.apply(e)
 					param
 				]
@@ -67,8 +50,8 @@ abstract class ExecutableElementRule extends MemberRuleSupport<ExecutableElement
 
 	}
 	
-	def protected generateParameters(AnnotationMirror triggerAnnotation, TypeElement annotatedClass, GenTypeElement generatedClass, Element ruleSrcElement){
-		paramRules.map[apply(ruleSrcElement, triggerAnnotation, annotatedClass, generatedClass)].flatten.toList
+	def protected generateParameters(Element ruleSrcElement){
+		paramRules.map[apply(ruleSrcElement)].flatten.toList
 	}
 	
 	

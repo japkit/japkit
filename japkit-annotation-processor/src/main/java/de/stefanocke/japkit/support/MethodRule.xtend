@@ -26,7 +26,7 @@ class MethodRule extends ExecutableElementRule {
 
 		method.returnType = returnTypeRule.apply(ruleSrcElement)
 
-		method.parameters = generateParameters( triggerAnnotation, annotatedClass, generatedClass, ruleSrcElement)
+		method.parameters = generateParameters(ruleSrcElement)
 
 		val codeBody =  bodyCodeRule.getAsCodeBody(method)
 		if (codeBody != null) {
