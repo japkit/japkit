@@ -28,6 +28,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 
 	AnnotationMirror metaAnnotation
 	E template
+	String avPrefix
 	
 	(Element)=>boolean activationRule
 	(Element)=>Iterable<? extends Element> srcElementsRule
@@ -38,11 +39,14 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	//members to be created for the generated member. for instance, getters and setters to  be created for the generated field
 	List<(GenTypeElement, Element ) => void> dependentMemberRules = newArrayList()
 
-	
-	
 	new(AnnotationMirror metaAnnotation, E template){
+		this(metaAnnotation, template, null)
+	}
+	
+	new(AnnotationMirror metaAnnotation, E template, String avPrefix){
 		_metaAnnotation = metaAnnotation
 		_template = template
+		_avPrefix = avPrefix
 		_activationRule	= createActivationRule
 		_srcElementsRule = createSrcElementsRule 
 		_nameRule = createNameRule
@@ -53,23 +57,23 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	
 	
 	protected def (Element)=>boolean createActivationRule(){
-		ru.createActivationRule(metaAnnotation)
+		ru.createActivationRule(metaAnnotation, avPrefix)
 	}	
 	
 	protected def (Element)=>Iterable<? extends Element> createSrcElementsRule(){
-		ru.createIteratorExpressionRule(metaAnnotation)
+		ru.createIteratorExpressionRule(metaAnnotation, avPrefix)
 	}
 	
 	protected def (Element)=>Set<Modifier> createModifiersRule(){
-		ru.createModifiersRule(metaAnnotation, template)
+		ru.createModifiersRule(metaAnnotation, template, avPrefix)
 	}
 	
 	protected def (Element)=>List<? extends AnnotationMirror> createAnnotationsRule(){
-		ru.createAnnotationMappingRules(metaAnnotation, template)
+		ru.createAnnotationMappingRules(metaAnnotation, template, avPrefix)
 	}
 	
 	protected def (Element)=>String createNameRule() {
-		ru.createNameExprRule(metaAnnotation, template)
+		ru.createNameExprRule(metaAnnotation, template, avPrefix)
 	}
 	
 

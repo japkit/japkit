@@ -37,11 +37,11 @@ class RuleUtils {
 	/**
 	 * To iterate over a collection of elements and apply the rule for each element.
 	 */
-	public def (Element)=>Iterable<? extends Element> createIteratorExpressionRule(AnnotationMirror metaAnnotation) {
+	public def (Element)=>Iterable<? extends Element> createIteratorExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
-		val iteratorExpr = metaAnnotation.value("iterator", String)
-		val iteratorLang = metaAnnotation.value("iteratorLang", String);
+		val iteratorExpr = metaAnnotation.value("iterator".withPrefix(avPrefix), String)
+		val iteratorLang = metaAnnotation.value("iteratorLang".withPrefix(avPrefix), String);
 
 		[Element ruleSrcElement|
 			val srcElements = if (iteratorExpr.nullOrEmpty) {
@@ -59,9 +59,9 @@ class RuleUtils {
 	/**
 	 * AV "activation" to enable or disable a rule
 	 */
-	public def (Element)=>boolean createActivationRule(AnnotationMirror metaAnnotation) {
+	public def (Element)=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
 
-		val activation = metaAnnotation?.elementMatchers("activation", null)
+		val activation = metaAnnotation?.elementMatchers("activation".withPrefix(avPrefix), null)
 		if(activation.nullOrEmpty) return ALWAYS_ACTIVE;
 
 		[Element ruleSrcElement|activation.exists[matches(ruleSrcElement)]]
@@ -72,12 +72,12 @@ class RuleUtils {
 	/**
 	 * To set the name of the generated element either statically (AV: name) or dynamically (AV: nameExpr)
 	 */
-	public def (Object)=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template) {
+	public def (Object)=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		val nameFromTemplate = template?.simpleName?.toString
 		if(metaAnnotation == null) return [nameFromTemplate]
-		val name = metaAnnotation.value("name", String)
-		val nameExpr = metaAnnotation.value("nameExpr", String)
-		val nameLang = metaAnnotation.value("nameLang", String);
+		val name = metaAnnotation.value("name".withPrefix(avPrefix), String)
+		val nameExpr = metaAnnotation.value("nameExpr".withPrefix(avPrefix), String)
+		val nameLang = metaAnnotation.value("nameLang".withPrefix(avPrefix), String);
 
 		[
 			if (!nameExpr.nullOrEmpty) {
@@ -95,11 +95,11 @@ class RuleUtils {
 	 * Copies annotations from template at first (if there are any ) and then applies the annotation mappings
 	 */
 	public def (Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
-		AnnotationMirror metaAnnotation, Element template) {
+		AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		
 		
 		if(metaAnnotation==null) return [e | template?.copyAnnotations ?: newArrayList]
-		val mappings = metaAnnotation.annotationMappings("annotationMappings", null);
+		val mappings = metaAnnotation.annotationMappings("annotationMappings".withPrefix(avPrefix), null);
 		
 		[ Element ruleSrcElement |
 			val annotationsFromTemplate = template?.copyAnnotations ?: newArrayList;
@@ -107,11 +107,11 @@ class RuleUtils {
 		]
 	}
 	
-	public def (Object)=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template) {
+	public def (Object)=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		val templateModifiers = template?.modifiers ?: emptySet
 
 		if(metaAnnotation == null) return [template?.modifiers]
-		val modi = metaAnnotation.value("modifiers", typeof(Modifier[]));
+		val modi = metaAnnotation.value("modifiers".withPrefix(avPrefix), typeof(Modifier[]));
 
 		//TODO: Expressions for isPublic , isPrivate etc
 		[
