@@ -11,8 +11,6 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 
-import static extension de.stefanocke.japkit.support.RuleUtils.*
-
 @Data
 public abstract class MemberRuleSupport<E extends Element, T extends GenElement> {
 	val protected extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
@@ -34,8 +32,10 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	(Element)=>boolean activationRule
 	(Element)=>Iterable<? extends Element> srcElementsRule
 	(Element)=>String nameRule
+	(Element)=>Set<Modifier> modifiersRule
+	(Element)=>List<? extends AnnotationMirror> annotationsRule
 	
-	private List<(T, Element)=>void> afterCreationRules = newArrayList()
+
 	
 	
 	new(AnnotationMirror metaAnnotation, E template){
@@ -44,17 +44,10 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_activationRule	= createActivationRule
 		_srcElementsRule = createSrcElementsRule 
 		_nameRule = createNameRule
-		addAfterCreationRule(createModifiersRule) [e, m | e.modifiers = m]
-		addAfterCreationRule(createAnnotationMappingRules) [e, a | e.annotationMirrors = a]
+		_modifiersRule = createModifiersRule
+		_annotationsRule = createAnnotationsRule
 	}
 	
-	protected def <R> addAfterCreationRule((Element)=>R rule, (T, R)=>void setter){
-		afterCreationRules.add(rule.andAssignResult(setter))
-	}
-	
-	protected def addAfterCreationRule((T, Element)=>void rule){
-		afterCreationRules.add(rule)
-	}
 	
 	protected def (Element)=>boolean createActivationRule(){
 		ru.createActivationRule(metaAnnotation)
@@ -68,7 +61,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		ru.createModifiersRule(metaAnnotation, template)
 	}
 	
-	protected def (Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(){
+	protected def (Element)=>List<? extends AnnotationMirror> createAnnotationsRule(){
 		ru.createAnnotationMappingRules(metaAnnotation, template)
 	}
 	
@@ -114,27 +107,22 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}
 
 
-
 	/**
 	 * To be overridden by subclasses to create the member.
 	 */
-	protected def GenElement createMember(Element ruleSrcElement);
-
-	/**
-	 * Creates the member from the template or by calling the factory and sets the name, the modifiers and the annotations.
-	 */
-	protected def T createMemberAndSetCommonAttributes(Element ruleSrcElement, (String)=>T factory) {
-		val member = createMember(ruleSrcElement, factory)
-		afterCreationRules.forEach[apply(member, ruleSrcElement)]
-		member
-	}
-
-	/**
-	 * Creates the member from the template or by calling the factory and sets the name.
-	 */
-	protected def <T extends GenElement> T createMember(Element ruleSrcElement, (String)=>T factory) {
+	protected def T createMember(Element ruleSrcElement){
 		val memberName = nameRule.apply(ruleSrcElement)
-		factory.apply(memberName)			
+		val member = createMember(ruleSrcElement, memberName)
+		member.applyRulesAfterCreation(ruleSrcElement)
+		member 
+	}
+	
+	protected def T createMember(Element ruleSrcElement, String name);
+
+
+	protected def void applyRulesAfterCreation(T member, Element ruleSrcElement) {
+		member.modifiers=modifiersRule.apply(ruleSrcElement)
+		member.annotationMirrors=annotationsRule.apply(ruleSrcElement)
 	}
 	
 

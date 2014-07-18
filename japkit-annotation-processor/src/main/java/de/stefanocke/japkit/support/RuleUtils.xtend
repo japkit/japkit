@@ -67,6 +67,8 @@ class RuleUtils {
 		[Element ruleSrcElement|activation.exists[matches(ruleSrcElement)]]
 	}
 	
+	public static val NO_NAME = [null as String]
+	
 	/**
 	 * To set the name of the generated element either statically (AV: name) or dynamically (AV: nameExpr)
 	 */

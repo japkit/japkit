@@ -73,5 +73,9 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 	protected def argumentsList(ExecutableElement method) {
 		method.parametersWithSrcNames.map[simpleName].join(", ")
 	}
+	
+	override protected createMember(Element ruleSrcElement, String name) {
+		throw new UnsupportedOperationException("Not used here")
+	}
 
 }

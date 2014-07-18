@@ -1,5 +1,6 @@
 package de.stefanocke.japkit.support
 
+import de.stefanocke.japkit.gen.CodeBody
 import de.stefanocke.japkit.gen.GenExecutableElement
 import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.metaannotations.Param
@@ -7,26 +8,27 @@ import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.Modifier
 import javax.lang.model.element.VariableElement
-import de.stefanocke.japkit.gen.CodeBody
 
 @Data
 abstract class ExecutableElementRule<G extends GenExecutableElement> extends MemberRuleSupport<ExecutableElement, G> {
 
 	
+	(Element)=>List<? extends GenParameter> paramRules
+	
+	(G, Element)=>CodeBody codeBodyRule
+	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 		
-		addAfterCreationRule(createParamRules(metaAnnotation, template)) [ee, params| ee.parameters = params]
-		addAfterCreationRule(createCodeBodyRuleWithAssignment)
+		_paramRules = createParamRules
+		_codeBodyRule = createCodeBodyRule 
 	}
 	
-	def protected (G, Element)=>void createCodeBodyRuleWithAssignment(){
-		val cbr = createCodeBodyRule();
-		[G genElement, Element ruleSourceElement | 
-			genElement.body = cbr.apply(genElement, ruleSourceElement)			
-		]
+	protected override applyRulesAfterCreation(G member, Element ruleSrcElement) {
+		super.applyRulesAfterCreation(member, ruleSrcElement)
+		member.parameters = _paramRules.apply(ruleSrcElement)
+		member.body = _codeBodyRule.apply(member, ruleSrcElement)
 	}
 	
 	def protected (G, Element)=>CodeBody createCodeBodyRule(){
@@ -35,7 +37,7 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	}
 	
 	
-	def protected (Element)=>List<? extends GenParameter>  createParamRules(AnnotationMirror metaAnnotation, ExecutableElement template){
+	def protected (Element)=>List<? extends GenParameter>  createParamRules(){
 		val rules= if(template !=null){
 			//If there is a template, use its parameters. They can optionally have @Param annotation
 			template.parametersWithSrcNames.map[createParamRule(it.annotationMirror(Param), it)].toList

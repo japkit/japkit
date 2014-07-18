@@ -10,10 +10,13 @@ class ConstructorRule extends ExecutableElementRule<GenConstructor> {
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 	}
-
-	protected override createMember(Element ruleSrcElement) {
-		val ctor = createMemberAndSetCommonAttributes(ruleSrcElement, [new GenConstructor])
-		ctor
+	
+	override protected createMember(Element ruleSrcElement, String name) {
+		new GenConstructor
+	}
+	
+	override protected createNameRule() {
+		RuleUtils.NO_NAME
 	}
 
 	
