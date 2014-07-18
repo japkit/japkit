@@ -11,7 +11,7 @@ class InnerClassGenerator implements MemberGenerator {
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, AnnotationMirror metaAnnotationToBeProcessed) {
 		
 		//TODO: Rule Caching
-		new InnerClassRule(metaAnnotationToBeProcessed, null).apply(annotatedClass, generatedClass, triggerAnnotation, generatedClass)
+		new InnerClassRule(metaAnnotationToBeProcessed, null).apply(generatedClass, generatedClass)
 					
 	}
 	

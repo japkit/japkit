@@ -35,6 +35,8 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	(Element)=>Set<Modifier> modifiersRule
 	(Element)=>List<? extends AnnotationMirror> annotationsRule
 	
+	//members to be created for the generated member. for instance, getters and setters to  be created for the generated field
+	List<(GenTypeElement, Element ) => void> dependentMemberRules = newArrayList()
 
 	
 	
@@ -46,6 +48,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_nameRule = createNameRule
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
+		createAndAddDelegateMethodRules
 	}
 	
 	
@@ -74,8 +77,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		ExtensionRegistry.get(GenExtensions)
 	}
 
-	def void apply(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
-		Element ruleSrcElement) {
+	def void apply(GenTypeElement generatedClass, Element ruleSrcElement) {
 
 		if (!activationRule.apply(ruleSrcElement)) {
 			return
@@ -88,17 +90,19 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 
 			srcElements.forEach [ e |
 				valueStack.scope(e) [
-					valueStack.putELVariables(e, triggerAnnotation, metaAnnotation)
+					putELVariables(valueStack, e, currentAnnotation, metaAnnotation) //TODO: refactoring. use thread local context there
 					val member = createMember(e)
 					generatedClass.add(member)
-					//Create delegate methods that use the generated member to retrieve the object to delegate to
-					createDelegateMethods(member, annotatedClass, generatedClass, triggerAnnotation)
+					dependentMemberRules.forEach[r | 
+						//apply dependent rules. The rule source element is the member just created.
+						r.apply(generatedClass, member)
+					]
 				]
 			]
 		} catch(Exception re) {
 			//don't let one member screw up the whole class
 			reportError('''Error in meta annotation «metaAnnotation» «IF template !=null»in template «template» «ENDIF»''', 
-				re, annotatedClass, triggerAnnotation, null
+				re, currentAnnotatedClass, currentAnnotation, null
 			)
 		} finally {
 			popCurrentMetaAnnotation
@@ -126,13 +130,13 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}
 	
 
-	protected def void createDelegateMethods(GenElement genElement, TypeElement annotatedClass,
-		GenTypeElement generatedClass, AnnotationMirror triggerAnnotation) {
-		if(metaAnnotation == null) return
-		val delegateMethodRules = triggerAnnotation.valueOrMetaValue("delegateMethods", typeof(AnnotationMirror[]),
-			metaAnnotation)?.map [
-			new DelegateMethodsRule(it, null)
+	protected def void createAndAddDelegateMethodRules() {
+		if(metaAnnotation == null) return;
+		
+		metaAnnotation.value("delegateMethods", typeof(AnnotationMirror[]))?.map [
+			val dmr =  new DelegateMethodsRule(it, null)
+			dependentMemberRules.add [g, e| dmr.apply(g,e)] 
 		]
-		delegateMethodRules?.forEach[apply(annotatedClass, generatedClass, triggerAnnotation, genElement)]
+		
 	}
 }

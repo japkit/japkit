@@ -200,6 +200,7 @@ class ELSupport {
 		valueStack.putELVariables(element, triggerAnnotation, elVarsAnnotation)
 	}
 
+	
 	def void putELVariables(ValueStack vs, Element element, AnnotationMirror triggerAnnotation,
 		AnnotationMirror elVarsAnnotation) {
 		elVarsAnnotation?.value("vars", typeof(AnnotationMirror[]))?.forEach [

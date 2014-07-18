@@ -75,14 +75,14 @@ class TemplateRule {
 	def addConstructors(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		constructorRules.forEach [
-			apply(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			it.apply(generatedClass, ruleSrcElement)
 		]
 	}
 	
 	def addMethods(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		methodRules.forEach [
-			apply(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			it.apply( generatedClass, ruleSrcElement)
 		]
 	}
 	
@@ -92,7 +92,7 @@ class TemplateRule {
 		//GenClasses in einem ersten separaten Durchlauf registrieren... Oder ClassSelectors für InnerClasses sind
 		//immer "Proxies" für noch zu erzeugende Klassen.	
 		innerClassRules.forEach [
-			apply(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			it.apply(generatedClass, ruleSrcElement)
 		]
 	}
 
@@ -103,7 +103,7 @@ class TemplateRule {
 	def addFields(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
 		fieldRules.forEach [
-			apply(annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			it.apply(generatedClass, ruleSrcElement)
 		]
 	}
 

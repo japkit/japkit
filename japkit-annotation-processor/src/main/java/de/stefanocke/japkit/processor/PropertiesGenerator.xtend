@@ -178,10 +178,10 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 				val genProperty = new Property(genField, genGetter, genSetter)
 				
 
-				delegateMethodRules.forEach[apply(annotatedClass, generatedClass, annotation, genProperty)]
+				delegateMethodRules.forEach[apply(generatedClass, genProperty)]
 			}
 			
-			templateRules.forEach[apply(annotatedClass, generatedClass, annotation, ruleSourceElement)]
+			templateRules.forEach[it.apply(annotatedClass, generatedClass, annotation, ruleSourceElement)]
 			
 		]
 

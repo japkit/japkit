@@ -14,7 +14,7 @@ class MethodGenerator extends MemberGeneratorSupport implements MemberGenerator 
 		AnnotationMirror methodAnnotation) {
 		
 		//TODO: Cache MethodRules by methodAnnotation
-		new MethodRule(methodAnnotation, null).apply(annotatedClass, generatedClass, triggerAnnotation, generatedClass)
+		new MethodRule(methodAnnotation, null).apply(generatedClass, generatedClass)
 	}
 
 	override getSupportedMetaAnnotation() {
