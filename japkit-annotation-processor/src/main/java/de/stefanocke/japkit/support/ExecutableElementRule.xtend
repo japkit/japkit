@@ -9,6 +9,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
+import javax.lang.model.type.TypeMirror
 
 @Data
 abstract class ExecutableElementRule<G extends GenExecutableElement> extends MemberRuleSupport<ExecutableElement, G> {
@@ -49,12 +50,17 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 		[ Element ruleSrcElement | rules.map[apply(ruleSrcElement)].flatten.toList ]
 	}
 	
-	def protected (Element)=>Iterable<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template){
+	protected def (Element)=>Iterable<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template){
 		val srcElementsRule = ru.createIteratorExpressionRule(paramAnnotation, null)
 		val nameRule = ru.createNameExprRule(paramAnnotation, template, null)
 		val annotationMappingRules = ru.createAnnotationMappingRules(paramAnnotation, template, null)
 		val typeRule = ru.createTypeRule(paramAnnotation, template?.asType, null);
 		
+		createParamRule(srcElementsRule, nameRule, typeRule, annotationMappingRules)
+
+	}
+	
+	protected def createParamRule((Element)=>Iterable<? extends Element> srcElementsRule, (Object)=>String nameRule, (Element)=>TypeMirror typeRule, (Element)=>List<? extends AnnotationMirror> annotationMappingRules) {
 		[ Element ruleSrcElement |
 			srcElementsRule.apply(ruleSrcElement).map [ e |
 				valueStack.scope(e) [
@@ -68,7 +74,6 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 				]
 			]
 		]
-
 	}
 	
 	
