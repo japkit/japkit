@@ -51,7 +51,10 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 				[f | (f as VariableElement).setterName],
 				ru.createModifiersRule(metaAnnotation, null, "setter"),
 				ru.createAnnotationMappingRules(metaAnnotation, null, "setter"),
-				[f | Collections.singletonList(new GenParameter(f.simpleName, f.asType))],
+				ru.createParamRule(null, [it.simpleName.toString], [it.asType], 
+					ru.createAnnotationMappingRules(metaAnnotation, null, "setterParam")
+				),
+				//[f | Collections.singletonList(new GenParameter(f.simpleName, f.asType))],
 				[m , f | ['''this.«f.simpleName» = «f.simpleName»;''']],
 				null
 			)

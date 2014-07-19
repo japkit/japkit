@@ -51,42 +51,10 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	
 	
 	def protected (Element)=>List<? extends GenParameter>  createParamRules(){
-		val rules= if(template !=null){
-			//If there is a template, use its parameters. They can optionally have @Param annotation
-			template.parametersWithSrcNames.map[createParamRule(it.annotationMirror(Param), it)].toList
-		} else {
-			//No template. Use the params from the @Method or @Constructor annotation
-			metaAnnotation.value("parameters", typeof(AnnotationMirror[])).map[createParamRule(it, null)].toList
-		}
-		
-		[ Element ruleSrcElement | rules.map[apply(ruleSrcElement)].flatten.toList ]
+		ru.createParamRules(metaAnnotation, template, avPrefix)
 	}
 	
-	protected def (Element)=>Iterable<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template){
-		val srcElementsRule = ru.createIteratorExpressionRule(paramAnnotation, null)
-		val nameRule = ru.createNameExprRule(paramAnnotation, template, null)
-		val annotationMappingRules = ru.createAnnotationMappingRules(paramAnnotation, template, null)
-		val typeRule = ru.createTypeRule(paramAnnotation, template?.asType, null);
-		
-		createParamRule(srcElementsRule, nameRule, typeRule, annotationMappingRules)
-
-	}
 	
-	protected def createParamRule((Element)=>Iterable<? extends Element> srcElementsRule, (Object)=>String nameRule, (Element)=>TypeMirror typeRule, (Element)=>List<? extends AnnotationMirror> annotationMappingRules) {
-		[ Element ruleSrcElement |
-			srcElementsRule.apply(ruleSrcElement).map [ e |
-				valueStack.scope(e) [
-					val name = nameRule.apply(e)
-					val type = typeRule.apply(e)
-					
-					val param = new GenParameter(name, type)
-						
-					param.annotationMirrors = annotationMappingRules.apply(e)
-					param
-				]
-			]
-		]
-	}
 	
 	
 }

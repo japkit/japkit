@@ -1,6 +1,7 @@
 package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenExtensions
+import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.Collections
 import java.util.List
@@ -8,10 +9,12 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
+import javax.lang.model.element.VariableElement
+import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.gen.GenElement
+import javax.lang.model.element.ExecutableElement
+import de.stefanocke.japkit.metaannotations.Param
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -140,10 +143,43 @@ class RuleUtils {
 		]
 	}
 	
-	public static def <R, E extends GenElement> andAssignResult((Element)=>R rule, (E, R)=>void setter){
-		[E genElement, Element ruleSrcElement |
-			val result = rule.apply(ruleSrcElement)
-			setter.apply(genElement, result)
+	def protected (Element)=>List<? extends GenParameter>  createParamRules(AnnotationMirror paramsAnnotation, ExecutableElement template, String avPrefix){
+		val rules= if(template !=null){
+			//If there is a template, use its parameters. They can optionally have @Param annotation
+			template.parametersWithSrcNames.map[createParamRule(it.annotationMirror(Param), it, null)].toList
+		} else {
+			//No template. Use the params from the @Method or @Constructor annotation
+			paramsAnnotation.value("parameters".withPrefix(avPrefix), typeof(AnnotationMirror[])).map[createParamRule(it, null, null)].toList
+		}
+		
+		[ Element ruleSrcElement | rules.map[apply(ruleSrcElement)].flatten.toList ]
+	}
+	
+	public def (Element)=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template, String avPrefix){
+		val srcElementsRule = createIteratorExpressionRule(paramAnnotation, avPrefix)
+		val nameRule = createNameExprRule(paramAnnotation, template, avPrefix)
+		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation, template,  avPrefix)
+		val typeRule = createTypeRule(paramAnnotation, template?.asType, avPrefix);
+		
+		createParamRule(srcElementsRule, nameRule, typeRule, annotationMappingRules)
+
+	}
+	
+	public def (Element)=>List<? extends GenParameter> createParamRule((Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule, (Element)=>TypeMirror typeRule, (Element)=>List<? extends AnnotationMirror> annotationMappingRules) {
+		[ Element ruleSrcElement |
+			(srcElementsRule ?: SINGLE_SRC_ELEMENT).apply(ruleSrcElement).map [ e |
+				valueStack.scope(e) [
+					val name = nameRule.apply(e)
+					val type = typeRule.apply(e)
+					
+					val param = new GenParameter(name, type)
+						
+					if(annotationMappingRules!=null){	
+						param.annotationMirrors = annotationMappingRules.apply(e)
+					}
+					param
+				]
+			].toList
 		]
 	}
 	

@@ -214,7 +214,7 @@ public @interface Field {
 	
 	AnnotationMapping[] setterAnnotationMappings() default {};
 	
-	
+	AnnotationMapping[] setterParamAnnotationMappings() default {};
 	
 
 	@interface List {
