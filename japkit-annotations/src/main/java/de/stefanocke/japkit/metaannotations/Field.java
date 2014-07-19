@@ -199,6 +199,7 @@ public @interface Field {
 	
 	Modifier[] getterModifiers() default { Modifier.PUBLIC };
 
+	AnnotationMapping[] getterAnnotationMappings() default {};
 	
 	
 	/**
@@ -210,6 +211,8 @@ public @interface Field {
 	Matcher[] setterActivation() default {};
 	
 	Modifier[] setterModifiers() default { Modifier.PUBLIC };
+	
+	AnnotationMapping[] setterAnnotationMappings() default {};
 	
 	
 	

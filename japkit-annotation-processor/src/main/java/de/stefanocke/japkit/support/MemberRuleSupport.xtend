@@ -67,6 +67,10 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_annotationsRule = annotationsRule ?: [emptyList]
 	}
 	
+	protected def addDependentMemberRule(MemberRuleSupport<?,?> mr){
+		dependentMemberRules.add [g, e| mr.apply(g,e)]
+	}
+	
 	
 	protected def (Element)=>boolean createActivationRule(){
 		ru.createActivationRule(metaAnnotation, avPrefix)
@@ -151,7 +155,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		
 		metaAnnotation.value("delegateMethods", typeof(AnnotationMirror[]))?.map [
 			val dmr =  new DelegateMethodsRule(it, null)
-			dependentMemberRules.add [g, e| dmr.apply(g,e)] 
+			addDependentMemberRule(dmr) 
 		]
 		
 	}

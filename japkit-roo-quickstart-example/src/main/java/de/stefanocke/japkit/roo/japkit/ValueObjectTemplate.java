@@ -9,7 +9,6 @@ import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.InnerClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
-import de.stefanocke.japkit.metaannotations.Param;
 import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
@@ -28,13 +27,13 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 								"  throw new IllegalArgumentException(\"#{element.simpleName} must not be null.\");\n" +
 								"}\n")))
 public abstract class ValueObjectTemplate {
-	//TODO: Hier fehlt ein scope. currentGenerated class wird nicht mehr zurückgesetzt... Dahe ist toString leer
+	
 	@InnerClass
 	@ClassSelector(kind=ClassSelectorKind.GEN_INNER_CLASS_NAME, expr="Builder") //TODO!
 	public static abstract class Builder{
-		@Field(iterator="#{properties}", nameExpr="#{element.simpleName}",
-				annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence",
-						"javax.validation.constraints", "org.springframework.format.annotation" }), generateGetter = true, generateSetter=true)
+		@Field(iterator = "#{properties}", nameExpr = "#{element.simpleName}", annotationMappings = @AnnotationMapping(
+				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
+						"org.springframework.format.annotation" }), generateGetter = true, generateSetter = true)
 		private SrcElementType field;
 		
 		

@@ -29,37 +29,33 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	
 	def addGetterRule() {
 		if (metaAnnotation?.value("generateGetter", boolean) == Boolean.TRUE) {
-			val mr = new MethodRule(
+			val getter = new MethodRule(
 				ru.createActivationRule(metaAnnotation, "getter"),
 				null,
-				[f | (f as GenField).getterName],
+				[f | (f as VariableElement).getterName],
 				ru.createModifiersRule(metaAnnotation, null, "getter"),
-				null,
+				ru.createAnnotationMappingRules(metaAnnotation, null, "getter"),
 				null,
 				[m , f | ['''return «f.simpleName»;''']],
 				[f | f.asType]
 			)
-			dependentMemberRules.add(
-				[g, e|mr.apply(g, e)]
-			)
+			addDependentMemberRule(getter)
 		}
 	}
 	
 	def addSetterRule() {
 		if (metaAnnotation?.value("generateSetter", boolean) == Boolean.TRUE) {
-			val mr = new MethodRule(
+			val setter = new MethodRule(
 				ru.createActivationRule(metaAnnotation, "setter"),
 				null,
-				[f | (f as GenField).setterName],
+				[f | (f as VariableElement).setterName],
 				ru.createModifiersRule(metaAnnotation, null, "setter"),
-				null,
+				ru.createAnnotationMappingRules(metaAnnotation, null, "setter"),
 				[f | Collections.singletonList(new GenParameter(f.simpleName, f.asType))],
 				[m , f | ['''this.«f.simpleName» = «f.simpleName»;''']],
 				null
 			)
-			dependentMemberRules.add(
-				[g, e|mr.apply(g, e)]
-			)
+			addDependentMemberRule(setter)
 		}
 	}
 	
