@@ -9,7 +9,6 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
-import javax.lang.model.element.TypeElement
 
 @Data
 public abstract class MemberRuleSupport<E extends Element, T extends GenElement> {
@@ -53,6 +52,19 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
 		createAndAddDelegateMethodRules
+	}
+	
+	new((Element)=>boolean activationRule,
+		(Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule,
+		(Element)=>Set<Modifier> modifiersRule, (Element)=>List<? extends AnnotationMirror> annotationsRule) {
+		_metaAnnotation = null
+		_template = null
+		_avPrefix = null
+		_activationRule = activationRule ?: RuleUtils.ALWAYS_ACTIVE
+		_srcElementsRule = srcElementsRule ?: RuleUtils.SINGLE_SRC_ELEMENT
+		_nameRule = nameRule
+		_modifiersRule = modifiersRule ?: [emptySet]
+		_annotationsRule = annotationsRule ?: [emptyList]
 	}
 	
 	

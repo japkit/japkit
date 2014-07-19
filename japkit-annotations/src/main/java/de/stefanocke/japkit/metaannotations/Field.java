@@ -182,11 +182,37 @@ public @interface Field {
 	String initLang() default "";
 
 	/**
-	 * The delegate methods to create. The delegate generated field.
+	 * The delegate methods to create. The delegate is the generated field.
 	 * 
 	 * @return
 	 */
 	DelegateMethods[] delegateMethods() default {};
+
+	
+	/**
+	 * 
+	 * @return whether to generate a getter for the field
+	 */
+	boolean generateGetter() default false;
+	
+	Matcher[] getterActivation() default {};
+	
+	Modifier[] getterModifiers() default { Modifier.PUBLIC };
+
+	
+	
+	/**
+	 * 
+	 * @return whether to generate a setter for the field
+	 */
+	boolean generateSetter() default false;
+	
+	Matcher[] setterActivation() default {};
+	
+	Modifier[] setterModifiers() default { Modifier.PUBLIC };
+	
+	
+	
 
 	@interface List {
 		Field[] value();

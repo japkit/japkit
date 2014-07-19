@@ -10,6 +10,8 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
+import java.util.Set
+import javax.lang.model.element.Modifier
 
 @Data
 abstract class ExecutableElementRule<G extends GenExecutableElement> extends MemberRuleSupport<ExecutableElement, G> {
@@ -24,6 +26,16 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 		
 		_paramRules = createParamRules
 		_codeBodyRule = createCodeBodyRule 
+	}
+	
+	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
+		(Element)=>String nameRule, (Element)=>Set<Modifier> modifiersRule,
+		(Element)=>List<? extends AnnotationMirror> annotationsRule,
+		(Element)=>List<? extends GenParameter> paramRules, (G, Element)=>CodeBody codeBodyRule) {
+		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule)
+		
+		_paramRules = paramRules ?: [emptyList]
+		_codeBodyRule = codeBodyRule ?: [g,e | null]
 	}
 	
 	protected override applyRulesAfterCreation(G member, Element ruleSrcElement) {

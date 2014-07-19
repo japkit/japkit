@@ -34,14 +34,9 @@ public abstract class ValueObjectTemplate {
 	public static abstract class Builder{
 		@Field(iterator="#{properties}", nameExpr="#{element.simpleName}",
 				annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence",
-						"javax.validation.constraints", "org.springframework.format.annotation" }))
+						"javax.validation.constraints", "org.springframework.format.annotation" }), generateGetter = true, generateSetter=true)
 		private SrcElementType field;
 		
-		@Method(iterator="#{properties}", nameExpr="get#{element.simpleName.toFirstUpper}", bodyExpr="return #{parent.element.simpleName};")
-		public abstract SrcElementType get();
-		
-		@Method(iterator="#{properties}", nameExpr="set#{element.simpleName.toFirstUpper}", bodyExpr="this.#{parent.element.simpleName} = #{parent.element.simpleName};")
-		public abstract void set(@Param(nameExpr = "#{element.simpleName}") SrcElementType p);
 		
 		@ClassSelector(kind=ClassSelectorKind.EXPR, expr="#{currentGenClass.enclosingElement.asType()}")
 		abstract static class EnclosingClass{}
@@ -52,11 +47,8 @@ public abstract class ValueObjectTemplate {
 	
 	@Field(iterator="#{properties}", nameExpr="#{element.simpleName}",
 			annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence",
-					"javax.validation.constraints", "org.springframework.format.annotation" }))
+					"javax.validation.constraints", "org.springframework.format.annotation" }), generateGetter = true)
 	private SrcElementType field;
-	
-	@Method(iterator="#{properties}", nameExpr="get#{element.simpleName.toFirstUpper}", bodyExpr="return #{parent.element.simpleName};")
-	public abstract SrcElementType get();
 	
 	@Constructor(bodyExpr="//Some ctor code")
 	private ValueObjectTemplate (){};
