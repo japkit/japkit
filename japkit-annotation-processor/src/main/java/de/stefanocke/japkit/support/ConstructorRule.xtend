@@ -10,6 +10,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.support.el.ValueStack
 
 class ConstructorRule extends ExecutableElementRule<GenConstructor> {
 

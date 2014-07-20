@@ -1,15 +1,15 @@
 package de.stefanocke.japkit.support
 
+import de.stefanocke.japkit.gen.CodeBody
 import de.stefanocke.japkit.gen.EmitterContext
+import de.stefanocke.japkit.gen.GenElement
+import de.stefanocke.japkit.support.el.ELSupport
 import de.stefanocke.japkit.support.el.ValueStack
 import java.util.List
+import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
 import org.eclipse.xtext.xbase.lib.Pair
-import de.stefanocke.japkit.support.el.ELSupport
-import javax.lang.model.element.AnnotationMirror
-import de.stefanocke.japkit.gen.GenElement
-import de.stefanocke.japkit.gen.CodeBody
 
 @Data
 class CodeRule {
@@ -70,8 +70,22 @@ class CodeRule {
 	/**
 	 * Gets the code as a closure usable in generated methods, constructors and fields.
 	 */
-	def CodeBody getAsCodeBody(GenElement element) {
-		if(metaAnnotation == null || (bodyExpr.nullOrEmpty && bodyCases.empty) ) return null
+//	def CodeBody getAsCodeBody(GenElement element, ValueStack vs) {
+//		if(metaAnnotation == null || (bodyExpr.nullOrEmpty && bodyCases.empty) ) return null
+//
+//		[ EmitterContext ec |
+//			
+//			vs.put("ec", ec)
+//			vs.put("element", element)
+//			code(ec, vs, element)
+//			
+//		]
+//
+//		
+//	}
+
+	def static CodeBody getAsCodeBody(GenElement genElement, Element element, CodeRule cr) {
+		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
 		val valueStack = new ValueStack(valueStack);
@@ -79,27 +93,51 @@ class CodeRule {
 			
 			valueStack.scope(element) [ vs |
 				vs.put("ec", ec)
-				evalBodyExpr(ec, vs, element)
+				vs.put("genElement", genElement)
+				cr.code(vs, element)
 			]
 		]
 
 		
 	}
 	
+	def static CodeBody getAsCodeBody(GenElement genElement, Element element, (ValueStack, Element)=>CharSequence cr) {
+		val extension ELSupport = ExtensionRegistry.get(ELSupport)
+
+		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
+		val valueStack = new ValueStack(valueStack);
+		[ EmitterContext ec |
+			
+			valueStack.scope(element) [ vs |
+				vs.put("ec", ec)
+				vs.put("genElement", genElement)
+				cr.apply(vs, element)
+			]
+		]
+
+		
+	}
+
+	
+	
+	
+	
 	/**
 	 * Gets the code as CharSequence. The EmitterContext an the context element must be available on the thread local value stack.
 	 * This method is aimed to be used to include reusable code fragments into other code expressions.
 	 */
-	public def code(){
-		val vs = valueStack		
-		code(vs.getRequired("element") as Element)
-	}
-	public def code(Element ruleSrcElement){
-		val vs = valueStack		
-		evalBodyExpr(vs.getRequired("ec") as EmitterContext, vs, ruleSrcElement )
+	public def code(ValueStack vs){
+		code(vs, vs.getCurrentRuleSrcElement)
 	}
 	
-	private def CharSequence evalBodyExpr(EmitterContext ec, ValueStack vs, Element ruleSrcElement) {
+	def getCurrentRuleSrcElement(ValueStack vs) {
+		vs.getRequired("element") as Element
+	}
+	public def code(ValueStack vs, Element ruleSrcElement){	
+		code(vs.getRequired("ec") as EmitterContext, vs, ruleSrcElement ?: vs.getCurrentRuleSrcElement)
+	}
+	
+	public def CharSequence code(EmitterContext ec, ValueStack vs, Element ruleSrcElement) {
 		if (bodyExpr.nullOrEmpty && bodyCases.empty) return null //Really?
 		
 		imports.forEach [
@@ -112,7 +150,7 @@ class CodeRule {
 			
 			
 			if (iteratorExpr.nullOrEmpty) {							
-				evalBodyExpr(vs, ruleSrcElement, bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
+				code(vs, ruleSrcElement, bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
 			} else {
 				val bodyIterator = eval(vs, iteratorExpr, iteratorLang, Iterable,
 					'''Error in code body iterator expression.''', emptyList)
@@ -124,7 +162,7 @@ class CodeRule {
 					'''
 						«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
 							«vs.scope(e as Element) [ vsInIteration |
-								evalBodyExpr(vsInIteration, e as Element, bodyCases, bodyExpr, lang, '')
+								code(vsInIteration, e as Element, bodyCases, bodyExpr, lang, '')
 							]»
 						«ENDFOR»
 					'''	
@@ -136,7 +174,7 @@ class CodeRule {
 		]
 	}
 	
-	private def CharSequence evalBodyExpr(ValueStack vs, Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
+	private def CharSequence code(ValueStack vs, Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
 		val bodyExprToUse = bodyCases.findFirst[
 			val matcher = key
 			!matcher.nullOrEmpty && matcher.exists[matches(ruleSrcElement)]

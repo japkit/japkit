@@ -3,14 +3,12 @@ package de.stefanocke.japkit.support
 import de.stefanocke.japkit.gen.CodeBody
 import de.stefanocke.japkit.gen.GenExecutableElement
 import de.stefanocke.japkit.gen.GenParameter
-import de.stefanocke.japkit.metaannotations.Param
+import de.stefanocke.japkit.support.el.ValueStack
 import java.util.List
+import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.VariableElement
-import javax.lang.model.type.TypeMirror
-import java.util.Set
 import javax.lang.model.element.Modifier
 
 @Data
@@ -41,12 +39,13 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	protected override applyRulesAfterCreation(G member, Element ruleSrcElement) {
 		super.applyRulesAfterCreation(member, ruleSrcElement)
 		member.parameters = _paramRules.apply(ruleSrcElement)
+		
 		member.body = _codeBodyRule.apply(member, ruleSrcElement)
 	}
 	
 	def protected (G, Element)=>CodeBody createCodeBodyRule(){
 		val cr = new CodeRule(metaAnnotation, "body");
-		[G genElement, Element ruleSourceElement | cr.getAsCodeBody(genElement)]
+		[genElement, ruleSourceElement | CodeRule.getAsCodeBody(genElement, ruleSourceElement, cr)]
 	}
 	
 	

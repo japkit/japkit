@@ -74,6 +74,10 @@ class ValueStack implements Map<String, Object> {
 		current.get(key) ?: parent?.get(key)
 	}
 	
+	def <T> T get(Object key, Class<T> clazz) {
+		clazz.cast(get(key)) 
+	}
+	
 	def getRequired(Object key){
 		val v = get(key)
 		if(v==null) {

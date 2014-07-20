@@ -1,8 +1,11 @@
 package de.stefanocke.japkit.roo.japkit;
 
+import java.util.Date;
+
 import javax.validation.constraints.NotNull;
 
 import de.stefanocke.japkit.metaannotations.AnnotationMapping;
+import de.stefanocke.japkit.metaannotations.Case;
 import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Constructor;
 import de.stefanocke.japkit.metaannotations.Field;
@@ -18,14 +21,12 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 
 
 
-@Template(vars=@Var(
-		name = "validationFragment",
-		code = 
-				@CodeFragment(
-						activation = @Matcher(srcAnnotations = NotNull.class),
-						expr = "if(#{element.simpleName}==null){\n" +
-								"  throw new IllegalArgumentException(\"#{element.simpleName} must not be null.\");\n" +
-								"}\n")))
+@Template(vars = {
+		@Var(name = "validationFragment", code = @CodeFragment(activation = @Matcher(srcAnnotations = NotNull.class),
+				expr = "if(#{element.simpleName}==null){\n"
+						+ "  throw new IllegalArgumentException(\"#{element.simpleName} must not be null.\");\n" + "}\n")),
+		@Var(name = "setterSurroundAssignmentFragment", code = @CodeFragment(imports=Date.class, cases = { @Case(matcher = @Matcher(srcType = Date.class),
+				expr = "new Date(#{surrounded}.getTime())") })) })
 public abstract class ValueObjectTemplate {
 	
 	@InnerClass
