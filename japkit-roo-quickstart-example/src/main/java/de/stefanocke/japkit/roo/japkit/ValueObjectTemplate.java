@@ -25,8 +25,13 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 		@Var(name = "validationFragment", code = @CodeFragment(activation = @Matcher(srcAnnotations = NotNull.class),
 				expr = "if(#{element.simpleName}==null){\n"
 						+ "  throw new IllegalArgumentException(\"#{element.simpleName} must not be null.\");\n" + "}\n")),
-		@Var(name = "setterSurroundAssignmentFragment", code = @CodeFragment(imports=Date.class, cases = { @Case(matcher = @Matcher(srcType = Date.class),
-				expr = "new Date(#{surrounded}.getTime())") })) })
+		@Var(name = "defensiveCopyFragment", code = @CodeFragment(imports=Date.class, cases = { @Case(matcher = @Matcher(srcType = Date.class),
+				expr = "new Date(#{surrounded}.getTime())") })),
+		@Var(name = "setterSurroundAssignmentFragment", code = @CodeFragment(expr = "#{defensiveCopyFragment.surround(surrounded)}")),
+		@Var(name = "getterSurroundReturnFragment", code = @CodeFragment(expr = "#{defensiveCopyFragment.surround(surrounded)}"))
+})
+
+//getterSurroundReturnFragment
 public abstract class ValueObjectTemplate {
 	
 	@InnerClass
@@ -54,9 +59,11 @@ public abstract class ValueObjectTemplate {
 	private ValueObjectTemplate (){};
 	
 	
-	@Constructor(bodyIterator = "#{properties}", 
+	@Constructor(
+			vars=@Var(name = "rhs", code=@CodeFragment(expr="builder.#{element.simpleName}")), 
+			bodyIterator = "#{properties}", 	
 			bodyExpr = "#{validationFragment.code()}" +
-			"this.#{element.simpleName} = builder.#{element.simpleName};\n")
+			"this.#{element.simpleName} = #{defensiveCopyFragment.surround(rhs.code())};\n")
 	@ParamNames("builder")
 	private ValueObjectTemplate(Builder builder) {
 	}

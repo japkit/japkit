@@ -37,7 +37,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 				ru.createModifiersRule(metaAnnotation, null, "getter"),
 				ru.createAnnotationMappingRules(metaAnnotation, null, "getter"),
 				null,
-				[m , f | '''return «f.simpleName»;'''],
+				[m , f | '''return «surround("getterSurroundReturnFragment",f.simpleName)»;'''],
 				[f | f.asType]
 			)
 			addDependentMemberRule(getter)
@@ -55,7 +55,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 				ru.createParamRule(null, [it.simpleName.toString], [it.asType], 
 					ru.createAnnotationMappingRules(metaAnnotation, null, "setterParam")
 				),				
-				[m, f | '''this.«f.simpleName» = «surround("setterSurroundAssignmentFragment", f.simpleName)»;'''],
+				[m, f | '''this.«f.simpleName» = «surround("setterSurroundAssignmentFragment",f.simpleName)»;'''],
 				null
 			)
 			addDependentMemberRule(setter)
