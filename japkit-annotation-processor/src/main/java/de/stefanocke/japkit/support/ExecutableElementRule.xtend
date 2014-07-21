@@ -10,6 +10,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
+import de.stefanocke.japkit.gen.GenElement
 
 @Data
 abstract class ExecutableElementRule<G extends GenExecutableElement> extends MemberRuleSupport<ExecutableElement, G> {
@@ -29,11 +30,13 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
 		(Element)=>String nameRule, (Element)=>Set<Modifier> modifiersRule,
 		(Element)=>List<? extends AnnotationMirror> annotationsRule,
-		(Element)=>List<? extends GenParameter> paramRules, (G, Element)=>CodeBody codeBodyRule) {
+		(Element)=>List<? extends GenParameter> paramRules, (G, Element)=>CharSequence codeRule) {
 		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule)
 		
 		_paramRules = paramRules ?: [emptyList]
-		_codeBodyRule = codeBodyRule ?: [g,e | null]
+		_codeBodyRule = [genElement, ruleSourceElement | 
+			CodeRule.getAsCodeBody(genElement, ruleSourceElement, codeRule as (GenElement, Element)=>CharSequence)
+		]
 	}
 	
 	protected override applyRulesAfterCreation(G member, Element ruleSrcElement) {

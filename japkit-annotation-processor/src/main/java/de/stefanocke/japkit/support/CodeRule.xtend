@@ -85,6 +85,8 @@ class CodeRule {
 //	}
 
 	def static CodeBody getAsCodeBody(GenElement genElement, Element element, CodeRule cr) {
+		if(cr == null) return null
+		
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)

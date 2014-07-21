@@ -25,9 +25,9 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
 		(Element)=>String nameRule, (Element)=>Set<Modifier> modifiersRule,
 		(Element)=>List<? extends AnnotationMirror> annotationsRule,
-		(Element)=>List<? extends GenParameter> paramRules, (GenMethod, Element)=>CodeBody codeBodyRule,
+		(Element)=>List<? extends GenParameter> paramRules, (GenMethod, Element)=>CharSequence codeRule,
 		(Element)=>TypeMirror returnTypeRule) {
-		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule, paramRules, codeBodyRule)
+		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule, paramRules, codeRule)
 		_returnTypeRule = returnTypeRule ?: [null]
 	}
 	

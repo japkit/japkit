@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.support
 
-import de.stefanocke.japkit.gen.CodeBody
 import de.stefanocke.japkit.gen.GenConstructor
 import de.stefanocke.japkit.gen.GenParameter
 import java.util.List
@@ -10,7 +9,6 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.support.el.ValueStack
 
 class ConstructorRule extends ExecutableElementRule<GenConstructor> {
 
@@ -21,9 +19,9 @@ class ConstructorRule extends ExecutableElementRule<GenConstructor> {
 	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
 		(Element)=>Set<Modifier> modifiersRule,
 		(Element)=>List<? extends AnnotationMirror> annotationsRule,
-		(Element)=>List<? extends GenParameter> paramRules, (GenConstructor, Element)=>CodeBody codeBodyRule,
+		(Element)=>List<? extends GenParameter> paramRules, (GenConstructor, Element)=>CharSequence codeRule,
 		(Element)=>TypeMirror returnTypeRule) {
-		super(activationRule, srcElementsRule, RuleUtils.NO_NAME, modifiersRule, annotationsRule, paramRules, codeBodyRule)
+		super(activationRule, srcElementsRule, RuleUtils.NO_NAME, modifiersRule, annotationsRule, paramRules, codeRule)
 	}
 	
 	override protected createMember(Element ruleSrcElement, String name) {
