@@ -32,7 +32,9 @@ class CodeRule {
 	String afterExpr
 	String separator
 	String emptyExpr
-	String[] surroundedByFragments
+	String[] surroundingFragments
+	String[] beforeFragments
+	String[] afterFragments
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
 		_metaAnnotation = metaAnnotation
@@ -60,7 +62,9 @@ class CodeRule {
 
 		_imports = metaAnnotation.value("imports", typeof(DeclaredType[]))
 		
-		_surroundedByFragments = metaAnnotation.value("surroundedByFragments", typeof(String[]))  
+		_surroundingFragments = metaAnnotation.value("surroundingFragments", typeof(String[]))  
+		_beforeFragments = metaAnnotation.value("beforeFragments", typeof(String[]))  
+		_afterFragments = metaAnnotation.value("afterFragments", typeof(String[]))  
 		
 	}
 	
@@ -172,8 +176,17 @@ class CodeRule {
 					}
 				}
 			
-			CodeFragmentRules.surround(surroundedByFragments, ruleSrcElement, result)
+			applyFragments(result, ruleSrcElement)
+			
 		]
+	}
+	
+	def applyFragments(CharSequence code, Element ruleSrcElement) {
+		val before = CodeFragmentRules.code(beforeFragments, ruleSrcElement)
+		val after = CodeFragmentRules.code(afterFragments, ruleSrcElement)
+		CodeFragmentRules.surround(surroundingFragments, ruleSrcElement, 
+			'''«before»«code»«after»'''
+		)
 	}
 	
 	private def CharSequence code(Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {

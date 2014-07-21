@@ -52,4 +52,12 @@ class CodeFragmentRules {
 		result
 	
 	}
+	
+	def static CharSequence code(String[] fragmentNames, Element ruleSrcElement){
+		if(fragmentNames==null) return ''
+		val extension ElSupport = ExtensionRegistry.get(ELSupport)
+		
+		fragmentNames.map[valueStack.getRequired(it) as  CodeFragmentRules].map[it.code(ruleSrcElement)].join
+			
+	}
 }

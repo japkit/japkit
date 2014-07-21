@@ -189,6 +189,24 @@ public @interface Method {
 	 * @return the language of the body expression. Default is Java EL.
 	 */
 	String bodyLang() default "";
+	
+	/**
+	 * 
+	 * @return names of the fragments to surround the generated code body.
+	 */
+	String[] surroundingFragments() default{};
+	
+	/**
+	 * 
+	 * @return names of the fragments to be inserted before the generated code body.
+	 */
+	String[] beforeFragments() default{};
+	
+	/**
+	 * 
+	 * @return names of the fragments to be inserted before the generated code body.
+	 */
+	String[] afterFragments() default{};
 
 	/**
 	 * The delegate methods to create. The delegate is the return value of the

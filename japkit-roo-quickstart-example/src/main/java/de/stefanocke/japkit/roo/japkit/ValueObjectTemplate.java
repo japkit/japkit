@@ -59,10 +59,10 @@ public abstract class ValueObjectTemplate {
 	
 	
 	@Constructor(
-			vars=@Var(name = "rhs", code=@CodeFragment(expr="builder.#{element.simpleName}", surroundedByFragments="defensiveCopyFragment")), 
+			vars={@Var(name = "rhs", code=@CodeFragment(expr="builder.#{element.simpleName}", surroundingFragments="defensiveCopyFragment")),
+				  @Var(name = "assignment", code=@CodeFragment(expr="this.#{element.simpleName} = #{rhs.code()};\n", beforeFragments="validationFragment"))}, 
 			bodyIterator = "#{properties}", 	
-			bodyExpr = "#{validationFragment.code()}" +
-			"this.#{element.simpleName} = #{rhs.code()};\n")
+			bodyExpr = "#{assignment.code()}")
 	@ParamNames("builder")
 	private ValueObjectTemplate(Builder builder) {
 	}
