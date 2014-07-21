@@ -35,15 +35,20 @@ class CodeFragmentRules {
 		result
 	}
 	
-	def static CharSequence surround(String fragmentName, CharSequence surrounded){
-		surround( fragmentName, null, surrounded)
+	def static CharSequence surround(String[] fragmentNames, CharSequence surrounded){
+		surround( fragmentNames, null, surrounded)
 	
 	}
 	
-	def static CharSequence surround(String fragmentName, Element ruleSrcElement, CharSequence surrounded){
+	def static CharSequence surround(String[] fragmentNames, Element ruleSrcElement, CharSequence surrounded){
 		val extension ElSupport = ExtensionRegistry.get(ELSupport)
-		val fragments = valueStack.get(fragmentName, CodeFragmentRules)
-		if(fragments == null) surrounded else fragments.surround(ruleSrcElement, surrounded)
+		
+		var result = surrounded
+		for(n : fragmentNames) {
+			val fragments = valueStack.getRequired(n) as  CodeFragmentRules
+			result = fragments.surround(ruleSrcElement, surrounded)		
+		}
+		result
 	
 	}
 }

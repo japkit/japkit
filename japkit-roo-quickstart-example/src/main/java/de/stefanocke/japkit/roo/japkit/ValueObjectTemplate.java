@@ -26,9 +26,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 				expr = "if(#{element.simpleName}==null){\n"
 						+ "  throw new IllegalArgumentException(\"#{element.simpleName} must not be null.\");\n" + "}\n")),
 		@Var(name = "defensiveCopyFragment", code = @CodeFragment(imports=Date.class, cases = { @Case(matcher = @Matcher(srcType = Date.class),
-				expr = "new Date(#{surrounded}.getTime())") })),
-		@Var(name = "setterSurroundAssignmentFragment", code = @CodeFragment(expr = "#{defensiveCopyFragment.surround(surrounded)}")),
-		@Var(name = "getterSurroundReturnFragment", code = @CodeFragment(expr = "#{defensiveCopyFragment.surround(surrounded)}"))
+				expr = "new Date(#{surrounded}.getTime())") }))
 })
 
 //getterSurroundReturnFragment
@@ -50,11 +48,12 @@ public abstract class ValueObjectTemplate {
 		public abstract EnclosingClass build();
 	}
 	
-	@Field(iterator="#{properties}", nameExpr="#{element.simpleName}",
-			annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence",
-					"javax.validation.constraints", "org.springframework.format.annotation" }), generateGetter = true)
+	@Field(iterator = "#{properties}", nameExpr = "#{element.simpleName}",
+			annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
+					"org.springframework.format.annotation" }), generateGetter = true,
+			getterSurroundReturnExprFragments = "defensiveCopyFragment")
 	private SrcElementType field;
-	
+
 	@Constructor(bodyExpr="//Some ctor code")
 	private ValueObjectTemplate (){};
 	

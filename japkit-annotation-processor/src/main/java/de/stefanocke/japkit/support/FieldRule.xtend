@@ -30,6 +30,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	
 	def addGetterRule() {
 		if (metaAnnotation?.value("generateGetter", boolean) == Boolean.TRUE) {
+			val surroundReturnExprFragments = metaAnnotation.value("getterSurroundReturnExprFragments", typeof(String[]))
 			val getter = new MethodRule(
 				ru.createActivationRule(metaAnnotation, "getter"),
 				null,
@@ -37,7 +38,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 				ru.createModifiersRule(metaAnnotation, null, "getter"),
 				ru.createAnnotationMappingRules(metaAnnotation, null, "getter"),
 				null,
-				[m , f | '''return «surround("getterSurroundReturnFragment",f.simpleName)»;'''],
+				[m , f | '''return «surround(surroundReturnExprFragments,f.simpleName)»;'''],
 				[f | f.asType]
 			)
 			addDependentMemberRule(getter)
@@ -46,6 +47,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	
 	def addSetterRule() {
 		if (metaAnnotation?.value("generateSetter", boolean) == Boolean.TRUE) {
+			val surroundAssignmentExprFragments = metaAnnotation.value("setterSurroundAssignmentExprFragments", typeof(String[]))
 			val setter = new MethodRule(
 				ru.createActivationRule(metaAnnotation, "setter"),
 				null,
@@ -55,7 +57,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 				ru.createParamRule(null, [it.simpleName.toString], [it.asType], 
 					ru.createAnnotationMappingRules(metaAnnotation, null, "setterParam")
 				),				
-				[m, f | '''this.«f.simpleName» = «surround("setterSurroundAssignmentFragment",f.simpleName)»;'''],
+				[m, f | '''this.«f.simpleName» = «surround(surroundAssignmentExprFragments ,f.simpleName)»;'''],
 				null
 			)
 			addDependentMemberRule(setter)

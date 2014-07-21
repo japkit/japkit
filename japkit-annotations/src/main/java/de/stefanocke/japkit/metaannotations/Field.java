@@ -201,6 +201,11 @@ public @interface Field {
 
 	AnnotationMapping[] getterAnnotationMappings() default {};
 	
+	/**
+	 * Names of code fragments to surround the return expression.
+	 */
+	String[] getterSurroundReturnExprFragments() default {};
+	
 	
 	/**
 	 * 
@@ -215,6 +220,11 @@ public @interface Field {
 	AnnotationMapping[] setterAnnotationMappings() default {};
 	
 	AnnotationMapping[] setterParamAnnotationMappings() default {};
+	
+	/**
+	 * Names of code fragments to surround the assignment expression.
+	 */
+	String[] setterSurroundAssignmentExprFragments() default {};
 	
 
 	@interface List {
