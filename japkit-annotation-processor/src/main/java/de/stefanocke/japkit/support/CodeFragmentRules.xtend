@@ -41,6 +41,7 @@ class CodeFragmentRules {
 	}
 	
 	def static CharSequence surround(String[] fragmentNames, Element ruleSrcElement, CharSequence surrounded){
+		if(fragmentNames==null) return surrounded
 		val extension ElSupport = ExtensionRegistry.get(ELSupport)
 		
 		var result = surrounded

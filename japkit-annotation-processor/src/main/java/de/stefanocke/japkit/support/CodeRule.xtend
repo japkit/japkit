@@ -32,6 +32,7 @@ class CodeRule {
 	String afterExpr
 	String separator
 	String emptyExpr
+	String[] surroundedByFragments
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
 		_metaAnnotation = metaAnnotation
@@ -59,7 +60,7 @@ class CodeRule {
 
 		_imports = metaAnnotation.value("imports", typeof(DeclaredType[]))
 		
-		
+		_surroundedByFragments = metaAnnotation.value("surroundedByFragments", typeof(String[]))  
 		
 	}
 	
@@ -139,39 +140,39 @@ class CodeRule {
 	}
 	
 	public def CharSequence code(EmitterContext ec, Element ruleSrcElement) {
-		if (bodyExpr.nullOrEmpty && bodyCases.empty) return null //Really?
-		
+		if(bodyExpr.nullOrEmpty && bodyCases.empty) return null //Really?
+
 		imports.forEach [
-		if (!ec.importIfPossible(it)) {
-				reportError('''Import for «it» not possible since it conflicts with existing import''',
-					null, metaAnnotation, 'imports')
+			if (!ec.importIfPossible(it)) {
+				reportError('''Import for «it» not possible since it conflicts with existing import''', null,
+					metaAnnotation, 'imports')
 			}
 		]
 		handleTypeElementNotFound(null, '''Code body «bodyExpr» could not be generated''') [
-			
-			
-			if (iteratorExpr.nullOrEmpty) {							
-				code(ruleSrcElement, bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
-			} else {
-				val bodyIterator = eval(valueStack, iteratorExpr, iteratorLang, Iterable,
-					'''Error in code body iterator expression.''', emptyList)
-				if(!bodyIterator.nullOrEmpty){	
-					val before = eval(valueStack, beforeExpr, lang, String,
-						'''Error in code body before expression.''', '')
-					val after = eval(valueStack, afterExpr, lang, String,
-						'''Error in code body after expression.''', '')
-					'''
-						«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
-							«valueStack.scope(e as Element) [ 
+			val result = if (iteratorExpr.nullOrEmpty) {
+					code(ruleSrcElement, bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
+				} else {
+					val bodyIterator = eval(valueStack, iteratorExpr, iteratorLang, Iterable,
+						'''Error in code body iterator expression.''', emptyList)
+					if (!bodyIterator.nullOrEmpty) {
+						val before = eval(valueStack, beforeExpr, lang, String,
+							'''Error in code body before expression.''', '')
+						val after = eval(valueStack, afterExpr, lang, String,
+							'''Error in code body after expression.''', '')
+						'''
+							«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
+								«valueStack.scope(e as Element) [
 								code(e as Element, bodyCases, bodyExpr, lang, '')
 							]»
-						«ENDFOR»
-					'''	
-				} else {								
-					eval(valueStack, emptyExpr, lang, String, '''Error in code body empty expression.''',
+							«ENDFOR»
+						'''
+					} else {
+						eval(valueStack, emptyExpr, lang, String, '''Error in code body empty expression.''',
 							'throw new UnsupportedOperationException();')
+					}
 				}
-			}
+			
+			CodeFragmentRules.surround(surroundedByFragments, ruleSrcElement, result)
 		]
 	}
 	
