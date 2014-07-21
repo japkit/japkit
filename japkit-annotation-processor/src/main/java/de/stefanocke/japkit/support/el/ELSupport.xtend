@@ -144,6 +144,17 @@ class ELSupport {
 			return ("" as Object) as T //WTF!?!
 		}
 
+		withValueStack(valueStack)[|
+			//nicht schön hier.
+			putShadowAnnotation(valueStack)
+			return getElProvider(lang).eval(valueStack as Map<String, Object>, expr, expectedType, lang) as T
+		]
+	}
+	
+	/**
+	 * Changes the thread local value stack and restores it at the end
+	 */
+	def <T> T withValueStack(ValueStack valueStack, ()=>T closure) {
 		var ValueStack oldValueStackTL = null
 		if (valueStack != getValueStack) {
 			oldValueStackTL = getValueStack
@@ -151,12 +162,8 @@ class ELSupport {
 			//Make an explicitely set value stack available to EL Var functions called within the expression
 			ExtensionRegistry.register(ValueStack, valueStack)
 		}
-
 		try {
-
-			//nicht schön hier.
-			putShadowAnnotation(valueStack)
-			return getElProvider(lang).eval(valueStack as Map<String, Object>, expr, expectedType, lang) as T
+			closure.apply
 		} finally {
 
 			if (oldValueStackTL != null) {

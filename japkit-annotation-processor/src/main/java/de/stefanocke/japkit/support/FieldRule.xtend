@@ -8,7 +8,6 @@ import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 
 import static de.stefanocke.japkit.support.CodeFragmentRules.*
-import de.stefanocke.japkit.support.el.ValueStack
 
 @Data
 class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
@@ -38,7 +37,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 				ru.createModifiersRule(metaAnnotation, null, "getter"),
 				ru.createAnnotationMappingRules(metaAnnotation, null, "getter"),
 				null,
-				[m , f | CodeRule.getAsCodeBody(m, f) [vs , e| '''return «f.simpleName»;''']],
+				[m , f | CodeRule.getAsCodeBody(m, f) [g, e| '''return «e.simpleName»;''']],
 				[f | f.asType]
 			)
 			addDependentMemberRule(getter)
@@ -56,9 +55,10 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 				ru.createParamRule(null, [it.simpleName.toString], [it.asType], 
 					ru.createAnnotationMappingRules(metaAnnotation, null, "setterParam")
 				),
-				//[f | Collections.singletonList(new GenParameter(f.simpleName, f.asType))],
 				[m , f | CodeRule.getAsCodeBody(m, f) 
-					[vs, e | '''this.«f.simpleName» = «surround(vs, "setterSurroundAssignmentFragment", f.simpleName)»;''']
+					[g, e 
+						| '''this.«f.simpleName» = «surround("setterSurroundAssignmentFragment", f.simpleName)»;'''
+					]
 				],
 				null
 			)

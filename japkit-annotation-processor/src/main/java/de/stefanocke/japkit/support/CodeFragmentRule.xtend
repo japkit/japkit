@@ -17,29 +17,21 @@ class CodeFragmentRule extends CodeRule {
 		_activation = metaAnnotation.elementMatchers("activation", null)
 	}
 	
-	override CharSequence code(ValueStack vs, Element ruleSrcElement){
-		val rse = ruleSrcElement ?: vs.getCurrentRuleSrcElement
+	override CharSequence code(Element ruleSrcElement){
+		val rse = ruleSrcElement ?: getCurrentRuleSrcElement
 		if(activation.nullOrEmpty || activation.exists[matches(rse)]){		
-			super.code(vs, rse)	
+			super.code(rse)	
 		} else ''
 	}
 	
-//	def CharSequence surround( CharSequence surrounded){
-//		surround(valueStack, surrounded)
-//	}
-	
-	def CharSequence surround(ValueStack vs, CharSequence surrounded){
-		surround(vs, vs.getCurrentRuleSrcElement, surrounded)
+	def CharSequence surround(CharSequence surrounded){
+		surround(getCurrentRuleSrcElement, surrounded)
 	}
 	
-//	def CharSequence surround(Element ruleSrcElement, CharSequence surrounded){
-//		surround(valueStack, ruleSrcElement, surrounded)
-//	}
-	
-	def CharSequence surround(ValueStack vs, Element ruleSrcElement, CharSequence surrounded){
+	def CharSequence surround(Element ruleSrcElement, CharSequence surrounded){
 		try{
-			vs.put("surrounded", surrounded)
-			val result = code(vs, ruleSrcElement ?: vs.getCurrentRuleSrcElement)
+			valueStack.put("surrounded", surrounded)
+			val result = code(ruleSrcElement ?: getCurrentRuleSrcElement)
 			if(result == null || result.length == 0) surrounded else result
 		} finally {
 			valueStack.remove("surrounded")

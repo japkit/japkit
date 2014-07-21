@@ -88,56 +88,55 @@ class CodeRule {
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
-		val valueStack = new ValueStack(valueStack);
+		val vs = new ValueStack(valueStack);
 		[ EmitterContext ec |
-			
-			valueStack.scope(element) [ vs |
-				vs.put("ec", ec)
-				vs.put("genElement", genElement)
-				cr.code(vs, element)
+			withValueStack(vs) [ |
+				valueStack.scope(element) [
+					it.put("ec", ec)
+					it.put("genElement", genElement)
+					cr.code(element)
+				]
 			]
 		]
-
 		
 	}
 	
-	def static CodeBody getAsCodeBody(GenElement genElement, Element element, (ValueStack, Element)=>CharSequence cr) {
+	def static CodeBody getAsCodeBody(GenElement genElement, Element element, (GenElement, Element)=>CharSequence cr) {
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
-		val valueStack = new ValueStack(valueStack);
+		val vs = new ValueStack(valueStack);
 		[ EmitterContext ec |
 			
-			valueStack.scope(element) [ vs |
-				vs.put("ec", ec)
-				vs.put("genElement", genElement)
-				cr.apply(vs, element)
+			withValueStack(vs)[|
+				valueStack.scope(element) [
+					it.put("ec", ec)
+					it.put("genElement", genElement)
+					cr.apply(genElement, element)
+				]		
 			]
 		]
 
 		
 	}
 
-	
-	
-	
 	
 	/**
 	 * Gets the code as CharSequence. The EmitterContext an the context element must be available on the thread local value stack.
 	 * This method is aimed to be used to include reusable code fragments into other code expressions.
 	 */
-	public def code(ValueStack vs){
-		code(vs, vs.getCurrentRuleSrcElement)
+	public def code(){
+		code(getCurrentRuleSrcElement)
 	}
 	
-	def getCurrentRuleSrcElement(ValueStack vs) {
-		vs.getRequired("element") as Element
+	def getCurrentRuleSrcElement() {
+		valueStack.getRequired("element") as Element
 	}
-	public def code(ValueStack vs, Element ruleSrcElement){	
-		code(vs.getRequired("ec") as EmitterContext, vs, ruleSrcElement ?: vs.getCurrentRuleSrcElement)
+	public def code(Element ruleSrcElement){	
+		code(valueStack.getRequired("ec") as EmitterContext, ruleSrcElement ?: getCurrentRuleSrcElement)
 	}
 	
-	public def CharSequence code(EmitterContext ec, ValueStack vs, Element ruleSrcElement) {
+	public def CharSequence code(EmitterContext ec, Element ruleSrcElement) {
 		if (bodyExpr.nullOrEmpty && bodyCases.empty) return null //Really?
 		
 		imports.forEach [
@@ -150,36 +149,37 @@ class CodeRule {
 			
 			
 			if (iteratorExpr.nullOrEmpty) {							
-				code(vs, ruleSrcElement, bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
+				code(ruleSrcElement, bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
 			} else {
-				val bodyIterator = eval(vs, iteratorExpr, iteratorLang, Iterable,
+				val bodyIterator = eval(valueStack, iteratorExpr, iteratorLang, Iterable,
 					'''Error in code body iterator expression.''', emptyList)
 				if(!bodyIterator.nullOrEmpty){	
-					val before = eval(vs, beforeExpr, lang, String,
+					val before = eval(valueStack, beforeExpr, lang, String,
 						'''Error in code body before expression.''', '')
-					val after = eval(vs, afterExpr, lang, String,
+					val after = eval(valueStack, afterExpr, lang, String,
 						'''Error in code body after expression.''', '')
 					'''
 						«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
-							«vs.scope(e as Element) [ vsInIteration |
-								code(vsInIteration, e as Element, bodyCases, bodyExpr, lang, '')
+							«valueStack.scope(e as Element) [ 
+								code(e as Element, bodyCases, bodyExpr, lang, '')
 							]»
 						«ENDFOR»
 					'''	
 				} else {								
-					eval(vs, emptyExpr, lang, String, '''Error in code body empty expression.''',
+					eval(valueStack, emptyExpr, lang, String, '''Error in code body empty expression.''',
 							'throw new UnsupportedOperationException();')
 				}
 			}
 		]
 	}
 	
-	private def CharSequence code(ValueStack vs, Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
+	private def CharSequence code(Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
 		val bodyExprToUse = bodyCases.findFirst[
 			val matcher = key
 			!matcher.nullOrEmpty && matcher.exists[matches(ruleSrcElement)]
 		]?.value ?: bodyExpr
 		
-		eval(vs, bodyExprToUse, lang, String, '''Error in code body expression.''',
+		//TODO: remove valuestack parameter
+		eval(valueStack, bodyExprToUse, lang, String, '''Error in code body expression.''',
 				errorResult)
 	}}
