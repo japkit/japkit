@@ -2,7 +2,6 @@ package de.stefanocke.japkit.support
 
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import de.stefanocke.japkit.support.el.ValueStack
 
 @Data
 class CodeFragmentRule extends CodeRule {

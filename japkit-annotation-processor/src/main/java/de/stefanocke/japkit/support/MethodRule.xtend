@@ -31,6 +31,14 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 		_returnTypeRule = returnTypeRule ?: [null]
 	}
 	
+	
+	new(AnnotationMirror metaAnnotation, String avPrefix, (Element)=>Iterable<? extends Element> srcElementsRule,
+		(Element)=>String nameRule, (Element)=>List<? extends GenParameter> paramRules,
+		(GenMethod, Element)=>CharSequence codeRule, (Element)=>TypeMirror returnTypeRule) {
+		super(metaAnnotation, avPrefix, srcElementsRule, nameRule, paramRules, codeRule)	
+		_returnTypeRule = returnTypeRule ?: [null]
+	}
+	
 	def createReturnTypeRule() {
 		ru.createTypeRule(metaAnnotation, template?.returnType, "return")
 	}

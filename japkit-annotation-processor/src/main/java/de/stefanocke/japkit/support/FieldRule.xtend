@@ -31,15 +31,14 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	def addGetterRule() {
 		if (metaAnnotation?.value("generateGetter", boolean) == Boolean.TRUE) {
 			val surroundReturnExprFragments = metaAnnotation.value("getterSurroundReturnExprFragments", typeof(String[]))
-			val getter = new MethodRule(
-				ru.createActivationRule(metaAnnotation, "getter"),
+			val getter = new MethodRule(metaAnnotation, "getter",
 				null,
-				[f | (f as VariableElement).getterName],
-				ru.createModifiersRule(metaAnnotation, null, "getter"),
-				ru.createAnnotationMappingRules(metaAnnotation, null, "getter"),
+				[(it as VariableElement).getterName],
 				null,
-				[m , f | '''return «surround(surroundReturnExprFragments,f.simpleName)»;'''],
-				[f | f.asType]
+				[m, f|
+				'''return «surround(surroundReturnExprFragments, f.simpleName)»;
+				'''],
+				[it.asType]
 			)
 			addDependentMemberRule(getter)
 		}
@@ -48,16 +47,15 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	def addSetterRule() {
 		if (metaAnnotation?.value("generateSetter", boolean) == Boolean.TRUE) {
 			val surroundAssignmentExprFragments = metaAnnotation.value("setterSurroundAssignmentExprFragments", typeof(String[]))
-			val setter = new MethodRule(
-				ru.createActivationRule(metaAnnotation, "setter"),
+			val setter = new MethodRule(metaAnnotation, "setter",
 				null,
-				[f | (f as VariableElement).setterName],
-				ru.createModifiersRule(metaAnnotation, null, "setter"),
-				ru.createAnnotationMappingRules(metaAnnotation, null, "setter"),
+				[(it as VariableElement).setterName],
 				ru.createParamRule(null, [it.simpleName.toString], [it.asType], 
 					ru.createAnnotationMappingRules(metaAnnotation, null, "setterParam")
 				),				
-				[m, f | '''this.«f.simpleName» = «surround(surroundAssignmentExprFragments ,f.simpleName)»;'''],
+				[m, f |
+				'''this.«f.simpleName» = «surround(surroundAssignmentExprFragments ,f.simpleName)»;
+				'''],
 				null
 			)
 			addDependentMemberRule(setter)

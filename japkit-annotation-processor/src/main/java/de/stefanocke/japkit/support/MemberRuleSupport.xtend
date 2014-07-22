@@ -54,6 +54,18 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		createAndAddDelegateMethodRules
 	}
 	
+	new(AnnotationMirror metaAnnotation, String avPrefix, (Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule){
+		_metaAnnotation = metaAnnotation
+		_template = null
+		_avPrefix = avPrefix
+		_activationRule	= createActivationRule
+		_srcElementsRule =  srcElementsRule ?: RuleUtils.SINGLE_SRC_ELEMENT 
+		_nameRule = nameRule
+		_modifiersRule = createModifiersRule
+		_annotationsRule = createAnnotationsRule
+		createAndAddDelegateMethodRules
+	}
+	
 	new((Element)=>boolean activationRule,
 		(Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule,
 		(Element)=>Set<Modifier> modifiersRule, (Element)=>List<? extends AnnotationMirror> annotationsRule) {

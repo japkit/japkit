@@ -1,10 +1,11 @@
 package de.stefanocke.japkit.support
 
+import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import de.stefanocke.japkit.support.el.ElExtensions
-import de.stefanocke.japkit.support.el.ELSupport
+
+import static extension de.stefanocke.japkit.support.RuleUtils.*
 
 @Data
 class CodeFragmentRules {
@@ -59,5 +60,21 @@ class CodeFragmentRules {
 		
 		fragmentNames.map[valueStack.getRequired(it) as  CodeFragmentRules].map[it.code(ruleSrcElement)].join
 			
+	}
+	
+	def static (Element, CharSequence)=>CharSequence createDefaultFragmentsRule(AnnotationMirror metaAnnotation, String avPrefix) {
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+		val surroundingFragments = metaAnnotation.value("surroundingFragments".withPrefix(avPrefix), typeof(String[]))
+		val beforeFragments = metaAnnotation.value("beforeFragments".withPrefix(avPrefix), typeof(String[]))
+		val afterFragments = metaAnnotation.value("afterFragments".withPrefix(avPrefix), typeof(String[]));
+		[ Element ruleSrcElement, CharSequence code |
+			val before = CodeFragmentRules.code(beforeFragments, ruleSrcElement)
+			val after = CodeFragmentRules.code(afterFragments, ruleSrcElement)
+			CodeFragmentRules.surround(
+				surroundingFragments,
+				ruleSrcElement,
+				'''«before»«code»«after»'''
+			)
+		]
 	}
 }

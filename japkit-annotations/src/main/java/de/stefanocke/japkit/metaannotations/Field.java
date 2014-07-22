@@ -206,6 +206,24 @@ public @interface Field {
 	 */
 	String[] getterSurroundReturnExprFragments() default {};
 	
+	/**
+	 * 
+	 * @return names of the fragments to surround the generated code body.
+	 */
+	String[] getterSurroundingFragments() default{};
+	
+	/**
+	 * 
+	 * @return names of the fragments to be inserted before the generated code body.
+	 */
+	String[] getterBeforeFragments() default{};
+	
+	/**
+	 * 
+	 * @return names of the fragments to be inserted before the generated code body.
+	 */
+	String[] getterAfterFragments() default{};
+	
 	
 	/**
 	 * 
@@ -225,6 +243,24 @@ public @interface Field {
 	 * Names of code fragments to surround the assignment expression.
 	 */
 	String[] setterSurroundAssignmentExprFragments() default {};
+	
+	/**
+	 * 
+	 * @return names of the fragments to surround the generated code body.
+	 */
+	String[] setterSurroundingFragments() default{};
+	
+	/**
+	 * 
+	 * @return names of the fragments to be inserted before the generated code body.
+	 */
+	String[] setterBeforeFragments() default{};
+	
+	/**
+	 * 
+	 * @return names of the fragments to be inserted before the generated code body.
+	 */
+	String[] setterAfterFragments() default{};
 	
 
 	@interface List {

@@ -32,9 +32,8 @@ class CodeRule {
 	String afterExpr
 	String separator
 	String emptyExpr
-	String[] surroundingFragments
-	String[] beforeFragments
-	String[] afterFragments
+	(Element, CharSequence)=>CharSequence defaultFragmentsRule
+	
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
 		_metaAnnotation = metaAnnotation
@@ -62,15 +61,14 @@ class CodeRule {
 
 		_imports = metaAnnotation.value("imports", typeof(DeclaredType[]))
 		
-		_surroundingFragments = metaAnnotation.value("surroundingFragments", typeof(String[]))  
-		_beforeFragments = metaAnnotation.value("beforeFragments", typeof(String[]))  
-		_afterFragments = metaAnnotation.value("afterFragments", typeof(String[]))  
-		
+ 
+		_defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
 	}
 	
 	private static def withPrefix(String name, String prefix){
 		if(prefix.nullOrEmpty) name else '''«prefix»«name.toFirstUpper»'''
 	}
+	
 	
 	/**
 	 * Gets the code as a closure usable in generated methods, constructors and fields.
@@ -108,7 +106,7 @@ class CodeRule {
 		
 	}
 	
-	def static CodeBody getAsCodeBody(GenElement genElement, Element element, (GenElement, Element)=>CharSequence cr) {
+	def static CodeBody getAsCodeBody(GenElement genElement, Element element, (GenElement, Element)=>CharSequence cr, (Element, CharSequence)=>CharSequence defaultFragments) {
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
@@ -119,12 +117,19 @@ class CodeRule {
 				valueStack.scope(element) [
 					it.put("ec", ec)
 					it.put("genElement", genElement)
-					cr.apply(genElement, element)
+					val result = cr.apply(genElement, element)
+					defaultFragments?.apply(element, result) ?: result
 				]		
 			]
 		]
 
 		
+	}
+	
+	def static (GenElement, Element)=>CodeBody createCodeBodyRule((GenElement, Element)=>CharSequence codeRule, (Element, CharSequence)=>CharSequence defaultFragments){
+		[genElement, ruleSourceElement | 
+			CodeRule.getAsCodeBody(genElement, ruleSourceElement, codeRule as (GenElement, Element)=>CharSequence, defaultFragments)
+		]
 	}
 
 	
@@ -176,18 +181,11 @@ class CodeRule {
 					}
 				}
 			
-			applyFragments(result, ruleSrcElement)
+			defaultFragmentsRule.apply(ruleSrcElement, result)
 			
 		]
 	}
 	
-	def applyFragments(CharSequence code, Element ruleSrcElement) {
-		val before = CodeFragmentRules.code(beforeFragments, ruleSrcElement)
-		val after = CodeFragmentRules.code(afterFragments, ruleSrcElement)
-		CodeFragmentRules.surround(surroundingFragments, ruleSrcElement, 
-			'''«before»«code»«after»'''
-		)
-	}
 	
 	private def CharSequence code(Element ruleSrcElement, List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
 		val bodyExprToUse = bodyCases.findFirst[
