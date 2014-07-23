@@ -53,12 +53,6 @@ public @interface ConstructorFromProperties {
 	
 	
 	/**
-	 * If copyConstructor is set, one can additionally generate a clone method that calls this copy constructor.
-	 * @return
-	 */
-	boolean cloneMethodCallingCopyConstructor() default false;
-
-	/**
 	 * 
 	 * @return true means, that for properties, where setters are available,
 	 *         they are used to initialize those properties

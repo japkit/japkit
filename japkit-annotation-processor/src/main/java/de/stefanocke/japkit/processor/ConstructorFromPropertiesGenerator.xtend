@@ -31,8 +31,6 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 		val copyConstructor = annotation.valueOrMetaValue("copyConstructor", Boolean, constructorAnnotation);
 		val copyConstructorFieldAccess = annotation.valueOrMetaValue("copyConstructorFieldAccess", Boolean,
 			constructorAnnotation);
-		val cloneMethodCallingCopyConstructor = annotation.valueOrMetaValue("cloneMethodCallingCopyConstructor", Boolean,
-			constructorAnnotation);
 
 		val mods = annotation.valueOrMetaValue("modifiers", typeof(Modifier[]), constructorAnnotation);
 		val createInitMethod = annotation.valueOrMetaValue("createInitMethod", Boolean, constructorAnnotation);
@@ -152,16 +150,6 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 			//TODO: Falls es schon einen gleichen Konstruktor gibt, sollen dann die Annotationen hinzugefügt werden?
 			c.annotationMirrors = mapAnnotations(sc, annotationMappings)
 			
-			if(copyConstructor && cloneMethodCallingCopyConstructor){
-				val cloneMethod = new GenMethod("clone") => [
-					visibility = Modifier.PUBLIC
-					returnType = OBJECT
-					body=['''return new «staticTypeRef(new GenDeclaredType(generatedClass))»(this);''']
-				]
-					
-				generatedClass.add(cloneMethod)
-				generatedClass.addInterface(declaredType(Cloneable.name))
-			}
 		]
 	}
 
