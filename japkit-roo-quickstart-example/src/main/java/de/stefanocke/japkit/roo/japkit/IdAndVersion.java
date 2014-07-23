@@ -6,16 +6,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
-import de.stefanocke.japkit.metaannotations.AnnotationMapping;
-import de.stefanocke.japkit.metaannotations.Properties;
+import de.stefanocke.japkit.metaannotations.Field;
+import de.stefanocke.japkit.metaannotations.Template;
 
-@Properties(sourceClass = IdAndVersion.class, fromFields = true, annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = "*"))
+@Template
 public class IdAndVersion {
+	@Field(generateGetter=true, generateSetter=true)
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Long id;
 
+	@Field(generateGetter=true, generateSetter=true)
 	@Version
 	@Column(name = "version")
 	private Integer version;
