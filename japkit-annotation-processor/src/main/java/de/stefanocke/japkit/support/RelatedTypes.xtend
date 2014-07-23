@@ -7,7 +7,6 @@ import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
-import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement

@@ -1,9 +1,5 @@
 package de.stefanocke.japkit.metaannotations;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import javax.lang.model.element.Modifier;
 
 import de.stefanocke.japkit.metaannotations.Properties.RuleSource;
@@ -69,39 +65,6 @@ public @interface ConstructorFromProperties {
 	 */
 	boolean callSetters() default true;
 
-	/**
-	 * Whether the constructor or init method shall create defensive copies
-	 * before assigning the value to the field.
-	 * <p>
-	 * If the type of the property is known to be immutable, no defensive copy
-	 * is created. Types from the following categories are considered immutable:
-	 * TypeCategory.PRIMITIVE, TypeCatergory.STRING, TypeCategory.MATH,
-	 * TypeCategory.ENUM
-	 * <p>
-	 * There are built in copy mechanisms for the following type categories
-	 * TypeCategory.TEMPORAL, TypeCategory.COLLECTION, TypeCategory.ARRAY
-	 * <p>
-	 * Note: For collections and arrays, only shallow copies are created. Deep
-	 * 'cloning' is not supported here.
-	 * <p>
-	 * If "callSetters" is set to true, this option is ignored. Whether
-	 * defensive copies are created is determined by the according Properties
-	 * annotation then.
-	 * 
-	 * @return
-	 */
-	boolean assignDefensiveCopies() default false;
-	
-	Matcher[]  assignDefensiveCopiesAlsoFor() default {};
-	
-	@SuppressWarnings("rawtypes")
-	Class<? extends java.util.List> listImpl() default ArrayList.class;
-	
-	@SuppressWarnings("rawtypes")
-	Class<? extends java.util.Set> setImpl() default HashSet.class;
-	
-	@SuppressWarnings("rawtypes")
-	Class<? extends java.util.Map> mapImpl() default HashMap.class;
 
 	/**
 	 * If set to to true, a separate method is created for the property

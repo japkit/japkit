@@ -7,7 +7,6 @@ import de.stefanocke.japkit.gen.GenMethod
 import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.ConstructorFromProperties
-import de.stefanocke.japkit.support.ImmutabiltyRules
 import de.stefanocke.japkit.support.JavadocUtil
 import de.stefanocke.japkit.support.Property
 import de.stefanocke.japkit.support.PropertyFilter
@@ -42,7 +41,6 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 		val annotationMappings = annotation.annotationMappings("annotationMappings", constructorAnnotation);
 
 		val propertyFilter = new PropertyFilter(annotation, constructorAnnotation)
-		val immutabilityRules = new ImmutabiltyRules(annotation, constructorAnnotation)
 
 		val fromFields = true //TODO: If this shall be configurable for some reason, TENFE must be handled below.
 
@@ -100,7 +98,7 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 
 				}
 				
-			val assignments = codeForAssignments(generatedClass, propertiesToSet, callSetters, assignmentRhs, immutabilityRules)
+			val assignments = codeForAssignments(generatedClass, propertiesToSet, callSetters, assignmentRhs)
 				
 			val c = new GenConstructor() => [
 				modifiers = mods.toSet
@@ -172,12 +170,8 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 	}
 
 	def CodeBody codeForAssignments(GenTypeElement generatedClass, Iterable<? extends Property> propertiesToSet, Boolean callSetters,
-		(Property)=>CharSequence rhs, ImmutabiltyRules immutabiltyRules) {
+		(Property)=>CharSequence rhs) {
 			
-		val wrapped = newHashMap()
-		
-		//Hässlich. Alles nur, damit die rules nicht erst im emmitter ausgewertet werden und dort erst die TNFE fliegt...
-		propertiesToSet.forEach[p | wrapped.put(p, immutabiltyRules.wrapAssignment(generatedClass, p, rhs.apply(p)))]
 		 
 		
 		['''
@@ -185,7 +179,7 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 				«IF callSetters && p.setter != null»
 					«p.setterName»(«rhs.apply(p)»);
 				«ELSE»
-					this.«p.field.simpleName» = «wrapped.get(p).code(it)»;
+					this.«p.field.simpleName» = «rhs.apply(p)»;
 				«ENDIF»
 			«ENDFOR»
 		''']

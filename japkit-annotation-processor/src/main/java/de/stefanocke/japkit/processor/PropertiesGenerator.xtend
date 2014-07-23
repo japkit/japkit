@@ -9,7 +9,6 @@ import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Properties
 import de.stefanocke.japkit.support.DelegateMethodsRule
-import de.stefanocke.japkit.support.ImmutabiltyRules
 import de.stefanocke.japkit.support.Property
 import de.stefanocke.japkit.support.PropertyFilter
 import javax.lang.model.element.AnnotationMirror
@@ -17,7 +16,6 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
-import java.util.Set
 
 class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
@@ -76,8 +74,6 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 		val overridesMatcher = annotation.valueOrMetaValue("overridesMatcher", AnnotationMirror, propertiesAnnotation).createElementMatcher
 		
 		val overrideElementsByName = (overridesSource?.enclosedElements?.filter[overridesMatcher.matches(it)] ?: emptyList).toMap[simpleName.toString]
-		
-		val immutabilityRules = new ImmutabiltyRules(annotation, propertiesAnnotation)
 		
 		//TODO: Rule caching
 		val propertyFilter = new PropertyFilter(annotation, propertiesAnnotation)
@@ -151,7 +147,7 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 												modifiers = getterModifiers.toSet
 												returnType = p.type
 												annotationMirrors = mapAnnotations(ruleSourceElement, annotationMappingsForGetters)
-												val b = getterBody(generatedClass, p, immutabilityRules)
+												val b = getterBody(generatedClass, p)
 												body = b
 												comment = '''@return «srcComment»'''
 											]
@@ -163,11 +159,10 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 					val method = new GenMethod(p.setterName) => [
 												modifiers = setterModifiers.toSet
 												addParameter(new GenParameter(p.name, p.type))
-												val wrapped = immutabilityRules.wrapAssignment(generatedClass, p, p.name)
 												body = [
 													'''
 														«beforeSet(p, annotatedClass, annotation, propertiesAnnotation)»
-														this.«p.name» = «wrapped.code(it)»;
+														this.«p.name» = «p.name»;
 													''']
 												comment = '''@param «p.name» «srcComment»'''
 											]
@@ -187,9 +182,8 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 
 	}
 
-	private def CodeBody getterBody(GenTypeElement generatedClass, Property p, ImmutabiltyRules rules) {
-		val wrapped = rules.wrapReturnedValue(generatedClass, p, p.name);
-		['''return «wrapped.code(it)»;''']
+	private def CodeBody getterBody(GenTypeElement generatedClass, Property p) {
+		['''return «p.name»;''']
 	}
 
 	//TODO: Das ist sehr prototypisch! Ggf. mit immutabilty rules zu allgemeinen "GetSetModificationRules" o.ä. zusammenführen.

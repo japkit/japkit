@@ -140,67 +140,6 @@ public @interface Properties {
 	boolean generateGetters() default true;
 
 	/**
-	 * Whether getters shall return unmodifiable collections and maps
-	 * 
-	 * @return
-	 */
-	boolean returnUnmodifiableCollections() default false;
-
-	/**
-	 * Whether getters shall return defensive copies of the properties.
-	 * <p>
-	 * If the property is a collection, and gettersReturnUnmodifiableCollections
-	 * is set, this option will be ignored.
-	 * <p>
-	 * If the type of the property is known to be immutable, no defensive copy
-	 * is created. Types from the following categories are considered immutable:
-	 * TypeCategory.PRIMITIVE, TypeCatergory.STRING, TypeCategory.MATH,
-	 * TypeCategory.ENUM
-	 * <p>
-	 * There are built in copy mechanisms for the following type categories
-	 * TypeCategory.TEMPORAL, TypeCategory.COLLECTION, TypeCategory.ARRAY
-	 * <p>
-	 * Note: For collections and arrays, only shallow copies are created. 'Deep
-	 * cloning' is not supported here.
-	 * 
-	 * @return
-	 */
-	boolean returnDefensiveCopies() default false;
-
-	/**
-	 * Whether setters shall create defensive copies before assigning the value
-	 * to the field.
-	 * <p>
-	 * If the type of the property is known to be immutable, no defensive copy
-	 * is created. Types from the following categories are considered immutable:
-	 * TypeCategory.PRIMITIVE, TypeCatergory.STRING, TypeCategory.MATH,
-	 * TypeCategory.ENUM
-	 * <p>
-	 * There are built in copy mechanisms for the following type categories
-	 * TypeCategory.TEMPORAL, TypeCategory.COLLECTION, TypeCategory.ARRAY
-	 * <p>
-	 * Note: For collections and arrays, only shallow copies are created. Deep
-	 * 'cloning' is not supported here.
-	 * 
-	 * 
-	 * @return
-	 */
-	boolean assignDefensiveCopies() default false;
-
-	Matcher[] returnDefensiveCopiesAlsoFor() default {};
-
-	Matcher[] assignDefensiveCopiesAlsoFor() default {};
-
-	@SuppressWarnings("rawtypes")
-	Class<? extends java.util.List> listImpl() default ArrayList.class;
-
-	@SuppressWarnings("rawtypes")
-	Class<? extends java.util.Set> setImpl() default HashSet.class;
-
-	@SuppressWarnings("rawtypes")
-	Class<? extends java.util.Map> mapImpl() default HashMap.class;
-
-	/**
 	 * Rules for excluding some properties from getter code generation. If at
 	 * least one of the matcher matches the property, no getter is generated.
 	 * 
