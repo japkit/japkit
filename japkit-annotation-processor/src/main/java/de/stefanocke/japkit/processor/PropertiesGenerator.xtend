@@ -15,8 +15,11 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.support.GetterSetterRules
+import de.stefanocke.japkit.support.ExtensionRegistry
 
 class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
+	protected extension GetterSetterRules = ExtensionRegistry.get(GetterSetterRules)
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror annotation, AnnotationMirror propertiesAnnotation) {
@@ -31,26 +34,19 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 		val createNameConstants = annotation.valueOrMetaValue("createNameConstants", Boolean, propertiesAnnotation)
 		val createProperties = annotation.valueOrMetaValue("createProperties", Boolean, propertiesAnnotation)
 
-		val generateSetters = annotation.valueOrMetaValue("generateSetters", Boolean, propertiesAnnotation)
-		val settersExcludeRules = annotation.elementMatchers("settersExcludeRules", propertiesAnnotation)
 
-		val generateGetters = annotation.valueOrMetaValue("generateGetters", Boolean, propertiesAnnotation)
-		val gettersExcludeRules = annotation.elementMatchers("gettersExcludeRules", propertiesAnnotation)
 		
 		val excludePropertiesFromSuperclass = annotation.valueOrMetaValue("excludePropertiesFromSuperclass", Boolean, propertiesAnnotation)
 		
 
 		val fieldModifiers = annotation.valueOrMetaValue("fieldModifiers", typeof(Modifier[]), propertiesAnnotation)
-		val getterModifiers = annotation.valueOrMetaValue("getterModifiers", typeof(Modifier[]),
-			propertiesAnnotation)
-		val setterModifiers = annotation.valueOrMetaValue("setterModifiers", typeof(Modifier[]),
-			propertiesAnnotation)
+
 
 		val ruleSource = annotation.valueOrMetaValue("ruleSource", Properties.RuleSource, propertiesAnnotation)
 		val annotationMappingsForFields = annotation.annotationMappings("annotationMappings", propertiesAnnotation)
-		val annotationMappingsForGetters = annotation.annotationMappings("annotationMappingsForGetters",
-			propertiesAnnotation)
 
+		val getterRule = createGetterRuleFromGetterAV(propertiesAnnotation)
+		val setterRule = createSetterRuleFromSetterAV(propertiesAnnotation)
 		
 		val delegateMethodRules = annotation.valueOrMetaValue("delegateMethods", typeof(AnnotationMirror[]), propertiesAnnotation).map [
 			new DelegateMethodsRule(it, null)
@@ -137,37 +133,15 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 				generatedClass.add(genField)
 				
 				
-				val genGetter = if (generateGetters && !gettersExcludeRules.exists[matches(ruleSourceElement)]) {
-					val method = new GenMethod(p.getterName) => [
-												modifiers = getterModifiers.toSet
-												returnType = p.type
-												annotationMirrors = mapAnnotations(ruleSourceElement, annotationMappingsForGetters)
-												val b = getterBody(generatedClass, p)
-												body = b
-												comment = '''@return «srcComment»'''
-											]
-					generatedClass.add(method)
-					method
-					
-				}
-				val genSetter = if (generateSetters && !settersExcludeRules.exists[matches(ruleSourceElement)]) {
-					val method = new GenMethod(p.setterName) => [
-												modifiers = setterModifiers.toSet
-												addParameter(new GenParameter(p.name, p.type))
-												body = [
-													'''
-														this.«p.name» = «p.name»;
-													''']
-												comment = '''@param «p.name» «srcComment»'''
-											]
-					generatedClass.add(method)
-					method
-				}
+				getterRule?.apply(generatedClass, ruleSourceElement)
 				
-				val genProperty = new Property(genField, genGetter, genSetter)
+				
+				setterRule?.apply(generatedClass, ruleSourceElement)
+				
+				//val genProperty = new Property(genField, genGetter, genSetter)
 				
 
-				delegateMethodRules.forEach[apply(generatedClass, genProperty)]
+				delegateMethodRules.forEach[apply(generatedClass, genField /*genProperty */)]
 			}
 			
 			templateRules.forEach[it.apply(annotatedClass, generatedClass, annotation, ruleSourceElement)]
@@ -176,9 +150,6 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 
 	}
 
-	private def CodeBody getterBody(GenTypeElement generatedClass, Property p) {
-		['''return «p.name»;''']
-	}
 
 
 	override getSupportedMetaAnnotation() {

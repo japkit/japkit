@@ -133,49 +133,9 @@ public @interface Properties {
 	 */
 	Matcher overridesMatcher() default @Matcher(srcKind = ElementKind.FIELD);
 
-	/**
-	 * 
-	 * @return whether to generate getters at all
-	 */
-	boolean generateGetters() default true;
-
-	/**
-	 * Rules for excluding some properties from getter code generation. If at
-	 * least one of the matcher matches the property, no getter is generated.
-	 * 
-	 * @return the element matchers
-	 */
-	Matcher[] gettersExcludeRules() default {};
-
-	/**
-	 * Maps annotations from source class properties to target class getters.
-	 * 
-	 * @return the annotation mappings.
-	 */
-	AnnotationMapping[] annotationMappingsForGetters() default {};
-
-	/**
-	 * 
-	 * @return whether to generate setters at all
-	 */
-	boolean generateSetters() default true;
-
-	/**
-	 * Rules for excluding some properties from setter code generation. If at
-	 * least one of the matcher matches the property, no setter is generated.
-	 * <p>
-	 * For example you might annotate derived properties with a @Derived
-	 * annotation and than exclude those properties from setter generation.
-	 * 
-	 * @return the element matchers
-	 */
-	Matcher[] settersExcludeRules() default {};
 
 	Modifier[] fieldModifiers() default { Modifier.PRIVATE };
 
-	Modifier[] getterModifiers() default { Modifier.PUBLIC };
-
-	Modifier[] setterModifiers() default { Modifier.PUBLIC };
 
 	/**
 	 * Names of properties to be included. They must exist in the source class,
@@ -211,6 +171,26 @@ public @interface Properties {
 	 * @return
 	 */
 	boolean excludePropertiesFromSuperclass() default true;
+	
+	
+
+	/**
+	 * A Setter annotation here means to generate a setter for the field. The
+	 * annotation can be used to further customize the setter, but all values
+	 * are optional.
+	 * 
+	 * @return the setter annotation
+	 */
+	Setter[] setter() default @Setter;
+
+	/**
+	 * A Getter annotation here means to generate a getter for the field. The
+	 * annotation can be used to further customize the getter, but all values
+	 * are optional.
+	 * 
+	 * @return the setter annotation
+	 */
+	Getter[] getter() default @Getter;
 
 	/**
 	 * The delegate methods to create. The delegate is the property.
