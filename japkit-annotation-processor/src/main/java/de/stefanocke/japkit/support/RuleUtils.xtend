@@ -50,9 +50,17 @@ class RuleUtils {
 			val srcElements = if (iteratorExpr.nullOrEmpty) {
 					Collections.singleton(ruleSrcElement)
 				} else {
-					eval(ruleSrcElement, iteratorExpr, iteratorLang, Iterable,
-						'''Iterator expression «iteratorExpr» could not be evaluated''', emptyList).
-						filterInstanceOf(Element)
+					val elements = eval(ruleSrcElement, iteratorExpr, iteratorLang, Object,
+						'''Iterator expression «iteratorExpr» could not be evaluated''', emptyList)
+						
+					if(elements instanceof Iterable<?>){	
+						(elements as Iterable<?>).filterInstanceOf(Element)					
+					} else if (elements instanceof Element){
+						Collections.singleton(elements as Element)
+					} else {
+						reportError('''Expected Element or Iterable of Element, but not «elements».''', null,null,null)
+						emptyList
+					}
 				} 
 			srcElements
 		]
