@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.support
 
-import de.stefanocke.japkit.gen.CodeBody
 import de.stefanocke.japkit.gen.GenMethod
 import de.stefanocke.japkit.gen.GenParameter
 import java.util.List
