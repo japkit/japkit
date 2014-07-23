@@ -183,4 +183,22 @@ class RuleUtils {
 		]
 	}
 	
+	def (Element)=>CharSequence createCommentRule(AnnotationMirror metaAnnotation, Element template, String avPrefix,
+		(Element)=>CharSequence defaultComment) {
+		val copyFromSrc =  metaAnnotation?.value("commentFromSrc".withPrefix(avPrefix), Boolean) ?: false
+		val commentExpr = metaAnnotation?.value("commentExpr".withPrefix(avPrefix), String)
+		val commentLang = metaAnnotation?.value("commentLang".withPrefix(avPrefix), String);
+		val commentFromTemplate = template?.docComment
+		val expr = if(commentExpr.nullOrEmpty) commentFromTemplate else commentExpr;
+
+		[ Element ruleSrcElement |
+			if(copyFromSrc) ruleSrcElement.docComment
+			else if (!expr.nullOrEmpty)
+				eval(valueStack, expr, commentLang, CharSequence, '''Comment could not be generated''',
+					'invalidComment')
+			else
+				defaultComment?.apply(ruleSrcElement)
+		]
+	}
+	
 }

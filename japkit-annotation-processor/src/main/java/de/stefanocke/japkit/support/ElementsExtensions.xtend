@@ -737,11 +737,15 @@ class ElementsExtensions {
 	}
 
 	def private dispatch String docComment(GenElement e) {
-		e.comment?.toString
+		e.comment?.toString?.trim
+	}
+	
+	def private dispatch String docComment(Property p) {
+		p.fieldOrGetter?.docComment  //TODO: If getter, extract @return comment here?
 	}
 
 	def private dispatch String docComment(Element e) {
-		elementUtils.getDocComment(e)
+		elementUtils.getDocComment(e)?.trim
 	}
 
 	def getDocComment(Element e) {

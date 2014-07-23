@@ -187,7 +187,23 @@ public @interface Field {
 	 * @return
 	 */
 	DelegateMethods[] delegateMethods() default {};
-
+	
+	/**
+	 * 
+	 * @return true means to copy the JavaDoc comment from the rule source element 
+	 */
+	boolean commentFromSrc() default false;
+	/**
+	 * 
+	 * @return an expression to create the JavaDoc comment
+	 */
+	String commentExpr() default "";
+	
+	/**
+	 * 
+	 * @return the expression language for commentExpr
+	 */
+	String commentLang() default "";
 	
 	/**
 	 * 

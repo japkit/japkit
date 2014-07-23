@@ -28,18 +28,18 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	
 	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
 		(Element)=>String nameRule, (Element)=>Set<Modifier> modifiersRule,
-		(Element)=>List<? extends AnnotationMirror> annotationsRule,
+		(Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule,
 		(Element)=>List<? extends GenParameter> paramRules, (G, Element)=>CharSequence codeRule) {
-		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule)
+		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule, commentRule)
 		
 		_paramRules = paramRules ?: [emptyList]
 		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement, Element)=>CharSequence, null)
 	}
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix, (Element)=>Iterable<? extends Element> srcElementsRule,
-		(Element)=>String nameRule, (Element)=>List<? extends GenParameter> paramRules,
+		(Element)=>String nameRule, (Element)=>CharSequence commentRule, (Element)=>List<? extends GenParameter> paramRules,
 		(G, Element)=>CharSequence codeRule) {
-		super(metaAnnotation, avPrefix, srcElementsRule, nameRule)
+		super(metaAnnotation, avPrefix, srcElementsRule, nameRule, commentRule)
 		_paramRules = paramRules ?: [emptyList]
 		val defaultFragments = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
 		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement, Element)=>CharSequence, defaultFragments)

@@ -1,9 +1,7 @@
 package de.stefanocke.japkit.metaannotations;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -195,6 +193,23 @@ public @interface InnerClass {
 	 * @return the prefix to use when renaming a generated method.
 	 */
 	String behaviorGenMethodRenamePrefix() default "gen";
+	
+	/**
+	 * 
+	 * @return true means to copy the JavaDoc comment from the rule source element 
+	 */
+	boolean commentFromSrc() default false;
+	/**
+	 * 
+	 * @return an expression to create the JavaDoc comment
+	 */
+	String commentExpr() default "";
+	
+	/**
+	 * 
+	 * @return the expression language for commentExpr
+	 */
+	String commentLang() default "";
 	
 	/**
 	 * EL Variables in the scope of the generated class. 

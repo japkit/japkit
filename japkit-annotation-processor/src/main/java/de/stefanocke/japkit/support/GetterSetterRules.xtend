@@ -19,6 +19,7 @@ class GetterSetterRules {
 		val getter = new MethodRule(metaAnnotation, "getter",
 			null,
 			[(it as VariableElement).getterName],
+			createCommentRule(metaAnnotation, null, "getter")[e | '''@return «e.docComment?.toString?.trim»'''],
 			null,
 			[m, f|
 			'''return «surround(surroundReturnExprFragments, f.simpleName)»;
@@ -33,6 +34,7 @@ class GetterSetterRules {
 		val setter = new MethodRule(metaAnnotation, "setter",
 			null,
 			[(it as VariableElement).setterName],
+			createCommentRule(metaAnnotation, null, "getter")[e | '''@param «e.simpleName» «e.docComment?.toString?.trim»'''],
 			createSetterParamRule(metaAnnotation),				
 			[m, f |
 			'''this.«f.simpleName» = «surround(surroundAssignmentExprFragments ,f.simpleName)»;

@@ -23,18 +23,18 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 	
 	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
 		(Element)=>String nameRule, (Element)=>Set<Modifier> modifiersRule,
-		(Element)=>List<? extends AnnotationMirror> annotationsRule,
+		(Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule,
 		(Element)=>List<? extends GenParameter> paramRules, (GenMethod, Element)=>CharSequence codeRule,
 		(Element)=>TypeMirror returnTypeRule) {
-		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule, paramRules, codeRule)
+		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule, commentRule, paramRules, codeRule)
 		_returnTypeRule = returnTypeRule ?: [null]
 	}
 	
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix, (Element)=>Iterable<? extends Element> srcElementsRule,
-		(Element)=>String nameRule, (Element)=>List<? extends GenParameter> paramRules,
+		(Element)=>String nameRule, (Element)=>CharSequence commentRule, (Element)=>List<? extends GenParameter> paramRules, 
 		(GenMethod, Element)=>CharSequence codeRule, (Element)=>TypeMirror returnTypeRule) {
-		super(metaAnnotation, avPrefix, srcElementsRule, nameRule, paramRules, codeRule)	
+		super(metaAnnotation, avPrefix, srcElementsRule, nameRule, commentRule, paramRules, codeRule)	
 		_returnTypeRule = returnTypeRule ?: [null]
 	}
 	

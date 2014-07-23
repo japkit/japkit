@@ -34,6 +34,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	(Element)=>String nameRule
 	(Element)=>Set<Modifier> modifiersRule
 	(Element)=>List<? extends AnnotationMirror> annotationsRule
+	(Element)=>CharSequence commentRule
 	
 	//members to be created for the generated member. for instance, getters and setters to  be created for the generated field
 	List<(GenTypeElement, Element ) => void> dependentMemberRules = newArrayList()
@@ -51,10 +52,12 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_nameRule = createNameRule
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
+		_commentRule = createCommentRule
 		createAndAddDelegateMethodRules
 	}
 	
-	new(AnnotationMirror metaAnnotation, String avPrefix, (Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule){
+	
+	new(AnnotationMirror metaAnnotation, String avPrefix, (Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule, (Element)=>CharSequence commentRule){
 		_metaAnnotation = metaAnnotation
 		_template = null
 		_avPrefix = avPrefix
@@ -63,12 +66,13 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_nameRule = nameRule
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
+		_commentRule = commentRule ?: createCommentRule
 		createAndAddDelegateMethodRules
 	}
 	
 	new((Element)=>boolean activationRule,
 		(Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule,
-		(Element)=>Set<Modifier> modifiersRule, (Element)=>List<? extends AnnotationMirror> annotationsRule) {
+		(Element)=>Set<Modifier> modifiersRule, (Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule) {
 		_metaAnnotation = null
 		_template = null
 		_avPrefix = null
@@ -77,6 +81,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_nameRule = nameRule
 		_modifiersRule = modifiersRule ?: [emptySet]
 		_annotationsRule = annotationsRule ?: [emptyList]
+		_commentRule = commentRule ?: [""]
 	}
 	
 	protected def addDependentMemberRule(MemberRuleSupport<?,?> mr){
@@ -102,6 +107,10 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	
 	protected def (Element)=>String createNameRule() {
 		ru.createNameExprRule(metaAnnotation, template, avPrefix)
+	}
+	
+	protected def (Element)=>CharSequence createCommentRule() {
+		ru.createCommentRule(metaAnnotation, template, avPrefix, null)
 	}
 	
 
@@ -159,6 +168,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	protected def void applyRulesAfterCreation(T member, Element ruleSrcElement) {
 		member.modifiers=modifiersRule.apply(ruleSrcElement)
 		member.annotationMirrors=annotationsRule.apply(ruleSrcElement)
+		member.comment = commentRule.apply(ruleSrcElement)
 	}
 	
 

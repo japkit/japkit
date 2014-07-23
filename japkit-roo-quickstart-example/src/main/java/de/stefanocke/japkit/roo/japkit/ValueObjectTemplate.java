@@ -26,7 +26,12 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 				expr = "if(#{element.simpleName}==null){\n"
 						+ "  throw new IllegalArgumentException(\"#{element.simpleName} must not be null.\");\n" + "}\n")),
 		@Var(name = "defensiveCopyFragment", code = @CodeFragment(imports=Date.class, cases = { @Case(matcher = @Matcher(srcType = Date.class),
-				expr = "new Date(#{surrounded}.getTime())") }))
+				expr = "new Date(#{surrounded}.getTime())")}))
+//		,
+//		@Var(name = "tryFinallyTest", code = @CodeFragment(expr="try {\n" +
+//				"#{surrounded}" +
+//				"} finally {\n" +
+//				"}\n"))
 })
 
 //getterSurroundReturnFragment
@@ -35,9 +40,10 @@ public abstract class ValueObjectTemplate {
 	@InnerClass
 	@ClassSelector(kind=ClassSelectorKind.GEN_INNER_CLASS_NAME, expr="Builder") //TODO!
 	public static abstract class Builder{
+		
 		@Field(iterator = "#{properties}", nameExpr = "#{element.simpleName}", annotationMappings = @AnnotationMapping(
 				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
-						"org.springframework.format.annotation" }), generateGetter = true, generateSetter = true)
+						"org.springframework.format.annotation" }), generateGetter = true, generateSetter = true, commentFromSrc = true)
 		private SrcElementType field;
 		
 		
@@ -51,7 +57,7 @@ public abstract class ValueObjectTemplate {
 	@Field(iterator = "#{properties}", nameExpr = "#{element.simpleName}",
 			annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 					"org.springframework.format.annotation" }), generateGetter = true,
-			getterSurroundReturnExprFragments = "defensiveCopyFragment")
+			getterSurroundReturnExprFragments = "defensiveCopyFragment", commentFromSrc=true)
 	private SrcElementType field;
 
 	@Constructor(bodyExpr="//Some ctor code")
