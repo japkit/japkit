@@ -243,6 +243,19 @@ public @interface Field {
 	
 	/**
 	 * 
+	 * @return an expression to create the JavaDoc comment
+	 */
+	String getterCommentExpr() default "";
+	
+	/**
+	 * 
+	 * @return the expression language for commentExpr
+	 */
+	String getterCommentLang() default "";
+	
+	
+	/**
+	 * 
 	 * @return whether to generate a setter for the field
 	 */
 	boolean generateSetter() default false;
@@ -277,6 +290,18 @@ public @interface Field {
 	 * @return names of the fragments to be inserted before the generated code body.
 	 */
 	String[] setterAfterFragments() default{};
+	
+	/**
+	 * 
+	 * @return an expression to create the JavaDoc comment
+	 */
+	String setterCommentExpr() default "";
+	
+	/**
+	 * 
+	 * @return the expression language for commentExpr
+	 */
+	String setterCommentLang() default "";
 	
 
 	@interface List {

@@ -56,7 +56,7 @@ public abstract class ValueObjectTemplate {
 	
 	@Field(iterator = "#{properties}", nameExpr = "#{element.simpleName}",
 			annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
-					"org.springframework.format.annotation" }), generateGetter = true,
+					"org.springframework.format.annotation" }), generateGetter = true, getterCommentExpr = "Getter for #{element.simpleName}. \n@returns #{element.simpleName}\n",
 			getterSurroundReturnExprFragments = "defensiveCopyFragment", commentFromSrc=true)
 	private SrcElementType field;
 
