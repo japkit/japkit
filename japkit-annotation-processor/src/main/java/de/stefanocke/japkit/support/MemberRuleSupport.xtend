@@ -84,7 +84,8 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_commentRule = commentRule ?: [""]
 	}
 	
-	protected def addDependentMemberRule(MemberRuleSupport<?,?> mr){
+	protected def void addDependentMemberRule(MemberRuleSupport<?,?> mr){
+		if(mr==null) return;
 		dependentMemberRules.add [g, e| mr.apply(g,e)]
 	}
 	
@@ -175,7 +176,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	protected def void createAndAddDelegateMethodRules() {
 		if(metaAnnotation == null) return;
 		
-		metaAnnotation.value("delegateMethods", typeof(AnnotationMirror[]))?.map [
+		metaAnnotation.value("delegateMethods", typeof(AnnotationMirror[]))?.forEach [
 			val dmr =  new DelegateMethodsRule(it, null)
 			addDependentMemberRule(dmr) 
 		]

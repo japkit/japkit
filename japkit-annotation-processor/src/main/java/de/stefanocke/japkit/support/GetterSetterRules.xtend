@@ -15,6 +15,14 @@ class GetterSetterRules {
 	extension ElementsExtensions  = ExtensionRegistry.get(ElementsExtensions)
 	extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	
+	def MethodRule createGetterRuleFromGetterAV(AnnotationMirror metaAnnotation) {
+		metaAnnotation?.value("getter", AnnotationMirror)?.createGetterRule(null)
+	}
+	
+	def MethodRule createSetterRuleFromSetterAV(AnnotationMirror metaAnnotation) {
+		metaAnnotation?.value("setter", AnnotationMirror)?.createSetterRule(null)
+	}
+	
 	def MethodRule createGetterRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		val surroundReturnExprFragments = metaAnnotation.value("surroundReturnExprFragments".withPrefix(avPrefix), typeof(String[]))
 		new MethodRule(metaAnnotation,  avPrefix,
@@ -30,7 +38,7 @@ class GetterSetterRules {
 	}
 	
 	def MethodRule createSetterRule(AnnotationMirror metaAnnotation, String avPrefix) {
-		val surroundAssignmentExprFragments = metaAnnotation.value("setterSurroundAssignmentExprFragments", typeof(String[]))
+		val surroundAssignmentExprFragments = metaAnnotation.value("surroundAssignmentExprFragments".withPrefix(avPrefix), typeof(String[]))
 		new MethodRule(metaAnnotation, avPrefix,
 			null,
 			[(it as VariableElement).setterName],

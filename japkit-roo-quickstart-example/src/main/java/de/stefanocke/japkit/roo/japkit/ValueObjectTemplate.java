@@ -9,10 +9,12 @@ import de.stefanocke.japkit.metaannotations.Case;
 import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Constructor;
 import de.stefanocke.japkit.metaannotations.Field;
+import de.stefanocke.japkit.metaannotations.Getter;
 import de.stefanocke.japkit.metaannotations.InnerClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.ParamNames;
+import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
@@ -43,7 +45,7 @@ public abstract class ValueObjectTemplate {
 		
 		@Field(iterator = "#{properties}", nameExpr = "#{element.simpleName}", annotationMappings = @AnnotationMapping(
 				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
-						"org.springframework.format.annotation" }), generateGetter = true, generateSetter = true, commentFromSrc = true)
+						"org.springframework.format.annotation" }), getter=@Getter, setter=@Setter, commentFromSrc = true)
 		private SrcElementType field;
 		
 		
@@ -56,8 +58,9 @@ public abstract class ValueObjectTemplate {
 	
 	@Field(iterator = "#{properties}", nameExpr = "#{element.simpleName}",
 			annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
-					"org.springframework.format.annotation" }), generateGetter = true, getterCommentExpr = "Getter for #{element.simpleName}. \n@returns #{element.simpleName}\n",
-			getterSurroundReturnExprFragments = "defensiveCopyFragment", commentFromSrc=true)
+					"org.springframework.format.annotation" }), commentFromSrc = true, getter = @Getter(
+					surroundReturnExprFragments = "defensiveCopyFragment",
+					commentExpr = "Getter for #{element.simpleName}. \n@returns #{element.simpleName}\n"))
 	private SrcElementType field;
 
 	@Constructor(bodyExpr="//Some ctor code")

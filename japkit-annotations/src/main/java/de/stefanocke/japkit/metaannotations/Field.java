@@ -205,105 +205,25 @@ public @interface Field {
 	 */
 	String commentLang() default "";
 	
+	
 	/**
+	 * A Setter annotation here means to generate a setter for the field. The
+	 * annotation can be used to further customize the setter, but all values
+	 * are optional.
 	 * 
-	 * @return whether to generate a getter for the field
+	 * @return the setter annotation
 	 */
-	boolean generateGetter() default false;
-	
-	Matcher[] getterActivation() default {};
-	
-	Modifier[] getterModifiers() default { Modifier.PUBLIC };
+	Setter[] setter() default {};
 
-	AnnotationMapping[] getterAnnotationMappings() default {};
-	
 	/**
-	 * Names of code fragments to surround the return expression.
-	 */
-	String[] getterSurroundReturnExprFragments() default {};
-	
-	/**
+	 * A Getter annotation here means to generate a getter for the field. The
+	 * annotation can be used to further customize the getter, but all values
+	 * are optional.
 	 * 
-	 * @return names of the fragments to surround the generated code body.
+	 * @return the setter annotation
 	 */
-	String[] getterSurroundingFragments() default{};
+	Getter[] getter() default {};
 	
-	/**
-	 * 
-	 * @return names of the fragments to be inserted before the generated code body.
-	 */
-	String[] getterBeforeFragments() default{};
-	
-	/**
-	 * 
-	 * @return names of the fragments to be inserted before the generated code body.
-	 */
-	String[] getterAfterFragments() default{};
-	
-	
-	/**
-	 * 
-	 * @return an expression to create the JavaDoc comment
-	 */
-	String getterCommentExpr() default "";
-	
-	/**
-	 * 
-	 * @return the expression language for commentExpr
-	 */
-	String getterCommentLang() default "";
-	
-	
-	/**
-	 * 
-	 * @return whether to generate a setter for the field
-	 */
-	boolean generateSetter() default false;
-	
-	Matcher[] setterActivation() default {};
-	
-	Modifier[] setterModifiers() default { Modifier.PUBLIC };
-	
-	AnnotationMapping[] setterAnnotationMappings() default {};
-	
-	AnnotationMapping[] setterParamAnnotationMappings() default {};
-	
-	/**
-	 * Names of code fragments to surround the assignment expression.
-	 */
-	String[] setterSurroundAssignmentExprFragments() default {};
-	
-	/**
-	 * 
-	 * @return names of the fragments to surround the generated code body.
-	 */
-	String[] setterSurroundingFragments() default{};
-	
-	/**
-	 * 
-	 * @return names of the fragments to be inserted before the generated code body.
-	 */
-	String[] setterBeforeFragments() default{};
-	
-	/**
-	 * 
-	 * @return names of the fragments to be inserted before the generated code body.
-	 */
-	String[] setterAfterFragments() default{};
-	
-	/**
-	 * 
-	 * @return an expression to create the JavaDoc comment
-	 */
-	String setterCommentExpr() default "";
-	
-	/**
-	 * 
-	 * @return the expression language for commentExpr
-	 */
-	String setterCommentLang() default "";
-	
-
 	@interface List {
 		Field[] value();
 	}

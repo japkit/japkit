@@ -7,17 +7,19 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 
 import de.stefanocke.japkit.metaannotations.Field;
+import de.stefanocke.japkit.metaannotations.Getter;
+import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
 
 @Template
 public class IdAndVersion {
-	@Field(generateGetter=true, generateSetter=true)
+	@Field(getter=@Getter, setter=@Setter)
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Long id;
 
-	@Field(generateGetter=true, generateSetter=true)
+	@Field(getter=@Getter, setter=@Setter)
 	@Version
 	@Column(name = "version")
 	private Integer version;
