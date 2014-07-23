@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.processor
 
-import de.stefanocke.japkit.annotations.BeforeSet
 import de.stefanocke.japkit.gen.CodeBody
 import de.stefanocke.japkit.gen.GenEnumConstant
 import de.stefanocke.japkit.gen.GenField
@@ -27,10 +26,6 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 		if (!activation.nullOrEmpty && !activation.exists[matches(annotatedClass)]) {
 			return
 		}
-
-		
-		
-	
 
 		//TODO:  Maybe its better to define a separate annotations for this.
 		val createNameConstants = annotation.valueOrMetaValue("createNameConstants", Boolean, propertiesAnnotation)
@@ -161,7 +156,6 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 												addParameter(new GenParameter(p.name, p.type))
 												body = [
 													'''
-														«beforeSet(p, annotatedClass, annotation, propertiesAnnotation)»
 														this.«p.name» = «p.name»;
 													''']
 												comment = '''@param «p.name» «srcComment»'''
@@ -186,24 +180,6 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 		['''return «p.name»;''']
 	}
 
-	//TODO: Das ist sehr prototypisch! Ggf. mit immutabilty rules zu allgemeinen "GetSetModificationRules" o.ä. zusammenführen.
-	def beforeSet(Property p, TypeElement annotatedClass, AnnotationMirror annotation,
-		AnnotationMirror propertiesAnnotation) {
-		val beforeMethods = annotatedClass.declaredMethods.filter [
-			val am = annotationMirror(BeforeSet)
-			val allowedType = am?.value(it, "propertyType", TypeMirror)
-			am != null &&
-				(p.type.isSubtype(allowedType) || (p.type.kind.primitive && p.type.kind.boxed.isSubtype(allowedType))) //&& allowedType.asTypeElement.qualifiedName.toString == OBJECT)  // TODO: Filter by field annotation ...am.value(it, "fieldAnnotation" )
-		]
-
-		//TODO: Map the parameters.
-		'''
-			«FOR m : beforeMethods»
-				«(m.enclosingElement as TypeElement).qualifiedName».«m.simpleName»(«p.name»);  
-			«ENDFOR»
-		'''
-
-	}
 
 	override getSupportedMetaAnnotation() {
 		Properties.name
