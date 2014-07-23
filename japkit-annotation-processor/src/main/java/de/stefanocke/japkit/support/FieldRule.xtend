@@ -27,7 +27,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	
 	def addGetterRule() {
 		if (metaAnnotation?.value("generateGetter", boolean) == Boolean.TRUE) {
-			addDependentMemberRule(createGetterRule(metaAnnotation))
+			addDependentMemberRule(createGetterRule(metaAnnotation, "getter"))
 		}
 	}
 	
@@ -35,7 +35,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	
 	def addSetterRule() {
 		if (metaAnnotation?.value("generateSetter", boolean) == Boolean.TRUE) {
-			addDependentMemberRule(createSetterRule(metaAnnotation))
+			addDependentMemberRule(createSetterRule(metaAnnotation, "setter"))
 		}
 	}
 	

@@ -7,6 +7,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.VariableElement
 
 import static de.stefanocke.japkit.support.CodeFragmentRules.*
+import static extension de.stefanocke.japkit.support.RuleUtils.*
 
 class GetterSetterRules {
 	
@@ -14,42 +15,40 @@ class GetterSetterRules {
 	extension ElementsExtensions  = ExtensionRegistry.get(ElementsExtensions)
 	extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	
-	def MethodRule createGetterRule(AnnotationMirror metaAnnotation) {
-		val surroundReturnExprFragments = metaAnnotation.value("getterSurroundReturnExprFragments", typeof(String[]))
-		val getter = new MethodRule(metaAnnotation, "getter",
+	def MethodRule createGetterRule(AnnotationMirror metaAnnotation, String avPrefix) {
+		val surroundReturnExprFragments = metaAnnotation.value("surroundReturnExprFragments".withPrefix(avPrefix), typeof(String[]))
+		new MethodRule(metaAnnotation,  avPrefix,
 			null,
 			[(it as VariableElement).getterName],
-			createCommentRule(metaAnnotation, null, "getter")[e | '''@return «e.docComment?.toString?.trim»'''],
+			createCommentRule(metaAnnotation, null,  avPrefix)[e | '''@return «e.docComment?.toString?.trim»'''],
 			null,
 			[m, f|
 			'''return «surround(surroundReturnExprFragments, f.simpleName)»;
 			'''],
 			[it.asType]
 		)
-		getter
 	}
 	
-	def MethodRule createSetterRule(AnnotationMirror metaAnnotation) {
+	def MethodRule createSetterRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		val surroundAssignmentExprFragments = metaAnnotation.value("setterSurroundAssignmentExprFragments", typeof(String[]))
-		val setter = new MethodRule(metaAnnotation, "setter",
+		new MethodRule(metaAnnotation, avPrefix,
 			null,
 			[(it as VariableElement).setterName],
-			createCommentRule(metaAnnotation, null, "getter")[e | '''@param «e.simpleName» «e.docComment?.toString?.trim»'''],
-			createSetterParamRule(metaAnnotation),				
+			createCommentRule(metaAnnotation, null, avPrefix)[e | '''@param «e.simpleName» «e.docComment?.toString?.trim»'''],
+			createSetterParamRule(metaAnnotation, avPrefix),				
 			[m, f |
 			'''this.«f.simpleName» = «surround(surroundAssignmentExprFragments ,f.simpleName)»;
 			'''],
 			null
 		)
-		setter
 	}
 	
-	private def (Element)=>List<? extends GenParameter> createSetterParamRule(AnnotationMirror metaAnnotation) {
+	private def (Element)=>List<? extends GenParameter> createSetterParamRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		createParamRule(
 			null,
 			[it.simpleName.toString],
 			[it.asType],
-			createAnnotationMappingRules(metaAnnotation, null, "setterParam")
+			createAnnotationMappingRules(metaAnnotation, null, "param".withPrefix(avPrefix))
 		)
 	}
 }
