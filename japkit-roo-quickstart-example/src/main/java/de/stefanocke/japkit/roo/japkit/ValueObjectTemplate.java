@@ -43,10 +43,10 @@ public abstract class ValueObjectTemplate {
 	@ClassSelector(kind=ClassSelectorKind.GEN_INNER_CLASS_NAME, expr="Builder") //TODO!
 	public static abstract class Builder{
 		
-		@Field(iterator = "#{properties}", nameExpr = "#{element.simpleName}", annotationMappings = @AnnotationMapping(
+		@Field(iterator = "#{properties}", annotationMappings = @AnnotationMapping(
 				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 						"org.springframework.format.annotation" }), getter=@Getter(fluent=true), setter=@Setter(fluent=true, chain=true), commentFromSrc = true)
-		private SrcElementType field;
+		private SrcElementType srcElementName;
 		
 		
 		@ClassSelector(kind=ClassSelectorKind.EXPR, expr="#{currentGenClass.enclosingElement.asType()}")
@@ -56,13 +56,13 @@ public abstract class ValueObjectTemplate {
 		public abstract EnclosingClass build();
 	}
 	
-	@Field(iterator = "#{properties}", nameExpr = "#{element.simpleName}",
+	@Field(iterator = "#{properties}", 
 			annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 					"org.springframework.format.annotation" }), commentFromSrc = true, getter = @Getter(
 					fluent=true,
 					surroundReturnExprFragments = "defensiveCopyFragment",
 					commentExpr = "Getter for #{element.simpleName}. \n@returns #{element.simpleName}\n"))
-	private SrcElementType field;
+	private SrcElementType srcElementName;
 
 	@Constructor(bodyExpr="//Some ctor code")
 	private ValueObjectTemplate (){};

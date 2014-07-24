@@ -83,22 +83,23 @@ class RuleUtils {
 	/**
 	 * To set the name of the generated element either statically (AV: name) or dynamically (AV: nameExpr)
 	 */
-	public def (Object)=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
+	public def (Element)=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		val nameFromTemplate = template?.simpleName?.toString
 		if(metaAnnotation == null) return [nameFromTemplate]
 		val name = metaAnnotation.value("name".withPrefix(avPrefix), String)
 		val nameExpr = metaAnnotation.value("nameExpr".withPrefix(avPrefix), String)
 		val nameLang = metaAnnotation.value("nameLang".withPrefix(avPrefix), String);
 
-		[
-			if (!nameExpr.nullOrEmpty) {
+		[Element ruleSrcElement |
+			val result = if (!nameExpr.nullOrEmpty) {
 				eval(valueStack, nameExpr, nameLang, String, '''Member name could not be generated''',
 					nameFromTemplate ?: 'invalidMemberName')
 			} else if(!name.nullOrEmpty) {
 				name
 			} else {
-				nameFromTemplate
+				if(nameFromTemplate=="srcElementName") ruleSrcElement.simpleName.toString else nameFromTemplate
 			}
+			if(result.nullOrEmpty) ruleSrcElement.simpleName.toString else result
 		]
 	}
 	
@@ -146,7 +147,7 @@ class RuleUtils {
 			if (!type.isVoid) {
 				type
 			} else {
-				typeFromTemplate
+				typeFromTemplate ?: ruleSrcElement.srcType
 			}
 		]
 	}
