@@ -25,9 +25,10 @@ class GetterSetterRules {
 	
 	def MethodRule createGetterRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		val surroundReturnExprFragments = metaAnnotation.value("surroundReturnExprFragments".withPrefix(avPrefix), typeof(String[]))
+		val fluent =  metaAnnotation.value("fluent", boolean);
 		new MethodRule(metaAnnotation,  avPrefix,
 			null,
-			[(it as VariableElement).getterName],
+			if(fluent) [it.simpleName.toString] else [(it as VariableElement).getterName],
 			createCommentRule(metaAnnotation, null,  avPrefix)[e | '''@return «e.docComment?.toString?.trim»'''],
 			null,
 			[m, f|
@@ -39,9 +40,10 @@ class GetterSetterRules {
 	
 	def MethodRule createSetterRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		val surroundAssignmentExprFragments = metaAnnotation.value("surroundAssignmentExprFragments".withPrefix(avPrefix), typeof(String[]))
+		val fluent =  metaAnnotation.value("fluent", boolean);
 		new MethodRule(metaAnnotation, avPrefix,
 			null,
-			[(it as VariableElement).setterName],
+			if(fluent) [it.simpleName.toString] else [(it as VariableElement).setterName],
 			createCommentRule(metaAnnotation, null, avPrefix)[e | '''@param «e.simpleName» «e.docComment?.toString?.trim»'''],
 			createSetterParamRule(metaAnnotation, avPrefix),				
 			[m, f |

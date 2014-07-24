@@ -12,6 +12,12 @@ public @interface Setter {
 	AnnotationMapping[] paramAnnotationMappings() default {};
 	
 	/**
+	 * 
+	 * @return true means, the "set" prefix is omitted.
+	 */
+	boolean fluent() default false;
+	
+	/**
 	 * Names of code fragments to surround the assignment expression.
 	 */
 	String[] surroundAssignmentExprFragments() default {};

@@ -10,6 +10,12 @@ public @interface Getter {
 	AnnotationMapping[] annotationMappings() default {};
 	
 	/**
+	 * 
+	 * @return true means, the "get" / "is" prefix is omitted.
+	 */
+	boolean fluent() default false;
+	
+	/**
 	 * Names of code fragments to surround the return expression.
 	 */
 	String[] surroundReturnExprFragments() default {};
