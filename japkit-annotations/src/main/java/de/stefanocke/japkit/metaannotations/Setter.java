@@ -18,6 +18,12 @@ public @interface Setter {
 	boolean fluent() default false;
 	
 	/**
+	 * 
+	 * @return true means, the setter returns 'this' to allow for chaining.
+	 */
+	boolean chain() default false;
+	
+	/**
 	 * Names of code fragments to surround the assignment expression.
 	 */
 	String[] surroundAssignmentExprFragments() default {};

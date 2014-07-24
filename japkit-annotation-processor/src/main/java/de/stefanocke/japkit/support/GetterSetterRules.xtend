@@ -11,9 +11,10 @@ import static extension de.stefanocke.japkit.support.RuleUtils.*
 
 class GetterSetterRules {
 	
-	extension JavaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
-	extension ElementsExtensions  = ExtensionRegistry.get(ElementsExtensions)
-	extension RuleUtils = ExtensionRegistry.get(RuleUtils)
+	val extension JavaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
+	val extension ElementsExtensions  = ExtensionRegistry.get(ElementsExtensions)
+	val extension RuleUtils = ExtensionRegistry.get(RuleUtils)
+	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	
 	def MethodRule createGetterRuleFromGetterAV(AnnotationMirror metaAnnotation) {
 		metaAnnotation?.value("getter", AnnotationMirror)?.createGetterRule(null)
@@ -41,15 +42,20 @@ class GetterSetterRules {
 	def MethodRule createSetterRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		val surroundAssignmentExprFragments = metaAnnotation.value("surroundAssignmentExprFragments".withPrefix(avPrefix), typeof(String[]))
 		val fluent =  metaAnnotation.value("fluent", boolean);
+		val chain =  metaAnnotation.value("chain", boolean);
 		new MethodRule(metaAnnotation, avPrefix,
 			null,
 			if(fluent) [it.simpleName.toString] else [(it as VariableElement).setterName],
 			createCommentRule(metaAnnotation, null, avPrefix)[e | '''@param «e.simpleName» «e.docComment?.toString?.trim»'''],
 			createSetterParamRule(metaAnnotation, avPrefix),				
 			[m, f |
-			'''this.«f.simpleName» = «surround(surroundAssignmentExprFragments ,f.simpleName)»;
+			'''
+			this.«f.simpleName» = «surround(surroundAssignmentExprFragments ,f.simpleName)»;
+			«IF chain»
+			return this;
+			«ENDIF»
 			'''],
-			null
+			if(chain) [currentGeneratedClass.asType] else null
 		)
 	}
 	
