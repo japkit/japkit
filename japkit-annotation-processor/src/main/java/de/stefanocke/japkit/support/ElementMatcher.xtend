@@ -20,6 +20,8 @@ class ElementMatcher {
 	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	val extension TypesExtensions typesExtensions = ExtensionRegistry.get(TypesExtensions)
 
+	String src
+	String srcLang
 	Modifier[] srcModifiers
 	Modifier[] srcModifiersNot
 	Set<ElementKind> srcKind
@@ -52,10 +54,11 @@ class ElementMatcher {
 		]
 	}
 
-	def boolean matches(Element e) {
-
-		//messager.printMessage(Kind.OTHER, '''Element «ve.simpleName». SrcAnnotations: «ve.annotationMirrors.map[fqn]» «allSrcAnnotationsArePresent(ve)» «srcType» «ve.asType.isSubtype(srcType)»''')
-		val result = e.hasAllModifiers(srcModifiers)
+	def boolean matches(Element originalSrcElement) {
+		val e = srcElement(originalSrcElement) 
+		
+		val result = (e!=null)
+		&& e.hasAllModifiers(srcModifiers)
 		&& e.hasNotModifiers(srcModifiersNot)
 		&& e.hasAnyKind(srcKind)
 		&& e.hasAllAnnotations(srcAnnotations)
@@ -85,6 +88,14 @@ class ElementMatcher {
 		
 		result
 	}
+	
+	def Element srcElement(Element element) {
+			if(src.nullOrEmpty) element else 
+				eval(element, src, srcLang, Element, '''Could not evaluate source element expression '«src»' in element matcher. ''', null)
+			
+		
+	}
+	
 	
 	def boolean isNotDeclaredBy(Element element, Set<String> notDeclaredByFqns){
 		notDeclaredByFqns.nullOrEmpty || !notDeclaredByFqns.contains((element.enclosingElement as TypeElement).qualifiedName.toString)
@@ -132,8 +143,6 @@ class ElementMatcher {
 	
 	
 	def boolean fulfillsCondition(Element element) {
-			
-			//TODO: Wenn eine expression auf ein TypeElement zugreift, muss eine Dependency registriert werden!
 			condition.nullOrEmpty || {
 				eval(element, condition, conditionLang, Boolean, '''Could not evaluate condition '«condition»' in element matcher. ''', false)
 			}
@@ -181,6 +190,8 @@ class ElementMatcher {
 	
 	
 	new(AnnotationMirror am) {
+		_src =  am.value("src", String)
+		_srcLang =  am.value("srcLang", String)
 		_srcModifiers = am.value("srcModifiers", typeof(Modifier[]))
 		_srcModifiersNot = am.value("srcModifiersNot", typeof(Modifier[]))
 		_srcKind = am.value("srcKind", typeof(ElementKind[]))?.toSet

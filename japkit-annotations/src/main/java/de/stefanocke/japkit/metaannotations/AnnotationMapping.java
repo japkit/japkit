@@ -21,6 +21,18 @@ public @interface AnnotationMapping {
 	String id() default "";
 
 	/**
+	 * Optional expression to determine the element to which the checks of the matcher are applied to. By default this is the current source element (#{element}). 
+	 * @return the expression
+	 */
+	String src() default "";
+
+	/**
+	 * 
+	 * @return language for the src expression. Defaults to Java EL.
+	 */
+	String srcLang() default "";
+	
+	/**
 	 * All of those modifiers must be present at the source element for the rule
 	 * to apply.
 	 * 
