@@ -12,6 +12,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.metaannotations.InnerClass
 import de.stefanocke.japkit.metaannotations.Constructor
+import de.stefanocke.japkit.gen.GenElement
 
 @Data
 class TemplateRule {
@@ -19,6 +20,7 @@ class TemplateRule {
 	protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension RelatedTypes relatedTypes = ExtensionRegistry.get(RelatedTypes)
 	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	val RuleUtils ru = ExtensionRegistry.get(RuleUtils)
 
 	TypeElement templateClass
 	AnnotationMirror templateAnnotation
@@ -26,6 +28,7 @@ class TemplateRule {
 	List<MethodRule> methodRules
 	List<FieldRule> fieldRules
 	List<InnerClassRule> innerClassRules
+	(GenElement, Element)=>List<? extends AnnotationMirror> annotationsRule
 
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
 		_templateClass = templateClass
@@ -45,6 +48,8 @@ class TemplateRule {
 		_innerClassRules = templateClass.declaredTypes.map[it -> annotationMirror(InnerClass)].filter[value != null].map [
 			new InnerClassRule(value, key)
 		].toList
+		
+		_annotationsRule=ru.createAnnotationMappingRules(templateAnnotation, templateClass, null)
 
 	}
 
@@ -58,6 +63,8 @@ class TemplateRule {
 			
 			valueStack.push
 			valueStack.putELVariables(ruleSrcElement, triggerAnnotation, templateAnnotation)
+			
+			generatedClass.annotationMirrors = annotationsRule.apply(generatedClass, ruleSrcElement)
 
 			addInterfaces(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
 			addInnerClasses(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)

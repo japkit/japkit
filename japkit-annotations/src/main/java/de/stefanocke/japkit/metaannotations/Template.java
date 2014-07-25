@@ -8,4 +8,10 @@ package de.stefanocke.japkit.metaannotations;
 @MemberGeneratorAnnotation
 public @interface Template {
 	Var[] vars() default {};
+	
+	/**
+	 * 
+	 * @return the annotation mappings
+	 */
+	AnnotationMapping[] annotationMappings() default {};
 }

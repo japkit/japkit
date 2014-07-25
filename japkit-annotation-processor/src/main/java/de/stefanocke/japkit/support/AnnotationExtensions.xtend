@@ -107,11 +107,11 @@ class AnnotationExtensions {
 	 }
 	 
 	 def annotationMappings(AnnotationMirror annotation, CharSequence avName, AnnotationMirror metaAnnotation){
-	 	 annotation.valueOrMetaValue(avName, typeof(AnnotationMirror[]), metaAnnotation).map[createAnnotationMappingRule(it)]
+	 	 annotation.valueOrMetaValue(avName, typeof(AnnotationMirror[]), metaAnnotation)?.map[createAnnotationMappingRule(it)] ?: emptyList
 	 }
 	 
 	 def annotationMappings(AnnotationMirror annotation, CharSequence avName){
-	 	 annotation.value(avName, typeof(AnnotationMirror[])).map[createAnnotationMappingRule(it)]
+	 	 annotation.value(avName, typeof(AnnotationMirror[]))?.map[createAnnotationMappingRule(it)] ?: emptyList
 	 }
 	 
 	

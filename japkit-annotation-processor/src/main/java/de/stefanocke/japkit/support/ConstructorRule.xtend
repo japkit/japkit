@@ -9,6 +9,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.gen.GenElement
 
 class ConstructorRule extends ExecutableElementRule<GenConstructor> {
 
@@ -18,7 +19,7 @@ class ConstructorRule extends ExecutableElementRule<GenConstructor> {
 	
 	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
 		(Element)=>Set<Modifier> modifiersRule,
-		(Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule,
+		(GenElement, Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule,
 		(Element)=>List<? extends GenParameter> paramRules, (GenConstructor, Element)=>CharSequence codeRule,
 		(Element)=>TypeMirror returnTypeRule) {
 		super(activationRule, srcElementsRule, RuleUtils.NO_NAME, modifiersRule, annotationsRule, commentRule, paramRules, codeRule)

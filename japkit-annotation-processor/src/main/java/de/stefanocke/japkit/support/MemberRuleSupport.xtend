@@ -33,7 +33,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	(Element)=>Iterable<? extends Element> srcElementsRule
 	(Element)=>String nameRule
 	(Element)=>Set<Modifier> modifiersRule
-	(Element)=>List<? extends AnnotationMirror> annotationsRule
+	(GenElement, Element)=>List<? extends AnnotationMirror> annotationsRule
 	(Element)=>CharSequence commentRule
 	
 	//members to be created for the generated member. for instance, getters and setters to  be created for the generated field
@@ -72,7 +72,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	
 	new((Element)=>boolean activationRule,
 		(Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule,
-		(Element)=>Set<Modifier> modifiersRule, (Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule) {
+		(Element)=>Set<Modifier> modifiersRule, (GenElement, Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule) {
 		_metaAnnotation = null
 		_template = null
 		_avPrefix = null
@@ -80,7 +80,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_srcElementsRule = srcElementsRule ?: RuleUtils.SINGLE_SRC_ELEMENT
 		_nameRule = nameRule
 		_modifiersRule = modifiersRule ?: [emptySet]
-		_annotationsRule = annotationsRule ?: [emptyList]
+		_annotationsRule = annotationsRule ?: [g,e |emptyList]
 		_commentRule = commentRule ?: [""]
 	}
 	
@@ -102,7 +102,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		ru.createModifiersRule(metaAnnotation, template, avPrefix)
 	}
 	
-	protected def (Element)=>List<? extends AnnotationMirror> createAnnotationsRule(){
+	protected def (GenElement, Element)=>List<? extends AnnotationMirror> createAnnotationsRule(){
 		ru.createAnnotationMappingRules(metaAnnotation, template, avPrefix)
 	}
 	
@@ -168,7 +168,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 
 	protected def void applyRulesAfterCreation(T member, Element ruleSrcElement) {
 		member.modifiers=modifiersRule.apply(ruleSrcElement)
-		member.annotationMirrors=annotationsRule.apply(ruleSrcElement)
+		member.annotationMirrors=annotationsRule.apply(member, ruleSrcElement)
 		member.comment = commentRule.apply(ruleSrcElement)
 	}
 	

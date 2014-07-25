@@ -15,6 +15,9 @@ import javax.lang.model.type.TypeMirror
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import javax.lang.model.element.ExecutableElement
 import de.stefanocke.japkit.metaannotations.Param
+import de.stefanocke.japkit.gen.GenElement
+import java.util.ArrayList
+import de.stefanocke.japkit.gen.GenAnnotationMirror
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -106,18 +109,22 @@ class RuleUtils {
 	/**
 	 * Copies annotations from template at first (if there are any ) and then applies the annotation mappings
 	 */
-	public def (Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
+	public def (GenElement, Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
 		AnnotationMirror metaAnnotation, Element template, String avPrefix) {
+				
+		val mappings = metaAnnotation?.annotationMappings("annotationMappings".withPrefix(avPrefix), null);
 		
-		
-		if(metaAnnotation==null) return [e | template?.copyAnnotations ?: newArrayList]
-		val mappings = metaAnnotation.annotationMappings("annotationMappings".withPrefix(avPrefix), null);
-		
-		[ Element ruleSrcElement |
-			val annotationsFromTemplate = template?.copyAnnotations ?: newArrayList;
-			mapAnnotations(ruleSrcElement, mappings, annotationsFromTemplate)
+		[ genElement, ruleSrcElement |
+			val existingAnnotationsAndTemplateAnnotations = new ArrayList(genElement.annotationMirrors.map[it as GenAnnotationMirror])
+			existingAnnotationsAndTemplateAnnotations.addAll(template?.copyAnnotations ?: emptyList)
+						
+			if(mappings.nullOrEmpty) return existingAnnotationsAndTemplateAnnotations
+			
+			mapAnnotations(ruleSrcElement, mappings, existingAnnotationsAndTemplateAnnotations)
 		]
 	}
+	
+	 
 	
 	public def (Object)=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		val templateModifiers = template?.modifiers ?: emptySet
@@ -174,7 +181,7 @@ class RuleUtils {
 
 	}
 	
-	public def (Element)=>List<? extends GenParameter> createParamRule((Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule, (Element)=>TypeMirror typeRule, (Element)=>List<? extends AnnotationMirror> annotationMappingRules) {
+	public def (Element)=>List<? extends GenParameter> createParamRule((Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule, (Element)=>TypeMirror typeRule, (GenElement, Element)=>List<? extends AnnotationMirror> annotationMappingRules) {
 		[ Element ruleSrcElement |
 			(srcElementsRule ?: SINGLE_SRC_ELEMENT).apply(ruleSrcElement).map [ e |
 				valueStack.scope(e) [
@@ -184,7 +191,7 @@ class RuleUtils {
 					val param = new GenParameter(name, type)
 						
 					if(annotationMappingRules!=null){	
-						param.annotationMirrors = annotationMappingRules.apply(e)
+						param.annotationMirrors = annotationMappingRules.apply(param, e)
 					}
 					param
 				]

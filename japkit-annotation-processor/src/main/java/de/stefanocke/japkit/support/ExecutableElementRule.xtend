@@ -28,7 +28,7 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	
 	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
 		(Element)=>String nameRule, (Element)=>Set<Modifier> modifiersRule,
-		(Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule,
+		(GenElement, Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule,
 		(Element)=>List<? extends GenParameter> paramRules, (G, Element)=>CharSequence codeRule) {
 		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule, commentRule)
 		

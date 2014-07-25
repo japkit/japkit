@@ -1,12 +1,12 @@
 package de.stefanocke.japkit.roo.japkit.web;
 
 import java.util.Arrays;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,14 +14,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import de.stefanocke.japkit.metaannotations.Param;
-import de.stefanocke.japkit.metaannotations.Var;
+import de.stefanocke.japkit.metaannotations.AVMapping;
+import de.stefanocke.japkit.metaannotations.AnnotationMapping;
 import de.stefanocke.japkit.metaannotations.Method;
+import de.stefanocke.japkit.metaannotations.Param;
 import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
+import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 
-@Template
+@Controller
+@Template(annotationMappings=@AnnotationMapping(targetAnnotation = RequestMapping.class, valueMappings = @AVMapping(name = "value", expr = "/#{path}")))
 public abstract class ControllerMembers {
 	@Method(imports = ControllerUtil.class, bodyExpr = "if (bindingResult.hasErrors()) {\n" 
 			+ "\tpopulateEditForm(uiModel, fbo);\n"

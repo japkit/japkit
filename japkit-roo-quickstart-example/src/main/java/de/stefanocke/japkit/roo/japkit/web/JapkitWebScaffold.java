@@ -90,9 +90,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		annotationMappings = {
 				@AnnotationMapping(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMappingMode.MERGE,
 						valueMappings = { @AVMapping(name = "propertyNames", mode = AVMappingMode.IGNORE,
-								expr = "viewProperties.collect{it.name}", lang = "GroovyScript"), }),
-				@AnnotationMapping(targetAnnotation = Controller.class),
-				@AnnotationMapping(targetAnnotation = RequestMapping.class, valueMappings = @AVMapping(name = "value", expr = "/#{path}")) },
+								expr = "viewProperties.collect{it.name}", lang = "GroovyScript"), })},
 		members = {
 				@Members(ControllerMembers.class),
 				@Members(activation = @Matcher(condition = "#{entityAnnotation.activeRecord}"), value = ControllerMembersActiveRecord.class),
