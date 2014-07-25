@@ -50,17 +50,17 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		
 		// The properties to show
 		@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = ViewModelSelector.class, includeRules = @Matcher(
-				srcAnnotationsNot = { Id.class, Version.class }))),
-		@Var(name = "explicitTableProperties", expr = "#{viewProperties}", matcher=@Matcher(srcAnnotations=TableColumn.class)),
+				annotationsNot = { Id.class, Version.class }))),
+		@Var(name = "explicitTableProperties", expr = "#{viewProperties}", matcher=@Matcher(annotations=TableColumn.class)),
 		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
 		@Var(name = "columnAnnotation", isFunction=true, annotation = TableColumn.class),
 
 		// Some matchers for categorize properties
-		@Var(name = "isDatetime", isFunction = true, matcher = @Matcher(srcSingleValueTypeCategory = TypeCategory.TEMPORAL)),
-		@Var(name = "isBoolean", isFunction = true, matcher = @Matcher(srcSingleValueType = boolean.class)),
-		@Var(name = "isEnum", isFunction = true, matcher = @Matcher(srcSingleValueTypeCategory = TypeCategory.ENUM)),
-		@Var(name = "isRequired", isFunction = true, matcher = @Matcher(srcAnnotations = NotNull.class)),
-		@Var(name = "isPast", isFunction = true, matcher = @Matcher(srcAnnotations = Past.class)),
+		@Var(name = "isDatetime", isFunction = true, matcher = @Matcher(singleValueTypeCategory = TypeCategory.TEMPORAL)),
+		@Var(name = "isBoolean", isFunction = true, matcher = @Matcher(singleValueType = boolean.class)),
+		@Var(name = "isEnum", isFunction = true, matcher = @Matcher(singleValueTypeCategory = TypeCategory.ENUM)),
+		@Var(name = "isRequired", isFunction = true, matcher = @Matcher(annotations = NotNull.class)),
+		@Var(name = "isPast", isFunction = true, matcher = @Matcher(annotations = Past.class)),
 		@Var(name = "patternAnnotation", isFunction = true, annotation=Pattern.class),
 		@Var(name = "regexp", isFunction = true, expr = "#{element.patternAnnotation.regexp}"),
 		// The view properties that have a date or time type
@@ -69,7 +69,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		@Var(name = "enumProperties", expr = "#{isEnum.filter(viewProperties)}"),
 		@Var(name = "dtfModelAttr", isFunction = true, expr = "#{fboShortId}_#{element.name.toLowerCase()}_date_format"),
 		
-		@Var(name = "isEntity", isFunction = true,  matcher = @Matcher(srcSingleValueTypeAnnotations = JapkitEntity.class)),
+		@Var(name = "isEntity", isFunction = true,  matcher = @Matcher(singleValueTypeAnnotations = JapkitEntity.class)),
 		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
 		@Var(name = "relatedEntities", expr = "entityProperties.collect{it.singleValueType.asElement()}", lang="GroovyScript"),
 		

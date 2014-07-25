@@ -22,7 +22,7 @@ public abstract class ToString {
 			
 			bodyCases={
 				//Only summary for collections
-				@Case(matcher=@Matcher(srcTypeCategory=TypeCategory.COLLECTION), 
+				@Case(matcher=@Matcher(typeCategory=TypeCategory.COLLECTION), 
 						expr = "append(\"#{element.simpleName}\", #{element.getter.simpleName}(), false).\n"),
 			},
 			bodyExpr = "append(\"#{element.simpleName}\", #{element.getter.simpleName}()).\n",

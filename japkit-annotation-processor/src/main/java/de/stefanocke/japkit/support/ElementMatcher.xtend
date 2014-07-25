@@ -22,24 +22,24 @@ class ElementMatcher {
 
 	String src
 	String srcLang
-	Modifier[] srcModifiers
-	Modifier[] srcModifiersNot
-	Set<ElementKind> srcKind
-	DeclaredType[] srcAnnotations
-	DeclaredType[] srcAnnotationsNot
+	Modifier[] modifiers
+	Modifier[] modifiersNot
+	Set<ElementKind> kind
+	DeclaredType[] annotations
+	DeclaredType[] annotationsNot
 	DeclaredType[] enclosingAnnotations
 	DeclaredType[] enclosingAnnotationsNot
 	Set<String> notDeclaredBy //FQNs
-	TypeMirror srcType
-	TypeCategory[] srcTypeCategory
-	TypeCategory[] srcTypeCategoryNot
-	DeclaredType[] srcTypeAnnotations
-	TypeMirror srcSingleValueType
-	TypeCategory[] srcSingleValueTypeCategory
-	TypeCategory[] srcSingleValueTypeCategoryNot
-	DeclaredType[] srcSingleValueTypeAnnotations
-	DeclaredType[] srcTypeArg0Annotations
-	DeclaredType[] srcTypeArg1Annotations
+	TypeMirror type
+	TypeCategory[] typeCategory
+	TypeCategory[] typeCategoryNot
+	DeclaredType[] typeAnnotations
+	TypeMirror singleValueType
+	TypeCategory[] singleValueTypeCategory
+	TypeCategory[] singleValueTypeCategoryNot
+	DeclaredType[] singleValueTypeAnnotations
+	DeclaredType[] typeArg0Annotations
+	DeclaredType[] typeArg1Annotations
 	String condition
 	String conditionLang
 	ConstraintRule[] constraints
@@ -58,27 +58,27 @@ class ElementMatcher {
 		val e = srcElement(originalSrcElement) 
 		
 		val result = (e!=null)
-		&& e.hasAllModifiers(srcModifiers)
-		&& e.hasNotModifiers(srcModifiersNot)
-		&& e.hasAnyKind(srcKind)
-		&& e.hasAllAnnotations(srcAnnotations)
-		&& e.hasNotAnnotations(srcAnnotationsNot)
+		&& e.hasAllModifiers(modifiers)
+		&& e.hasNotModifiers(modifiersNot)
+		&& e.hasAnyKind(kind)
+		&& e.hasAllAnnotations(annotations)
+		&& e.hasNotAnnotations(annotationsNot)
 		&& e.enclosingElement.hasAllAnnotations(enclosingAnnotations)
 		&& e.enclosingElement.hasNotAnnotations(enclosingAnnotationsNot)
 		&& e.isNotDeclaredBy(notDeclaredBy)
 		
-		&& e.srcType.hasAllAnnotations(srcTypeAnnotations)		
-		&& e.srcType.isSubtype(srcType)
-		&& (srcTypeCategory.nullOrEmpty || e.srcType.belongsToOneOfCategories(srcTypeCategory))	
-		&& !e.srcType.belongsToOneOfCategories(srcTypeCategoryNot)	
+		&& e.srcType.hasAllAnnotations(typeAnnotations)		
+		&& e.srcType.isSubtype(type)
+		&& (typeCategory.nullOrEmpty || e.srcType.belongsToOneOfCategories(typeCategory))	
+		&& !e.srcType.belongsToOneOfCategories(typeCategoryNot)	
 			
-		&& e.srcSingleValueType.hasAllAnnotations(srcSingleValueTypeAnnotations)
-		&& e.srcSingleValueType.isSubtype(srcSingleValueType)
-		&& (srcSingleValueTypeCategory.nullOrEmpty || e.srcSingleValueType.belongsToOneOfCategories(srcSingleValueTypeCategory))	
-		&& !e.srcSingleValueType.belongsToOneOfCategories(srcSingleValueTypeCategoryNot)	
+		&& e.srcSingleValueType.hasAllAnnotations(singleValueTypeAnnotations)
+		&& e.srcSingleValueType.isSubtype(singleValueType)
+		&& (singleValueTypeCategory.nullOrEmpty || e.srcSingleValueType.belongsToOneOfCategories(singleValueTypeCategory))	
+		&& !e.srcSingleValueType.belongsToOneOfCategories(singleValueTypeCategoryNot)	
 			
-		&& e.srcTypeArgHasAllAnnotations(srcTypeArg0Annotations, 0)
-		&& e.srcTypeArgHasAllAnnotations(srcTypeArg1Annotations, 1)
+		&& e.srcTypeArgHasAllAnnotations(typeArg0Annotations, 0)
+		&& e.srcTypeArgHasAllAnnotations(typeArg1Annotations, 1)
 		&& fulfillsCondition(e)
 		
 		//evaluate all constraints, if the matcher matches
@@ -192,24 +192,24 @@ class ElementMatcher {
 	new(AnnotationMirror am) {
 		_src =  am.value("src", String)
 		_srcLang =  am.value("srcLang", String)
-		_srcModifiers = am.value("srcModifiers", typeof(Modifier[]))
-		_srcModifiersNot = am.value("srcModifiersNot", typeof(Modifier[]))
-		_srcKind = am.value("srcKind", typeof(ElementKind[]))?.toSet
-		_srcAnnotations = am.value("srcAnnotations", typeof(DeclaredType[]))
-		_srcAnnotationsNot = am.value("srcAnnotationsNot", typeof(DeclaredType[]))
+		_modifiers = am.value("modifiers", typeof(Modifier[]))
+		_modifiersNot = am.value("modifiersNot", typeof(Modifier[]))
+		_kind = am.value("kind", typeof(ElementKind[]))?.toSet
+		_annotations = am.value("annotations", typeof(DeclaredType[]))
+		_annotationsNot = am.value("annotationsNot", typeof(DeclaredType[]))
 		_enclosingAnnotations = am.value("enclosingAnnotations", typeof(DeclaredType[]))
 		_enclosingAnnotationsNot = am.value("enclosingAnnotationsNot", typeof(DeclaredType[]))
 		_notDeclaredBy = am.value("notDeclaredBy", typeof(DeclaredType[]))?.map[asTypeElement.qualifiedName.toString].toSet
-		_srcType = am.value("srcType", TypeMirror)
-		_srcTypeCategory = am.value("srcTypeCategory", typeof(TypeCategory[]))	
-		_srcTypeCategoryNot = am.value("srcTypeCategoryNot", typeof(TypeCategory[]))	
-		_srcTypeAnnotations = am.value("srcTypeAnnotations", typeof(DeclaredType[]))	
-		_srcSingleValueType = am.value("srcSingleValueType", TypeMirror)
-		_srcSingleValueTypeCategory = am.value("srcSingleValueTypeCategory", typeof(TypeCategory[]))	
-		_srcSingleValueTypeCategoryNot = am.value("srcSingleValueTypeCategoryNot", typeof(TypeCategory[]))	
-		_srcSingleValueTypeAnnotations = am.value("srcSingleValueTypeAnnotations", typeof(DeclaredType[]))
-		_srcTypeArg0Annotations = am.value("srcTypeArg0Annotations", typeof(DeclaredType[]))	
-		_srcTypeArg1Annotations = am.value("srcTypeArg1Annotations", typeof(DeclaredType[]))	
+		_type = am.value("type", TypeMirror)
+		_typeCategory = am.value("typeCategory", typeof(TypeCategory[]))	
+		_typeCategoryNot = am.value("typeCategoryNot", typeof(TypeCategory[]))	
+		_typeAnnotations = am.value("typeAnnotations", typeof(DeclaredType[]))	
+		_singleValueType = am.value("singleValueType", TypeMirror)
+		_singleValueTypeCategory = am.value("singleValueTypeCategory", typeof(TypeCategory[]))	
+		_singleValueTypeCategoryNot = am.value("singleValueTypeCategoryNot", typeof(TypeCategory[]))	
+		_singleValueTypeAnnotations = am.value("singleValueTypeAnnotations", typeof(DeclaredType[]))
+		_typeArg0Annotations = am.value("typeArg0Annotations", typeof(DeclaredType[]))	
+		_typeArg1Annotations = am.value("typeArg1Annotations", typeof(DeclaredType[]))	
 		_condition =  am.value("condition", String)
 		_conditionLang =  am.value("conditionLang", String)
 		_constraints = am.value("constraints", typeof(AnnotationMirror[])).map[new ConstraintRule(it)]	

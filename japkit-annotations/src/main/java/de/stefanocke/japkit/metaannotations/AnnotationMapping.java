@@ -38,7 +38,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return the modifiers
 	 */
-	Modifier[] srcModifiers() default {};
+	Modifier[] modifiers() default {};
 	
 	/**
 	 * If any of those modifiers is present on the source element, the rule is
@@ -46,7 +46,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return
 	 */
-	Modifier[] srcModifiersNot() default {};
+	Modifier[] modifiersNot() default {};
 
 	/**
 	 * All of those annotations must be present on the source element for the
@@ -54,7 +54,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return the annotations
 	 */
-	Class<? extends Annotation>[] srcAnnotations() default {};
+	Class<? extends Annotation>[] annotations() default {};
 	
 	/**
 	 * If any of those annotations is present on the source element, the
@@ -62,7 +62,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return the annotations
 	 */
-	Class<? extends Annotation>[] srcAnnotationsNot() default {};
+	Class<? extends Annotation>[] annotationsNot() default {};
 
 	/**
 	 * All of those annotations must be present on the enclosing element of the
@@ -101,7 +101,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return the annotations
 	 */
-	Class<?> srcType() default Object.class;
+	Class<?> type() default Object.class;
 	
 	/**
 	 * Same semantics as srcType, but in case of a generic collection, the collection's element type is considered.
@@ -110,7 +110,7 @@ public @interface AnnotationMapping {
 	 *  
 	 * @return the type
 	 */
-	Class<?> srcSingleValueType() default Object.class;
+	Class<?> singleValueType() default Object.class;
 	
 	/**
 	 * The source element's type must belong to at least one of the given categories.
@@ -122,7 +122,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return the categories
 	 */
-	TypeCategory[] srcTypeCategory() default {};
+	TypeCategory[] typeCategory() default {};
 	
 	/**
 	 * Same semantics as srcTypeCategory, but in case of a generic collection, the collection's element type is considered.
@@ -131,7 +131,7 @@ public @interface AnnotationMapping {
 	 *  
 	 * @return the type categories
 	 */
-	TypeCategory[] srcSingleValueTypeCategory() default {};
+	TypeCategory[] singleValueTypeCategory() default {};
 
 	/**
 	 * The source element's must not belong to any of the given categories. 
@@ -142,7 +142,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return the type categories
 	 */
-	TypeCategory[] srcTypeCategoryNot() default {};
+	TypeCategory[] typeCategoryNot() default {};
 	
 	/**
 	 * Same semantics as srcTypeCategoryNot, but in case of a generic collection, the collection's element type is considered.
@@ -151,7 +151,7 @@ public @interface AnnotationMapping {
 	 *  
 	 * @return the type categories
 	 */
-	TypeCategory[] srcSingleValueTypeCategoryNot() default {};
+	TypeCategory[] singleValueTypeCategoryNot() default {};
 	
 	/**
 	 * The source element's type must have those annotations for the rule to
@@ -165,7 +165,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return the annotations
 	 */
-	Class<? extends Annotation>[] srcTypeAnnotations() default {};
+	Class<? extends Annotation>[] typeAnnotations() default {};
 	
 	/**
 	 * Same semantics as srcTypeAnnotations, but in case of a generic collection, the collection's element type is considered.
@@ -174,7 +174,7 @@ public @interface AnnotationMapping {
 	 *  
 	 * @return the annotations
 	 */
-	Class<? extends Annotation>[] srcSingleValueTypeAnnotations() default {};
+	Class<? extends Annotation>[] singleValueTypeAnnotations() default {};
 
 	/**
 	 * The source element's type must have at least one type argument and the
@@ -188,7 +188,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return the annotations
 	 */
-	Class<? extends Annotation>[] srcTypeArg0Annotations() default {};
+	Class<? extends Annotation>[] typeArg0Annotations() default {};
 
 	/**
 	 * The source element's type must have at least two type arguments and the
@@ -202,7 +202,7 @@ public @interface AnnotationMapping {
 	 * 
 	 * @return the annotations
 	 */
-	Class<? extends Annotation>[] srcTypeArg1Annotations() default {};
+	Class<? extends Annotation>[] typeArg1Annotations() default {};
 
 	/**
 	 * Condition expression. If not empty, it must evaluate to true for the rule

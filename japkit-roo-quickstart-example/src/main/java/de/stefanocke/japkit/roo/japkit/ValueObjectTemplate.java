@@ -24,10 +24,10 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 
 
 @Template(vars = {
-		@Var(name = "validationFragment", code = @CodeFragment(activation = @Matcher(srcAnnotations = NotNull.class),
+		@Var(name = "validationFragment", code = @CodeFragment(activation = @Matcher(annotations = NotNull.class),
 				expr = "if(#{element.simpleName}==null){\n"
 						+ "  throw new IllegalArgumentException(\"#{element.simpleName} must not be null.\");\n" + "}\n")),
-		@Var(name = "defensiveCopyFragment", code = @CodeFragment(imports=Date.class, cases = { @Case(matcher = @Matcher(srcType = Date.class),
+		@Var(name = "defensiveCopyFragment", code = @CodeFragment(imports=Date.class, cases = { @Case(matcher = @Matcher(type = Date.class),
 				expr = "new Date(#{surrounded}.getTime())")}))
 //		,
 //		@Var(name = "tryFinallyTest", code = @CodeFragment(expr="try {\n" +

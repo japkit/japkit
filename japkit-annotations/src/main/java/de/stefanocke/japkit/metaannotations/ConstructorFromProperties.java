@@ -116,7 +116,7 @@ public @interface ConstructorFromProperties {
 	 * 
 	 * @return
 	 */
-	Matcher[] excludeRules() default { @Matcher(srcModifiers=Modifier.STATIC)};
+	Matcher[] excludeRules() default { @Matcher(modifiers=Modifier.STATIC)};
 
 	/**
 	 * Rules to decide which super constructors to call. For each super

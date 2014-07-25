@@ -131,7 +131,7 @@ public @interface Properties {
 	 * 
 	 * @return
 	 */
-	Matcher overridesMatcher() default @Matcher(srcKind = ElementKind.FIELD);
+	Matcher overridesMatcher() default @Matcher(kind = ElementKind.FIELD);
 
 
 	Modifier[] fieldModifiers() default { Modifier.PRIVATE };
