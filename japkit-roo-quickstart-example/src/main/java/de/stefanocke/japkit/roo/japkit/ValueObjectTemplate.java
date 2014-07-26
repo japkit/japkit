@@ -2,6 +2,7 @@ package de.stefanocke.japkit.roo.japkit;
 
 import java.util.Date;
 
+import javax.lang.model.element.Modifier;
 import javax.validation.constraints.NotNull;
 
 import de.stefanocke.japkit.metaannotations.AnnotationMapping;
@@ -12,6 +13,7 @@ import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.Getter;
 import de.stefanocke.japkit.metaannotations.InnerClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
+import de.stefanocke.japkit.metaannotations.Members;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Setter;
@@ -36,18 +38,15 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 //				"}\n"))
 })
 
-//getterSurroundReturnFragment
+
 public abstract class ValueObjectTemplate {
 	
-	@InnerClass
+	@InnerClass(members=@Members(Builder.class))
+	@Field(iterator = "#{properties}", modifiers=Modifier.PRIVATE, annotationMappings = @AnnotationMapping(
+			copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
+					"org.springframework.format.annotation" }), getter=@Getter(fluent=true), setter=@Setter(fluent=true, chain=true), commentFromSrc = true)
 	@ClassSelector(kind=ClassSelectorKind.GEN_INNER_CLASS_NAME, expr="Builder") //TODO!
 	public static abstract class Builder{
-		
-		@Field(iterator = "#{properties}", annotationMappings = @AnnotationMapping(
-				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
-						"org.springframework.format.annotation" }), getter=@Getter(fluent=true), setter=@Setter(fluent=true, chain=true), commentFromSrc = true)
-		private SrcElementType srcElementName;
-		
 		
 		@ClassSelector(kind=ClassSelectorKind.EXPR, expr="#{currentGenClass.enclosingElement.asType()}")
 		abstract static class EnclosingClass{}

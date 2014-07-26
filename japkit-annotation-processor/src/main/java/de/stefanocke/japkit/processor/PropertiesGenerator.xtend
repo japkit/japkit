@@ -144,7 +144,7 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 				delegateMethodRules.forEach[apply(generatedClass, genField /*genProperty */)]
 			}
 			
-			templateRules.forEach[it.apply(annotatedClass, generatedClass, annotation, ruleSourceElement)]
+			templateRules.forEach[it.apply(generatedClass, ruleSourceElement)]
 			
 		]
 
@@ -154,6 +154,11 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 
 	override getSupportedMetaAnnotation() {
 		Properties.name
+	}
+	
+	
+	override createMemberRule(TypeElement membersClass, AnnotationMirror metaAnnotationToBeProcessed) {
+		throw new UnsupportedOperationException("Not used here")
 	}
 
 }

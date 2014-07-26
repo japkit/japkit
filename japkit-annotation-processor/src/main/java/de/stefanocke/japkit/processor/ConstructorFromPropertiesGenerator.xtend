@@ -176,5 +176,9 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 	override getSupportedMetaAnnotation() {
 		ConstructorFromProperties.name
 	}
+	
+	override createMemberRule(TypeElement membersClass, AnnotationMirror metaAnnotationToBeProcessed) {
+		throw new UnsupportedOperationException("Not use here")
+	}
 
 }

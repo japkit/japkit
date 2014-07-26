@@ -9,9 +9,10 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure2
 
 @Data
-public abstract class MemberRuleSupport<E extends Element, T extends GenElement> {
+public abstract class MemberRuleSupport<E extends Element, T extends GenElement> implements Procedure2<GenTypeElement,Element>{
 	val protected extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 
 	//val extension RoundEnvironment roundEnv = ExtensionRegistry.get(RoundEnvironment)
@@ -119,7 +120,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		ExtensionRegistry.get(GenExtensions)
 	}
 
-	def void apply(GenTypeElement generatedClass, Element ruleSrcElement) {
+	override void apply(GenTypeElement generatedClass, Element ruleSrcElement) {
 
 		if (!activationRule.apply(ruleSrcElement)) {
 			return

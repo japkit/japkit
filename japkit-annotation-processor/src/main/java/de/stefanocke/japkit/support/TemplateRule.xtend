@@ -13,13 +13,15 @@ import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.metaannotations.InnerClass
 import de.stefanocke.japkit.metaannotations.Constructor
 import de.stefanocke.japkit.gen.GenElement
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure2
 
 @Data
-class TemplateRule {
+class TemplateRule implements Procedure2<GenTypeElement,Element>{
 
 	protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension RelatedTypes relatedTypes = ExtensionRegistry.get(RelatedTypes)
 	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val RuleUtils ru = ExtensionRegistry.get(RuleUtils)
 
 	TypeElement templateClass
@@ -53,24 +55,23 @@ class TemplateRule {
 
 	}
 
-	def apply(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation) {
-		apply(annotatedClass, generatedClass, triggerAnnotation, generatedClass)
+	def apply(GenTypeElement generatedClass) {
+		apply(generatedClass, generatedClass)
 	}
 
-	def void apply(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
-		Element ruleSrcElement) {
+	override void apply(GenTypeElement generatedClass, Element ruleSrcElement) {
 		try {
 			
 			valueStack.push
-			valueStack.putELVariables(ruleSrcElement, triggerAnnotation, templateAnnotation)
+			valueStack.putELVariables(ruleSrcElement, currentAnnotation, templateAnnotation)
 			
 			generatedClass.annotationMirrors = annotationsRule.apply(generatedClass, ruleSrcElement)
 
-			addInterfaces(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
-			addInnerClasses(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
-			addFields(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
-			addConstructors(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
-			addMethods(templateClass, annotatedClass, generatedClass, triggerAnnotation, ruleSrcElement)
+			addInterfaces(templateClass, generatedClass, ruleSrcElement)
+			addInnerClasses(templateClass, generatedClass, ruleSrcElement)
+			addFields(templateClass, generatedClass, ruleSrcElement)
+			addConstructors(templateClass, generatedClass,  ruleSrcElement)
+			addMethods(templateClass, generatedClass, ruleSrcElement)
 			
 			
 		} finally {
@@ -79,22 +80,22 @@ class TemplateRule {
 
 	}
 
-	def addConstructors(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+	def addConstructors(TypeElement templateClass, GenTypeElement generatedClass,
+		 Element ruleSrcElement) {
 		constructorRules.forEach [
 			it.apply(generatedClass, ruleSrcElement)
 		]
 	}
 	
-	def addMethods(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+	def addMethods(TypeElement templateClass, GenTypeElement generatedClass,
+		 Element ruleSrcElement) {
 		methodRules.forEach [
 			it.apply( generatedClass, ruleSrcElement)
 		]
 	}
 	
-	def addInnerClasses(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+	def addInnerClasses(TypeElement templateClass, GenTypeElement generatedClass,
+		 Element ruleSrcElement) {
 		//TODO: Zirkuläre Dependencies zwischen inner classes sind gegenwärtig nicht möglicht. Evtl könnte man die 
 		//GenClasses in einem ersten separaten Durchlauf registrieren... Oder ClassSelectors für InnerClasses sind
 		//immer "Proxies" für noch zu erzeugende Klassen.	
@@ -107,17 +108,16 @@ class TemplateRule {
 		ExtensionRegistry.get(GenExtensions)
 	}
 
-	def addFields(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+	def addFields(TypeElement templateClass, GenTypeElement generatedClass,
+		 Element ruleSrcElement) {
 		fieldRules.forEach [
 			it.apply(generatedClass, ruleSrcElement)
 		]
 	}
 
-	def addInterfaces(TypeElement templateClass, TypeElement annotatedClass, GenTypeElement generatedClass,
-		AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
+	def addInterfaces(TypeElement templateClass, GenTypeElement generatedClass, Element ruleSrcElement) {
 		templateClass.interfaces.forEach [
-			val resolvedType = relatedType(it, annotatedClass, generatedClass, triggerAnnotation, null, ruleSrcElement)
+			val resolvedType = relatedType(it, currentAnnotatedClass, generatedClass, currentAnnotation, null, ruleSrcElement)
 			generatedClass.addInterface(resolvedType) //TODO: Check , if interface already exists? 
 		]
 	}

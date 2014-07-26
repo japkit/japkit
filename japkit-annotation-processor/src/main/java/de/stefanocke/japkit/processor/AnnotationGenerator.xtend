@@ -29,5 +29,9 @@ val extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 	override getSupportedMetaAnnotation() {
 		AnnotationMapping.name
 	}
+	
+	override createMemberRule(TypeElement membersClass, AnnotationMirror metaAnnotationToBeProcessed) {
+		throw new UnsupportedOperationException("Not used here")
+	}
 
 }
