@@ -169,7 +169,7 @@ class CodeRule {
 	private def CharSequence code(List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
 		val bodyExprToUse = bodyCases.findFirst[
 			val matcher = key
-			!matcher.nullOrEmpty && matcher.exists[matches(currentRuleSrcElement)]
+			!matcher.nullOrEmpty && matcher.exists[matches(currentSrcElement)]
 		]?.value ?: bodyExpr
 		
 		//TODO: remove valuestack parameter

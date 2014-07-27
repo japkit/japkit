@@ -16,7 +16,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 		val methodFilter = metaAnnotation.elementMatchers("methodFilter", null);
 		
 		[ |
-			val ruleSrcElement = currentRuleSrcElement
+			val ruleSrcElement = currentSrcElement
 			valueStack.put("delegate", ruleSrcElement)
 			val delegateTypeElement = ruleSrcElement.srcType.asTypeElement
 			delegateTypeElement.allMethods.filter[m|methodFilter.nullOrEmpty || methodFilter.exists[matches(m)]]
@@ -25,7 +25,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 
 	protected override createMember() {
 
-		val delegateMethod = currentRuleSrcElement as ExecutableElement
+		val delegateMethod = currentSrcElement as ExecutableElement
 		val method = genExtensions.copyFrom(delegateMethod, false);
 
 		val customMethodName = nameRule.apply

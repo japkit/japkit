@@ -75,7 +75,7 @@ class RuleUtils {
 		val activation = metaAnnotation?.elementMatchers("activation".withPrefix(avPrefix), null)
 		if(activation.nullOrEmpty) return ALWAYS_ACTIVE;
 
-		[|activation.exists[matches(currentRuleSrcElement)]]
+		[|activation.exists[matches(currentSrcElement)]]
 	}
 	
 	public static val NO_NAME = [|null as String]
@@ -97,9 +97,9 @@ class RuleUtils {
 			} else if(!name.nullOrEmpty) {
 				name
 			} else {
-				if(nameFromTemplate=="srcElementName") currentRuleSrcElement.simpleName.toString else nameFromTemplate
+				if(nameFromTemplate=="srcElementName") currentSrcElement.simpleName.toString else nameFromTemplate
 			}
-			if(result.nullOrEmpty) currentRuleSrcElement.simpleName.toString else result
+			if(result.nullOrEmpty) currentSrcElement.simpleName.toString else result
 		]
 	}
 	
@@ -117,7 +117,7 @@ class RuleUtils {
 						
 			if(mappings.nullOrEmpty) return existingAnnotationsAndTemplateAnnotations
 			
-			mapAnnotations(currentRuleSrcElement, mappings, existingAnnotationsAndTemplateAnnotations)
+			mapAnnotations(currentSrcElement, mappings, existingAnnotationsAndTemplateAnnotations)
 		]
 	}
 	
@@ -144,14 +144,14 @@ class RuleUtils {
 
 		[  |
 			val typeFromTemplate = template?.relatedType(currentAnnotatedClass, currentGeneratedClass, currentAnnotation,
-				null, currentRuleSrcElement)
+				null, currentSrcElement)
 			if(metaAnnotation == null) return typeFromTemplate
 			val type = currentAnnotation.resolveType(currentAnnotatedClass, currentGeneratedClass, metaAnnotation,
-				"type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix), currentRuleSrcElement)
+				"type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix), currentSrcElement)
 			if (!type.isVoid) {
 				type
 			} else {
-				typeFromTemplate ?: currentRuleSrcElement.srcType
+				typeFromTemplate ?: currentSrcElement.srcType
 			}
 		]
 	}
@@ -205,7 +205,7 @@ class RuleUtils {
 		val expr = if(commentExpr.nullOrEmpty) commentFromTemplate else commentExpr;
 
 		[ |
-			if(copyFromSrc) currentRuleSrcElement.docComment
+			if(copyFromSrc) currentSrcElement.docComment
 			else if (!expr.nullOrEmpty)
 				eval(valueStack, expr, commentLang, CharSequence, '''Comment could not be generated''',
 					'invalidComment')

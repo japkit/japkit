@@ -5,25 +5,17 @@ import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
-import de.stefanocke.japkit.support.PropertyFilter
-import de.stefanocke.japkit.support.RuleFactory
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypesExtensions
-import de.stefanocke.japkit.support.TypesRegistry
-import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.net.URL
-import java.util.ArrayList
-import java.util.Collections
 import java.util.Map
 import java.util.ServiceLoader
 import java.util.concurrent.TimeUnit
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import javax.lang.model.type.TypeMirror
 
-import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.support.SwitchRule
+import static de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 class ELSupport {
 	val extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
@@ -112,7 +104,7 @@ class ELSupport {
 		}
 	}
 	
-	def getCurrentRuleSrcElement() {
+	def getCurrentSrcElement() {
 		getCurrentSrc(Element)
 	}
 	
@@ -138,7 +130,7 @@ class ELSupport {
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
 		} catch (Exception e) {
-			reportError('''«errorMessage»: «e.message» EL expression: «expr»''', valueStack.get("element") as Element,
+			reportError('''«errorMessage»: «e.message» EL expression: «expr»''', if(currentSrc instanceof Element) getCurrentSrcElement else null ,
 				null, null)
 			errorResult
 		}

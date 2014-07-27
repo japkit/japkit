@@ -13,7 +13,7 @@ class CodeFragmentRule extends CodeRule {
 	}
 	
 	override CharSequence code(){
-		if(activation.nullOrEmpty || activation.exists[matches(currentRuleSrcElement)]){		
+		if(activation.nullOrEmpty || activation.exists[matches(currentSrcElement)]){		
 			super.code()	
 		} else ''
 	}

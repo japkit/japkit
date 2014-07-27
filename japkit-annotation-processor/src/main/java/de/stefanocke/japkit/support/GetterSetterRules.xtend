@@ -31,13 +31,13 @@ class GetterSetterRules {
 		val fluent =  metaAnnotation.value("fluent", boolean);
 		new MethodRule(metaAnnotation,  avPrefix,
 			null,
-			if(fluent) [|currentRuleSrcElement.simpleName.toString] else [|(getCurrentSrc(VariableElement)).getterName],
-			createCommentRule(metaAnnotation, null,  avPrefix)[| '''@return «currentRuleSrcElement.docComment?.toString?.trim»'''],
+			if(fluent) [|currentSrcElement.simpleName.toString] else [|(getCurrentSrc(VariableElement)).getterName],
+			createCommentRule(metaAnnotation, null,  avPrefix)[| '''@return «currentSrcElement.docComment?.toString?.trim»'''],
 			null,
 			[m|
-			'''return «surround(surroundReturnExprFragments, currentRuleSrcElement.simpleName)»;
+			'''return «surround(surroundReturnExprFragments, currentSrcElement.simpleName)»;
 			'''],
-			[|currentRuleSrcElement.asType]
+			[|currentSrcElement.asType]
 		)
 	}
 	
@@ -47,12 +47,12 @@ class GetterSetterRules {
 		val chain =  metaAnnotation.value("chain", boolean);
 		new MethodRule(metaAnnotation, avPrefix,
 			null,
-			if(fluent) [|currentRuleSrcElement.simpleName.toString] else [|(currentRuleSrcElement as VariableElement).setterName],
-			createCommentRule(metaAnnotation, null, avPrefix)[|'''@param «currentRuleSrcElement.simpleName» «currentRuleSrcElement.docComment?.toString?.trim»'''],
+			if(fluent) [|currentSrcElement.simpleName.toString] else [|(currentSrcElement as VariableElement).setterName],
+			createCommentRule(metaAnnotation, null, avPrefix)[|'''@param «currentSrcElement.simpleName» «currentSrcElement.docComment?.toString?.trim»'''],
 			createSetterParamRule(metaAnnotation, avPrefix),				
 			[m|
 			'''
-			this.«currentRuleSrcElement.simpleName» = «surround(surroundAssignmentExprFragments ,currentRuleSrcElement.simpleName)»;
+			this.«currentSrcElement.simpleName» = «surround(surroundAssignmentExprFragments ,currentSrcElement.simpleName)»;
 			«IF chain»
 			return this;
 			«ENDIF»
@@ -64,8 +64,8 @@ class GetterSetterRules {
 	private def ()=>List<? extends GenParameter> createSetterParamRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		createParamRule(
 			null,
-			[|currentRuleSrcElement.simpleName.toString],
-			[|currentRuleSrcElement.asType],
+			[|currentSrcElement.simpleName.toString],
+			[|currentSrcElement.asType],
 			createAnnotationMappingRules(metaAnnotation, null, "param".withPrefix(avPrefix))
 		)
 	}

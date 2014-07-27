@@ -57,7 +57,7 @@ class TemplateRule implements Procedure1<GenTypeElement>{
 		try {
 			
 			valueStack.push
-			valueStack.putELVariables(currentRuleSrcElement, currentAnnotation, templateAnnotation)
+			valueStack.putELVariables(currentSrcElement, currentAnnotation, templateAnnotation)
 			
 			generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
 
@@ -76,7 +76,7 @@ class TemplateRule implements Procedure1<GenTypeElement>{
 
 	def addInterfaces(GenTypeElement generatedClass) {
 		templateClass.interfaces.forEach [
-			val resolvedType = relatedType(it, currentAnnotatedClass, generatedClass, currentAnnotation, null, currentRuleSrcElement)
+			val resolvedType = relatedType(it, currentAnnotatedClass, generatedClass, currentAnnotation, null, currentSrcElement)
 			generatedClass.addInterface(resolvedType) //TODO: Check , if interface already exists? 
 		]
 	}
