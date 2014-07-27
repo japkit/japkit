@@ -27,8 +27,8 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 
 @Template(vars = {
 		@Var(name = "validationFragment", code = @CodeFragment(activation = @Matcher(annotations = NotNull.class),
-				expr = "if(#{element.simpleName}==null){\n"
-						+ "  throw new IllegalArgumentException(\"#{element.simpleName} must not be null.\");\n" + "}\n")),
+				expr = "if(#{src.simpleName}==null){\n"
+						+ "  throw new IllegalArgumentException(\"#{src.simpleName} must not be null.\");\n" + "}\n")),
 		@Var(name = "defensiveCopyFragment", code = @CodeFragment(imports=Date.class, cases = { @Case(matcher = @Matcher(type = Date.class),
 				expr = "new Date(#{surrounded}.getTime())")}))
 //		,
@@ -60,7 +60,7 @@ public abstract class ValueObjectTemplate {
 					"org.springframework.format.annotation" }), commentFromSrc = true, getter = @Getter(
 					fluent=true,
 					surroundReturnExprFragments = "defensiveCopyFragment",
-					commentExpr = "Getter for #{element.simpleName}. \n@returns #{element.simpleName}\n"))
+					commentExpr = "Getter for #{src.simpleName}. \n@returns #{src.simpleName}\n"))
 	private SrcElementType srcElementName;
 
 	@Constructor(bodyExpr="//Some ctor code")
@@ -68,8 +68,8 @@ public abstract class ValueObjectTemplate {
 	
 	
 	@Constructor(
-			vars={@Var(name = "rhs", code=@CodeFragment(expr="builder.#{element.simpleName}", surroundingFragments="defensiveCopyFragment")),
-				  @Var(name = "assignment", code=@CodeFragment(expr="this.#{element.simpleName} = #{rhs.code()};\n", beforeFragments="validationFragment"))}, 
+			vars={@Var(name = "rhs", code=@CodeFragment(expr="builder.#{src.simpleName}", surroundingFragments="defensiveCopyFragment")),
+				  @Var(name = "assignment", code=@CodeFragment(expr="this.#{src.simpleName} = #{rhs.code()};\n", beforeFragments="validationFragment"))}, 
 			bodyIterator = "#{properties}", 	
 			bodyExpr = "#{assignment.code()}")
 	@ParamNames("builder")

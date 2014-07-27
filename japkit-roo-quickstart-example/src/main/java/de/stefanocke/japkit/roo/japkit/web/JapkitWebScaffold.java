@@ -10,8 +10,6 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import de.stefanocke.japkit.metaannotations.AVMapping;
 import de.stefanocke.japkit.metaannotations.AVMappingMode;
@@ -62,12 +60,12 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		@Var(name = "isRequired", isFunction = true, matcher = @Matcher(annotations = NotNull.class)),
 		@Var(name = "isPast", isFunction = true, matcher = @Matcher(annotations = Past.class)),
 		@Var(name = "patternAnnotation", isFunction = true, annotation=Pattern.class),
-		@Var(name = "regexp", isFunction = true, expr = "#{element.patternAnnotation.regexp}"),
+		@Var(name = "regexp", isFunction = true, expr = "#{src.patternAnnotation.regexp}"),
 		// The view properties that have a date or time type
 		@Var(name = "datetimeProperties", expr = "#{isDatetime.filter(viewProperties)}"),
 		@Var(name = "hasDatetimeProperties", expr = "#{!datetimeProperties.isEmpty()}"),
 		@Var(name = "enumProperties", expr = "#{isEnum.filter(viewProperties)}"),
-		@Var(name = "dtfModelAttr", isFunction = true, expr = "#{fboShortId}_#{element.name.toLowerCase()}_date_format"),
+		@Var(name = "dtfModelAttr", isFunction = true, expr = "#{fboShortId}_#{src.name.toLowerCase()}_date_format"),
 		
 		@Var(name = "isEntity", isFunction = true,  matcher = @Matcher(singleValueTypeAnnotations = JapkitEntity.class)),
 		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
@@ -75,7 +73,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		
 		//TODO: Etwas unschön, dass bei functions nur Element als Parameter erlaubt ist. Zumindest noch Type zulassen, wenn schon nicht Object.
 		@Var(name = "findRepository", isFunction = true, typeQuery = @TypeQuery(
-				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{element.asType()}")),
+				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src.asType()}")),
 				
 		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository", expr="#{fboElement.findRepository}",
 				setInShadowAnnotation = true),

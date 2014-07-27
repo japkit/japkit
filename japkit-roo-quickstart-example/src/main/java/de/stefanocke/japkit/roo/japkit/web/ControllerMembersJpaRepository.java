@@ -26,8 +26,8 @@ public abstract class ControllerMembersJpaRepository {
 	@Autowired
 	private Repository repository;
 
-	@Field(iterator = "#{relatedEntitiesWithJpaRepositories.keySet()}", nameExpr = "#{element.simpleName.toFirstLower}Repository",
-			vars = @Var(name = "relatedEntityRepository", expr = "#{relatedEntitiesWithJpaRepositories[element]}"))
+	@Field(iterator = "#{relatedEntitiesWithJpaRepositories.keySet()}", nameExpr = "#{src.simpleName.toFirstLower}Repository",
+			vars = @Var(name = "relatedEntityRepository", expr = "#{relatedEntitiesWithJpaRepositories[src]}"))
 	@Autowired
 	private RelatedEntityRepository relatedEntityRepository;
 
@@ -35,8 +35,8 @@ public abstract class ControllerMembersJpaRepository {
 			bodyExpr = "return new RepositoryAdapter<#{ec.typeRef(fbo)}>(repository);")
 	protected abstract CrudOperations<FormBackingObject> crudOperations();
 
-	@Method(iterator = "#{entityPropertiesWithJpaRepositories.keySet()}", nameExpr = "get#{element.name.toFirstUpper}Choices", vars = {
-			@Var(name = "relatedEntity", expr = "#{element.singleValueType}"),
+	@Method(iterator = "#{entityPropertiesWithJpaRepositories.keySet()}", nameExpr = "get#{src.name.toFirstUpper}Choices", vars = {
+			@Var(name = "relatedEntity", expr = "#{src.singleValueType}"),
 			@Var(name = "relatedEntityRepositoryName", expr = "#{relatedEntity.asElement.simpleName.toFirstLower}Repository") },
 			bodyExpr = "return #{relatedEntityRepositoryName}.findAll();")
 	protected abstract List<RelatedEntity> getEntityChoices();

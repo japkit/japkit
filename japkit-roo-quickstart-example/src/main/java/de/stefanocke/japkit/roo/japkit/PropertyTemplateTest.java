@@ -6,7 +6,7 @@ import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 
-@Template(vars = @Var(expr = "#{element.name.toFirstUpper}", name = "propertyName"))
+@Template(vars = @Var(expr = "#{src.name.toFirstUpper}", name = "propertyName"))
 public class PropertyTemplateTest {
 	@Method(nameExpr = "add#{propertyName}")
 	@ParamNames("e")

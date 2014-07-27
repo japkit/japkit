@@ -65,7 +65,7 @@ class ELSupport {
 	def <T> T scope(ValueStack vs, Object e, (ValueStack)=>T closure) {
 		try {
 			vs.push
-			vs.put("element", e)
+			vs.put("src", e)
 			closure.apply(vs)
 
 		} finally {
@@ -86,7 +86,7 @@ class ELSupport {
 	def void scope(ValueStack vs, Object e, (ValueStack)=>void closure) {
 		try {
 			vs.push
-			vs.put("element", e)
+			vs.put("src", e)
 			closure.apply(vs)
 
 		} finally {
@@ -113,7 +113,7 @@ class ELSupport {
 	}
 	
 	def Object getCurrentSrc(){
-		valueStack.getRequired("element")
+		valueStack.getRequired("src")
 	}
 
 	def <T> T eval(Object src, String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
