@@ -82,13 +82,13 @@ class ELVariableRule {
 		_codeFragments = if(codeFragmentAnnotations.empty) null else new CodeFragmentRules(codeFragmentAnnotations)
 	}
 
-	def void putELVariable(ValueStack vs, Element element, AnnotationMirror triggerAnnotation) {
+	def void putELVariable(Element element, AnnotationMirror triggerAnnotation) {
 		try {
 			if (isFunction) {
-				vs.put(name, this)
+				valueStack.put(name, this)
 			} else {
-				val value = eval(vs, element, triggerAnnotation)
-				vs.put(name, value)
+				val value = eval(element, triggerAnnotation)
+				valueStack.put(name, value)
 			}
 		} catch (TypeElementNotFoundException tenfe) {
 			ExtensionRegistry.get(TypesRegistry).handleTypeElementNotFound(tenfe, currentAnnotatedClass)
@@ -103,7 +103,7 @@ class ELVariableRule {
 	}
 
 	def Object eval(Element element) {
-		eval(valueStack, element, currentAnnotation)
+		eval(element, currentAnnotation)
 	}
 	
 	def Object filter(Iterable<? extends Element> collection) {
@@ -114,7 +114,7 @@ class ELVariableRule {
 		collection.map[eval(it)]
 	}
 	
-	def Object eval(ValueStack vs, Element element, AnnotationMirror triggerAnnotation) {
+	def Object eval(Element element, AnnotationMirror triggerAnnotation) {
 
 		pushCurrentMetaAnnotation(elVarAnnotation)
 		try {
@@ -132,8 +132,8 @@ class ELVariableRule {
 					av
 
 				} else if (!expr.nullOrEmpty) {
-					vs.scope(element) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
-						eval(vs, expr, lang, type);
+					scope(element) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
+						eval(expr, lang, type);
 					]					
 
 				} else if (!propertyFilterAnnotations.nullOrEmpty) {
@@ -144,7 +144,7 @@ class ELVariableRule {
 						toList
 
 				} else if (typeQuery != null) {
-					evalTypeQuery(vs, typeQuery, element)
+					evalTypeQuery(typeQuery, element)
 				} else if (codeFragments!=null){
 					codeFragments
 				} else {
@@ -182,9 +182,9 @@ class ELVariableRule {
 			//Das hier funktioniert so nicht, wenn isFunction true ist. Macht aber nichts.
 			if (setInShadowAnnotation && !triggerAv.nullOrEmpty) {
 
-				//TODO: Es fürfte ungewöhnlich sein, hier einen AnnotationMirror zu setzen. Daher nehmen wir value anstatt valueForVariable.
+				//TODO: Es dürfte ungewöhnlich sein, hier einen AnnotationMirror zu setzen. Daher nehmen wir value anstatt valueForVariable.
 				//Ist das sinnvoll oder eher verwirrend? 
-				vs.getVariablesForShadowAnnotation().put(triggerAv, value)
+				valueStack.getVariablesForShadowAnnotation().put(triggerAv, value)
 			}
 
 			valueForVariable
@@ -211,7 +211,7 @@ class ELVariableRule {
 		throw new IllegalArgumentException('''Cannot retrieve annotation «annotationFqn» for «object»''')
 	}
 
-	def evalTypeQuery(ValueStack vs, AnnotationMirror typeQuery, Element element) {
+	def evalTypeQuery(AnnotationMirror typeQuery, Element element) {
 		val triggerAnnotation = typeQuery.value("annotation", TypeMirror);
 		val shadow = typeQuery.value("shadow", Boolean);
 		val unique = typeQuery.value("unique", Boolean);
@@ -225,8 +225,8 @@ class ELVariableRule {
 		val inTypesSet = if (filterAV.nullOrEmpty)
 				emptySet
 			else {
-				val inTypes = vs.scope(element) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
-					eval(vs, inExpr, inExprLang, Object);
+				val inTypes = scope(element) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
+					eval(inExpr, inExprLang, Object);
 				]
 
 				(if (inTypes instanceof Iterable<?>) {

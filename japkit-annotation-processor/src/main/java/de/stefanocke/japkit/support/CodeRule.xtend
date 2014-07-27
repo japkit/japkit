@@ -82,7 +82,7 @@ class CodeRule {
 		val vs = new ValueStack(valueStack);
 		[ EmitterContext ec |
 			withValueStack(vs) [ |
-				valueStack.scope [
+				scope [
 					it.put("ec", ec)
 					it.put("genElement", genElement)
 					cr.code
@@ -100,7 +100,7 @@ class CodeRule {
 		[ EmitterContext ec |
 			
 			withValueStack(vs)[|
-				valueStack.scope [
+				scope [
 					it.put("ec", ec)
 					it.put("genElement", genElement)
 					val result = cr.apply(genElement)
@@ -140,22 +140,22 @@ class CodeRule {
 			val result = if (iteratorExpr.nullOrEmpty) {
 					code(bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
 				} else {
-					val bodyIterator = eval(valueStack, iteratorExpr, iteratorLang, Iterable,
+					val bodyIterator = eval(iteratorExpr, iteratorLang, Iterable,
 						'''Error in code body iterator expression.''', emptyList)
 					if (!bodyIterator.nullOrEmpty) {
-						val before = eval(valueStack, beforeExpr, lang, String,
+						val before = eval(beforeExpr, lang, String,
 							'''Error in code body before expression.''', '')
-						val after = eval(valueStack, afterExpr, lang, String,
+						val after = eval(afterExpr, lang, String,
 							'''Error in code body after expression.''', '')
 						'''
 							«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
-								«valueStack.scope(e as Element) [
+								«scope(e as Element) [
 								code(bodyCases, bodyExpr, lang, '')
 							]»
 							«ENDFOR»
 						'''
 					} else {
-						eval(valueStack, emptyExpr, lang, String, '''Error in code body empty expression.''',
+						eval(emptyExpr, lang, String, '''Error in code body empty expression.''',
 							'throw new UnsupportedOperationException();')
 					}
 				}
@@ -173,6 +173,5 @@ class CodeRule {
 		]?.value ?: bodyExpr
 		
 		//TODO: remove valuestack parameter
-		eval(valueStack, bodyExprToUse, lang, String, '''Error in code body expression.''',
-				errorResult)
+		eval(bodyExprToUse, lang, String, '''Error in code body expression.''',	errorResult)
 	}}

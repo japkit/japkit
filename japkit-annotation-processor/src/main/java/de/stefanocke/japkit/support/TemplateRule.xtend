@@ -54,10 +54,10 @@ class TemplateRule implements Procedure1<GenTypeElement>{
 	}
 
 	override void apply(GenTypeElement generatedClass) {
-		try {
+		
 			
-			valueStack.push
-			valueStack.putELVariables(currentSrcElement, currentAnnotation, templateAnnotation)
+		scope[
+			putELVariables(currentSrcElement, currentAnnotation, templateAnnotation)
 			
 			generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
 
@@ -65,12 +65,8 @@ class TemplateRule implements Procedure1<GenTypeElement>{
 			innerClassRules.forEach [it.apply(generatedClass)]
 			fieldRules.forEach [it.apply(generatedClass)]
 			constructorRules.forEach [it.apply(generatedClass)]
-			methodRules.forEach [it.apply( generatedClass)]
-			
-			
-		} finally {
-			valueStack.pop
-		}
+			methodRules.forEach [it.apply( generatedClass)]		
+		]
 
 	}
 

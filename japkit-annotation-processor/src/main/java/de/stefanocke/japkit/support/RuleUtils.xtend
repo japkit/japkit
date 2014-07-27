@@ -92,7 +92,7 @@ class RuleUtils {
 
 		[ |
 			val result = if (!nameExpr.nullOrEmpty) {
-				eval(valueStack, nameExpr, nameLang, String, '''Member name could not be generated''',
+				eval(nameExpr, nameLang, String, '''Member name could not be generated''',
 					nameFromTemplate ?: 'invalidMemberName')
 			} else if(!name.nullOrEmpty) {
 				name
@@ -181,7 +181,7 @@ class RuleUtils {
 	public def ()=>List<? extends GenParameter> createParamRule(()=>Iterable<? extends Object> srcRule, ()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
 		[ |
 			(srcRule ?: SINGLE_SRC_ELEMENT).apply.map [ e |
-				valueStack.scope(e) [
+				scope(e) [
 					val name = nameRule.apply
 					val type = typeRule.apply
 					
@@ -207,7 +207,7 @@ class RuleUtils {
 		[ |
 			if(copyFromSrc) currentSrcElement.docComment
 			else if (!expr.nullOrEmpty)
-				eval(valueStack, expr, commentLang, CharSequence, '''Comment could not be generated''',
+				eval(expr, commentLang, CharSequence, '''Comment could not be generated''',
 					'invalidComment')
 			else
 				defaultComment?.apply

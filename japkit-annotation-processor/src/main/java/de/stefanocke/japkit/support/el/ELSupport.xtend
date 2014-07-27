@@ -62,7 +62,8 @@ class ELSupport {
 		defaultElProvider = elProviders.get(defaultLanguage)
 	}
 
-	def <T> T scope(ValueStack vs, Object e, (ValueStack)=>T closure) {
+	def <T> T scope(Object e, (ValueStack)=>T closure) {
+		val vs = valueStack
 		try {
 			vs.push
 			vs.put("src", e)
@@ -73,7 +74,8 @@ class ELSupport {
 		}
 	}
 	
-	def <T> T scope(ValueStack vs, (ValueStack)=>T closure) {
+	def <T> T scope((ValueStack)=>T closure) {
+		val vs = valueStack
 		try {
 			vs.push
 			closure.apply(vs)
@@ -83,7 +85,8 @@ class ELSupport {
 		}
 	}
 
-	def void scope(ValueStack vs, Object e, (ValueStack)=>void closure) {
+	def void scope( Object e, (ValueStack)=>void closure) {
+		val vs = valueStack
 		try {
 			vs.push
 			vs.put("src", e)
@@ -94,7 +97,8 @@ class ELSupport {
 		}
 	}
 	
-	def void scope(ValueStack vs, (ValueStack)=>void closure) {
+	def void scope((ValueStack)=>void closure) {
+		val vs = valueStack
 		try {
 			vs.push
 			closure.apply(vs)
@@ -118,15 +122,15 @@ class ELSupport {
 
 	def <T> T eval(Object src, String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
 		T errorResult) {
-		valueStack.scope(src) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
-			eval(valueStack, expr, lang, expectedType, errorMessage, errorResult)
+		scope(src) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
+			eval(expr, lang, expectedType, errorMessage, errorResult)
 		]
 	}
 
-	def <T> T eval(ValueStack valueStack, String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
+	def <T> T eval(String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
 		T errorResult) {
 		try {
-			return eval(valueStack, expr, lang, expectedType)	as T
+			return eval(expr, lang, expectedType)	as T
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
 		} catch (Exception e) {
@@ -138,21 +142,21 @@ class ELSupport {
 
 	//
 	def <T> T eval(Object src, String expr, String lang, Class<T> expectedType) {
-		valueStack.scope(src) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
-			eval(it, expr, lang, expectedType)
+		scope(src) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
+			eval(expr, lang, expectedType)
 		]
 	}
 
-	def <T> T eval(ValueStack valueStack, String expr, String lang, Class<T> expectedType) {
+	def <T> T eval(String expr, String lang, Class<T> expectedType) {
 		if(expr.nullOrEmpty && expectedType == String){
 			return ("" as Object) as T //WTF!?!
 		}
 
-		withValueStack(valueStack)[|
-			//nicht schön hier.
-			putShadowAnnotation(valueStack)
-			return getElProvider(lang).eval(valueStack as Map<String, Object>, expr, expectedType, lang) as T
-		]
+		
+		//nicht schön hier.
+		putShadowAnnotation
+		return getElProvider(lang).eval(valueStack as Map<String, Object>, expr, expectedType, lang) as T
+		
 	}
 	
 	/**
@@ -178,7 +182,7 @@ class ELSupport {
 	}
 
 	//nicht schön hier.
-	def putShadowAnnotation(ValueStack valueStack) {
+	def putShadowAnnotation() {
 		val currAnno = valueStack.get("currentAnnotation") as AnnotationMirror
 		if (currAnno != null) {
 			valueStack.put("shadowAnnotation",
@@ -193,10 +197,6 @@ class ELSupport {
 	}
 
 	def write(Writer writer, URL templateUrl, String templateLanguage, Long templateLastModified) {
-		write(valueStack, writer, templateUrl, templateLanguage, templateLastModified)
-	}
-
-	def write(ValueStack valueStack, Writer writer, URL templateUrl, String templateLanguage, Long templateLastModified) {
 		getTemplateProvider(templateLanguage).write(writer, templateUrl, valueStack, templateLanguage,
 			templateLastModified)
 	}
@@ -207,15 +207,10 @@ class ELSupport {
 		p
 	}
 
-	def void putELVariables(Element element, AnnotationMirror triggerAnnotation, AnnotationMirror elVarsAnnotation) {
-		valueStack.putELVariables(element, triggerAnnotation, elVarsAnnotation)
-	}
-
 	
-	def void putELVariables(ValueStack vs, Element element, AnnotationMirror triggerAnnotation,
-		AnnotationMirror elVarsAnnotation) {
+	def void putELVariables(Element element, AnnotationMirror triggerAnnotation, AnnotationMirror elVarsAnnotation) {
 		elVarsAnnotation?.value("vars", typeof(AnnotationMirror[]))?.forEach [
-			vs.putELVariable(element, triggerAnnotation, it)
+			putELVariable(element, triggerAnnotation, it)
 		]
 	}
 
@@ -223,12 +218,12 @@ class ELSupport {
 		getOrCreate(vs, "variablesForShadowAnnotation", [newHashMap])
 	}
 
-	def void putELVariable(ValueStack vs, Element element, AnnotationMirror triggerAnnotation,
+	def void putELVariable(Element element, AnnotationMirror triggerAnnotation,
 		AnnotationMirror elVarAnnotation) {
 
 		//TODO: Use Rule Factory
 		val varRule = new ELVariableRule(elVarAnnotation)
-		varRule.putELVariable(vs, element, triggerAnnotation)
+		varRule.putELVariable(element, triggerAnnotation)
 	}
 	
 

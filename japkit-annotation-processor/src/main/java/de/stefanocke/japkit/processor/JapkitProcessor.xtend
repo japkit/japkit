@@ -460,7 +460,7 @@ class JapkitProcessor extends AbstractProcessor {
 		//Whatever type dependecies we had so far - they will be re-created. Especially UNKNOWN_TYPE dependencies might be replaced by normal ones
 		removeDependenciesForAnnotatedClass(annotatedClass.qualifiedName.toString)
 
-		valueStack.scope(annotatedClass)[
+		scope(annotatedClass)[
 			processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]		
 		]
 
@@ -508,7 +508,7 @@ class JapkitProcessor extends AbstractProcessor {
 
 				//EL Variables			
 				triggerAnnotation.metaAnnotations(Var).forEach[
-					putELVariable(valueStack, annotatedClass, triggerAnnotation, it)]
+					putELVariable(annotatedClass, triggerAnnotation, it)]
 
 				//@GenerateClass
 				classGenerator.processGenClassAnnotation(annotatedClass, triggerAnnotation, generatedClasses)

@@ -72,7 +72,7 @@ class AnnotationValueMappingRule {
 						}
 					
 				} else {
-					val elements = eval(valueStack, expr, lang, Iterable) as Iterable<Element>  //TODO: Check if instanceof element
+					val elements = eval(expr, lang, Iterable) as Iterable<Element>  //TODO: Check if instanceof element
 					val annotations = newArrayList 
 					elements.forEach[annotationMapping.mapOrCopyAnnotations(annotations, it, mappingsWithId, true)]
 					coerceAnnotationValue(annotations, avType)
@@ -105,7 +105,7 @@ class AnnotationValueMappingRule {
 
 		val targetClass = if(avType.kind.isPrimitive) avType.toAnnotationValueClass else Object
 
-		val result = eval(valueStack, expr, lang, targetClass)
+		val result = eval(expr, lang, targetClass)
 
 		coerceAnnotationValue(result, avType)
 

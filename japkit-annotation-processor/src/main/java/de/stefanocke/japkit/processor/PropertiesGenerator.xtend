@@ -97,7 +97,7 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 		propertiesToGenerate.forEach [ p |
 			val ruleSourceElement = p.getSourceElement(ruleSource)
 			
-			valueStack.scope(ruleSourceElement)[
+			scope(ruleSourceElement)[
 			
 			val overrideElement = overrideElementsByName.get(p.name)
 			
@@ -138,9 +138,9 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 				
 				//val genProperty = new Property(genField, genGetter, genSetter)
 				
-				valueStack.scope(genField/*genProperty */) [
-						delegateMethodRules.forEach[apply(generatedClass)]
-					]
+				scope(genField/*genProperty */) [
+					delegateMethodRules.forEach[apply(generatedClass)]
+				]
 			}
 			
 			templateRules.forEach[it.apply(generatedClass)]

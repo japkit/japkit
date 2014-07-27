@@ -131,13 +131,13 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 			val srcElements = srcElementsRule.apply 
 
 			srcElements.forEach [ e |
-				valueStack.scope(e) [
-					putELVariables(valueStack, currentSrcElement, currentAnnotation, metaAnnotation) //TODO: refactoring. use thread local context there
+				scope(e) [
+					putELVariables(currentSrcElement, currentAnnotation, metaAnnotation) //TODO: refactoring. use thread local context there
 					val member = createMember
 					generatedClass.add(member)
 					dependentMemberRules.forEach[r | 
 						//apply dependent rules. The rule source element is the member just created.
-						valueStack.scope(member)[
+						scope(member)[
 							r.apply(generatedClass)
 						]
 					]

@@ -156,12 +156,7 @@ class AnnotationMappingRule {
 		
 		val annotation = am
 		
-		//If the src element has not changed, use the ELContext of the parent annotation mapping.
-		//Otherwise create an new one, where the properties of the parent context can be accessed by prefixing with "parent."
-		//val elContext = if(parentElContext!=null && !srcElementChanged) parentElContext 
-		//	else  srcElement.createElContextMap(parentElContext, #{"targetAnnotation"->am})
-		
-		valueStack.scope(srcElement) [ vs |
+		scope(srcElement) [ vs |
 			vs.put("targetAnnotation", annotation)
 		
 			annotation => [
