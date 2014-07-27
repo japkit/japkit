@@ -70,7 +70,7 @@ class ELSupport {
 		defaultElProvider = elProviders.get(defaultLanguage)
 	}
 
-	def <T> T scope(ValueStack vs, Element e, (ValueStack)=>T closure) {
+	def <T> T scope(ValueStack vs, Object e, (ValueStack)=>T closure) {
 		try {
 			vs.push
 			vs.put("element", e)
@@ -91,7 +91,7 @@ class ELSupport {
 		}
 	}
 
-	def void scope(ValueStack vs, Element e, (ValueStack)=>void closure) {
+	def void scope(ValueStack vs, Object e, (ValueStack)=>void closure) {
 		try {
 			vs.push
 			vs.put("element", e)
@@ -111,10 +111,22 @@ class ELSupport {
 			vs.pop
 		}
 	}
+	
+	def getCurrentRuleSrcElement() {
+		getCurrentSrc(Element)
+	}
+	
+	def <T> T getCurrentSrc(Class<T> clazz){
+		clazz.cast(getCurrentSrc)
+	}
+	
+	def Object getCurrentSrc(){
+		valueStack.getRequired("element")
+	}
 
-	def <T> T eval(Element ruleSourceElement, String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
+	def <T> T eval(Object src, String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
 		T errorResult) {
-		valueStack.scope(ruleSourceElement) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
+		valueStack.scope(src) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
 			eval(valueStack, expr, lang, expectedType, errorMessage, errorResult)
 		]
 	}
@@ -133,8 +145,8 @@ class ELSupport {
 	}
 
 	//
-	def <T> T eval(Element ruleSourceElement, String expr, String lang, Class<T> expectedType) {
-		valueStack.scope(ruleSourceElement) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
+	def <T> T eval(Object src, String expr, String lang, Class<T> expectedType) {
+		valueStack.scope(src) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
 			eval(it, expr, lang, expectedType)
 		]
 	}

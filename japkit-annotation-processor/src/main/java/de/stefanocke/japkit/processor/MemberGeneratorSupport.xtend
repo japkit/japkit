@@ -14,7 +14,6 @@ import de.stefanocke.japkit.support.TypesRegistry
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import javax.lang.model.element.Element
 
 abstract class MemberGeneratorSupport implements MemberGenerator {
 	protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -34,8 +33,8 @@ abstract class MemberGeneratorSupport implements MemberGenerator {
 			GenTypeElement generatedClass, AnnotationMirror triggerAnnotation,
 			AnnotationMirror metaAnnotationToBeProcessed){
 				//TODO: Always cache the rule and / or store it in a ClassRule 
-				createMemberRule(membersClass, metaAnnotationToBeProcessed).apply(generatedClass, generatedClass)
+				createMemberRule(membersClass, metaAnnotationToBeProcessed).apply(generatedClass)
 	}
 	
-	def (GenTypeElement,Element)=>void createMemberRule(TypeElement membersClass, AnnotationMirror metaAnnotationToBeProcessed)
+	def (GenTypeElement)=>void createMemberRule(TypeElement membersClass, AnnotationMirror metaAnnotationToBeProcessed)
 }

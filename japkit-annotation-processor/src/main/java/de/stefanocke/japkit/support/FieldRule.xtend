@@ -11,9 +11,9 @@ import javax.lang.model.type.TypeMirror
 class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	extension GetterSetterRules = ExtensionRegistry.get(GetterSetterRules)
 	
-	(GenField, Element)=>CodeBody initCodeRule
+	(GenField)=>CodeBody initCodeRule
 	
-	(Element)=>TypeMirror typeRule
+	()=>TypeMirror typeRule
 	
 	new(AnnotationMirror metaAnnotation, VariableElement template) {
 		super(metaAnnotation, template)
@@ -34,24 +34,24 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	}
 	
 	
-	protected def (Element)=>TypeMirror createTypeRule() {
+	protected def ()=>TypeMirror createTypeRule() {
 		ru.createTypeRule(metaAnnotation, template?.asType, null)
 	}
 	
-	override protected createMember(Element ruleSrcElement, String name) {
+	override protected createMember(String name) {
 		new GenField(name, null)
 	}
 	
-	protected override applyRulesAfterCreation(GenField member, Element ruleSrcElement) {
-		super.applyRulesAfterCreation(member, ruleSrcElement)
-		member.type = typeRule.apply(ruleSrcElement)
+	protected override applyRulesAfterCreation(GenField member) {
+		super.applyRulesAfterCreation(member)
+		member.type = typeRule.apply
 		
-		member.constantExpr = _initCodeRule.apply(member, ruleSrcElement)
+		member.constantExpr = _initCodeRule.apply(member)
 	}
 	
-	def protected (GenField, Element)=>CodeBody createInitCodeRule(){
+	def protected (GenField)=>CodeBody createInitCodeRule(){
 		val cr = new CodeRule(metaAnnotation, "init");
-		[genElement, ruleSourceElement | CodeRule.getAsCodeBody(genElement, ruleSourceElement, cr)]
+		[genElement | CodeRule.getAsCodeBody(genElement, cr)]
 	}
 
 }

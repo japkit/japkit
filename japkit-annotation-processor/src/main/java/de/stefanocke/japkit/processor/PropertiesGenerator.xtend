@@ -1,24 +1,23 @@
 package de.stefanocke.japkit.processor
 
-import de.stefanocke.japkit.gen.CodeBody
 import de.stefanocke.japkit.gen.GenEnumConstant
 import de.stefanocke.japkit.gen.GenField
-import de.stefanocke.japkit.gen.GenMethod
-import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Properties
 import de.stefanocke.japkit.support.DelegateMethodsRule
+import de.stefanocke.japkit.support.ExtensionRegistry
+import de.stefanocke.japkit.support.GetterSetterRules
 import de.stefanocke.japkit.support.Property
 import de.stefanocke.japkit.support.PropertyFilter
+import de.stefanocke.japkit.support.el.ELSupport
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.support.GetterSetterRules
-import de.stefanocke.japkit.support.ExtensionRegistry
 
 class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
+	val protected extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	protected extension GetterSetterRules = ExtensionRegistry.get(GetterSetterRules)
 
 	override createMembers(TypeElement membersClass, TypeElement annotatedClass, GenTypeElement generatedClass,
@@ -98,6 +97,8 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 		propertiesToGenerate.forEach [ p |
 			val ruleSourceElement = p.getSourceElement(ruleSource)
 			
+			valueStack.scope(ruleSourceElement)[
+			
 			val overrideElement = overrideElementsByName.get(p.name)
 			
 			//TODO: Javadoc
@@ -118,7 +119,6 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 			}
 			if (createProperties) {
 			
-
 				//TODO: In case of getter, extract the @return
 				val srcComment = p.fieldOrGetter.docComment?.toString?.trim
 				
@@ -131,20 +131,21 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 					//TODO: Make configurable whether just to use an @see here.
 					]
 				generatedClass.add(genField)
-				
-				
-				getterRule?.apply(generatedClass, ruleSourceElement)
-				
-				
-				setterRule?.apply(generatedClass, ruleSourceElement)
+								
+				getterRule?.apply(generatedClass)
+							
+				setterRule?.apply(generatedClass)
 				
 				//val genProperty = new Property(genField, genGetter, genSetter)
 				
-
-				delegateMethodRules.forEach[apply(generatedClass, genField /*genProperty */)]
+				valueStack.scope(genField/*genProperty */) [
+						delegateMethodRules.forEach[apply(generatedClass)]
+					]
 			}
 			
-			templateRules.forEach[it.apply(generatedClass, ruleSourceElement)]
+			templateRules.forEach[it.apply(generatedClass)]
+			
+			]
 			
 		]
 

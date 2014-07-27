@@ -38,102 +38,99 @@ class RuleUtils {
 		(if(prefix.nullOrEmpty) name else '''«prefix»«name.toFirstUpper»''').toString
 	}
 	
-	public static val (Element)=>Iterable<? extends Element> SINGLE_SRC_ELEMENT = [Element e |  Collections.singleton(e)]
+	public static val ()=>Iterable<? extends Object> SINGLE_SRC_ELEMENT = [|  Collections.singleton(ExtensionRegistry.get(ELSupport).currentSrc)]
 	
 	/**
 	 * To iterate over a collection of elements and apply the rule for each element.
 	 */
-	public def (Element)=>Iterable<? extends Element> createIteratorExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	public def ()=>Iterable<? extends Object> createIteratorExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
 		val iteratorExpr = metaAnnotation.value("iterator".withPrefix(avPrefix), String)
 		val iteratorLang = metaAnnotation.value("iteratorLang".withPrefix(avPrefix), String);
 
-		[Element ruleSrcElement|
+		[|
 			val srcElements = if (iteratorExpr.nullOrEmpty) {
-					Collections.singleton(ruleSrcElement)
+					Collections.singleton(currentSrc)
 				} else {
-					val elements = eval(ruleSrcElement, iteratorExpr, iteratorLang, Object,
+					val elements = eval(currentSrc, iteratorExpr, iteratorLang, Object,
 						'''Iterator expression «iteratorExpr» could not be evaluated''', emptyList)
 						
 					if(elements instanceof Iterable<?>){	
 						(elements as Iterable<?>).filterInstanceOf(Element)					
-					} else if (elements instanceof Element){
-						Collections.singleton(elements as Element)
 					} else {
-						reportError('''Expected Element or Iterable of Element, but not «elements».''', null,null,null)
-						emptyList
-					}
+						Collections.singleton(elements)
+					} 
 				} 
 			srcElements
 		]
 	}
 	
-	public static val ALWAYS_ACTIVE = [Element e | true]
+	public static val ALWAYS_ACTIVE = [| true]
 	/**
 	 * AV "activation" to enable or disable a rule
 	 */
-	public def (Element)=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
 
 		val activation = metaAnnotation?.elementMatchers("activation".withPrefix(avPrefix), null)
 		if(activation.nullOrEmpty) return ALWAYS_ACTIVE;
 
-		[Element ruleSrcElement|activation.exists[matches(ruleSrcElement)]]
+		[|activation.exists[matches(currentRuleSrcElement)]]
 	}
 	
-	public static val NO_NAME = [null as String]
+	public static val NO_NAME = [|null as String]
 	
 	/**
 	 * To set the name of the generated element either statically (AV: name) or dynamically (AV: nameExpr)
 	 */
-	public def (Element)=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
+	public def ()=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		val nameFromTemplate = template?.simpleName?.toString
-		if(metaAnnotation == null) return [nameFromTemplate]
+		if(metaAnnotation == null) return [|nameFromTemplate]
 		val name = metaAnnotation.value("name".withPrefix(avPrefix), String)
 		val nameExpr = metaAnnotation.value("nameExpr".withPrefix(avPrefix), String)
 		val nameLang = metaAnnotation.value("nameLang".withPrefix(avPrefix), String);
 
-		[Element ruleSrcElement |
+		[ |
 			val result = if (!nameExpr.nullOrEmpty) {
 				eval(valueStack, nameExpr, nameLang, String, '''Member name could not be generated''',
 					nameFromTemplate ?: 'invalidMemberName')
 			} else if(!name.nullOrEmpty) {
 				name
 			} else {
-				if(nameFromTemplate=="srcElementName") ruleSrcElement.simpleName.toString else nameFromTemplate
+				if(nameFromTemplate=="srcElementName") currentRuleSrcElement.simpleName.toString else nameFromTemplate
 			}
-			if(result.nullOrEmpty) ruleSrcElement.simpleName.toString else result
+			if(result.nullOrEmpty) currentRuleSrcElement.simpleName.toString else result
 		]
 	}
 	
 	/**
 	 * Copies annotations from template at first (if there are any ) and then applies the annotation mappings
 	 */
-	public def (GenElement, Element)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
+	public def (GenElement)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
 		AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 				
 		val mappings = metaAnnotation?.annotationMappings("annotationMappings".withPrefix(avPrefix), null);
 		
-		[ genElement, ruleSrcElement |
+		[ genElement|
 			val existingAnnotationsAndTemplateAnnotations = new ArrayList(genElement.annotationMirrors.map[it as GenAnnotationMirror])
 			existingAnnotationsAndTemplateAnnotations.addAll(template?.copyAnnotations ?: emptyList)
 						
 			if(mappings.nullOrEmpty) return existingAnnotationsAndTemplateAnnotations
 			
-			mapAnnotations(ruleSrcElement, mappings, existingAnnotationsAndTemplateAnnotations)
+			mapAnnotations(currentRuleSrcElement, mappings, existingAnnotationsAndTemplateAnnotations)
 		]
 	}
 	
 	 
 	
-	public def (Object)=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
+	public def ()=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		val templateModifiers = template?.modifiers ?: emptySet
 
-		if(metaAnnotation == null) return [template?.modifiers]
+		if(metaAnnotation == null) return [|template?.modifiers]
 		val modi = metaAnnotation.value("modifiers".withPrefix(avPrefix), typeof(Modifier[]));
 
 		//TODO: Expressions for isPublic , isPrivate etc
-		[
+		[|
 			if (!modi.nullOrEmpty) {
 				modi.toSet
 			} else
@@ -142,24 +139,24 @@ class RuleUtils {
 	}
 	
 	//TODO: AV-overriding überdenken. 
-	public def (Element)=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template,
+	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template,
 		String avPrefix) {
 
-		[ Element ruleSrcElement |
+		[  |
 			val typeFromTemplate = template?.relatedType(currentAnnotatedClass, currentGeneratedClass, currentAnnotation,
-				null, ruleSrcElement)
+				null, currentRuleSrcElement)
 			if(metaAnnotation == null) return typeFromTemplate
 			val type = currentAnnotation.resolveType(currentAnnotatedClass, currentGeneratedClass, metaAnnotation,
-				"type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix), ruleSrcElement)
+				"type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix), currentRuleSrcElement)
 			if (!type.isVoid) {
 				type
 			} else {
-				typeFromTemplate ?: ruleSrcElement.srcType
+				typeFromTemplate ?: currentRuleSrcElement.srcType
 			}
 		]
 	}
 	
-	def protected (Element)=>List<? extends GenParameter>  createParamRules(AnnotationMirror paramsAnnotation, ExecutableElement template, String avPrefix){
+	def protected ()=>List<? extends GenParameter>  createParamRules(AnnotationMirror paramsAnnotation, ExecutableElement template, String avPrefix){
 		val rules= if(template !=null){
 			//If there is a template, use its parameters. They can optionally have @Param annotation
 			template.parametersWithSrcNames.map[createParamRule(it.annotationMirror(Param), it, null)].toList
@@ -168,30 +165,30 @@ class RuleUtils {
 			paramsAnnotation.value("parameters".withPrefix(avPrefix), typeof(AnnotationMirror[])).map[createParamRule(it, null, null)].toList
 		}
 		
-		[ Element ruleSrcElement | rules.map[apply(ruleSrcElement)].flatten.toList ]
+		[ | rules.map[apply].flatten.toList ]
 	}
 	
-	public def (Element)=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template, String avPrefix){
-		val srcElementsRule = createIteratorExpressionRule(paramAnnotation, avPrefix)
+	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template, String avPrefix){
+		val srcRule = createIteratorExpressionRule(paramAnnotation, avPrefix)
 		val nameRule = createNameExprRule(paramAnnotation, template, avPrefix)
 		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation, template,  avPrefix)
 		val typeRule = createTypeRule(paramAnnotation, template?.asType, avPrefix);
 		
-		createParamRule(srcElementsRule, nameRule, typeRule, annotationMappingRules)
+		createParamRule(srcRule, nameRule, typeRule, annotationMappingRules)
 
 	}
 	
-	public def (Element)=>List<? extends GenParameter> createParamRule((Element)=>Iterable<? extends Element> srcElementsRule, (Element)=>String nameRule, (Element)=>TypeMirror typeRule, (GenElement, Element)=>List<? extends AnnotationMirror> annotationMappingRules) {
-		[ Element ruleSrcElement |
-			(srcElementsRule ?: SINGLE_SRC_ELEMENT).apply(ruleSrcElement).map [ e |
+	public def ()=>List<? extends GenParameter> createParamRule(()=>Iterable<? extends Object> srcRule, ()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
+		[ |
+			(srcRule ?: SINGLE_SRC_ELEMENT).apply.map [ e |
 				valueStack.scope(e) [
-					val name = nameRule.apply(e)
-					val type = typeRule.apply(e)
+					val name = nameRule.apply
+					val type = typeRule.apply
 					
 					val param = new GenParameter(name, type)
 						
 					if(annotationMappingRules!=null){	
-						param.annotationMirrors = annotationMappingRules.apply(param, e)
+						param.annotationMirrors = annotationMappingRules.apply(param)
 					}
 					param
 				]
@@ -199,21 +196,21 @@ class RuleUtils {
 		]
 	}
 	
-	def (Element)=>CharSequence createCommentRule(AnnotationMirror metaAnnotation, Element template, String avPrefix,
-		(Element)=>CharSequence defaultComment) {
+	def ()=>CharSequence createCommentRule(AnnotationMirror metaAnnotation, Element template, String avPrefix,
+		()=>CharSequence defaultComment) {
 		val copyFromSrc =  metaAnnotation?.value("commentFromSrc".withPrefix(avPrefix), Boolean) ?: false
 		val commentExpr = metaAnnotation?.value("commentExpr".withPrefix(avPrefix), String)
 		val commentLang = metaAnnotation?.value("commentLang".withPrefix(avPrefix), String);
 		val commentFromTemplate = template?.docComment
 		val expr = if(commentExpr.nullOrEmpty) commentFromTemplate else commentExpr;
 
-		[ Element ruleSrcElement |
-			if(copyFromSrc) ruleSrcElement.docComment
+		[ |
+			if(copyFromSrc) currentRuleSrcElement.docComment
 			else if (!expr.nullOrEmpty)
 				eval(valueStack, expr, commentLang, CharSequence, '''Comment could not be generated''',
 					'invalidComment')
 			else
-				defaultComment?.apply(ruleSrcElement)
+				defaultComment?.apply
 		]
 	}
 	

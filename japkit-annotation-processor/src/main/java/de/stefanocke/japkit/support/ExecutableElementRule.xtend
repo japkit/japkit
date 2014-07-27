@@ -15,9 +15,9 @@ import javax.lang.model.element.Modifier
 abstract class ExecutableElementRule<G extends GenExecutableElement> extends MemberRuleSupport<ExecutableElement, G> {
 
 	
-	(Element)=>List<? extends GenParameter> paramRules
+	()=>List<? extends GenParameter> paramRules
 	
-	(G, Element)=>CodeBody codeBodyRule
+	(G)=>CodeBody codeBodyRule
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
@@ -26,39 +26,39 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 		_codeBodyRule = createCodeBodyRule 
 	}
 	
-	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
-		(Element)=>String nameRule, (Element)=>Set<Modifier> modifiersRule,
-		(GenElement, Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule,
-		(Element)=>List<? extends GenParameter> paramRules, (G, Element)=>CharSequence codeRule) {
+	new(()=>boolean activationRule, ()=>Iterable<? extends Element> srcElementsRule,
+		()=>String nameRule, ()=>Set<Modifier> modifiersRule,
+		(GenElement)=>List<? extends AnnotationMirror> annotationsRule, ()=>CharSequence commentRule,
+		()=>List<? extends GenParameter> paramRules, (G)=>CharSequence codeRule) {
 		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule, commentRule)
 		
-		_paramRules = paramRules ?: [emptyList]
-		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement, Element)=>CharSequence, null)
+		_paramRules = paramRules ?: [|emptyList]
+		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement)=>CharSequence, null)
 	}
 	
-	new(AnnotationMirror metaAnnotation, String avPrefix, (Element)=>Iterable<? extends Element> srcElementsRule,
-		(Element)=>String nameRule, (Element)=>CharSequence commentRule, (Element)=>List<? extends GenParameter> paramRules,
-		(G, Element)=>CharSequence codeRule) {
+	new(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Element> srcElementsRule,
+		()=>String nameRule, ()=>CharSequence commentRule, ()=>List<? extends GenParameter> paramRules,
+		(G)=>CharSequence codeRule) {
 		super(metaAnnotation, avPrefix, srcElementsRule, nameRule, commentRule)
-		_paramRules = paramRules ?: [emptyList]
+		_paramRules = paramRules ?: [|emptyList]
 		val defaultFragments = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
-		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement, Element)=>CharSequence, defaultFragments)
+		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement)=>CharSequence, defaultFragments)
 	}
 	
-	protected override applyRulesAfterCreation(G member, Element ruleSrcElement) {
-		super.applyRulesAfterCreation(member, ruleSrcElement)
-		member.parameters = _paramRules.apply(ruleSrcElement)
+	protected override applyRulesAfterCreation(G member) {
+		super.applyRulesAfterCreation(member)
+		member.parameters = _paramRules.apply
 		
-		member.body = _codeBodyRule.apply(member, ruleSrcElement)
+		member.body = _codeBodyRule.apply(member)
 	}
 	
-	def protected (G, Element)=>CodeBody createCodeBodyRule(){
+	def protected (G)=>CodeBody createCodeBodyRule(){
 		val cr = new CodeRule(metaAnnotation, "body");
-		[genElement, ruleSourceElement | CodeRule.getAsCodeBody(genElement, ruleSourceElement, cr)]
+		[genElement | CodeRule.getAsCodeBody(genElement, cr)]
 	}
 	
 	
-	def protected (Element)=>List<? extends GenParameter>  createParamRules(){
+	def protected ()=>List<? extends GenParameter>  createParamRules(){
 		ru.createParamRules(metaAnnotation, template, avPrefix)
 	}
 	

@@ -15,19 +15,20 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 	override protected createSrcElementsRule() {
 		val methodFilter = metaAnnotation.elementMatchers("methodFilter", null);
 		
-		[ Element ruleSrcElement |
+		[ |
+			val ruleSrcElement = currentRuleSrcElement
 			valueStack.put("delegate", ruleSrcElement)
 			val delegateTypeElement = ruleSrcElement.srcType.asTypeElement
 			delegateTypeElement.allMethods.filter[m|methodFilter.nullOrEmpty || methodFilter.exists[matches(m)]]
 		]
 	}
 
-	protected override createMember(Element ruleSrcElement) {
+	protected override createMember() {
 
-		val delegateMethod = ruleSrcElement as ExecutableElement
+		val delegateMethod = currentRuleSrcElement as ExecutableElement
 		val method = genExtensions.copyFrom(delegateMethod, false);
 
-		val customMethodName = nameRule.apply(ruleSrcElement)
+		val customMethodName = nameRule.apply
 		if (!customMethodName.nullOrEmpty) {
 			method.simpleName = customMethodName
 		}
@@ -74,7 +75,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 		method.parametersWithSrcNames.map[simpleName].join(", ")
 	}
 	
-	override protected createMember(Element ruleSrcElement, String name) {
+	override protected createMember(String name) {
 		throw new UnsupportedOperationException("Not used here")
 	}
 

@@ -15,41 +15,41 @@ import de.stefanocke.japkit.gen.GenElement
 class MethodRule extends ExecutableElementRule<GenMethod> {
 
 	
-	(Element)=>TypeMirror returnTypeRule
+	()=>TypeMirror returnTypeRule
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 		_returnTypeRule = createReturnTypeRule
 	}
 	
-	new((Element)=>boolean activationRule, (Element)=>Iterable<? extends Element> srcElementsRule,
-		(Element)=>String nameRule, (Element)=>Set<Modifier> modifiersRule,
-		(GenElement, Element)=>List<? extends AnnotationMirror> annotationsRule, (Element)=>CharSequence commentRule,
-		(Element)=>List<? extends GenParameter> paramRules, (GenMethod, Element)=>CharSequence codeRule,
-		(Element)=>TypeMirror returnTypeRule) {
+	new(()=>boolean activationRule, ()=>Iterable<? extends Element> srcElementsRule,
+		()=>String nameRule, ()=>Set<Modifier> modifiersRule,
+		(GenElement)=>List<? extends AnnotationMirror> annotationsRule, ()=>CharSequence commentRule,
+		()=>List<? extends GenParameter> paramRules, (GenMethod)=>CharSequence codeRule,
+		()=>TypeMirror returnTypeRule) {
 		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule, commentRule, paramRules, codeRule)
-		_returnTypeRule = returnTypeRule ?: [null]
+		_returnTypeRule = returnTypeRule ?: [|null]
 	}
 	
 	
-	new(AnnotationMirror metaAnnotation, String avPrefix, (Element)=>Iterable<? extends Element> srcElementsRule,
-		(Element)=>String nameRule, (Element)=>CharSequence commentRule, (Element)=>List<? extends GenParameter> paramRules, 
-		(GenMethod, Element)=>CharSequence codeRule, (Element)=>TypeMirror returnTypeRule) {
+	new(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Element> srcElementsRule,
+		()=>String nameRule, ()=>CharSequence commentRule, ()=>List<? extends GenParameter> paramRules, 
+		(GenMethod)=>CharSequence codeRule, ()=>TypeMirror returnTypeRule) {
 		super(metaAnnotation, avPrefix, srcElementsRule, nameRule, commentRule, paramRules, codeRule)	
-		_returnTypeRule = returnTypeRule ?: [null]
+		_returnTypeRule = returnTypeRule ?: [|null]
 	}
 	
 	def createReturnTypeRule() {
 		ru.createTypeRule(metaAnnotation, template?.returnType, "return")
 	}
 
-	protected override createMember(Element ruleSrcElement, String name) {
+	protected override createMember(String name) {
 		new GenMethod(name)
 	}
 	
-	protected override applyRulesAfterCreation(GenMethod member, Element ruleSrcElement) {
-		super.applyRulesAfterCreation(member, ruleSrcElement)
-		member.returnType = returnTypeRule.apply(ruleSrcElement)
+	protected override applyRulesAfterCreation(GenMethod member) {
+		super.applyRulesAfterCreation(member)
+		member.returnType = returnTypeRule.apply
 	}
 	
 	
