@@ -82,12 +82,12 @@ class ELVariableRule {
 		_codeFragments = if(codeFragmentAnnotations.empty) null else new CodeFragmentRules(codeFragmentAnnotations)
 	}
 
-	def void putELVariable(Element element, AnnotationMirror triggerAnnotation) {
+	def void putELVariable() {
 		try {
 			if (isFunction) {
 				valueStack.put(name, this)
 			} else {
-				val value = eval(element, triggerAnnotation)
+				val value = eval()
 				valueStack.put(name, value)
 			}
 		} catch (TypeElementNotFoundException tenfe) {
@@ -98,31 +98,43 @@ class ELVariableRule {
 			//dann dazu genutzt werden kann die Flut an gemeldeten Folgefehlern einzudämmen. 
 			reportError(
 				'''Could not evaluate EL variable «name»: «e.message» EL expression: «expr», Property Filter: «propertyFilterAnnotations».''',
-				e, element, elVarAnnotation, null)
+				e, if(currentSrc instanceof Element) currentSrcElement, elVarAnnotation, null)
 		}
 	}
 
-	def Object eval(Element element) {
-		eval(element, currentAnnotation)
+	//For use in EL to customize src
+	def Object eval(Object src) {
+		scope(src)[
+			eval()
+		]		
 	}
 	
 	def Object filter(Iterable<? extends Element> collection) {
-		collection.filter[eval(it) as Boolean]
+		collection.filter[
+			scope(it)[
+				eval() as Boolean
+			]
+		]
 	}
 	
 	def Object map(Iterable<? extends Element> collection) {
-		collection.map[eval(it)]
+		collection.map[
+			scope(it)[
+				eval()			
+			]
+		]
 	}
 	
-	def Object eval(Element element, AnnotationMirror triggerAnnotation) {
-
+	def Object eval() {
+		val triggerAnnotation = currentAnnotation
+		
 		pushCurrentMetaAnnotation(elVarAnnotation)
 		try {
 
 			var Object av
 			
-			//Be default, the value is the current element. This is useful for matcher and retrieveAV
-			var Object value = element
+			//Be default, the value is the current src. This is useful for matcher and retrieveAV
+			var Object value = currentSrc
 			
 			value = if (!triggerAv.nullOrEmpty && {
 					av = currentAnnotation.value(triggerAv, type);
@@ -131,11 +143,8 @@ class ELVariableRule {
 
 					av
 
-				} else if (!expr.nullOrEmpty) {
-					scope(element) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
-						eval(expr, lang, type);
-					]					
-
+				} else if (!expr.nullOrEmpty) {					
+					eval(expr, lang, type);									
 				} else if (!propertyFilterAnnotations.nullOrEmpty) {
 
 					//TODO: Rule caching?
@@ -144,7 +153,7 @@ class ELVariableRule {
 						toList
 
 				} else if (typeQuery != null) {
-					evalTypeQuery(typeQuery, element)
+					evalTypeQuery(typeQuery)
 				} else if (codeFragments!=null){
 					codeFragments
 				} else {
@@ -211,7 +220,7 @@ class ELVariableRule {
 		throw new IllegalArgumentException('''Cannot retrieve annotation «annotationFqn» for «object»''')
 	}
 
-	def evalTypeQuery(AnnotationMirror typeQuery, Element element) {
+	def evalTypeQuery(AnnotationMirror typeQuery) {
 		val triggerAnnotation = typeQuery.value("annotation", TypeMirror);
 		val shadow = typeQuery.value("shadow", Boolean);
 		val unique = typeQuery.value("unique", Boolean);
@@ -225,9 +234,8 @@ class ELVariableRule {
 		val inTypesSet = if (filterAV.nullOrEmpty)
 				emptySet
 			else {
-				val inTypes = scope(element) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
-					eval(inExpr, inExprLang, Object);
-				]
+				val inTypes =  eval(inExpr, inExprLang, Object)
+				
 
 				(if (inTypes instanceof Iterable<?>) {
 					(inTypes as Iterable<TypeMirror>).toSet

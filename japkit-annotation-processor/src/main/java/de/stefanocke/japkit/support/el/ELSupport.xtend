@@ -209,7 +209,7 @@ class ELSupport {
 
 		//TODO: Use Rule Factory
 		val varRule = new ELVariableRule(elVarAnnotation)
-		varRule.putELVariable(element, triggerAnnotation)
+		varRule.putELVariable()
 	}
 	
 
