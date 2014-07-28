@@ -201,7 +201,7 @@ class RelatedTypes {
 	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, TypeElement annotatedClass, Class<T> targetType) {
 		val expr = classSelectorAnnotation.value("expr", String);
 		val lang = classSelectorAnnotation.value("lang", String);
-		ExtensionRegistry.get(ELSupport).eval(annotatedClass, expr, lang, targetType,
+		ExtensionRegistry.get(ELSupport).eval(expr, lang, targetType,
 			'''Error when evaluating class selector expression '«expr»'  ''', null			
 		)
 	}

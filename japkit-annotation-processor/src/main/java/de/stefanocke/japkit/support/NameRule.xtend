@@ -46,7 +46,13 @@ class NameRule {
 			}
 		
 		} else if(!expr.nullOrEmpty) {
-			eval(orgElement, expr, lang, String)
+			//The extra scoping for src element is required here since in ElementsExtensions.generatedTypeElementAccordingToTriggerAnnotation
+			//the name of the generated class for a different annotated class than the current one is determined.
+			//This has nevertheless some flaws, since there could be other context variables that were different when the other class has been generated.
+			//Maybe, the typesRegistry could be used in generatedTypeElementAccordingToTriggerAnnotation instead of calculating the name? 
+			scope(orgElement)[
+				eval(expr, lang, String)			
+			]
 		} else {
 			orgName.toString
 		}

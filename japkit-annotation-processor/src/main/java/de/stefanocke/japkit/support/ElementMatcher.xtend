@@ -20,7 +20,7 @@ class ElementMatcher {
 	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	val extension TypesExtensions typesExtensions = ExtensionRegistry.get(TypesExtensions)
 
-	String src
+	String srcExpr
 	String srcLang
 	Modifier[] modifiers
 	Modifier[] modifiersNot
@@ -57,41 +57,44 @@ class ElementMatcher {
 	def boolean matches(Element originalSrcElement) {
 		val e = srcElement(originalSrcElement) 
 		
-		val result = (e!=null)
-		&& e.hasAllModifiers(modifiers)
-		&& e.hasNotModifiers(modifiersNot)
-		&& e.hasAnyKind(kind)
-		&& e.hasAllAnnotations(annotations)
-		&& e.hasNotAnnotations(annotationsNot)
-		&& e.enclosingElement.hasAllAnnotations(enclosingAnnotations)
-		&& e.enclosingElement.hasNotAnnotations(enclosingAnnotationsNot)
-		&& e.isNotDeclaredBy(notDeclaredBy)
-		
-		&& e.srcType.hasAllAnnotations(typeAnnotations)		
-		&& e.srcType.isSubtype(type)
-		&& (typeCategory.nullOrEmpty || e.srcType.belongsToOneOfCategories(typeCategory))	
-		&& !e.srcType.belongsToOneOfCategories(typeCategoryNot)	
+		scope(e)[
+			val result = (e!=null)
+			&& e.hasAllModifiers(modifiers)
+			&& e.hasNotModifiers(modifiersNot)
+			&& e.hasAnyKind(kind)
+			&& e.hasAllAnnotations(annotations)
+			&& e.hasNotAnnotations(annotationsNot)
+			&& e.enclosingElement.hasAllAnnotations(enclosingAnnotations)
+			&& e.enclosingElement.hasNotAnnotations(enclosingAnnotationsNot)
+			&& e.isNotDeclaredBy(notDeclaredBy)
 			
-		&& e.srcSingleValueType.hasAllAnnotations(singleValueTypeAnnotations)
-		&& e.srcSingleValueType.isSubtype(singleValueType)
-		&& (singleValueTypeCategory.nullOrEmpty || e.srcSingleValueType.belongsToOneOfCategories(singleValueTypeCategory))	
-		&& !e.srcSingleValueType.belongsToOneOfCategories(singleValueTypeCategoryNot)	
+			&& e.srcType.hasAllAnnotations(typeAnnotations)		
+			&& e.srcType.isSubtype(type)
+			&& (typeCategory.nullOrEmpty || e.srcType.belongsToOneOfCategories(typeCategory))	
+			&& !e.srcType.belongsToOneOfCategories(typeCategoryNot)	
+				
+			&& e.srcSingleValueType.hasAllAnnotations(singleValueTypeAnnotations)
+			&& e.srcSingleValueType.isSubtype(singleValueType)
+			&& (singleValueTypeCategory.nullOrEmpty || e.srcSingleValueType.belongsToOneOfCategories(singleValueTypeCategory))	
+			&& !e.srcSingleValueType.belongsToOneOfCategories(singleValueTypeCategoryNot)	
+				
+			&& e.srcTypeArgHasAllAnnotations(typeArg0Annotations, 0)
+			&& e.srcTypeArgHasAllAnnotations(typeArg1Annotations, 1)
+			&& fulfillsCondition(e)
 			
-		&& e.srcTypeArgHasAllAnnotations(typeArg0Annotations, 0)
-		&& e.srcTypeArgHasAllAnnotations(typeArg1Annotations, 1)
-		&& fulfillsCondition(e)
+			//evaluate all constraints, if the matcher matches
+			if(result){
+				constraints.forEach[validate] 
+			}
+			
+			result
 		
-		//evaluate all constraints, if the matcher matches
-		if(result){
-			constraints.forEach[validate(e)] //Prototypisch. sowas sollte besser in den ELResolver.
-		}
-		
-		result
+		]
 	}
 	
 	def Element srcElement(Element element) {
-			if(src.nullOrEmpty) element else 
-				eval(element, src, srcLang, Element, '''Could not evaluate source element expression '«src»' in element matcher. ''', null)
+			if(srcExpr.nullOrEmpty) element else 
+				eval(srcExpr, srcLang, Element, '''Could not evaluate source element expression '«srcExpr»' in element matcher. ''', null)
 			
 		
 	}
@@ -143,10 +146,8 @@ class ElementMatcher {
 	
 	
 	def boolean fulfillsCondition(Element element) {
-			condition.nullOrEmpty || {
-				eval(element, condition, conditionLang, Boolean, '''Could not evaluate condition '«condition»' in element matcher. ''', false)
-			}
-		
+			condition.nullOrEmpty || 
+				eval(condition, conditionLang, Boolean, '''Could not evaluate condition '«condition»' in element matcher. ''', false)		
 	}
 
 	def hasAllAnnotations(TypeMirror type, DeclaredType[] annotations) {
@@ -190,7 +191,7 @@ class ElementMatcher {
 	
 	
 	new(AnnotationMirror am) {
-		_src =  am.value("src", String)
+		_srcExpr =  am.value("src", String)
 		_srcLang =  am.value("srcLang", String)
 		_modifiers = am.value("modifiers", typeof(Modifier[]))
 		_modifiersNot = am.value("modifiersNot", typeof(Modifier[]))

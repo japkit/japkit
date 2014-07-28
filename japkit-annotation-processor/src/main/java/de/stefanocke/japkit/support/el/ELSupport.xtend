@@ -120,13 +120,6 @@ class ELSupport {
 		valueStack.getRequired("src")
 	}
 
-	def <T> T eval(Object src, String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
-		T errorResult) {
-		scope(src) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
-			eval(expr, lang, expectedType, errorMessage, errorResult)
-		]
-	}
-
 	def <T> T eval(String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
 		T errorResult) {
 		try {
@@ -138,13 +131,6 @@ class ELSupport {
 				null, null)
 			errorResult
 		}
-	}
-
-	//
-	def <T> T eval(Object src, String expr, String lang, Class<T> expectedType) {
-		scope(src) [ //TODO: Das ist etwas ineffizient. Es würde reichen, diesen Scope aufzumachen, wann immer das ruleSourceElement bestimmt wird
-			eval(expr, lang, expectedType)
-		]
 	}
 
 	def <T> T eval(String expr, String lang, Class<T> expectedType) {

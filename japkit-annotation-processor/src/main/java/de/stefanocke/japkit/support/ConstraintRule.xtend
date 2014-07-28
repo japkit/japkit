@@ -17,16 +17,16 @@ class ConstraintRule {
 	Kind msgKind
 	String lang
 	
-	def validate(Element e){
+	def validate(){
 		
 		val result = 
 		handleTypeElementNotFound(true, '''Constraint «expr» could not be evaluated.''')[
-			eval(e, expr, null, Boolean, '''Constraint «expr» could not be evaluated''', true)
+			eval(expr, lang, Boolean, '''Constraint «expr» could not be evaluated''', true)
 		]
 		
 		
 		if(result == null || !result){
-			_messageCollector.reportMessage(msg, e, msgKind)
+			reportMessage(msg, if(currentSrc instanceof Element) currentSrcElement, msgKind)
 		}
 	}
 	

@@ -53,7 +53,7 @@ class RuleUtils {
 			val srcElements = if (iteratorExpr.nullOrEmpty) {
 					Collections.singleton(currentSrc)
 				} else {
-					val elements = eval(currentSrc, iteratorExpr, iteratorLang, Object,
+					val elements = eval(iteratorExpr, iteratorLang, Object,
 						'''Iterator expression «iteratorExpr» could not be evaluated''', emptyList)
 						
 					if(elements instanceof Iterable<?>){	
