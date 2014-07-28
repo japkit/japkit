@@ -30,7 +30,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	String avPrefix
 	
 	()=>boolean activationRule
-	()=>Iterable<? extends Object> srcElementsRule
+	()=>Iterable<? extends Object> srcRule
 	()=>String nameRule
 	()=>Set<Modifier> modifiersRule
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
@@ -48,7 +48,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_template = template
 		_avPrefix = avPrefix
 		_activationRule	= createActivationRule
-		_srcElementsRule = createSrcElementsRule 
+		_srcRule = createSrcRule 
 		_nameRule = createNameRule
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
@@ -57,12 +57,12 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}
 	
 	
-	new(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Element> srcElementsRule, ()=>String nameRule, ()=>CharSequence commentRule){
+	new(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Object> srcRule, ()=>String nameRule, ()=>CharSequence commentRule){
 		_metaAnnotation = metaAnnotation
 		_template = null
 		_avPrefix = avPrefix
 		_activationRule	= createActivationRule
-		_srcElementsRule =  srcElementsRule ?: RuleUtils.SINGLE_SRC_ELEMENT 
+		_srcRule =  srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT 
 		_nameRule = nameRule
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
@@ -71,13 +71,13 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}
 	
 	new(()=>boolean activationRule,
-		()=>Iterable<? extends Element> srcElementsRule, ()=>String nameRule,
+		()=>Iterable<? extends Object> srcRule, ()=>String nameRule,
 		()=>Set<Modifier> modifiersRule, (GenElement)=>List<? extends AnnotationMirror> annotationsRule, ()=>CharSequence commentRule) {
 		_metaAnnotation = null
 		_template = null
 		_avPrefix = null
 		_activationRule = activationRule ?: RuleUtils.ALWAYS_ACTIVE
-		_srcElementsRule = srcElementsRule ?: RuleUtils.SINGLE_SRC_ELEMENT
+		_srcRule = srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT
 		_nameRule = nameRule
 		_modifiersRule = modifiersRule ?: [| emptySet]
 		_annotationsRule = annotationsRule ?: [g |emptyList]
@@ -94,8 +94,8 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		ru.createActivationRule(metaAnnotation, avPrefix)
 	}	
 	
-	protected def ()=>Iterable<? extends Object> createSrcElementsRule(){
-		ru.createIteratorExpressionRule(metaAnnotation, avPrefix)
+	protected def ()=>Iterable<? extends Object> createSrcRule(){
+		ru.createSrcExpressionRule(metaAnnotation, avPrefix)
 	}
 	
 	protected def ()=>Set<Modifier> createModifiersRule(){
@@ -128,7 +128,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		try {
 			pushCurrentMetaAnnotation(metaAnnotation)
 
-			val srcElements = srcElementsRule.apply 
+			val srcElements = srcRule.apply 
 
 			srcElements.forEach [ e |
 				scope(e) [

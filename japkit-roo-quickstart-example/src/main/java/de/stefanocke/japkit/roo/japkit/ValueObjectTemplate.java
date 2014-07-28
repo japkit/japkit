@@ -42,7 +42,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 public abstract class ValueObjectTemplate {
 	
 	@InnerClass(members=@Members(Builder.class))
-	@Field(iterator = "#{properties}", modifiers=Modifier.PRIVATE, annotationMappings = @AnnotationMapping(
+	@Field(src = "#{properties}", modifiers=Modifier.PRIVATE, annotationMappings = @AnnotationMapping(
 			copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 					"org.springframework.format.annotation" }), getter=@Getter(fluent=true), setter=@Setter(fluent=true, chain=true), commentFromSrc = true)
 	@ClassSelector(kind=ClassSelectorKind.GEN_INNER_CLASS_NAME, expr="Builder") //TODO!
@@ -55,7 +55,7 @@ public abstract class ValueObjectTemplate {
 		public abstract EnclosingClass build();
 	}
 	
-	@Field(iterator = "#{properties}", 
+	@Field(src = "#{properties}", 
 			annotationMappings = @AnnotationMapping(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 					"org.springframework.format.annotation" }), commentFromSrc = true, getter = @Getter(
 					fluent=true,

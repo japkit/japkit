@@ -17,12 +17,12 @@ class ConstructorRule extends ExecutableElementRule<GenConstructor> {
 		super(metaAnnotation, template)
 	}
 	
-	new(()=>boolean activationRule, ()=>Iterable<? extends Element> srcElementsRule,
+	new(()=>boolean activationRule, ()=>Iterable<? extends Object> srcRule,
 		()=>Set<Modifier> modifiersRule,
 		(GenElement)=>List<? extends AnnotationMirror> annotationsRule, ()=>CharSequence commentRule,
 		()=>List<? extends GenParameter> paramRules, (GenConstructor)=>CharSequence codeRule,
 		()=>TypeMirror returnTypeRule) {
-		super(activationRule, srcElementsRule, RuleUtils.NO_NAME, modifiersRule, annotationsRule, commentRule, paramRules, codeRule)
+		super(activationRule, srcRule, RuleUtils.NO_NAME, modifiersRule, annotationsRule, commentRule, paramRules, codeRule)
 	}
 	
 	override protected createMember(String name) {

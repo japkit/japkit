@@ -46,7 +46,7 @@ public abstract class ControllerMembers {
 	@ParamNames("uiModel")
 	abstract void addDateTimeFormatPatterns(Model uiModel);
 
-	@Method(iterator = "#{datetimeProperties}", nameExpr = "getDateTimeFormat#{src.name.toFirstUpper}", vars = @Var(
+	@Method(src = "#{datetimeProperties}", nameExpr = "getDateTimeFormat#{src.name.toFirstUpper}", vars = @Var(
 			name = "dtfAnnotation", expr = "#{src}", annotation = DateTimeFormat.class),
 			bodyExpr = "return \"#{dtfAnnotation.style}\";")
 	abstract String getDateTimeFormat();

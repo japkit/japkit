@@ -43,18 +43,18 @@ class RuleUtils {
 	/**
 	 * To iterate over a collection of elements and apply the rule for each element.
 	 */
-	public def ()=>Iterable<? extends Object> createIteratorExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	public def ()=>Iterable<? extends Object> createSrcExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
-		val iteratorExpr = metaAnnotation.value("iterator".withPrefix(avPrefix), String)
-		val iteratorLang = metaAnnotation.value("iteratorLang".withPrefix(avPrefix), String);
+		val iteratorExpr = metaAnnotation.value("src".withPrefix(avPrefix), String)
+		val iteratorLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String);
 
 		[|
 			val srcElements = if (iteratorExpr.nullOrEmpty) {
 					Collections.singleton(currentSrc)
 				} else {
 					val elements = eval(iteratorExpr, iteratorLang, Object,
-						'''Iterator expression «iteratorExpr» could not be evaluated''', emptyList)
+						'''Src expression «iteratorExpr» could not be evaluated''', emptyList)
 						
 					if(elements instanceof Iterable<?>){	
 						(elements as Iterable<?>).filterInstanceOf(Element)					
@@ -169,7 +169,7 @@ class RuleUtils {
 	}
 	
 	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template, String avPrefix){
-		val srcRule = createIteratorExpressionRule(paramAnnotation, avPrefix)
+		val srcRule = createSrcExpressionRule(paramAnnotation, avPrefix)
 		val nameRule = createNameExprRule(paramAnnotation, template, avPrefix)
 		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation, template,  avPrefix)
 		val typeRule = createTypeRule(paramAnnotation, template?.asType, avPrefix);

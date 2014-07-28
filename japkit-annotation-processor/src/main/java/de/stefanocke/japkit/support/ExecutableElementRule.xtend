@@ -7,7 +7,6 @@ import de.stefanocke.japkit.gen.GenParameter
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 
@@ -26,20 +25,20 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 		_codeBodyRule = createCodeBodyRule 
 	}
 	
-	new(()=>boolean activationRule, ()=>Iterable<? extends Element> srcElementsRule,
+	new(()=>boolean activationRule, ()=>Iterable<? extends Object> srcRule,
 		()=>String nameRule, ()=>Set<Modifier> modifiersRule,
 		(GenElement)=>List<? extends AnnotationMirror> annotationsRule, ()=>CharSequence commentRule,
 		()=>List<? extends GenParameter> paramRules, (G)=>CharSequence codeRule) {
-		super(activationRule, srcElementsRule, nameRule, modifiersRule, annotationsRule, commentRule)
+		super(activationRule, srcRule, nameRule, modifiersRule, annotationsRule, commentRule)
 		
 		_paramRules = paramRules ?: [|emptyList]
 		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement)=>CharSequence, null)
 	}
 	
-	new(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Element> srcElementsRule,
+	new(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Object> srcRule,
 		()=>String nameRule, ()=>CharSequence commentRule, ()=>List<? extends GenParameter> paramRules,
 		(G)=>CharSequence codeRule) {
-		super(metaAnnotation, avPrefix, srcElementsRule, nameRule, commentRule)
+		super(metaAnnotation, avPrefix, srcRule, nameRule, commentRule)
 		_paramRules = paramRules ?: [|emptyList]
 		val defaultFragments = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
 		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement)=>CharSequence, defaultFragments)

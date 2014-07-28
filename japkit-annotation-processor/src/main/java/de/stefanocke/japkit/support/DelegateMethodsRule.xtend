@@ -12,13 +12,13 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 		super(metaAnnotation, template)
 	}
 
-	override protected createSrcElementsRule() {
+	override protected createSrcRule() {
 		val methodFilter = metaAnnotation.elementMatchers("methodFilter", null);
 		
 		[ |
-			val ruleSrcElement = currentSrcElement
-			valueStack.put("delegate", ruleSrcElement)
-			val delegateTypeElement = ruleSrcElement.srcType.asTypeElement
+			val srcElement = currentSrcElement
+			valueStack.put("delegate", srcElement)
+			val delegateTypeElement = srcElement.srcType.asTypeElement
 			delegateTypeElement.allMethods.filter[m|methodFilter.nullOrEmpty || methodFilter.exists[matches(m)]]
 		]
 	}
