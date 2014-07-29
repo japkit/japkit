@@ -8,7 +8,6 @@ import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.PropertyFilter
-import de.stefanocke.japkit.support.RelatedTypes
 import de.stefanocke.japkit.support.RuleFactory
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypesExtensions
@@ -23,6 +22,7 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.support.TypeResolver
 
 @Data
 class ELVariableRule {
@@ -33,7 +33,7 @@ class ELVariableRule {
 	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	extension ELSupport = ExtensionRegistry.get(ELSupport)
 	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	val extension RelatedTypes = ExtensionRegistry.get(RelatedTypes)
+	val extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 
 	AnnotationMirror elVarAnnotation
 	String name

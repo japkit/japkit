@@ -29,7 +29,7 @@ class RuleUtils {
 	val protected extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	val protected extension AnnotationExtensions  = ExtensionRegistry.get(AnnotationExtensions)
 	val protected extension GenExtensions = ExtensionRegistry.get(GenExtensions)
-	val protected extension RelatedTypes relatedTypes = ExtensionRegistry.get(RelatedTypes)
+	val protected extension TypeResolver relatedTypes = ExtensionRegistry.get(TypeResolver)
 	val protected extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	

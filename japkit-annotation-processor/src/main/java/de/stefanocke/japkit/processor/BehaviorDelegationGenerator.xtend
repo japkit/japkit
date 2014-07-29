@@ -10,7 +10,6 @@ import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
-import de.stefanocke.japkit.support.RelatedTypes
 import de.stefanocke.japkit.support.TypesExtensions
 import de.stefanocke.japkit.support.TypesRegistry
 import java.util.ArrayList
@@ -21,13 +20,14 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.support.TypeResolver
 
 class BehaviorDelegationGenerator {
 	
 	
 	protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	protected extension RelatedTypes relatedTypes = ExtensionRegistry.get(RelatedTypes)
+	protected extension TypeResolver relatedTypes = ExtensionRegistry.get(TypeResolver)
 	protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	
 	def getGenExtensions(){

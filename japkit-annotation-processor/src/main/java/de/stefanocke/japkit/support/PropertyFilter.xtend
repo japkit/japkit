@@ -13,7 +13,7 @@ class PropertyFilter {
 	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	val extension JavaBeansExtensions javaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
 	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val extension RelatedTypes relatedTypes = ExtensionRegistry.get(RelatedTypes)
+	val extension TypeResolver relatedTypes = ExtensionRegistry.get(TypeResolver)
 
 	String[] includeNames
 	List<ElementMatcher> includeRules

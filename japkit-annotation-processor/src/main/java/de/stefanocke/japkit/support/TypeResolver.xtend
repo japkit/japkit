@@ -11,7 +11,8 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
 
-class RelatedTypes {
+/**Resolves type references / class selectors from templates and annotations.*/
+class TypeResolver {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
@@ -41,26 +42,22 @@ class RelatedTypes {
 	def resolveType(AnnotationMirror metaAnnotation, String typeAvName) { 
 
 		val selector = currentAnnotation.valueOrMetaValue(typeAvName, TypeMirror, metaAnnotation)
-		resolveType(selector, typeAvName)
+		selector.resolveType
 
 	}
 
 	def resolveTypes(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
 
 		val selectors = currentAnnotation.valueOrMetaValue(typeArgsAvName, typeof(TypeMirror[]), metaAnnotation)
-		selectors.map(s|resolveType(s, typeArgsAvName))
+		selectors.map(s|s.resolveType)
 
 	}
-	
+
 	def TypeMirror resolveType(TypeMirror selector) {
-		resolveType(selector, null)
-	}
-
-	def private TypeMirror resolveType(TypeMirror selector, CharSequence annotationValueName) {
 
 		
 		try {
-			var resolved =  resolveClassSelector(selector, annotationValueName, true)
+			var resolved =  resolveClassSelector(selector, true)
 			
 			var type = resolved.type
 			
@@ -77,7 +74,7 @@ class RelatedTypes {
 					type
 				} else {
 					getDeclaredType(type.asElement, selDecl.typeArguments.map[
-						resolveType(annotationValueName)
+						resolveType()
 					])				
 				}	
 			}
@@ -109,7 +106,7 @@ class RelatedTypes {
 	/**
 	 * If the type element is annotated with @ClassSelector, the selector is resolved.
 	 */
-	def private resolveClassSelector(TypeMirror type, CharSequence annotationValueName, boolean throwTypeElementNotFound) {
+	def private resolveClassSelector(TypeMirror type, boolean throwTypeElementNotFound) {
 
 		val resolvedSelector = new ResolvedClassSelector
 		resolvedSelector.type = type
@@ -161,7 +158,7 @@ class RelatedTypes {
 					default: {
 						resolvedSelector.type = null
 						messageCollector.reportError('''Selector «resolvedSelector.kind» not supported''',
-							currentAnnotatedClass, currentAnnotation, annotationValueName)
+							currentAnnotatedClass, currentAnnotation, null)
 					}
 						
 				}
@@ -212,14 +209,14 @@ class RelatedTypes {
 	def relatedTypeElementWithProxy(AnnotationMirror metaAnnotation, CharSequence annotationValueName) {
 
 		val selector = currentAnnotation.valueOrMetaValue(annotationValueName, TypeMirror, metaAnnotation)
-		relatedTypeElementWithProxy(selector, annotationValueName)
+		relatedTypeElementWithProxy(selector)
 
 	}
 
-	def private relatedTypeElementWithProxy(TypeMirror selector, CharSequence annotationValueName) {
+	def private relatedTypeElementWithProxy(TypeMirror selector) {
 		try {
 
-			var resolved = resolveClassSelector(selector, annotationValueName, false)
+			var resolved = resolveClassSelector(selector, false)
 
 			var tm = resolved.type
 			var selectorKind = resolved.kind
@@ -262,7 +259,7 @@ class RelatedTypes {
 				
 			} else {
 				throw new ProcessingException('''Selector «selectorKind» not supported''', currentAnnotatedClass, currentAnnotation,
-							annotationValueName, null)
+							null, null)
 			}
 
 		} catch (ProcessingException pe) {

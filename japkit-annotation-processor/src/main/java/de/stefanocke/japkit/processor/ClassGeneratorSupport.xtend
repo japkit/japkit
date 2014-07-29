@@ -18,7 +18,6 @@ import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.ProcessingException
-import de.stefanocke.japkit.support.RelatedTypes
 import de.stefanocke.japkit.support.RuleFactory
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypesExtensions
@@ -41,6 +40,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
 import java.util.Collection
+import de.stefanocke.japkit.support.TypeResolver
 
 class ClassGeneratorSupport {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -51,7 +51,7 @@ class ClassGeneratorSupport {
 	protected val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	protected val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	protected val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	protected val extension RelatedTypes = ExtensionRegistry.get(RelatedTypes)
+	protected val extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 	protected val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 	
 	protected BehaviorDelegationGenerator behaviorDelegationGenerator = new BehaviorDelegationGenerator
