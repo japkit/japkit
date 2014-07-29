@@ -84,7 +84,11 @@ class AnnotationMappingRule {
 	}
 	
 	private def copyAnnotation(AnnotationMirror am) {
+		val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 		GenExtensions.copy(am) => [
+				if(it.annotationType.qualifiedName==currentAnnotation.annotationType.qualifiedName){
+					putShadowAnnotation(it)
+				}
 			//TODO: Ist this still necessary here? 
 				if(setShadowOnTriggerAnnotations){setShadowIfAppropriate}
 			]

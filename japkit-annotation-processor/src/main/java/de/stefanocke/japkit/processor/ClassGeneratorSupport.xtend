@@ -20,6 +20,7 @@ import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.ProcessingException
 import de.stefanocke.japkit.support.RuleFactory
 import de.stefanocke.japkit.support.TypeElementNotFoundException
+import de.stefanocke.japkit.support.TypeResolver
 import de.stefanocke.japkit.support.TypesExtensions
 import de.stefanocke.japkit.support.TypesRegistry
 import de.stefanocke.japkit.support.el.ELSupport
@@ -39,8 +40,6 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
-import java.util.Collection
-import de.stefanocke.japkit.support.TypeResolver
 
 class ClassGeneratorSupport {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -147,6 +146,8 @@ class ClassGeneratorSupport {
 				]
 				
 				generatedClass.addAnnotationMirror(shadowAnnotation)
+				//put on value stack
+				putShadowAnnotation(shadowAnnotation)
 			}
 		
 		} catch (RuntimeException re){

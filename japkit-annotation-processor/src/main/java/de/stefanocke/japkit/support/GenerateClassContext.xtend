@@ -1,10 +1,10 @@
 package de.stefanocke.japkit.support
 
+import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.support.el.ELSupport
 import java.util.Stack
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.support.el.ELSupport
 
 /**
  * Provides access currently generated class and annotated class.
@@ -79,5 +79,10 @@ class GenerateClassContext {
 		currentGeneratedClasses.pop		
 		ExtensionRegistry.get(ELSupport).valueStack.pop
 		
+	}
+	
+	def putShadowAnnotation(AnnotationMirror shadowAnnotation) {
+		val extension ELSupport = ExtensionRegistry.get(ELSupport)
+		valueStack.put("shadowAnnotation", shadowAnnotation)
 	}
 }

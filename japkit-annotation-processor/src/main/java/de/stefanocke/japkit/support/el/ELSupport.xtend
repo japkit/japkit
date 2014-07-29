@@ -3,7 +3,6 @@ package de.stefanocke.japkit.support.el
 import com.google.common.base.Stopwatch
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
-import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypesExtensions
@@ -22,7 +21,6 @@ class ELSupport {
 
 	extension TypesExtensions types = ExtensionRegistry.get(TypesExtensions)
 	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 
 	val Map<String, ELProvider> elProviders = newHashMap
 
@@ -139,8 +137,6 @@ class ELSupport {
 		}
 
 		
-		//nicht schön hier.
-		putShadowAnnotation
 		return getElProvider(lang).eval(valueStack as Map<String, Object>, expr, expectedType, lang) as T
 		
 	}
@@ -167,14 +163,7 @@ class ELSupport {
 		}
 	}
 
-	//nicht schön hier.
-	def putShadowAnnotation() {
-		val currAnno = valueStack.get("currentAnnotation") as AnnotationMirror
-		if (currAnno != null) {
-			valueStack.put("shadowAnnotation",
-				currentGeneratedClass?.annotationMirror(currAnno.annotationAsTypeElement.qualifiedName))
-		}
-	}
+	
 
 	def getElProvider(String lang) {
 		val p = elProviders.get(if(lang.nullOrEmpty) defaultLanguage else lang)
