@@ -31,7 +31,7 @@ class PropertyFilter {
 	def List<Property> getFilteredProperties(TypeElement annotatedClass, GenTypeElement generatedClass) {
 		val propertySource = handleTypeElementNotFound(null,
 			'''Could not find property source for «annotatedClass». No properties will be generated.''', annotatedClass) [
-			relatedType(annotatedClass, generatedClass, am, "sourceClass", metaAnnotation, annotatedClass)?.asTypeElement
+			relatedType(metaAnnotation, "sourceClass")?.asTypeElement
 		]
 		if (propertySource != null) {
 			handleTypeElementNotFound(emptyList,

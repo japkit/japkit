@@ -58,8 +58,7 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 			createTemplateRule(templateClass, null)
 		]
 		
-		val overridesSource = 
-			relatedType(annotatedClass, generatedClass, annotation, "overrides", propertiesAnnotation, annotatedClass)?.asTypeElement
+		val overridesSource = relatedType(propertiesAnnotation, "overrides")?.asTypeElement
 			
 		val overridesMatcher = annotation.valueOrMetaValue("overridesMatcher", AnnotationMirror, propertiesAnnotation).createElementMatcher
 		

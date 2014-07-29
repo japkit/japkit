@@ -1,14 +1,11 @@
 package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenClass
-import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.metaannotations.GenerateClass
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
@@ -18,31 +15,21 @@ class RelatedTypes {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+	extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
+	extension ELSupport =  ExtensionRegistry.get(ELSupport)
 	MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	
-	//Closure to resolve all type selectors in a given type
-	def relatedTypesTransformation(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, Element ruleSrcElement) {
-		[ TypeMirror t |
-			t.relatedType(annotatedClass, generatedClass, triggerAnnotation, null, ruleSrcElement)
-		]
-	}
-	
 	def resolveType(
-		AnnotationMirror anno,
-		TypeElement annotatedClass,
-		GenTypeElement generatedClass,
-		AnnotationMirror methodAnnotation,
+		AnnotationMirror metaAnnotation,
 		String typeAvName,
-		String typeArgsAvName,
-		Element ruleSrcElement
+		String typeArgsAvName
 	) {
 		createTypeIfNecessary(
-			relatedType(annotatedClass, generatedClass, anno, typeAvName, methodAnnotation, ruleSrcElement),
-			relatedTypes(annotatedClass, generatedClass, anno, typeArgsAvName, methodAnnotation, ruleSrcElement)
+			relatedType( metaAnnotation, typeAvName),
+			relatedTypes(metaAnnotation, typeArgsAvName)
 		)
 	}
-
+	
 	def private createTypeIfNecessary(TypeMirror type, List<TypeMirror> typeArgs) {
 		if (type == null || typeArgs.nullOrEmpty || !(type instanceof DeclaredType)) {
 			type
@@ -51,34 +38,34 @@ class RelatedTypes {
 		}
 	}
 
-	def relatedType(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am, CharSequence annotationValueName,
-		AnnotationMirror metaAnnotation,  Element ruleSourceElement) {
+	def relatedType(AnnotationMirror metaAnnotation, String typeAvName) { 
 
-		val selector = am.valueOrMetaValue(annotationValueName, TypeMirror, metaAnnotation)
-		relatedType(selector, annotatedClass, generatedClass, am, annotationValueName, ruleSourceElement)
+		val selector = currentAnnotation.valueOrMetaValue(typeAvName, TypeMirror, metaAnnotation)
+		relatedType(selector, typeAvName)
 
 	}
 
-	def relatedTypes(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am, CharSequence annotationValueName,
-		AnnotationMirror metaAnnotation, Element ruleSourceElement) {
+	def relatedTypes(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
 
-		val selectors = am.valueOrMetaValue(annotationValueName, typeof(TypeMirror[]), metaAnnotation)
-		selectors.map(s|relatedType(s, annotatedClass, generatedClass, am, annotationValueName, ruleSourceElement))
+		val selectors = currentAnnotation.valueOrMetaValue(typeArgsAvName, typeof(TypeMirror[]), metaAnnotation)
+		selectors.map(s|relatedType(s, typeArgsAvName))
 
 	}
 	
+	def TypeMirror relatedType(TypeMirror selector) {
+		relatedType(selector, null)
+	}
 
-	def TypeMirror relatedType(TypeMirror selector, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am,
-		CharSequence annotationValueName, Element ruleSourceElement) {
+	def private TypeMirror relatedType(TypeMirror selector, CharSequence annotationValueName) {
 
 		
 		try {
-			var resolved =  resolveClassSelector(selector, annotatedClass, generatedClass, am, annotationValueName, ruleSourceElement, true)
+			var resolved =  resolveClassSelector(selector, annotationValueName, true)
 			
 			var type = resolved.type
 			
 			if (type != null) {
-				annotatedClass.registerTypeDependencyForAnnotatedClass(type)
+				currentAnnotatedClass.registerTypeDependencyForAnnotatedClass(type)
 			}
 			
 			//If the selector has type arguments, map them as well
@@ -90,7 +77,7 @@ class RelatedTypes {
 					type
 				} else {
 					getDeclaredType(type.asElement, selDecl.typeArguments.map[
-						relatedType(annotatedClass, generatedClass, am, annotationValueName, ruleSourceElement)
+						relatedType(annotationValueName)
 					])				
 				}	
 			}
@@ -122,8 +109,7 @@ class RelatedTypes {
 	/**
 	 * If the type element is annotated with @ClassSelector, the selector is resolved.
 	 */
-	def private resolveClassSelector(TypeMirror type, TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am,
-		CharSequence annotationValueName, Element ruleSourceElement, boolean throwTypeElementNotFound) {
+	def private resolveClassSelector(TypeMirror type, CharSequence annotationValueName, boolean throwTypeElementNotFound) {
 
 		val resolvedSelector = new ResolvedClassSelector
 		resolvedSelector.type = type
@@ -147,35 +133,35 @@ class RelatedTypes {
 					case ClassSelectorKind.NONE:
 						resolvedSelector.type = null
 					case ClassSelectorKind.ANNOTATED_CLASS:
-						resolvedSelector.type = annotatedClass?.asType
+						resolvedSelector.type = currentAnnotatedClass?.asType
 					case ClassSelectorKind.GENERATED_CLASS:
-						resolvedSelector.type = generatedClass?.asType
+						resolvedSelector.type = currentGeneratedClass?.asType
 					case ClassSelectorKind.SRC_ELEMENT_TYPE:
-						resolvedSelector.type = ruleSourceElement.asType
+						resolvedSelector.type = currentSrcElement.asType
 					case ClassSelectorKind.SRC_ELEMENT_SINGLE_VALUE_TYPE:
-						resolvedSelector.type = ruleSourceElement.asType.singleValueType
+						resolvedSelector.type = currentSrcElement.asType.singleValueType
 					case ClassSelectorKind.TYPE_MIRROR: {
-						resolvedSelector.type = am.value(classSelectorAnnotation.getClassSelectorAvName(te),
+						resolvedSelector.type = currentAnnotation.value(classSelectorAnnotation.getClassSelectorAvName(te),
 							TypeMirror)
 						if(resolvedSelector.type == null){
-							resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, TypeMirror)
+							resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, TypeMirror)
 						}	
 					}
 					case ClassSelectorKind.INNER_CLASS_NAME:
-					{	val enclosingClass = annotatedClass
-						resolveInnerClassSelector(resolvedSelector, am, annotatedClass, classSelectorAnnotation, te, enclosingClass, throwTypeElementNotFound)	
+					{	val enclosingClass = currentAnnotatedClass
+						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te, enclosingClass, throwTypeElementNotFound)	
 					}
 					case ClassSelectorKind.GEN_INNER_CLASS_NAME:
-					{	val enclosingClass = generatedClass
-						resolveInnerClassSelector(resolvedSelector, am, annotatedClass, classSelectorAnnotation, te, enclosingClass, throwTypeElementNotFound)	
+					{	val enclosingClass = currentGeneratedClass
+						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te, enclosingClass, throwTypeElementNotFound)	
 					}
 					case ClassSelectorKind.EXPR : {
-						resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, TypeMirror)
+						resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, TypeMirror)
 					}
 					default: {
 						resolvedSelector.type = null
 						messageCollector.reportError('''Selector «resolvedSelector.kind» not supported''',
-							annotatedClass, am, annotationValueName)
+							currentAnnotatedClass, currentAnnotation, annotationValueName)
 					}
 						
 				}
@@ -187,18 +173,17 @@ class RelatedTypes {
 		resolvedSelector
 	}
 	
-	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector, AnnotationMirror am, TypeElement annotatedClass, AnnotationMirror classSelectorAnnotation, TypeElement te, TypeElement enclosingClass, boolean throwTypeElementNotFound) {
-		resolvedSelector.innerClassName = am.value(annotatedClass,
-			classSelectorAnnotation.getClassSelectorAvName(te), String)
+	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector, AnnotationMirror classSelectorAnnotation, TypeElement te, TypeElement enclosingClass, boolean throwTypeElementNotFound) {
+		resolvedSelector.innerClassName = currentAnnotation.value(currentAnnotatedClass, classSelectorAnnotation.getClassSelectorAvName(te), String)
 			
 		if(resolvedSelector.innerClassName == null){
-			resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, annotatedClass, String)
+			resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, String)
 		} 
 		resolvedSelector.typeElement = findInnerClass(enclosingClass, resolvedSelector.innerClassName, throwTypeElementNotFound)
 		resolvedSelector.type = resolvedSelector.typeElement?.asType
 	}
 	
-	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, TypeElement annotatedClass, Class<T> targetType) {
+	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, Class<T> targetType) {
 		val expr = classSelectorAnnotation.value("expr", String);
 		val lang = classSelectorAnnotation.value("lang", String);
 		ExtensionRegistry.get(ELSupport).eval(expr, lang, targetType,
@@ -224,20 +209,17 @@ class RelatedTypes {
 	 * This proxy can be used by the code generator to state requirements for the type element, for example, which superclasses to extend. 
 	 * 
 	 */
-	def relatedTypeElementWithProxy(TypeElement annotatedClass, AnnotationMirror am, CharSequence annotationValueName,
-		AnnotationMirror metaAnnotation) {
+	def relatedTypeElementWithProxy(AnnotationMirror metaAnnotation, CharSequence annotationValueName) {
 
-		val genClass = am.metaAnnotation(GenerateClass)
-		val selector = am.valueOrMetaValue(annotationValueName, TypeMirror, metaAnnotation)
-		relatedTypeElementWithProxy(selector, annotatedClass, am, genClass, annotationValueName)
+		val selector = currentAnnotation.valueOrMetaValue(annotationValueName, TypeMirror, metaAnnotation)
+		relatedTypeElementWithProxy(selector, annotationValueName)
 
 	}
 
-	def private relatedTypeElementWithProxy(TypeMirror selector, TypeElement annotatedClass, AnnotationMirror am,
-		AnnotationMirror metaAnnotation, CharSequence annotationValueName) {
+	def private relatedTypeElementWithProxy(TypeMirror selector, CharSequence annotationValueName) {
 		try {
 
-			var resolved = resolveClassSelector(selector, annotatedClass, null, am, annotationValueName, annotatedClass, false)
+			var resolved = resolveClassSelector(selector, annotationValueName, false)
 
 			var tm = resolved.type
 			var selectorKind = resolved.kind
@@ -263,7 +245,7 @@ class RelatedTypes {
 					val simpleName = segments.last
 
 					val packageName = if (segments.length == 1) {
-							annotatedClass.package.qualifiedName
+							currentAnnotatedClass.package.qualifiedName
 						} else {
 							fqn.substring(0, fqn.length - simpleName.length - 1)
 						}
@@ -275,11 +257,11 @@ class RelatedTypes {
 			} else if(selectorKind == ClassSelectorKind.INNER_CLASS_NAME){
 				
 					val proxy = new GenClass(resolved.innerClassName)
-					proxy.setEnclosingElement(annotatedClass)
+					proxy.setEnclosingElement(currentAnnotatedClass)
 					proxy -> resolved.typeElement
 				
 			} else {
-				throw new ProcessingException('''Selector «selectorKind» not supported''', annotatedClass, am,
+				throw new ProcessingException('''Selector «selectorKind» not supported''', currentAnnotatedClass, currentAnnotation,
 							annotationValueName, null)
 			}
 

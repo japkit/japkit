@@ -46,7 +46,7 @@ class BehaviorDelegationGenerator {
 
 		//TODO: Name of interface and base class configurable
 		//TODO: Visibility of interface and base class configurable
-		val behaviorProxyAndTypeElement = annotatedClass.relatedTypeElementWithProxy(am, "behaviorClass", genClassAnnotation)
+		val behaviorProxyAndTypeElement = relatedTypeElementWithProxy(genClassAnnotation, "behaviorClass")
 
 		val behaviorClass = behaviorProxyAndTypeElement.key
 

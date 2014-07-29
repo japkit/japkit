@@ -143,11 +143,9 @@ class RuleUtils {
 		String avPrefix) {
 
 		[  |
-			val typeFromTemplate = template?.relatedType(currentAnnotatedClass, currentGeneratedClass, currentAnnotation,
-				null, currentSrcElement)
+			val typeFromTemplate = template?.relatedType
 			if(metaAnnotation == null) return typeFromTemplate
-			val type = currentAnnotation.resolveType(currentAnnotatedClass, currentGeneratedClass, metaAnnotation,
-				"type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix), currentSrcElement)
+			val type = resolveType(metaAnnotation,"type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix))
 			if (!type.isVoid) {
 				type
 			} else {
