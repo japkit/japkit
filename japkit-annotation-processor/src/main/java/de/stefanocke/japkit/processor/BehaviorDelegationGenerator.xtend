@@ -27,7 +27,7 @@ class BehaviorDelegationGenerator {
 	
 	protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	protected extension TypeResolver relatedTypes = ExtensionRegistry.get(TypeResolver)
+	protected extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	
 	def getGenExtensions(){

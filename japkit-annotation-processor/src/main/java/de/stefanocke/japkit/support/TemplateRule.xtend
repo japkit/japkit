@@ -17,7 +17,7 @@ import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
 class TemplateRule implements Procedure1<GenTypeElement>{
 
 	protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension TypeResolver relatedTypes = ExtensionRegistry.get(TypeResolver)
+	val extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val RuleUtils ru = ExtensionRegistry.get(RuleUtils)

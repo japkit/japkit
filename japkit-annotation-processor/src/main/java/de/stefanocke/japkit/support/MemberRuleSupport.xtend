@@ -22,7 +22,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	val protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	val protected extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val protected extension TypeResolver relatedTypes = ExtensionRegistry.get(TypeResolver)
+	val protected extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	val protected RuleUtils ru = ExtensionRegistry.get(RuleUtils)
 
 	AnnotationMirror metaAnnotation

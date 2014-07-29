@@ -49,7 +49,7 @@ class JapkitProcessor extends AbstractProcessor {
 	extension TypesExtensions typesExtensions
 
 	extension AnnotationExtensions annotationExtensions
-	extension TypeResolver relatedTypes
+	extension TypeResolver typesResolver
 	extension MessageCollector messageCollector
 	extension GenerateClassContext generateClassContext
 	extension TypesRegistry typesRegistry
@@ -82,7 +82,7 @@ class JapkitProcessor extends AbstractProcessor {
 		messageCollector.diagnosticLogging = "true".equals(processingEnv.options.get("diagnosticMessages"))
 
 		generateClassContext = ExtensionRegistry.get(GenerateClassContext)
-		relatedTypes = ExtensionRegistry.get(TypeResolver)
+		typesResolver = ExtensionRegistry.get(TypeResolver)
 		typesRegistry = ExtensionRegistry.get(TypesRegistry)
 		ruleFactory = ExtensionRegistry.get(RuleFactory)
 		elSupport = ExtensionRegistry.get(ELSupport)

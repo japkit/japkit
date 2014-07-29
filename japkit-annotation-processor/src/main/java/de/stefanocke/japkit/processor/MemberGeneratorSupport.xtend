@@ -22,7 +22,7 @@ abstract class MemberGeneratorSupport implements MemberGenerator {
 	protected extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 	protected extension JavaBeansExtensions javaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
 	protected extension ProcessingEnvironment processingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
-	protected extension TypeResolver relatedTypes = ExtensionRegistry.get(TypeResolver)
+	protected extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	protected extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	protected extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	protected extension RuleFactory = ExtensionRegistry.get(RuleFactory)

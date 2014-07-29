@@ -89,7 +89,7 @@ class TypeResolver {
 			//Beispiel: Kind-Entität verweist in ihren Annotationen auf Aggregat-Root. Aggregat-Root enthält liste der Kinder.
 			//Ggf kann man hier immer einen Zyklus "vermuten". Aber welche Elemente sind in diesem enthalten?
 			//
-			//Man kann das evtl umgehen, in dem in relatedTypes immer auf die annotierte Klasse verwiesen wird und nicht auf 
+			//Man kann das umgehen, indem in Trigger-Annotationen immer auf die annotierte Klasse verwiesen wird und nicht auf 
 			//die daraus generierte Klasse.
 			//
 			//Vermutlich ein JDK-Bug. Anstatt eine ErrorType zu liefern, wird hier eine Instanz von com.sun.tools.javac.code.Attribute.Error
