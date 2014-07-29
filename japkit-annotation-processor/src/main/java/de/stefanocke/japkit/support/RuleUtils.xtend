@@ -143,7 +143,7 @@ class RuleUtils {
 		String avPrefix) {
 
 		[  |
-			val typeFromTemplate = template?.relatedType
+			val typeFromTemplate = template?.resolveType
 			if(metaAnnotation == null) return typeFromTemplate
 			val type = resolveType(metaAnnotation,"type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix))
 			if (!type.isVoid) {

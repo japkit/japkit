@@ -25,8 +25,8 @@ class RelatedTypes {
 		String typeArgsAvName
 	) {
 		createTypeIfNecessary(
-			relatedType( metaAnnotation, typeAvName),
-			relatedTypes(metaAnnotation, typeArgsAvName)
+			resolveType( metaAnnotation, typeAvName),
+			resolveTypes(metaAnnotation, typeArgsAvName)
 		)
 	}
 	
@@ -38,25 +38,25 @@ class RelatedTypes {
 		}
 	}
 
-	def relatedType(AnnotationMirror metaAnnotation, String typeAvName) { 
+	def resolveType(AnnotationMirror metaAnnotation, String typeAvName) { 
 
 		val selector = currentAnnotation.valueOrMetaValue(typeAvName, TypeMirror, metaAnnotation)
-		relatedType(selector, typeAvName)
+		resolveType(selector, typeAvName)
 
 	}
 
-	def relatedTypes(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
+	def resolveTypes(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
 
 		val selectors = currentAnnotation.valueOrMetaValue(typeArgsAvName, typeof(TypeMirror[]), metaAnnotation)
-		selectors.map(s|relatedType(s, typeArgsAvName))
+		selectors.map(s|resolveType(s, typeArgsAvName))
 
 	}
 	
-	def TypeMirror relatedType(TypeMirror selector) {
-		relatedType(selector, null)
+	def TypeMirror resolveType(TypeMirror selector) {
+		resolveType(selector, null)
 	}
 
-	def private TypeMirror relatedType(TypeMirror selector, CharSequence annotationValueName) {
+	def private TypeMirror resolveType(TypeMirror selector, CharSequence annotationValueName) {
 
 		
 		try {
@@ -77,7 +77,7 @@ class RelatedTypes {
 					type
 				} else {
 					getDeclaredType(type.asElement, selDecl.typeArguments.map[
-						relatedType(annotationValueName)
+						resolveType(annotationValueName)
 					])				
 				}	
 			}

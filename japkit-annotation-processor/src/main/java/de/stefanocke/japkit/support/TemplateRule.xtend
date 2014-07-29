@@ -72,7 +72,7 @@ class TemplateRule implements Procedure1<GenTypeElement>{
 
 	def addInterfaces(GenTypeElement generatedClass) {
 		templateClass.interfaces.forEach [
-			generatedClass.addInterface(it.relatedType) //TODO: Check , if interface already exists? 
+			generatedClass.addInterface(it.resolveType) //TODO: Check , if interface already exists? 
 		]
 	}
 }

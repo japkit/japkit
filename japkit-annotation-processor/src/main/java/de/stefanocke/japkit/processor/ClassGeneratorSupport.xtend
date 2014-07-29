@@ -241,11 +241,11 @@ class ClassGeneratorSupport {
 	
 		def setSuperClassAndInterfaces(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am,
 		AnnotationMirror genClass) {
-		val superclass = relatedType(genClass, "superclass") as DeclaredType ->	relatedTypes(genClass, "superclassTypeArgs") 
+		val superclass = resolveType(genClass, "superclass") as DeclaredType ->	resolveTypes(genClass, "superclassTypeArgs") 
 		//interfaces with type args
 		val interfaces = (1 .. 2).map[i|
-			relatedType(genClass, '''interface«i»''') as DeclaredType ->
-				relatedTypes(genClass, '''interface«i»TypeArgs''')].filter[
+			resolveType(genClass, '''interface«i»''') as DeclaredType ->
+				resolveTypes(genClass, '''interface«i»TypeArgs''')].filter[
 			key != null].toList
 
 		generatedClass => [
