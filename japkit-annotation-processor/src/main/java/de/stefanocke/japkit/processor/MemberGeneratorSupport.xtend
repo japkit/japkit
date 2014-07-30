@@ -14,6 +14,8 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.support.TypeResolver
+import java.util.List
+import de.stefanocke.japkit.gen.GenElement
 
 abstract class MemberGeneratorSupport implements MemberGenerator {
 	protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -36,5 +38,5 @@ abstract class MemberGeneratorSupport implements MemberGenerator {
 				createMemberRule(membersClass, metaAnnotationToBeProcessed).apply(generatedClass)
 	}
 	
-	def (GenTypeElement)=>void createMemberRule(TypeElement membersClass, AnnotationMirror metaAnnotationToBeProcessed)
+	def (GenTypeElement)=>List<? extends GenElement> createMemberRule(TypeElement membersClass, AnnotationMirror metaAnnotationToBeProcessed)
 }

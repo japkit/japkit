@@ -9,10 +9,10 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
-public abstract class MemberRuleSupport<E extends Element, T extends GenElement> implements Procedure1<GenTypeElement>{
+public abstract class MemberRuleSupport<E extends Element, T extends GenElement> implements Function1<GenTypeElement, List<? extends GenElement>>{
 	val protected extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 
 	val protected extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
@@ -37,7 +37,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	()=>CharSequence commentRule
 	
 	//members to be created for the generated member. for instance, getters and setters to  be created for the generated field
-	List<(GenTypeElement) => void> dependentMemberRules = newArrayList()
+	List<(GenTypeElement) => List<? extends GenElement>> dependentMemberRules = newArrayList()
 
 	new(AnnotationMirror metaAnnotation, E template){
 		this(metaAnnotation, template, null)
@@ -122,7 +122,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	override apply(GenTypeElement generatedClass) {
 
 		if (!activationRule.apply) {
-			return
+			return emptyList
 		}
 
 		try {
@@ -130,15 +130,17 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 
 			withSrc [
 				putELVariables(metaAnnotation)
+				val generatedMembers = newArrayList()
 				val member = createMember
 				generatedClass.add(member)
+				generatedMembers.add(member)
 				dependentMemberRules.forEach [ r |
 					//apply dependent rules. The rule source element is the member just created.
 					scope(member) [
-						r.apply(generatedClass)
+						generatedMembers.addAll(r.apply(generatedClass))
 					]
 				]
-				member
+				generatedMembers
 			]
 			
 		} catch(Exception re) {
@@ -146,15 +148,15 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 			reportError('''Error in meta annotation «metaAnnotation» «IF template !=null»in template «template» «ENDIF»''', 
 				re, currentAnnotatedClass, currentAnnotation, null
 			)
+			emptyList
 		} finally {
 			popCurrentMetaAnnotation
 		}
 
 	}
 	
-	protected def withSrc((Object)=>T closure){
-		//Note: We currently don't use the result
-		ru.mapWithSrc(srcRule, closure).toList
+	protected def withSrc((Object)=>Iterable<? extends GenElement> closure){
+		ru.mapWithSrc(srcRule, closure).flatten.toList
 	}
 
 

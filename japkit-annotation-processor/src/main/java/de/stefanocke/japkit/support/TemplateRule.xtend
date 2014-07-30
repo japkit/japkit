@@ -11,10 +11,10 @@ import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
-class TemplateRule implements Procedure1<GenTypeElement>{
+class TemplateRule implements Function1<GenTypeElement, List<? extends GenElement>>{
 
 	protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
@@ -53,7 +53,7 @@ class TemplateRule implements Procedure1<GenTypeElement>{
 
 	}
 
-	override void apply(GenTypeElement generatedClass) {
+	override apply(GenTypeElement generatedClass) {
 		
 			
 		scope[
@@ -62,10 +62,15 @@ class TemplateRule implements Procedure1<GenTypeElement>{
 			generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
 
 			addInterfaces(generatedClass)
-			innerClassRules.forEach [it.apply(generatedClass)]
-			fieldRules.forEach [it.apply(generatedClass)]
-			constructorRules.forEach [it.apply(generatedClass)]
-			methodRules.forEach [it.apply( generatedClass)]		
+			
+			val generatedMembers = newArrayList
+			
+			innerClassRules.forEach [generatedMembers.addAll(it.apply(generatedClass))]
+			fieldRules.forEach [generatedMembers.addAll(it.apply(generatedClass))]
+			constructorRules.forEach [generatedMembers.addAll(it.apply(generatedClass))]
+			methodRules.forEach [generatedMembers.addAll(it.apply( generatedClass))]		
+			
+			generatedMembers
 		]
 
 	}

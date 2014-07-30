@@ -15,6 +15,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+import javax.lang.model.element.ExecutableElement
 
 class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
 	val protected extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
@@ -131,13 +132,13 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 					]
 				generatedClass.add(genField)
 								
-				getterRule?.apply(generatedClass)
+				val genGetter = getterRule?.apply(generatedClass)?.head as ExecutableElement
 							
-				setterRule?.apply(generatedClass)
+				val genSetter = setterRule?.apply(generatedClass)?.head as ExecutableElement
 				
-				//val genProperty = new Property(genField, genGetter, genSetter)
+				val genProperty = new Property(genField, genGetter, genSetter)
 				
-				scope(genField/*genProperty */) [
+				scope(genProperty) [
 					delegateMethodRules.forEach[apply(generatedClass)]
 				]
 			}
