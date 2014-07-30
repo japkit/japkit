@@ -119,7 +119,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		ExtensionRegistry.get(GenExtensions)
 	}
 
-	override void apply(GenTypeElement generatedClass) {
+	override apply(GenTypeElement generatedClass) {
 
 		if (!activationRule.apply) {
 			return
@@ -128,21 +128,19 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		try {
 			pushCurrentMetaAnnotation(metaAnnotation)
 
-			val srcElements = srcRule.apply 
-
-			srcElements.forEach [ e |
-				scope(e) [
-					putELVariables(metaAnnotation) 
-					val member = createMember
-					generatedClass.add(member)
-					dependentMemberRules.forEach[r | 
-						//apply dependent rules. The rule source element is the member just created.
-						scope(member)[
-							r.apply(generatedClass)
-						]
+			withSrc [
+				putELVariables(metaAnnotation)
+				val member = createMember
+				generatedClass.add(member)
+				dependentMemberRules.forEach [ r |
+					//apply dependent rules. The rule source element is the member just created.
+					scope(member) [
+						r.apply(generatedClass)
 					]
 				]
+				member
 			]
+			
 		} catch(Exception re) {
 			//don't let one member screw up the whole class
 			reportError('''Error in meta annotation «metaAnnotation» «IF template !=null»in template «template» «ENDIF»''', 
@@ -152,6 +150,11 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 			popCurrentMetaAnnotation
 		}
 
+	}
+	
+	protected def withSrc((Object)=>T closure){
+		//Note: We currently don't use the result
+		ru.mapWithSrc(srcRule, closure).toList
 	}
 
 

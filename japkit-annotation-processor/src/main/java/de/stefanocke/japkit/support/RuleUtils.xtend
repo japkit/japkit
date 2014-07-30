@@ -51,7 +51,7 @@ class RuleUtils {
 
 		[|
 			val srcElements = if (iteratorExpr.nullOrEmpty) {
-					Collections.singleton(currentSrc)
+					null //Use parent's src. No new scope.
 				} else {
 					val elements = eval(iteratorExpr, iteratorLang, Object,
 						'''Src expression «iteratorExpr» could not be evaluated''', emptyList)
@@ -64,6 +64,21 @@ class RuleUtils {
 				} 
 			srcElements
 		]
+	}
+	
+	public def <T> Iterable<T>  mapWithSrc(()=>Iterable<? extends Object> srcRule, (Object)=>T closure) {
+		val srcElements = srcRule?.apply
+
+		if (srcElements != null) {
+			srcElements.map [ e |
+				scope(e) [
+					closure.apply(e)
+				]
+			]
+		} else {
+			//Use parent's src. No new scope.
+			Collections.singleton(closure.apply(currentSrc))
+		}
 	}
 	
 	public static val ALWAYS_ACTIVE = [| true]
@@ -178,18 +193,16 @@ class RuleUtils {
 	
 	public def ()=>List<? extends GenParameter> createParamRule(()=>Iterable<? extends Object> srcRule, ()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
 		[ |
-			(srcRule ?: SINGLE_SRC_ELEMENT).apply.map [ e |
-				scope(e) [
-					val name = nameRule.apply
-					val type = typeRule.apply
+			mapWithSrc(srcRule) [
+				val name = nameRule.apply
+				val type = typeRule.apply
+				
+				val param = new GenParameter(name, type)
 					
-					val param = new GenParameter(name, type)
-						
-					if(annotationMappingRules!=null){	
-						param.annotationMirrors = annotationMappingRules.apply(param)
-					}
-					param
-				]
+				if(annotationMappingRules!=null){	
+					param.annotationMirrors = annotationMappingRules.apply(param)
+				}
+				param
 			].toList
 		]
 	}
