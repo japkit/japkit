@@ -21,7 +21,7 @@ public @interface AnnotationMapping {
 	String id() default "";
 
 	/**
-	 * Optional expression to determine the element to which the checks of the matcher are applied to. By default this is the current source element (#{element}). 
+	 * Optional expression to determine the element to which the checks of the matcher are applied to. By default this is the current source element (#{src}). 
 	 * @return the expression
 	 */
 	String src() default "";

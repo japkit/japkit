@@ -40,6 +40,14 @@ public @interface Constructor {
 	 * @return the language of the src expression. Defaults to Java EL.
 	 */
 	String srcLang() default "";
+	
+	/**
+	 * By default, the current source object has the name "src" on the value stack.
+	 * If this annotation value is set, the source object will additionally provided under the given name.  
+	 * 
+	 * @return the name of the source variable
+	 */
+	String srcVar() default "";
 
 	/**
 	 * EL Variables within the scope of the method. The root property "element"

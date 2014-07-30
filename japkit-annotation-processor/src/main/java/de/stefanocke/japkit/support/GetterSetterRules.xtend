@@ -63,7 +63,6 @@ class GetterSetterRules {
 	
 	private def ()=>List<? extends GenParameter> createSetterParamRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		createParamRule(
-			null,
 			[|currentSrcElement.simpleName.toString],
 			[|currentSrcElement.asType],
 			createAnnotationMappingRules(metaAnnotation, null, "param".withPrefix(avPrefix))

@@ -30,6 +30,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	String avPrefix
 	
 	()=>boolean activationRule
+	String srcVarName
 	()=>Iterable<? extends Object> srcRule
 	()=>String nameRule
 	()=>Set<Modifier> modifiersRule
@@ -48,6 +49,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_template = template
 		_avPrefix = avPrefix
 		_activationRule	= createActivationRule
+		_srcVarName = createSrcVarName
 		_srcRule = createSrcRule 
 		_nameRule = createNameRule
 		_modifiersRule = createModifiersRule
@@ -62,6 +64,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_template = null
 		_avPrefix = avPrefix
 		_activationRule	= createActivationRule
+		_srcVarName = createSrcVarName
 		_srcRule =  srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT 
 		_nameRule = nameRule
 		_modifiersRule = createModifiersRule
@@ -77,6 +80,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_template = null
 		_avPrefix = null
 		_activationRule = activationRule ?: RuleUtils.ALWAYS_ACTIVE
+		_srcVarName = createSrcVarName
 		_srcRule = srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT
 		_nameRule = nameRule
 		_modifiersRule = modifiersRule ?: [| emptySet]
@@ -96,6 +100,10 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	
 	protected def ()=>Iterable<? extends Object> createSrcRule(){
 		ru.createSrcExpressionRule(metaAnnotation, avPrefix)
+	}
+	
+	protected def String createSrcVarName(){
+		ru.getSrcVarName(metaAnnotation, avPrefix)
 	}
 	
 	protected def ()=>Set<Modifier> createModifiersRule(){
@@ -156,7 +164,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}
 	
 	protected def withSrc((Object)=>Iterable<? extends GenElement> closure){
-		ru.mapWithSrc(srcRule, closure).flatten.toList
+		ru.mapWithSrc(srcRule, _srcVarName, closure).flatten.toList
 	}
 
 

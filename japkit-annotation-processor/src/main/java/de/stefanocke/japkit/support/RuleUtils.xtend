@@ -46,15 +46,15 @@ class RuleUtils {
 	public def ()=>Iterable<? extends Object> createSrcExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
-		val iteratorExpr = metaAnnotation.value("src".withPrefix(avPrefix), String)
-		val iteratorLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String);
+		val srcExpr = metaAnnotation.value("src".withPrefix(avPrefix), String)
+		val srcLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String);
 
 		[|
-			val srcElements = if (iteratorExpr.nullOrEmpty) {
+			val srcElements = if (srcExpr.nullOrEmpty) {
 					null //Use parent's src. No new scope.
 				} else {
-					val elements = eval(iteratorExpr, iteratorLang, Object,
-						'''Src expression «iteratorExpr» could not be evaluated''', emptyList)
+					val elements = eval(srcExpr, srcLang, Object,
+						'''Src expression «srcExpr» could not be evaluated''', emptyList)
 						
 					if(elements instanceof Iterable<?>){	
 						(elements as Iterable<?>).filterInstanceOf(Element)					
@@ -66,12 +66,17 @@ class RuleUtils {
 		]
 	}
 	
-	public def <T> Iterable<T>  mapWithSrc(()=>Iterable<? extends Object> srcRule, (Object)=>T closure) {
+	public def getSrcVarName(AnnotationMirror metaAnnotation, String avPrefix) {
+		metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
+	}
+	
+	public def <T> Iterable<T>  mapWithSrc(()=>Iterable<? extends Object> srcRule, String srcVarName, (Object)=>T closure) {
 		val srcElements = srcRule?.apply
 
 		if (srcElements != null) {
 			srcElements.map [ e |
 				scope(e) [
+					if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
 					closure.apply(e)
 				]
 			]
@@ -182,18 +187,25 @@ class RuleUtils {
 	}
 	
 	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template, String avPrefix){
+		val srcVarName = getSrcVarName(paramAnnotation, avPrefix)
 		val srcRule = createSrcExpressionRule(paramAnnotation, avPrefix)
 		val nameRule = createNameExprRule(paramAnnotation, template, avPrefix)
 		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation, template,  avPrefix)
 		val typeRule = createTypeRule(paramAnnotation, template?.asType, avPrefix);
 		
-		createParamRule(srcRule, nameRule, typeRule, annotationMappingRules)
+		createParamRule(srcRule, srcVarName, nameRule, typeRule, annotationMappingRules)
 
 	}
 	
-	public def ()=>List<? extends GenParameter> createParamRule(()=>Iterable<? extends Object> srcRule, ()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
+	public def ()=>List<? extends GenParameter> createParamRule(()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
+		createParamRule(null, null, nameRule, typeRule, annotationMappingRules)
+	
+	}
+	
+	public def ()=>List<? extends GenParameter> createParamRule(()=>Iterable<? extends Object> srcRule, String srcVarName, ()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
+		
 		[ |
-			mapWithSrc(srcRule) [
+			mapWithSrc(srcRule, srcVarName) [
 				val name = nameRule.apply
 				val type = typeRule.apply
 				

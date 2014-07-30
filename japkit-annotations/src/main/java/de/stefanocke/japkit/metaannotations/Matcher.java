@@ -14,7 +14,18 @@ import javax.lang.model.element.Modifier;
  * 
  */
 public @interface Matcher {
+	/**
+	 * Optional expression to determine the element to which the checks of the matcher are applied to. By default this is the current source element (#{src}). 
+	 * @return the expression
+	 */
+	String src() default "";
 
+	/**
+	 * 
+	 * @return language for the src expression. Defaults to Java EL.
+	 */
+	String srcLang() default "";
+	
 	/**
 	 * All of those modifiers must be present at the source element for the rule
 	 * to apply.
