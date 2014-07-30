@@ -61,7 +61,7 @@ class ResourceGenerator {
 			try {
 				pushCurrentMetaAnnotation(resourceTemplateAnnotation)
 				
-				elSupport.putELVariables(annotatedClass, triggerAnnotation, resourceTemplateAnnotation)
+				elSupport.putELVariables(resourceTemplateAnnotation)
 				
 				var Long templateLastModified = null
 				

@@ -507,8 +507,7 @@ class JapkitProcessor extends AbstractProcessor {
 					'''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
 
 				//EL Variables			
-				triggerAnnotation.metaAnnotations(Var).forEach[
-					putELVariable(annotatedClass, triggerAnnotation, it)]
+				triggerAnnotation.metaAnnotations(Var).forEach[putELVariable(it)]
 
 				//@GenerateClass
 				classGenerator.processGenClassAnnotation(annotatedClass, triggerAnnotation, generatedClasses)

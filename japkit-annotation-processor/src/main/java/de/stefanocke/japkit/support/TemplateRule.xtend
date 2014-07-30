@@ -57,7 +57,7 @@ class TemplateRule implements Procedure1<GenTypeElement>{
 		
 			
 		scope[
-			putELVariables(currentSrcElement, currentAnnotation, templateAnnotation)
+			putELVariables(templateAnnotation)
 			
 			generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
 

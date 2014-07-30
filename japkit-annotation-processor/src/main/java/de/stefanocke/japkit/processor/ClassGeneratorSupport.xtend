@@ -79,7 +79,7 @@ class ClassGeneratorSupport {
 		
 			setSuperClassAndInterfaces(annotatedClass, generatedClass, triggerAnnotation, genClass)
 		
-			putELVariables(generatedClass, triggerAnnotation, genClass)
+			putELVariables(genClass)
 		
 			if(isTopLevelClass){
 				createShadowAnnotation(triggerAnnotation, annotatedClass, genClass, generatedClass)	
