@@ -33,6 +33,13 @@ public @interface AnnotationMapping {
 	String srcLang() default "";
 	
 	/**
+	 * If set, the src element must have this simpleName.
+	 * @return
+	 */
+	String name() default "";
+	
+	
+	/**
 	 * All of those modifiers must be present at the source element for the rule
 	 * to apply.
 	 * 

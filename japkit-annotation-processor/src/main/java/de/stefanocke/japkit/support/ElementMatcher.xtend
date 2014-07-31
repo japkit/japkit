@@ -22,6 +22,7 @@ class ElementMatcher {
 
 	String srcExpr
 	String srcLang
+	String name
 	Modifier[] modifiers
 	Modifier[] modifiersNot
 	Set<ElementKind> kind
@@ -59,6 +60,7 @@ class ElementMatcher {
 		
 		scope(e)[
 			val result = (e!=null)
+			&& (name.nullOrEmpty || name.contentEquals(e.simpleName))
 			&& e.hasAllModifiers(modifiers)
 			&& e.hasNotModifiers(modifiersNot)
 			&& e.hasAnyKind(kind)
@@ -193,6 +195,7 @@ class ElementMatcher {
 	new(AnnotationMirror am) {
 		_srcExpr =  am.value("src", String)
 		_srcLang =  am.value("srcLang", String)
+		_name = am.value("name", String)
 		_modifiers = am.value("modifiers", typeof(Modifier[]))
 		_modifiersNot = am.value("modifiersNot", typeof(Modifier[]))
 		_kind = am.value("kind", typeof(ElementKind[]))?.toSet
