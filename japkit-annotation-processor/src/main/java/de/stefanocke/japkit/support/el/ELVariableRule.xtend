@@ -23,9 +23,10 @@ import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import de.stefanocke.japkit.support.TypeResolver
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
-class ELVariableRule {
+class ELVariableRule implements Function1<Object, Object>{
 	val extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
 
 	extension TypesExtensions types = ExtensionRegistry.get(TypesExtensions)
@@ -256,4 +257,9 @@ class ELVariableRule {
 		if(unique) MoreCollectionExtensions.singleValue(types) else types
 
 	}
+	
+	override apply(Object p) {
+		eval(p)
+	}
+	
 }

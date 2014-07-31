@@ -129,8 +129,8 @@ class ElExtensions {
 	 */
 	def static get(Element e, String functionName,  Map<String, Object> context) {
 		val function = context.get(functionName)
-		if(function != null && function instanceof ELVariableRule && (function as ELVariableRule).isFunction){
-			(function as ELVariableRule).eval(e)
+		if(function != null && function instanceof Function1<?,?>){
+			(function as Function1<Element,?>).apply(e)
 		} else {
 			//TODO: Prop Not Found Exception to allow default resolving?
 			//Mit Groovy scheint das zu funktionieren, da die get Methode anscheinden die letzte ist, die aufgerufen wird
