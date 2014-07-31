@@ -24,9 +24,10 @@ import javax.lang.model.type.TypeMirror
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import de.stefanocke.japkit.support.TypeResolver
 import org.eclipse.xtext.xbase.lib.Functions.Function1
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 @Data
-class ELVariableRule implements Function1<Object, Object>{
+class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 	val extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
 
 	extension TypesExtensions types = ExtensionRegistry.get(TypesExtensions)
@@ -260,6 +261,10 @@ class ELVariableRule implements Function1<Object, Object>{
 	
 	override apply(Object p) {
 		eval(p)
+	}
+	
+	override apply() {
+		eval
 	}
 	
 }

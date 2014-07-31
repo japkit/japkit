@@ -28,7 +28,7 @@ public abstract class ControllerMembersJpaRepository {
 	@Method
 	public abstract void foobar();
 	
-	@Field(activation = @Matcher(condition = "#{useFboRepository}"))
+	@Field(activation = @Matcher(condition = "useFboRepository"))
 	@Autowired
 	private Repository repository;
 
@@ -37,7 +37,7 @@ public abstract class ControllerMembersJpaRepository {
 	@Autowired
 	private RelatedEntityRepository relatedEntityRepository;
 
-	@Method(activation = @Matcher(condition = "#{useFboRepository}"), imports = RepositoryAdapter.class,
+	@Method(activation = @Matcher(condition = "useFboRepository"), imports = RepositoryAdapter.class,
 			bodyExpr = "return new RepositoryAdapter<#{ec.typeRef(fbo)}>(repository);")
 	protected abstract CrudOperations<FormBackingObject> crudOperations();
 

@@ -15,6 +15,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 
 import static de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 class ELSupport {
 	val extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
@@ -118,10 +119,21 @@ class ELSupport {
 		valueStack.getRequired("src")
 	}
 
-	def <T> T eval(String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
+	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
 		T errorResult) {
 		try {
-			return eval(expr, lang, expectedType)	as T
+			//If the expression language is not set, look on value stack at first
+			//TODO: only for legal Java identifiers?
+			val resultFromValueStack = if(lang.nullOrEmpty){
+				val v = valueStack.get(expr)
+				if(v instanceof Function0<?>){
+					(v as Function0<T>).apply
+				} else {
+					v as T
+				}
+			} else null
+			
+			return resultFromValueStack ?: eval(expr, lang, expectedType)	as T
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
 		} catch (Exception e) {

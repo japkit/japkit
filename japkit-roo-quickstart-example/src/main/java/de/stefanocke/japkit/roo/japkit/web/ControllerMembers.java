@@ -39,21 +39,21 @@ public abstract class ControllerMembers {
 
 	@Method(
 			imports = ControllerUtil.class, 
-			bodyIterator = "#{datetimeProperties}",
+			bodyIterator = "datetimeProperties",
 			bodyExpr = "uiModel.addAttribute(\"#{dtfModelAttr.eval(src)}\", " +
 					"ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));\n"
 			)
 	@ParamNames("uiModel")
 	abstract void addDateTimeFormatPatterns(Model uiModel);
 
-	@Method(src = "#{datetimeProperties}", srcVar="p", nameExpr = "getDateTimeFormat#{p.name.toFirstUpper}", vars = @Var(
+	@Method(src = "datetimeProperties", srcVar="p", nameExpr = "getDateTimeFormat#{p.name.toFirstUpper}", vars = @Var(
 			name = "dtfAnnotation", expr = "#{p}", annotation = DateTimeFormat.class),
 			bodyExpr = "return \"#{dtfAnnotation.style}\";")
 	abstract String getDateTimeFormat();
 
 	@Method(
 			imports = { Arrays.class }, 
-			bodyIterator="#{enumProperties}",
+			bodyIterator="enumProperties",
 			// TODO: Eigentlich singleValueType.
 			bodyExpr = "uiModel.addAttribute(\"${src.name}s\", Arrays.asList(${ec.typeRef(src.type)}.values()));\n"
 			)
@@ -61,7 +61,7 @@ public abstract class ControllerMembers {
 	abstract void addEnumChoices(Model uiModel);
 	
 	@Method(
-			bodyIterator="#{entityProperties}",
+			bodyIterator="entityProperties",
 			// TODO: Eigentlich singleValueType.
 			bodyExpr = "uiModel.addAttribute(\"${src.name}Choices\", get${src.name.toFirstUpper}Choices());\n"
 			)
