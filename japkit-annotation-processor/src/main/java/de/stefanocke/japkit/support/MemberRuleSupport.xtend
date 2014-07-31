@@ -36,6 +36,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	()=>Set<Modifier> modifiersRule
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
 	()=>CharSequence commentRule
+	boolean genElementIsSrcForDependentRules
 	
 	//members to be created for the generated member. for instance, getters and setters to  be created for the generated field
 	List<(GenTypeElement) => List<? extends GenElement>> dependentMemberRules = newArrayList()
@@ -55,6 +56,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
 		_commentRule = createCommentRule
+		_genElementIsSrcForDependentRules = metaAnnotation?.value("genElementIsSrcForDependentRules", Boolean) ?: true
 		createAndAddDelegateMethodRules
 	}
 	
@@ -70,6 +72,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
 		_commentRule = commentRule ?: createCommentRule
+		_genElementIsSrcForDependentRules = metaAnnotation?.value("genElementIsSrcForDependentRules", Boolean) ?: true
 		createAndAddDelegateMethodRules
 	}
 	
@@ -86,6 +89,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_modifiersRule = modifiersRule ?: [| emptySet]
 		_annotationsRule = annotationsRule ?: [g |emptyList]
 		_commentRule = commentRule ?: [|""]
+		_genElementIsSrcForDependentRules = true
 	}
 	
 	protected def void addDependentMemberRule(MemberRuleSupport<?,?> mr){
@@ -142,15 +146,15 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 				generatedClass.add(member)
 				generatedMembers.add(member)
 				
-
-				//make the member just generated available on value stack
-				valueStack.put("genElement", member)
-				dependentMemberRules.forEach [ r |
-					//apply dependent rules. 
-					generatedMembers.addAll(r.apply(generatedClass))
-				
-				]			
-				
+				scope(getSrcElementForDependentRules(member))[
+					//make the member just generated available on value stack
+					valueStack.put("genElement", member)
+					dependentMemberRules.forEach [ r |
+						//apply dependent rules. 
+						generatedMembers.addAll(r.apply(generatedClass))
+					
+					]			
+				]
 				generatedMembers
 			]
 			
@@ -164,6 +168,10 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 			popCurrentMetaAnnotation
 		}
 
+	}
+	
+	protected def getSrcElementForDependentRules(GenElement genElement){
+		if (genElementIsSrcForDependentRules) genElement else currentSrcElement
 	}
 	
 	protected def inScope((Object)=>Iterable<? extends GenElement> closure){
