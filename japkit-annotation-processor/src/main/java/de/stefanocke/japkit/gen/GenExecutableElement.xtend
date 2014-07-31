@@ -71,5 +71,9 @@ abstract class GenExecutableElement extends GenParameterizable implements Execut
 	new(Name  simpleName){
 		super(simpleName)
 	}
+	
+	def void setReturnType(TypeMirror returnType){
+		this.returnType = returnType ?:  GenNoType.INSTANCE
+	}
  	
 }
