@@ -34,6 +34,7 @@ import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import de.stefanocke.japkit.support.TypeResolver
+import de.stefanocke.japkit.support.el.ELVariableRule
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -507,7 +508,7 @@ class JapkitProcessor extends AbstractProcessor {
 					'''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
 
 				//EL Variables			
-				triggerAnnotation.metaAnnotations(Var).forEach[putELVariable(it)]
+				triggerAnnotation.metaAnnotations(Var).forEach[new ELVariableRule(it).putELVariable]
 
 				//@GenerateClass
 				classGenerator.processGenClassAnnotation(annotatedClass, triggerAnnotation, generatedClasses)

@@ -199,24 +199,10 @@ class ELSupport {
 		p
 	}
 
-	
-	def void putELVariables(AnnotationMirror elVarsAnnotation) {
-		elVarsAnnotation?.value("vars", typeof(AnnotationMirror[]))?.forEach [
-			putELVariable(it)
-		]
-	}
 
 	def Map<String, Object> getVariablesForShadowAnnotation(ValueStack vs) {
 		getOrCreate(vs, "variablesForShadowAnnotation", [newHashMap])
 	}
-
-	def void putELVariable(AnnotationMirror elVarAnnotation) {
-
-		//TODO: Use Rule Factory
-		val varRule = new ELVariableRule(elVarAnnotation)
-		varRule.putELVariable()
-	}
-	
 
 
 }

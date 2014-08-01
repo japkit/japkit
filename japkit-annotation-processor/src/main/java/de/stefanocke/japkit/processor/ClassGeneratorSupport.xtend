@@ -40,6 +40,7 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
+import de.stefanocke.japkit.support.RuleUtils
 
 class ClassGeneratorSupport {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -52,6 +53,7 @@ class ClassGeneratorSupport {
 	protected val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	protected val extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 	protected val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+	protected val extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	
 	protected BehaviorDelegationGenerator behaviorDelegationGenerator = new BehaviorDelegationGenerator
 	
@@ -79,7 +81,8 @@ class ClassGeneratorSupport {
 		
 			setSuperClassAndInterfaces(annotatedClass, generatedClass, triggerAnnotation, genClass)
 		
-			putELVariables(genClass)
+			//TODO: Where is the scope for those variables?
+			createELVariableRules(genClass, null).forEach[it.putELVariable]
 		
 			if(isTopLevelClass){
 				createShadowAnnotation(triggerAnnotation, annotatedClass, genClass, generatedClass)	
