@@ -91,7 +91,7 @@ class RuleUtils {
 						varRules?.forEach[it.putELVariable]
 						closure.apply(e)
 					]
-				]
+				].toList
 			} else {
 				// No new scope required. Use parent's src.
 				applyInExistingScope(closure)
