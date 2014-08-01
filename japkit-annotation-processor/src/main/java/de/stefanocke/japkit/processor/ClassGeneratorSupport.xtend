@@ -81,9 +81,6 @@ class ClassGeneratorSupport {
 		
 			setSuperClassAndInterfaces(annotatedClass, generatedClass, triggerAnnotation, genClass)
 		
-			//TODO: Where is the scope for those variables?
-			createELVariableRules(genClass, null).forEach[it.putELVariable]
-		
 			if(isTopLevelClass){
 				createShadowAnnotation(triggerAnnotation, annotatedClass, genClass, generatedClass)	
 			}

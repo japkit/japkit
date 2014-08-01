@@ -5,18 +5,29 @@ import de.stefanocke.japkit.metaannotations.GenerateClass
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import java.util.List
+import java.util.ArrayList
 
 class TopLevelClassGenerator extends ClassGeneratorSupport{
 	
 
-	def GenTypeElement processGenClassAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation, Set<GenTypeElement> generatedClasses) {
+	def Set<GenTypeElement> processGenClassAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation) {
 
 		val genClass = triggerAnnotation.metaAnnotation(GenerateClass)
-		if(genClass == null) return null;
+		if(genClass == null) return emptySet;
 		
-		val GenTypeElement enclosingClass = null
+		//Supports ELVariables in the scope of the generated class.
+		//Note: src expression is currently not supported in the annotation, since generating multiple classes is not supported
+		//and would for instance be in conflict with ElementExtensions.generatedTypeElementAccordingToTriggerAnnotation 
+		val scopeRule = createScopeRule(genClass, null)
 	
-		generateClass(annotatedClass, enclosingClass, triggerAnnotation, genClass, null, null, generatedClasses)
+		val generatedClasses = newHashSet
+		
+		scopeRule.apply[
+			generateClass(annotatedClass, null, triggerAnnotation, genClass, null, null, generatedClasses)		
+		]
+		
+		generatedClasses
 	}
 		
 }
