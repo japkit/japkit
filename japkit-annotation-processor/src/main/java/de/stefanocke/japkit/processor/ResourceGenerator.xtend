@@ -7,24 +7,17 @@ import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.NameRule
-import de.stefanocke.japkit.support.ProcessingException
+import de.stefanocke.japkit.support.RuleUtils
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypesRegistry
 import de.stefanocke.japkit.support.el.ELSupport
-import de.stefanocke.japkit.support.el.ValueStack
 import java.io.File
-import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
-import java.io.OutputStreamWriter
-import java.nio.charset.Charset
-import java.util.HashMap
-import java.util.Map
 import java.util.Set
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import javax.tools.StandardLocation
 
 class ResourceGenerator {
 
@@ -33,6 +26,7 @@ class ResourceGenerator {
 	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	val extension RuleUtils ru = ExtensionRegistry.get(RuleUtils)
 	val ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 
 	//The directory for resource templates if they are kept locally within the project.
@@ -57,44 +51,47 @@ class ResourceGenerator {
 			val resourePathNameRule = new NameRule(triggerAnnotation, resourceTemplateAnnotation, "path")
 			
 			val resourceLocation = resourceTemplateAnnotation.value("location", ResourceLocation);	
+			val scopeRule = createScopeRule(resourceTemplateAnnotation, null)
 			
 			try {
 				pushCurrentMetaAnnotation(resourceTemplateAnnotation)
 				
-				elSupport.putELVariables(resourceTemplateAnnotation)
+				scopeRule.apply [
 				
-				var Long templateLastModified = null
-				
-				val templateURL = if (resourceTemplateDir != null) {
-						val templateDir = new File(resourceTemplateDir, templatePackagePath)
-						val file = new File(templateDir, templateName)
-						templateLastModified=file.lastModified
-						file.toURI.toURL
-					} else {
-						class.classLoader.getResource(templatePackagePath+'/'+templateName)					
+					var Long templateLastModified = null
+					
+					val templateURL = if (resourceTemplateDir != null) {
+							val templateDir = new File(resourceTemplateDir, templatePackagePath)
+							val file = new File(templateDir, templateName)
+							templateLastModified=file.lastModified
+							file.toURI.toURL
+						} else {
+							class.classLoader.getResource(templatePackagePath+'/'+templateName)					
+						}
+	
+					// filer.getResource(StandardLocation.CLASS_OUTPUT, triggerAnnotation.annotationAsTypeElement.package.qualifiedName, templateName).toUri;
+					printDiagnosticMessage['''Resoure template «templateName» «templateURL»''']
+	
+					val resourceName = resoureNameRule.getName(templateName, annotatedClass)
+					val resourcePathName = resourePathNameRule.getName(annotatedClass.package.qualifiedName.toString.replace('.', '/'), annotatedClass)
+						
+					val resourceFile = resourceLocation.getFile(options, resourcePathName, resourceName)
+					resourceFile.ensureParentDirectoriesExist			
+					val writer = new FileWriter(resourceFile)
+					//new OutputStreamWriter(new FileOutputStream(resourceFile), "UTF-8")
+					
+					val start = System.currentTimeMillis
+					try {
+						
+						elSupport.write(writer, templateURL, templateLang, templateLastModified)
+	
+					} finally {
+						writer.flush
+						writer.close
+						printDiagnosticMessage['''Resource file written «resourceFile». Duration: «System.currentTimeMillis - start»''']
 					}
-
-				// filer.getResource(StandardLocation.CLASS_OUTPUT, triggerAnnotation.annotationAsTypeElement.package.qualifiedName, templateName).toUri;
-				printDiagnosticMessage['''Resoure template «templateName» «templateURL»''']
-
-				val resourceName = resoureNameRule.getName(templateName, annotatedClass)
-				val resourcePathName = resourePathNameRule.getName(annotatedClass.package.qualifiedName.toString.replace('.', '/'), annotatedClass)
-					
-				val resourceFile = resourceLocation.getFile(options, resourcePathName, resourceName)
-				resourceFile.ensureParentDirectoriesExist			
-				val writer = new FileWriter(resourceFile)
-				//new OutputStreamWriter(new FileOutputStream(resourceFile), "UTF-8")
-				
-				val start = System.currentTimeMillis
-				try {
-					
-					elSupport.write(writer, templateURL, templateLang, templateLastModified)
-
-				} finally {
-					writer.flush
-					writer.close
-					printDiagnosticMessage['''Resource file written «resourceFile». Duration: «System.currentTimeMillis - start»''']
-				}
+					null
+				]
 			} catch (TypeElementNotFoundException tenfe) { 
 				handleTypeElementNotFound(
 					'''Type element not found when processing resource template «templateName» for «annotatedClass».''',

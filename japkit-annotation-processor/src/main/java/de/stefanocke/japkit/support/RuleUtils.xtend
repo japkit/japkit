@@ -68,6 +68,10 @@ class RuleUtils {
 	}
 	
 
+	/**Scope rule that gets the source element from "src" AV */
+	public def <T> ((Object)=>T)=>Iterable<T>  createScopeRule(AnnotationMirror metaAnnotation, String avPrefix) {
+		createScopeRule(metaAnnotation, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
+	}
 	
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
