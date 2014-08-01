@@ -30,7 +30,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	String avPrefix
 	
 	()=>boolean activationRule
-	String srcVarName
+	((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> scopeRule
 	()=>Iterable<? extends Object> srcRule
 	()=>String nameRule
 	()=>Set<Modifier> modifiersRule
@@ -48,9 +48,9 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_metaAnnotation = metaAnnotation
 		_template = template
 		_avPrefix = avPrefix
-		_activationRule	= createActivationRule
-		_srcVarName = createSrcVarName
+		_activationRule	= createActivationRule	
 		_srcRule = createSrcRule 
+		_scopeRule = createScopeRule(srcRule)
 		_nameRule = createNameRule
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
@@ -64,8 +64,8 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_template = null
 		_avPrefix = avPrefix
 		_activationRule	= createActivationRule
-		_srcVarName = createSrcVarName
 		_srcRule =  srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT 
+		_scopeRule = createScopeRule(srcRule)
 		_nameRule = nameRule
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
@@ -80,8 +80,8 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_template = null
 		_avPrefix = null
 		_activationRule = activationRule ?: RuleUtils.ALWAYS_ACTIVE
-		_srcVarName = createSrcVarName
 		_srcRule = srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT
+		_scopeRule = createScopeRule(srcRule)
 		_nameRule = nameRule
 		_modifiersRule = modifiersRule ?: [| emptySet]
 		_annotationsRule = annotationsRule ?: [g |emptyList]
@@ -102,8 +102,8 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		ru.createSrcExpressionRule(metaAnnotation, avPrefix)
 	}
 	
-	protected def String createSrcVarName(){
-		ru.getSrcVarName(metaAnnotation, avPrefix)
+	protected def ((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> createScopeRule(()=>Iterable<? extends Object> srcRule){
+		ru.createScopeRule(metaAnnotation, avPrefix, srcRule)  
 	}
 	
 	protected def ()=>Set<Modifier> createModifiersRule(){
@@ -136,8 +136,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		try {
 			pushCurrentMetaAnnotation(metaAnnotation)
 
-			withSrc [
-				putELVariables(metaAnnotation)
+			inScope [
 				val generatedMembers = newArrayList()
 				val member = createMember
 				generatedClass.add(member)
@@ -163,8 +162,9 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 
 	}
 	
-	protected def withSrc((Object)=>Iterable<? extends GenElement> closure){
-		ru.mapWithSrc(srcRule, _srcVarName, closure).flatten.toList
+	protected def inScope((Object)=>Iterable<? extends GenElement> closure){
+		val result = scopeRule.apply(closure)  
+		result.flatten.toList
 	}
 
 

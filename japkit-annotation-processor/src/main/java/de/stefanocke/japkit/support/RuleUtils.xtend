@@ -1,23 +1,24 @@
 package de.stefanocke.japkit.support
 
+import de.stefanocke.japkit.gen.GenAnnotationMirror
+import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenExtensions
 import de.stefanocke.japkit.gen.GenParameter
+import de.stefanocke.japkit.metaannotations.Param
 import de.stefanocke.japkit.support.el.ELSupport
+import de.stefanocke.japkit.support.el.ELVariableRule
+import java.util.ArrayList
 import java.util.Collections
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import javax.lang.model.element.ExecutableElement
-import de.stefanocke.japkit.metaannotations.Param
-import de.stefanocke.japkit.gen.GenElement
-import java.util.ArrayList
-import de.stefanocke.japkit.gen.GenAnnotationMirror
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -66,24 +67,41 @@ class RuleUtils {
 		]
 	}
 	
-	public def getSrcVarName(AnnotationMirror metaAnnotation, String avPrefix) {
-		metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
+
+	
+	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
+	 * Optionally puts EL-Variables into that scope. 
+	 */
+	public def <T> ((Object)=>T)=>Iterable<T>  createScopeRule(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
+			
+		val srcVarName = metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
+		val varRules = createELVariableRules(metaAnnotation, avPrefix);
+
+		[(Object)=>T closure |
+			val srcElements = srcRule?.apply	
+			if (srcElements != null || !varRules.nullOrEmpty || !srcVarName.nullOrEmpty) {
+				//as soon as a new src is defined or other EL variables, we need a new scope
+				(srcElements ?: Collections.singleton(currentSrc)).map [ e |
+					scope(e) [
+						if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
+						varRules?.forEach[it.putELVariable]
+						closure.apply(e)
+					]
+				]
+			} else {
+				// No new scope required. Use parent's src.
+				applyInExistingScope(closure)
+			}
+		
+		]
 	}
 	
-	public def <T> Iterable<T>  mapWithSrc(()=>Iterable<? extends Object> srcRule, String srcVarName, (Object)=>T closure) {
-		val srcElements = srcRule?.apply
-
-		if (srcElements != null) {
-			srcElements.map [ e |
-				scope(e) [
-					if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
-					closure.apply(e)
-				]
-			]
-		} else {
-			//Use parent's src. No new scope.
-			Collections.singleton(closure.apply(currentSrc))
-		}
+	public static def <T> applyInExistingScope((Object)=>T closure) {
+		Collections.singleton(closure.apply(ExtensionRegistry.get(ELSupport).currentSrc))
+	}
+	
+	public def createELVariableRules(AnnotationMirror metaAnnotation, String avPrefix){
+		metaAnnotation?.value("vars".withPrefix(avPrefix), typeof(AnnotationMirror[]))?.map[new ELVariableRule(it)] ?: emptyList;
 	}
 	
 	public static val ALWAYS_ACTIVE = [| true]
@@ -187,25 +205,26 @@ class RuleUtils {
 	}
 	
 	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template, String avPrefix){
-		val srcVarName = getSrcVarName(paramAnnotation, avPrefix)
+		
 		val srcRule = createSrcExpressionRule(paramAnnotation, avPrefix)
+		val scopeRule = createScopeRule(paramAnnotation, avPrefix, srcRule)
 		val nameRule = createNameExprRule(paramAnnotation, template, avPrefix)
 		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation, template,  avPrefix)
 		val typeRule = createTypeRule(paramAnnotation, template?.asType, avPrefix);
 		
-		createParamRule(srcRule, srcVarName, nameRule, typeRule, annotationMappingRules)
+		createParamRule(scopeRule, nameRule, typeRule, annotationMappingRules)
 
 	}
 	
 	public def ()=>List<? extends GenParameter> createParamRule(()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
-		createParamRule(null, null, nameRule, typeRule, annotationMappingRules)
+		createParamRule([applyInExistingScope], nameRule, typeRule, annotationMappingRules)
 	
 	}
 	
-	public def ()=>List<? extends GenParameter> createParamRule(()=>Iterable<? extends Object> srcRule, String srcVarName, ()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
+	public def ()=>List<? extends GenParameter> createParamRule(((Object)=>GenParameter)=>Iterable<GenParameter> scopeRule, ()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
 		
 		[ |
-			mapWithSrc(srcRule, srcVarName) [
+			scopeRule.apply [
 				val name = nameRule.apply
 				val type = typeRule.apply
 				
