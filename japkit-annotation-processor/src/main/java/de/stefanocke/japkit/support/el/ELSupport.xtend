@@ -13,9 +13,9 @@ import java.util.ServiceLoader
 import java.util.concurrent.TimeUnit
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 import static de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 class ELSupport {
 	val extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
@@ -122,16 +122,8 @@ class ELSupport {
 	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
 		T errorResult) {
 		try {
-			//If the expression language is not set, look on value stack at first
-			//TODO: only for legal Java identifiers?
-			val resultFromValueStack = if(lang.nullOrEmpty){
-				val v = valueStack.get(expr)
-				if(v instanceof Function0<?>){
-					(v as Function0<T>).apply
-				} else {
-					v as T
-				}
-			} else null
+			
+			val resultFromValueStack = evalFromValueStack(expr, lang)
 			
 			return resultFromValueStack ?: eval(expr, lang, expectedType)	as T
 		} catch (TypeElementNotFoundException tenfe) {
@@ -141,6 +133,19 @@ class ELSupport {
 				null, null)
 			errorResult
 		}
+	}
+	
+	//If the expression language is not set, look on value stack at first
+	//TODO: only for legal Java identifiers?
+	def <T> T evalFromValueStack(String expr, String lang) {
+		if(lang.nullOrEmpty){
+			val v = valueStack.get(expr)
+			if(v instanceof Function0<?>){
+				(v as Function0<T>).apply
+			} else {
+				v as T
+			}
+		} else null
 	}
 
 	def <T> T eval(String expr, String lang, Class<T> expectedType) {
