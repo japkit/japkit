@@ -27,9 +27,10 @@ class AnnotationMappingRule {
 	val extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 	val extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 	val extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val extension RuleUtils =  ExtensionRegistry.get(RuleUtils)
 
 	String id
-	ElementMatcher elementMatcher
+	()=>boolean activationRule
 	DeclaredType targetAnnotation
 	AnnotationValueMappingRule[] valueMappings
 	AnnotationMappingMode mode
@@ -41,9 +42,6 @@ class AnnotationMappingRule {
 	boolean setShadowOnTriggerAnnotations
 	
 
-	def private appliesTo(Element e) {
-		elementMatcher.matches(e)
-	}
 
 	/**
 	 * Adds the annotation mapped by this rule.
@@ -58,7 +56,7 @@ class AnnotationMappingRule {
 	def void mapOrCopyAnnotations(List<GenAnnotationMirror> annotations, Element srcElement, Map<String, AnnotationMappingRule> mappingsWithId, 
 		 boolean srcElementChanged
 	) {
-		if(!appliesTo(srcElement)){
+		if (!activationRule.apply) {
 			return
 		}
 		
@@ -176,7 +174,6 @@ class AnnotationMappingRule {
 						messageCollector.reportError('''
 								Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
 								Cause: «e.message»
-								Annotation Mapping was triggered by: «_elementMatcher»
 							''', e, srcElement, null, null)
 					}
 				]
@@ -261,7 +258,7 @@ class AnnotationMappingRule {
 
 	new(AnnotationMirror am) {
 		_id = am.value("id", String)
-		_elementMatcher = createElementMatcher(am)
+		_activationRule = createActivationRule(am, null)
 		_targetAnnotation = am.value("targetAnnotation", DeclaredType)
 		_valueMappings = am.value("valueMappings", typeof(AnnotationMirror[])).map[
 			new AnnotationValueMappingRule(it)]

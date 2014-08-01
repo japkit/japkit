@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.metaannotations;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 
 import de.stefanocke.japkit.metaannotations.classselectors.None;
@@ -59,8 +58,7 @@ public @interface Method {
 
 	/**
 	 * By default, this method annotation is active an will generate a method.
-	 * To switch it on or of case by case, a Matcher can be used here. The
-	 * element on which the matcher is applied is the annotated class.
+	 * To switch it on or of case by case, a Matcher can be used here.
 	 * <p>
 	 * In case of multiple matchers, at least one must match to activate the
 	 * rule.
