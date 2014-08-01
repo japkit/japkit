@@ -897,7 +897,13 @@ class ElementsExtensions {
 				null, null, null);
 			null
 		}
-		else if(!typeElement.generated) {  //Only apply the transformation if it is not a generated class 
+		else if(!typeElement.generated && 
+			//Workaround dafür, dass @Generated Source-Retention hat und somit typeElement.generated im inkrementellen Build falsche Ergebnisse liefert.
+			!ExtensionRegistry.get(AnnotationExtensions).isShadowAnnotation(annotations.head)
+			
+		) {  
+		
+			//Only apply the transformation if it is not a generated class 
 				
 			//TODO: Zumindest Teile davon können in die Type Registry
 			val triggerAnnotation = annotations.head
