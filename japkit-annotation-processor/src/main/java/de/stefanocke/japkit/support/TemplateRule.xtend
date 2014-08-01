@@ -29,6 +29,7 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 	List<FieldRule> fieldRules
 	List<InnerClassRule> innerClassRules
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
+	((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> scopeRule
 
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
 		_templateClass = templateClass
@@ -50,14 +51,14 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 		].toList
 		
 		_annotationsRule=ru.createAnnotationMappingRules(templateAnnotation, templateClass, null)
+		_scopeRule=ru.createScopeRule(templateAnnotation, null)
 
 	}
 
 	override apply(GenTypeElement generatedClass) {
 		
 			
-		scope[
-			putELVariables(templateAnnotation)
+		scopeRule.apply [
 			
 			generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
 
@@ -71,7 +72,7 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 			methodRules.forEach [generatedMembers.addAll(it.apply( generatedClass))]		
 			
 			generatedMembers
-		]
+		].flatten.toList
 
 	}
 

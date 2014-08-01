@@ -30,6 +30,15 @@ public @interface ResourceTemplate {
 	String srcLang() default "";
 	
 	/**
+	 * By default, the current source object has the name "src" on the value stack.
+	 * If this annotation value is set, the source object will additionally provided under the given name.  
+	 * 
+	 * @return the name of the source variable
+	 */
+	String srcVar() default "";
+	
+	
+	/**
 	 * 
 	 * @return the template language
 	 */
