@@ -24,31 +24,31 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 
 	TypeElement templateClass
 	AnnotationMirror templateAnnotation
-	List<ConstructorRule> constructorRules
-	List<MethodRule> methodRules
-	List<FieldRule> fieldRules
-	List<InnerClassRule> innerClassRules
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
+	List<(GenTypeElement)=> List<? extends GenElement>> memberRules
 	((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> scopeRule
 
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
 		_templateClass = templateClass
 		_templateAnnotation = templateAnnotation ?: templateClass.annotationMirror(Template)
-		_methodRules = templateClass.declaredMethods.map[it -> annotationMirror(Method)].filter[value != null].map [
-			new MethodRule(value, key)
-		].toList
+		_memberRules=newArrayList()	
 		
-		_constructorRules = templateClass.declaredConstructors.map[it -> annotationMirror(Constructor)].filter[value != null].map [
-			new ConstructorRule(value, key)
-		].toList
-
-		_fieldRules = templateClass.declaredFields.map [
-			new FieldRule(annotationMirror(Field), it)
-		]
-		
-		_innerClassRules = templateClass.declaredTypes.map[it -> annotationMirror(InnerClass)].filter[value != null].map [
+		memberRules.addAll(templateClass.declaredTypes.map[it -> annotationMirror(InnerClass)].filter[value != null].map [
 			new InnerClassRule(value, key)
-		].toList
+		])
+		
+		memberRules.addAll(templateClass.declaredFields.map [
+			new FieldRule(annotationMirror(Field), it)
+		])
+		
+		memberRules.addAll(templateClass.declaredConstructors.map[it -> annotationMirror(Constructor)].filter[value != null].map [
+			new ConstructorRule(value, key)
+		])
+		
+		memberRules.addAll(templateClass.declaredMethods.map[it -> annotationMirror(Method)].filter[value != null].map [
+			new MethodRule(value, key)
+		])
+		
 		
 		_annotationsRule=ru.createAnnotationMappingRules(templateAnnotation, templateClass, null)
 		_scopeRule=ru.createScopeRule(templateAnnotation, null)
@@ -66,10 +66,7 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 			
 			val generatedMembers = newArrayList
 			
-			innerClassRules.forEach [generatedMembers.addAll(it.apply(generatedClass))]
-			fieldRules.forEach [generatedMembers.addAll(it.apply(generatedClass))]
-			constructorRules.forEach [generatedMembers.addAll(it.apply(generatedClass))]
-			methodRules.forEach [generatedMembers.addAll(it.apply( generatedClass))]		
+			memberRules.forEach [generatedMembers.addAll(it.apply(generatedClass))]	
 			
 			generatedMembers
 		].flatten.toList
