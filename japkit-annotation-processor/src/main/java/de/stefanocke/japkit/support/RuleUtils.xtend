@@ -52,7 +52,7 @@ class RuleUtils {
 
 		[|
 			val srcElements = if (srcExpr.nullOrEmpty) {
-					null //Use parent's src. No new scope.
+					Collections.singleton(currentSrcElement) //Use parent's src. 
 				} else {
 					val elements = eval(srcExpr, srcLang, Object,
 						'''Src expression «srcExpr» could not be evaluated''', emptyList)
@@ -82,27 +82,26 @@ class RuleUtils {
 		val varRules = createELVariableRules(metaAnnotation, avPrefix);
 
 		[(Object)=>T closure |
-			val srcElements = srcRule?.apply	
-			if (srcElements != null || !varRules.nullOrEmpty || !srcVarName.nullOrEmpty) {
-				//as soon as a new src is defined or other EL variables, we need a new scope
-				(srcElements ?: Collections.singleton(currentSrc)).map [ e |
-					scope(e) [
-						if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
-						varRules?.forEach[it.putELVariable]
-						closure.apply(e)
-					]
-				].toList
-			} else {
-				// No new scope required. Use parent's src.
-				applyInExistingScope(closure)
-			}
-		
+			val srcElements = srcRule?.apply ?: Collections.singleton(currentSrcElement)	
+			
+				
+			(srcElements ?: Collections.singleton(currentSrc)).map [ e |
+				scope(e) [
+					if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
+					varRules?.forEach[it.putELVariable]
+					closure.apply(e)
+				]
+			].toList
+					
 		]
 	}
 	
-	public static def <T> applyInExistingScope((Object)=>T closure) {
-		Collections.singleton(closure.apply(ExtensionRegistry.get(ELSupport).currentSrc))
+	val SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null)
+	
+	public def <T> ((Object)=>T)=>Iterable<T> scopeWithCurrentSrc(){		
+		SCOPE_WITH_CURRENT_SRC	as ((Object)=>T)=>Iterable<T>
 	}
+	
 	
 	public def createELVariableRules(AnnotationMirror metaAnnotation, String avPrefix){
 		metaAnnotation?.value("vars".withPrefix(avPrefix), typeof(AnnotationMirror[]))?.map[new ELVariableRule(it)] ?: emptyList;
@@ -221,7 +220,7 @@ class RuleUtils {
 	}
 	
 	public def ()=>List<? extends GenParameter> createParamRule(()=>String nameRule, ()=>TypeMirror typeRule, (GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
-		createParamRule([applyInExistingScope], nameRule, typeRule, annotationMappingRules)
+		createParamRule(scopeWithCurrentSrc, nameRule, typeRule, annotationMappingRules)
 	
 	}
 	
