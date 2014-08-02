@@ -141,12 +141,16 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 				val member = createMember
 				generatedClass.add(member)
 				generatedMembers.add(member)
+				
+
+				//make the member just generated available on value stack
+				valueStack.put("genElement", member)
 				dependentMemberRules.forEach [ r |
-					//apply dependent rules. The rule source element is the member just created.
-					scope(member) [
-						generatedMembers.addAll(r.apply(generatedClass))
-					]
-				]
+					//apply dependent rules. 
+					generatedMembers.addAll(r.apply(generatedClass))
+				
+				]			
+				
 				generatedMembers
 			]
 			
