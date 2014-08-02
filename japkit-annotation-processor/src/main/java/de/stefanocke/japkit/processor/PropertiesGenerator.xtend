@@ -45,8 +45,8 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 		val ruleSource = annotation.valueOrMetaValue("ruleSource", Properties.RuleSource, propertiesAnnotation)
 		val annotationMappingsForFields = annotation.annotationMappings("annotationMappings", propertiesAnnotation)
 
-		val getterRule = createGetterRuleFromGetterAV(propertiesAnnotation)
-		val setterRule = createSetterRuleFromSetterAV(propertiesAnnotation)
+		val getterRule = createGetterRuleFromGetterAV(propertiesAnnotation, null)
+		val setterRule = createSetterRuleFromSetterAV(propertiesAnnotation, null)
 		
 		val delegateMethodRules = annotation.valueOrMetaValue("delegateMethods", typeof(AnnotationMirror[]), propertiesAnnotation).map [
 			new DelegateMethodsRule(it, null)

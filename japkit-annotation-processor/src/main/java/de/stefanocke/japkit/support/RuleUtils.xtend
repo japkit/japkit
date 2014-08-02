@@ -126,10 +126,9 @@ class RuleUtils {
 	 */
 	public def ()=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		val nameFromTemplate = template?.simpleName?.toString
-		if(metaAnnotation == null) return [|nameFromTemplate]
-		val name = metaAnnotation.value("name".withPrefix(avPrefix), String)
-		val nameExpr = metaAnnotation.value("nameExpr".withPrefix(avPrefix), String)
-		val nameLang = metaAnnotation.value("nameLang".withPrefix(avPrefix), String);
+		val name = metaAnnotation?.value("name".withPrefix(avPrefix), String)
+		val nameExpr = metaAnnotation?.value("nameExpr".withPrefix(avPrefix), String)
+		val nameLang = metaAnnotation?.value("nameLang".withPrefix(avPrefix), String);
 
 		[ |
 			val result = if (!nameExpr.nullOrEmpty) {
@@ -185,8 +184,7 @@ class RuleUtils {
 
 		[  |
 			val typeFromTemplate = template?.resolveType
-			if(metaAnnotation == null) return typeFromTemplate
-			val type = resolveType(metaAnnotation,"type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix))
+			val type = metaAnnotation?.resolveType("type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix))
 			if (!type.isVoid) {
 				type
 			} else {
