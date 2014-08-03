@@ -56,7 +56,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
 		_commentRule = createCommentRule
-		_genElementIsSrcForDependentRules = metaAnnotation?.value("genElementIsSrcForDependentRules", Boolean) ?: true
+		_genElementIsSrcForDependentRules = genElementIsSrcForDependentRulesAV
 		createAndAddDelegateMethodRules
 	}
 	
@@ -72,7 +72,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_modifiersRule = createModifiersRule
 		_annotationsRule = createAnnotationsRule
 		_commentRule = commentRule ?: createCommentRule
-		_genElementIsSrcForDependentRules = metaAnnotation?.value("genElementIsSrcForDependentRules", Boolean) ?: true
+		_genElementIsSrcForDependentRules = genElementIsSrcForDependentRulesAV
 		createAndAddDelegateMethodRules
 	}
 	
@@ -90,6 +90,10 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_annotationsRule = annotationsRule ?: [g |emptyList]
 		_commentRule = commentRule ?: [|""]
 		_genElementIsSrcForDependentRules = true
+	}
+	
+	protected def genElementIsSrcForDependentRulesAV(){
+		 metaAnnotation?.value("genElementIsSrcForDependentRules", Boolean) ?: true	 
 	}
 	
 	protected def void addDependentMemberRule(MemberRuleSupport<?,?> mr){

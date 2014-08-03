@@ -204,6 +204,13 @@ public @interface Constructor {
 	 */
 	String commentLang() default "";
 
+	/**
+	 * If dependent members are created, the generated field by default becomes the src element for the according rules.
+	 * If the original src shall be used instead, set this AV to false. 
+	 * @return
+	 */
+	boolean genElementIsSrcForDependentRules() default true;
+	
 	@interface List {
 		Constructor[] value();
 	}

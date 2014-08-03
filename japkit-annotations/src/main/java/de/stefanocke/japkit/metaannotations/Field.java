@@ -215,6 +215,13 @@ public @interface Field {
 	 */
 	String commentLang() default "";
 	
+	/**
+	 * If dependent members are created, the generated field by default becomes the src element for the according rules.
+	 * If the original src shall be used instead, set this AV to false. 
+	 * @return
+	 */
+	boolean genElementIsSrcForDependentRules() default true;
+	
 	
 	/**
 	 * A Setter annotation here means to generate a setter for the field. The

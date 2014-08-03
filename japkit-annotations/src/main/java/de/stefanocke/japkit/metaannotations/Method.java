@@ -239,6 +239,13 @@ public @interface Method {
 	String commentLang() default "";
 
 	/**
+	 * If dependent members are created, the generated method by default becomes the src element for the according rules.
+	 * If the original src shall be used instead, set this AV to false. 
+	 * @return
+	 */
+	boolean genElementIsSrcForDependentRules() default true;
+	
+	/**
 	 * The delegate methods to create. The delegate is the return value of the
 	 * generated method.
 	 * 

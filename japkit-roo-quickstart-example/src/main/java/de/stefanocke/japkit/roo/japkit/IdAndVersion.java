@@ -21,7 +21,7 @@ import de.stefanocke.japkit.metaannotations.Var;
 
 })
 public class IdAndVersion {
-	/**#{src.simpleName}*/
+	/***/
 	@Field(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('id')}"), getter=@Getter, setter=@Setter)
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
