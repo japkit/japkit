@@ -22,13 +22,17 @@ import de.stefanocke.japkit.metaannotations.Var;
 })
 public class IdAndVersion {
 	/**#{src.simpleName}*/
-	@Field(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('id')}"), getter=@Getter, setter=@Setter)
+	@Field(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('id')}"))
+	@Getter(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('id')}"))
+	@Setter(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('id')}"))
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Long id;
 
-	@Field(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('version')}"), getter=@Getter, setter=@Setter)
+	@Field(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('version')}"))
+	@Getter(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('version')}"))
+	@Setter(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('version')}"))
 	@Version
 	@Column(name = "version")
 	private Integer version;

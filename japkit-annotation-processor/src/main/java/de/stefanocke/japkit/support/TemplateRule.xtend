@@ -4,8 +4,10 @@ import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Constructor
 import de.stefanocke.japkit.metaannotations.Field
+import de.stefanocke.japkit.metaannotations.Getter
 import de.stefanocke.japkit.metaannotations.InnerClass
 import de.stefanocke.japkit.metaannotations.Method
+import de.stefanocke.japkit.metaannotations.Setter
 import de.stefanocke.japkit.metaannotations.Template
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
@@ -21,6 +23,7 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val RuleUtils ru = ExtensionRegistry.get(RuleUtils)
+	val GetterSetterRules gs = ExtensionRegistry.get(GetterSetterRules)
 
 	TypeElement templateClass
 	AnnotationMirror templateAnnotation
@@ -39,6 +42,14 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 		
 		memberRules.addAll(templateClass.declaredFields.map [
 			new FieldRule(annotationMirror(Field), it)
+		])
+		
+		memberRules.addAll(templateClass.declaredFields.map[it -> annotationMirror(Getter)].filter[value != null].map [
+			gs.createGetterRule(value, key, null)
+		])
+		
+		memberRules.addAll(templateClass.declaredFields.map[it -> annotationMirror(Setter)].filter[value != null].map [
+			gs.createSetterRule(value, key, null)
 		])
 		
 		memberRules.addAll(templateClass.declaredConstructors.map[it -> annotationMirror(Constructor)].filter[value != null].map [
