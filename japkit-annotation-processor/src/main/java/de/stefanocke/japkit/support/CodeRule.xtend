@@ -10,6 +10,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
 import org.eclipse.xtext.xbase.lib.Pair
+import java.util.regex.Pattern
 
 @Data
 class CodeRule {
@@ -22,6 +23,7 @@ class CodeRule {
 	val protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	
 	AnnotationMirror metaAnnotation
+	Element template
 	DeclaredType[] imports
 	String iteratorExpr
 	String iteratorLang
@@ -36,9 +38,16 @@ class CodeRule {
 	
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
+		this(metaAnnotation, null, avPrefix)
+	}
+	
+	new(AnnotationMirror metaAnnotation, Element template, String avPrefix){
 		_metaAnnotation = metaAnnotation
+		_template=template
 		
-		_bodyExpr = metaAnnotation.value("expr".withPrefix(avPrefix), String)
+		val bodyExprFromAV = metaAnnotation.value("expr".withPrefix(avPrefix), String)
+		_bodyExpr=if(bodyExprFromAV.nullOrEmpty) JavadocUtil.getCode(template?.getDocComment).get("expr".withPrefix(avPrefix)) else   bodyExprFromAV
+		
 		_lang = metaAnnotation.value("lang".withPrefix(avPrefix), String)
 		
 		val bodyCaseAnnotations = metaAnnotation.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
@@ -66,7 +75,7 @@ class CodeRule {
 	}
 	
 	private static def withPrefix(String name, String prefix){
-		if(prefix.nullOrEmpty) name else '''«prefix»«name.toFirstUpper»'''
+		if(prefix.nullOrEmpty) name else '''«prefix»«name.toFirstUpper»'''.toString
 	}
 	
 	

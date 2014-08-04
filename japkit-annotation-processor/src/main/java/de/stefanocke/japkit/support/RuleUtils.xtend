@@ -19,6 +19,7 @@ import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import static extension de.stefanocke.japkit.support.JavadocUtil.*
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -244,7 +245,7 @@ class RuleUtils {
 		val copyFromSrc =  metaAnnotation?.value("commentFromSrc".withPrefix(avPrefix), Boolean) ?: false
 		val commentExpr = metaAnnotation?.value("commentExpr".withPrefix(avPrefix), String)
 		val commentLang = metaAnnotation?.value("commentLang".withPrefix(avPrefix), String);
-		val commentFromTemplate = template?.docComment
+		val commentFromTemplate = template?.docComment.removeCode
 		val expr = if(commentExpr.nullOrEmpty) commentFromTemplate else commentExpr;
 
 		[ |

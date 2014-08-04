@@ -26,23 +26,35 @@ import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 @Controller
 @Template(annotationMappings=@AnnotationMapping(targetAnnotation = RequestMapping.class, valueMappings = @AVMapping(name = "value", expr = "/#{path}")))
 public abstract class ControllerMembers {
-	@Method(imports = ControllerUtil.class, bodyExpr = "if (bindingResult.hasErrors()) {\n" 
-			+ "\tpopulateEditForm(uiModel, fbo);\n"
-			+ "\treturn \"#{path}/create\";\n" + "}\n" 
-			+ "uiModel.asMap().clear();\n" 
-			+ "crudOperations().persist(fbo);\n"
-			+ "return \"redirect:/#{path}/\" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);\n")
+	
+	/**
+	 * Some comment...
+	 * 
+	 * @param fbo
+	 * 
+	 * @japkit.bodyExpr <pre>
+	 * <code>
+	 * if (bindingResult.hasErrors()) {
+	 * 	populateEditForm(uiModel, fbo);
+	 * 	return "#{path}/create";
+	 * }
+	 * uiModel.asMap().clear();
+	 * crudOperations().persist(fbo);
+	 * return "redirect:/#{path}/" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);
+	 * </code>
+	 * </pre>
+	 */
+	@Method(imports = ControllerUtil.class)
 	@ParamNames({ "fbo", "bindingResult", "uiModel", "httpServletRequest" })
 	@RequestMapping(method = RequestMethod.POST, produces = "text/html")
 	public abstract String create(@Valid FormBackingObject fbo, BindingResult bindingResult, Model uiModel,
 			HttpServletRequest httpServletRequest);
 
-	@Method(
-			imports = ControllerUtil.class, 
-			bodyIterator = "datetimeProperties",
-			bodyExpr = "uiModel.addAttribute(\"#{dtfModelAttr.eval(src)}\", " +
-					"ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));\n"
-			)
+	/**
+	 * @japkit.bodyExpr 
+	 * <code>uiModel.addAttribute("#{dtfModelAttr.eval(src)}", ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));</code>
+	 */
+	@Method(imports = ControllerUtil.class,	bodyIterator = "datetimeProperties")
 	@ParamNames("uiModel")
 	abstract void addDateTimeFormatPatterns(Model uiModel);
 
