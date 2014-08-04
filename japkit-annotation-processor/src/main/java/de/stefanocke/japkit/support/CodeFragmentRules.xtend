@@ -3,12 +3,12 @@ package de.stefanocke.japkit.support
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Element
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 import static extension de.stefanocke.japkit.support.RuleUtils.*
 
 @Data
-class CodeFragmentRules {
+class CodeFragmentRules implements Function0<CharSequence>{
 	val List<CodeFragmentRule> rules
 	
 	new(Iterable<AnnotationMirror> metaAnnotations){
@@ -63,4 +63,9 @@ class CodeFragmentRules {
 			)
 		]
 	}
+	
+	override apply() {
+		code()
+	}
+	
 }

@@ -11,9 +11,10 @@ import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
 import org.eclipse.xtext.xbase.lib.Pair
 import java.util.Map
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 @Data
-class CodeRule {
+class CodeRule implements Function0<CharSequence> {
 	val protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val protected extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	val protected extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
@@ -198,5 +199,10 @@ class CodeRule {
 		'''
 		else cs
 	}
+	
+	override apply() {
+		code()
+	}
+	
 }
 	
