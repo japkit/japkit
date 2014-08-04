@@ -24,6 +24,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.WildcardType
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import org.apache.commons.lang3.StringEscapeUtils
 
 class JavaEmitter implements EmitterContext{
 
@@ -386,7 +387,7 @@ class JavaEmitter implements EmitterContext{
 	}
 	
 	def dispatch CharSequence annotationValueCode(String value) {
-		'''"«value»"''' 
+		'''"«StringEscapeUtils.escapeJava(value)»"''' 
 	}
 	
 	def dispatch CharSequence annotationValueCode(TypeMirror type) {
