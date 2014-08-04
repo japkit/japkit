@@ -146,6 +146,12 @@ public @interface Field {
 	 *         iteration of initExpr.
 	 */
 	String initSeparator() default "";
+	
+	/**
+	 * If true, a linebreak is inserted after the "before expression", the "init expression" and the "after expression".
+	 * @return
+	 */
+	boolean initLinebreak() default false;
 
 	/**
 	 * 

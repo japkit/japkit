@@ -77,6 +77,17 @@ public @interface CodeFragment {
 	 *         iteration of bodyExpr.
 	 */
 	String separator() default "";
+	
+	/**
+	 * If true, a linebreak is inserted after the "before expression", the
+	 * "body expression" and the "after expression". Note that this applies
+	 * also, if no iterator is used. So, you can control whether the fragment
+	 * end with a line break or whether it is in one line with the code that
+	 * follows.
+	 * 
+	 * @return
+	 */
+	boolean linebreak() default true;
 
 	/**
 	 * 

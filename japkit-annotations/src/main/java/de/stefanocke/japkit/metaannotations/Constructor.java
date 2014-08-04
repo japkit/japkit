@@ -139,6 +139,12 @@ public @interface Constructor {
 	 *         iteration of bodyExpr.
 	 */
 	String bodySeparator() default "";
+	
+	/**
+	 * If true, a linebreak is inserted after the "before expression", the "body expression" and the "after expression".
+	 * @return
+	 */
+	boolean bodyLinebreak() default true;
 
 	/**
 	 * 

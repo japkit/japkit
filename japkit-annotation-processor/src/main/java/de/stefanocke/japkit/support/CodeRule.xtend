@@ -10,7 +10,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
 import org.eclipse.xtext.xbase.lib.Pair
-import java.util.regex.Pattern
+import java.util.Map
 
 @Data
 class CodeRule {
@@ -35,6 +35,7 @@ class CodeRule {
 	String separator
 	String emptyExpr
 	(CharSequence)=>CharSequence defaultFragmentsRule
+	boolean linebreak
 	
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
@@ -45,8 +46,9 @@ class CodeRule {
 		_metaAnnotation = metaAnnotation
 		_template=template
 		
-		val bodyExprFromAV = metaAnnotation.value("expr".withPrefix(avPrefix), String)
-		_bodyExpr=if(bodyExprFromAV.nullOrEmpty) JavadocUtil.getCode(template?.getDocComment).get("expr".withPrefix(avPrefix)) else   bodyExprFromAV
+		val codeFromJavadoc = JavadocUtil.getCode(template?.getDocComment)
+		
+		_bodyExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "expr".withPrefix(avPrefix))
 		
 		_lang = metaAnnotation.value("lang".withPrefix(avPrefix), String)
 		
@@ -58,9 +60,9 @@ class CodeRule {
 		]?.toList ?: emptyList
 
 
-		_beforeExpr = metaAnnotation.value("beforeExpr".withPrefix(avPrefix), String)
-		_afterExpr = metaAnnotation.value("afterExpr".withPrefix(avPrefix), String)
-		_emptyExpr = metaAnnotation.value("emptyExpr".withPrefix(avPrefix), String)
+		_beforeExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "beforeExpr".withPrefix(avPrefix)) 
+		_afterExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "afterExpr".withPrefix(avPrefix)) 
+		_emptyExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "emptyExpr".withPrefix(avPrefix)) 
 
 		//body iterator
 		_iteratorExpr = metaAnnotation.value("iterator".withPrefix(avPrefix), String)
@@ -72,6 +74,13 @@ class CodeRule {
 		
  
 		_defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
+		
+		_linebreak = metaAnnotation.value("linebreak".withPrefix(avPrefix), boolean)
+	}
+	
+	private def stringFromAnnotationOrMap(AnnotationMirror metaAnnotation, Map<String, String> map, String name){
+		 val av = metaAnnotation.value(name, String)
+		 if(av.nullOrEmpty) map.get(name) else av
 	}
 	
 	private static def withPrefix(String name, String prefix){
@@ -153,15 +162,13 @@ class CodeRule {
 						'''Error in code body iterator expression.''', emptyList)
 					if (!bodyIterator.nullOrEmpty) {
 						val before = eval(beforeExpr, lang, String,
-							'''Error in code body before expression.''', '')
+							'''Error in code body before expression.''', '').withLinebreakIfRequested
 						val after = eval(afterExpr, lang, String,
-							'''Error in code body after expression.''', '')
+							'''Error in code body after expression.''', '').withLinebreakIfRequested
 						'''
-							«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»
-								«scope(e as Element) [
+							«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»«scope(e as Element) [
 								code(bodyCases, bodyExpr, lang, '')
-							]»
-							«ENDFOR»
+							]»«ENDFOR»
 						'''
 					} else {
 						eval(emptyExpr, lang, String, '''Error in code body empty expression.''',
@@ -182,5 +189,14 @@ class CodeRule {
 		]?.value ?: bodyExpr
 		
 		//TODO: remove valuestack parameter
-		eval(bodyExprToUse, lang, String, '''Error in code body expression.''',	errorResult)
-	}}
+		eval(bodyExprToUse, lang, String, '''Error in code body expression.''',	errorResult).withLinebreakIfRequested
+	}
+	
+	private def CharSequence withLinebreakIfRequested(CharSequence cs){
+		if(linebreak && cs !=null && cs.length>0) 
+		'''«cs»
+		'''
+		else cs
+	}
+}
+	
