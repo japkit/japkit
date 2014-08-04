@@ -49,7 +49,7 @@ class CodeRule implements Function0<CharSequence> {
 		
 		val codeFromJavadoc = JavadocUtil.getCode(template?.getDocComment)
 		
-		_bodyExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "expr".withPrefix(avPrefix))
+		_bodyExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "code".withPrefix(avPrefix))
 		
 		_lang = metaAnnotation.value("lang".withPrefix(avPrefix), String)
 		
@@ -61,9 +61,9 @@ class CodeRule implements Function0<CharSequence> {
 		]?.toList ?: emptyList
 
 
-		_beforeExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "beforeExpr".withPrefix(avPrefix)) 
-		_afterExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "afterExpr".withPrefix(avPrefix)) 
-		_emptyExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "emptyExpr".withPrefix(avPrefix)) 
+		_beforeExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "beforeIteratorCode".withPrefix(avPrefix)) 
+		_afterExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "afterIteratorCode".withPrefix(avPrefix)) 
+		_emptyExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "emptyIteratorCode".withPrefix(avPrefix)) 
 
 		//body iterator
 		_iteratorExpr = metaAnnotation.value("iterator".withPrefix(avPrefix), String)

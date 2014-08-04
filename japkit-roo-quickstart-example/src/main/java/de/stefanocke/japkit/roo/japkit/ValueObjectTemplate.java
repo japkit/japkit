@@ -27,7 +27,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
 
 @Template(vars = {
 		@Var(name = "validationFragment", code = @CodeFragment(activation = @Matcher(annotations = NotNull.class),
-				expr = "if(#{src.simpleName}==null){\n"
+				code = "if(#{src.simpleName}==null){\n"
 						+ "  throw new IllegalArgumentException(\"#{src.simpleName} must not be null.\");\n" + "}")),
 		@Var(name = "defensiveCopyFragment", code = @CodeFragment(imports=Date.class, cases = { @Case(matcher = @Matcher(type = Date.class),
 				expr = "new Date(#{surrounded}.getTime())")} , linebreak=false))
@@ -51,7 +51,7 @@ public abstract class ValueObjectTemplate {
 		@ClassSelector(kind=ClassSelectorKind.EXPR, expr="#{currentGenClass.enclosingElement.asType()}")
 		abstract static class EnclosingClass{}
 		
-		@Method(bodyExpr="return new #{currentGenClass.enclosingElement.simpleName}(this);") 
+		@Method(bodyCode="return new #{currentGenClass.enclosingElement.simpleName}(this);") 
 		public abstract EnclosingClass build();
 	}
 	
@@ -63,15 +63,15 @@ public abstract class ValueObjectTemplate {
 					commentExpr = "Getter for #{src.simpleName}. \n@returns #{src.simpleName}\n"))
 	private SrcElementType srcElementName;
 
-	@Constructor(bodyExpr="//Some ctor code")
+	@Constructor(bodyCode="//Some ctor code")
 	private ValueObjectTemplate (){};
 	
 	
 	@Constructor(
-			vars={@Var(name = "rhs", code=@CodeFragment(expr="builder.#{src.simpleName}", surroundingFragments="defensiveCopyFragment", linebreak=false)),
-				  @Var(name = "assignment", code=@CodeFragment(expr="this.#{src.simpleName} = #{rhs.code()};", beforeFragments="validationFragment"))}, 
+			vars={@Var(name = "rhs", code=@CodeFragment(code="builder.#{src.simpleName}", surroundingFragments="defensiveCopyFragment", linebreak=false)),
+				  @Var(name = "assignment", code=@CodeFragment(code="this.#{src.simpleName} = #{rhs.code()};", beforeFragments="validationFragment"))}, 
 			bodyIterator = "properties", 	
-			bodyExpr = "assignment")
+			bodyCode = "assignment")
 	@ParamNames("builder")
 	private ValueObjectTemplate(Builder builder) {
 	}

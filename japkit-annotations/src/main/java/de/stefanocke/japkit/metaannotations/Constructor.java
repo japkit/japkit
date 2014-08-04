@@ -121,7 +121,7 @@ public @interface Constructor {
 	 * 
 	 * @return an expression to generate the body. 
 	 */
-	String bodyExpr() default "";
+	String bodyCode() default "";
 	
 	
 	/**
@@ -149,25 +149,25 @@ public @interface Constructor {
 	/**
 	 * 
 	 * @return an expression for the code to be generated before the repetitive
-	 *         bodyExpr. Only rendered, if the iterator expression is set and
+	 *         bodyCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
 	 */
-	String bodyBeforeExpr() default "";
+	String bodyBeforeIteratorCode() default "";
 
 	/**
 	 * 
 	 * @return an expression for the code to be generated after the repetitive
-	 *         bodyExpr. Only rendered, if the iterator expression is set and
+	 *         bodyCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
 	 */
-	String bodyAfterExpr() default "";
+	String bodyAfterIteratorCode() default "";
 
 	/**
 	 * 
 	 * @return an expression for the code to be generated if the iterator
 	 *         expression is set but does result in an empty iterator.
 	 */
-	String bodyEmptyExpr() default "";
+	String bodyEmptyIteratorExpr() default "";
 
 	/**
 	 * 

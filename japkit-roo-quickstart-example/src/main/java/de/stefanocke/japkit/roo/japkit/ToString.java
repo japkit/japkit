@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import de.stefanocke.japkit.metaannotations.Case;
+import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Properties;
@@ -18,17 +19,25 @@ public abstract class ToString {
 			
 			bodyIterator="#{toStringProperties}",
 			//bodyIteratorVar="p"
-			bodyBeforeExpr = "return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).\n",
+			bodyBeforeIteratorCode = "return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).\n",
 			
 			bodyCases={
 				//Only summary for collections
 				@Case(matcher=@Matcher(typeCategory=TypeCategory.COLLECTION), 
 						expr = "append(\"#{src.simpleName}\", #{src.getter.simpleName}(), false).\n"),
 			},
-			bodyExpr = "append(\"#{src.simpleName}\", #{src.getter.simpleName}()).\n",
-			bodyAfterExpr = "toString();\n",
-			bodyEmptyExpr = "return super.toString();" 
+			bodyCode = "append(\"#{src.simpleName}\", #{src.getter.simpleName}()).\n",
+			bodyAfterIteratorCode = "toString();\n",
+			bodyEmptyIteratorCode = "return super.toString();" 
 			)
 	public abstract String toString();
+	
+	//idea: Fragments could be written as classes:
+	
+	/**
+	 * @japkit.expr <code>append("#{src.simpleName}", #{src.getter.simpleName}(), false).</code>
+	 */
+	@CodeFragment(activation=@Matcher(typeCategory=TypeCategory.COLLECTION))
+	class AppendCollection{}
 	
 }

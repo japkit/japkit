@@ -32,7 +32,7 @@ public abstract class ControllerMembers {
 	 * 
 	 * @param fbo
 	 * 
-	 * @japkit.bodyExpr <pre>
+	 * @japkit.bodyCode <pre>
 	 * <code>
 	 * if (bindingResult.hasErrors()) {
 	 * 	populateEditForm(uiModel, fbo);
@@ -51,12 +51,12 @@ public abstract class ControllerMembers {
 			HttpServletRequest httpServletRequest);
 
 	/**
-	 * @japkit.bodyBeforeExpr <code>//blah</code>
+	 * @japkit.bodyBeforeIteratorCode <code>//blah</code>
 	 * 
-	 * @japkit.bodyExpr 
+	 * @japkit.bodyCode 
 	 * <code>uiModel.addAttribute("#{dtfModelAttr.eval(src)}", ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));</code>
 	 * 
-	 * @japkit.bodyAfterExpr <code>//blub</code>
+	 * @japkit.bodyAfterIteratorCode <code>//blub</code>
 	 */
 	@Method(imports = ControllerUtil.class,	bodyIterator = "datetimeProperties")
 	@ParamNames("uiModel")
@@ -64,14 +64,14 @@ public abstract class ControllerMembers {
 
 	@Method(src = "datetimeProperties", srcVar="p", nameExpr = "getDateTimeFormat#{p.name.toFirstUpper}", vars = @Var(
 			name = "dtfAnnotation", expr = "#{p}", annotation = DateTimeFormat.class),
-			bodyExpr = "return \"#{dtfAnnotation.style}\";")
+			bodyCode = "return \"#{dtfAnnotation.style}\";")
 	abstract String getDateTimeFormat();
 
 	@Method(
 			imports = { Arrays.class }, 
 			bodyIterator="enumProperties",
 			// TODO: Eigentlich singleValueType.
-			bodyExpr = "uiModel.addAttribute(\"${src.name}s\", Arrays.asList(${ec.typeRef(src.type)}.values()));\n"
+			bodyCode = "uiModel.addAttribute(\"${src.name}s\", Arrays.asList(${ec.typeRef(src.type)}.values()));\n"
 			)
 	@ParamNames("uiModel")
 	abstract void addEnumChoices(Model uiModel);
@@ -79,25 +79,25 @@ public abstract class ControllerMembers {
 	@Method(
 			bodyIterator="entityProperties",
 			// TODO: Eigentlich singleValueType.
-			bodyExpr = "uiModel.addAttribute(\"${src.name}Choices\", get${src.name.toFirstUpper}Choices());\n"
+			bodyCode = "uiModel.addAttribute(\"${src.name}Choices\", get${src.name.toFirstUpper}Choices());\n"
 			)
 	@ParamNames("uiModel")
 	abstract void addEntityChoices(Model uiModel);
 
 	// TODO: Help with escaping here.
-	@Method(bodyExpr = "populateEditForm(uiModel, new ${ec.typeRef(fbo)}());\\n" + "return \\\"${path}/create\\\";", bodyLang = "GString")
+	@Method(bodyCode = "populateEditForm(uiModel, new ${ec.typeRef(fbo)}());\\n" + "return \\\"${path}/create\\\";", bodyLang = "GString")
 	@ParamNames({ "uiModel" })
 	@RequestMapping(params = "form", produces = "text/html")
 	public abstract String createForm(Model uiModel);
 
-	@Method(bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", crudOperations().find(id));\n"
+	@Method(bodyCode = "uiModel.addAttribute(\"#{modelAttribute}\", crudOperations().find(id));\n"
 			+ "uiModel.addAttribute(\"itemId\", id);\n" + "addDateTimeFormatPatterns(uiModel);\n" + "return \"#{path}/show\";")
 	@ParamNames({ "id", "uiModel" })
 	@RequestMapping(produces = "text/html", value = "/{id}")
 	public abstract String show(@PathVariable("id") Long id, Model uiModel);
 
 	@Method(
-			bodyExpr = "if (page != null || size != null) {\n"
+			bodyCode = "if (page != null || size != null) {\n"
 					+ "\tint sizeNo = size == null ? 10 : size.intValue();\n"
 					+ "\tfinal int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;\n"
 					+ "\tuiModel.addAttribute(\"#{modelAttribute}s\", crudOperations().findEntries(firstResult, sizeNo, sortFieldName, sortOrder));\n"
@@ -113,7 +113,7 @@ public abstract class ControllerMembers {
 			value = "sortOrder", required = false) String sortOrder, Model uiModel);
 
 	@Method(imports = ControllerUtil.class, 
-			bodyExpr = "if (bindingResult.hasErrors()) {\n" 
+			bodyCode = "if (bindingResult.hasErrors()) {\n" 
 			+ "\tpopulateEditForm(uiModel, fbo);\n"
 			+ "\treturn \"#{path}/update\";\n" 
 			+ "}\n" 
@@ -125,12 +125,12 @@ public abstract class ControllerMembers {
 	public abstract String update(@Valid FormBackingObject fbo, BindingResult bindingResult, Model uiModel,
 			HttpServletRequest httpServletRequest);
 
-	@Method(bodyExpr = "populateEditForm(uiModel, crudOperations().find(id));\n" + "return \"#{path}/update\";")
+	@Method(bodyCode = "populateEditForm(uiModel, crudOperations().find(id));\n" + "return \"#{path}/update\";")
 	@ParamNames({ "id", "uiModel" })
 	@RequestMapping(value = "/{id}", params = "form", produces = "text/html")
 	public abstract String updateForm(@PathVariable("id") Long id, Model uiModel);
 
-	@Method(bodyExpr = "crudOperations().remove(id);\n" 
+	@Method(bodyCode = "crudOperations().remove(id);\n" 
 			+ "uiModel.asMap().clear();\n"
 			+ "uiModel.addAttribute(\"page\", (page == null) ? \"1\" : page.toString());\n"
 			+ "uiModel.addAttribute(\"size\", (size == null) ? \"10\" : size.toString());\n" + "return \"redirect:/#{path}\";")
@@ -140,7 +140,7 @@ public abstract class ControllerMembers {
 			required = false, value = "size") Integer size, Model uiModel);
 
 	// TODO: Conditional calls to addDateTimeFormatPatterns?
-	@Method(bodyExpr = "uiModel.addAttribute(\"#{modelAttribute}\", #{modelAttribute});\n" 
+	@Method(bodyCode = "uiModel.addAttribute(\"#{modelAttribute}\", #{modelAttribute});\n" 
 			+ "addDateTimeFormatPatterns(uiModel);\n"
 			+ "addEnumChoices(uiModel);\n"
 			+ "addEntityChoices(uiModel);\n"

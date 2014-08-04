@@ -10,7 +10,7 @@ import de.stefanocke.japkit.roo.base.web.CrudOperations;
 @Template
 public abstract class ControllerMembersActiveRecord implements CrudOperations<FormBackingObject> {
 
-	@Method(bodyExpr = "return this;")
+	@Method(bodyCode = "return this;")
 	protected abstract CrudOperations<FormBackingObject> crudOperations();
 
 	/*
@@ -20,7 +20,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * de.stefanocke.japkit.roo.japkit.CrudOperations#remove(java.lang.Long)
 	 */
 	@Override
-	@Method(bodyExpr = "#{ec.typeRef(fbo)} fbo = #{ec.typeRef(fbo)}.find#{fboName}(id);\n" + "fbo.remove();\n")
+	@Method(bodyCode = "#{ec.typeRef(fbo)} fbo = #{ec.typeRef(fbo)}.find#{fboName}(id);\n" + "fbo.remove();\n")
 	@ParamNames("id")
 	public abstract void remove(Long id);
 
@@ -32,7 +32,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * .roo.japkit.FormBackingObject)
 	 */
 	@Override
-	@Method(bodyExpr = "return fbo.merge();")
+	@Method(bodyCode = "return fbo.merge();")
 	@ParamNames("fbo")
 	public abstract FormBackingObject merge(FormBackingObject fbo);
 
@@ -44,7 +44,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * japkit.roo.japkit.FormBackingObject)
 	 */
 	@Override
-	@Method(bodyExpr = "fbo.persist();")
+	@Method(bodyCode = "fbo.persist();")
 	@ParamNames("fbo")
 	public abstract void persist(FormBackingObject fbo);
 
@@ -54,7 +54,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * @see de.stefanocke.japkit.roo.japkit.CrudOperations#find(java.lang.Long)
 	 */
 	@Override
-	@Method(bodyExpr = "return #{ec.typeRef(fbo)}.find#{fboName}(id);")
+	@Method(bodyCode = "return #{ec.typeRef(fbo)}.find#{fboName}(id);")
 	@ParamNames("id")
 	public abstract FormBackingObject find(Long id);
 
@@ -64,7 +64,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * @see de.stefanocke.japkit.roo.japkit.CrudOperations#count()
 	 */
 	@Override
-	@Method(bodyExpr = "return #{ec.typeRef(fbo)}.count#{fboName}s();")
+	@Method(bodyCode = "return #{ec.typeRef(fbo)}.count#{fboName}s();")
 	public abstract long count();
 
 	/*
@@ -75,7 +75,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * java.lang.String)
 	 */
 	@Override
-	@Method(bodyExpr = "return #{ec.typeRef(fbo)}.findAll#{fboName}s(sortFieldName, sortOrder);")
+	@Method(bodyCode = "return #{ec.typeRef(fbo)}.findAll#{fboName}s(sortFieldName, sortOrder);")
 	@ParamNames({ "sortFieldName", "sortOrder" })
 	public abstract List<FormBackingObject> findAll(String sortFieldName, String sortOrder);
 
@@ -87,7 +87,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * Integer, java.lang.Integer, java.lang.String, java.lang.String)
 	 */
 	@Override
-	@Method(bodyExpr = "return #{ec.typeRef(fbo)}.find#{fboName}Entries(firstResult, maxResults, sortFieldName, sortOrder);")
+	@Method(bodyCode = "return #{ec.typeRef(fbo)}.find#{fboName}Entries(firstResult, maxResults, sortFieldName, sortOrder);")
 	@ParamNames({ "firstResult", "maxResults", "sortFieldName", "sortOrder" })
 	public abstract List<FormBackingObject> findEntries(Integer firstResult, Integer maxResults, String sortFieldName, String sortOrder);
 

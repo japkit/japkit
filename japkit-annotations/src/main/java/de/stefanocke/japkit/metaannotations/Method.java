@@ -148,11 +148,11 @@ public @interface Method {
 
 	/**
 	 * 
-	 * @return an expression to generate the body. The root property "element"
+	 * @return an expression to generate the body. The root property "src"
 	 *         refers to the generated method or, if a bodyIterator is used, the
 	 *         current iterator element.
 	 */
-	String bodyExpr() default "";
+	String bodyCode() default "";
 
 	/**
 	 * If there is at least one of the given cases, where all matcher match, the
@@ -179,29 +179,29 @@ public @interface Method {
 	/**
 	 * 
 	 * @return an expression for the code to be generated before the repetitive
-	 *         bodyExpr. Only rendered, if the iterator expression is set and
+	 *         bodyCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
 	 */
-	String bodyBeforeExpr() default "";
+	String bodyBeforeIteratorCode() default "";
 
 	/**
 	 * 
 	 * @return an expression for the code to be generated after the repetitive
-	 *         bodyExpr. Only rendered, if the iterator expression is set and
+	 *         bodyCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
 	 */
-	String bodyAfterExpr() default "";
+	String bodyAfterIteratorCode() default "";
 
 	/**
 	 * 
 	 * @return an expression for the code to be generated if the iterator
 	 *         expression is set but does result in an empty iterator.
 	 */
-	String bodyEmptyExpr() default "";
+	String bodyEmptyIteratorCode() default "";
 
 	/**
 	 * 
-	 * @return the language of the body expression. Default is Java EL.
+	 * @return the language of the body expression(s). Default is Java EL.
 	 */
 	String bodyLang() default "";
 

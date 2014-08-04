@@ -38,13 +38,13 @@ public abstract class ControllerMembersJpaRepository {
 	private RelatedEntityRepository relatedEntityRepository;
 
 	@Method(activation = @Matcher(condition = "useFboRepository"), imports = RepositoryAdapter.class,
-			bodyExpr = "return new RepositoryAdapter<#{ec.typeRef(fbo)}>(repository);")
+			bodyCode = "return new RepositoryAdapter<#{ec.typeRef(fbo)}>(repository);")
 	protected abstract CrudOperations<FormBackingObject> crudOperations();
 
 	@Method(src = "#{entityPropertiesWithJpaRepositories.keySet()}", nameExpr = "get#{src.name.toFirstUpper}Choices", vars = {
 			@Var(name = "relatedEntity", expr = "#{src.singleValueType}"),
 			@Var(name = "relatedEntityRepositoryName", expr = "#{relatedEntity.asElement.simpleName.toFirstLower}Repository") },
-			bodyExpr = "return #{relatedEntityRepositoryName}.findAll();")
+			bodyCode = "return #{relatedEntityRepositoryName}.findAll();")
 	protected abstract List<RelatedEntity> getEntityChoices();
 
 }

@@ -24,48 +24,48 @@ public abstract class ActiveRecordMembers {
 	transient EntityManager entityManager;
 
 	@Method(imports = { EntityManager.class, IllegalStateException.class },
-			bodyExpr = "EntityManager em = new #{entityName}().entityManager;\n"
+			bodyCode = "EntityManager em = new #{entityName}().entityManager;\n"
 					+ "if (em == null) throw new IllegalStateException(\"Entity manager has not been injected\");\n" + "return em;\n")
 	static final EntityManager entityManager() {
 		return null;
 	}
 
-	@Method(bodyExpr = "if (this.entityManager == null) this.entityManager = entityManager();")
+	@Method(bodyCode = "if (this.entityManager == null) this.entityManager = entityManager();")
 	private void initEntityManager() {
 	}
 
 	@Method(nameExpr = "count#{entityName}s",
-			bodyExpr = "return entityManager().createQuery(\"SELECT COUNT(o) FROM #{entityName} o\", Long.class).getSingleResult();")
+			bodyCode = "return entityManager().createQuery(\"SELECT COUNT(o) FROM #{entityName} o\", Long.class).getSingleResult();")
 	public static long count() {
 		return 0;
 	}
 
-	@Method(nameExpr = "find#{entityName}", bodyExpr = "if (id == null) return null;\n"
+	@Method(nameExpr = "find#{entityName}", bodyCode = "if (id == null) return null;\n"
 			+ "return entityManager().find(#{entityName}.class, id);")
 	@ParamNames("id")
 	public static GeneratedClass find(Long id) {
 		return null;
 	}
 
-	@Method(nameExpr = "findAll#{entityName}s", bodyExpr = "return find#{entityName}Entries(null, null, null, null);")
+	@Method(nameExpr = "findAll#{entityName}s", bodyCode = "return find#{entityName}Entries(null, null, null, null);")
 	public static List<GeneratedClass> findAll() {
 		return null;
 	}
 
-	@Method(nameExpr = "findAll#{entityName}s", bodyExpr = "return find#{entityName}Entries(null, null, sortFieldName, sortOrder);")
+	@Method(nameExpr = "findAll#{entityName}s", bodyCode = "return find#{entityName}Entries(null, null, sortFieldName, sortOrder);")
 	@ParamNames({ "sortFieldName", "sortOrder" })
 	public static List<GeneratedClass> findAll(String sortFieldName, String sortOrder) {
 		return null;
 	}
 
-	@Method(nameExpr = "find#{entityName}Entries", bodyExpr = "return find#{entityName}Entries(firstResult, maxResults, null, null);")
+	@Method(nameExpr = "find#{entityName}Entries", bodyCode = "return find#{entityName}Entries(firstResult, maxResults, null, null);")
 	@ParamNames({ "firstResult", "maxResults" })
 	public static List<GeneratedClass> findEntries(Integer firstResult, Integer maxResults) {
 		return null;
 	}
 
 	@Method(nameExpr = "find#{entityName}Entries", imports = TypedQuery.class,
-			bodyExpr = "String jpaQuery = \"SELECT o FROM #{entityName} o\";\n" + "addOrderBy(jpaQuery, sortFieldName, sortOrder);\n"
+			bodyCode = "String jpaQuery = \"SELECT o FROM #{entityName} o\";\n" + "addOrderBy(jpaQuery, sortFieldName, sortOrder);\n"
 					+ "TypedQuery<#{entityName}> query =  entityManager().createQuery(jpaQuery, #{entityName}.class);\n"
 					+ "if(firstResult!=null && maxResults!=null){query.setFirstResult(firstResult).setMaxResults(maxResults);}\n"
 					+ "return query.getResultList();")
@@ -78,7 +78,7 @@ public abstract class ActiveRecordMembers {
 	// being generated. However, we keep quite close to Roo code gen here.
 	// Same is true for other methods here. Mostly, fixed parts can easily
 	// be factored out.
-	@Method(bodyExpr = "if (sortFieldName != null /**TODO: Check field name*/) {\n"
+	@Method(bodyCode = "if (sortFieldName != null /**TODO: Check field name*/) {\n"
 			+ "\tString jpaQueryWithOrderBy = jpaQuery + \" ORDER BY \" + sortFieldName;\n"
 			+ "\tif (\"ASC\".equalsIgnoreCase(sortOrder) || \"DESC\".equalsIgnoreCase(sortOrder)) {\n"
 			+ "\t\tjpaQueryWithOrderBy = jpaQueryWithOrderBy + \" \" + sortOrder;\n" + "\t}\n" + "\treturn jpaQueryWithOrderBy;\n" + "}\n"
@@ -88,25 +88,25 @@ public abstract class ActiveRecordMembers {
 		return null;
 	}
 
-	@Method(bodyExpr = "initEntityManager();\n" + "this.entityManager.persist(this);")
+	@Method(bodyCode = "initEntityManager();\n" + "this.entityManager.persist(this);")
 	@Transactional
 	public abstract void persist();
 
-	@Method(bodyExpr = "initEntityManager();\n" + " if (this.entityManager.contains(this)) {\n" + "\tthis.entityManager.remove(this);\n"
+	@Method(bodyCode = "initEntityManager();\n" + " if (this.entityManager.contains(this)) {\n" + "\tthis.entityManager.remove(this);\n"
 			+ "} else {\n" + "\t#{entityName} attached = #{entityName}.find#{entityName}(this.id);\n"
 			+ "\tthis.entityManager.remove(attached);\n" + "}")
 	@Transactional
 	public abstract void remove();
 
-	@Method(bodyExpr = "initEntityManager();\n" + "this.entityManager.flush();")
+	@Method(bodyCode = "initEntityManager();\n" + "this.entityManager.flush();")
 	@Transactional
 	public abstract void flush();
 
-	@Method(bodyExpr = "initEntityManager();\n" + "this.entityManager.clear();")
+	@Method(bodyCode = "initEntityManager();\n" + "this.entityManager.clear();")
 	@Transactional
 	public abstract void clear();
 
-	@Method(bodyExpr = "initEntityManager();\n" + "#{entityName} merged = this.entityManager.merge(this);\n"
+	@Method(bodyCode = "initEntityManager();\n" + "#{entityName} merged = this.entityManager.merge(this);\n"
 			+ "this.entityManager.flush();\n" + "return merged;")
 	@Transactional
 	public abstract GeneratedClass merge();

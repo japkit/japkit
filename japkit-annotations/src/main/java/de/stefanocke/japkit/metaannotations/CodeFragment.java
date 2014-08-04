@@ -37,8 +37,8 @@ public @interface CodeFragment {
 
 	/**
 	 * If the body shall contain some repetitive code, this expression can be
-	 * used. It determines how often to repeat bodyExpr. The iteration variable
-	 * is provided as "element" on the value stack.
+	 * used. It determines how often to repeat "code". The iteration variable
+	 * is provided as "src" on the value stack.
 	 * <p>
 	 * A typical example is to iterate over the properties of the class, to
 	 * generate methods like toString or equals / hashcode.
@@ -56,10 +56,10 @@ public @interface CodeFragment {
 
 	/**
 	 * 
-	 * @return an expression to generate the body. The root property "element"
-	 *         refers to the generated method or, if a bodyIterator is used, the current iterator element.
+	 * @return an expression to generate the code. The root property "src"
+	 *         refers to the generated method or, if an iterator is used, the current iterator element.
 	 */
-	String expr() default "";
+	String code() default "";
 	
 	
 	/**
@@ -92,25 +92,25 @@ public @interface CodeFragment {
 	/**
 	 * 
 	 * @return an expression for the code to be generated before the repetitive
-	 *         bodyExpr. Only rendered, if the iterator expression is set and
+	 *         code. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
 	 */
-	String beforeExpr() default "";
+	String beforeIteratorCode() default "";
 
 	/**
 	 * 
 	 * @return an expression for the code to be generated after the repetitive
-	 *         bodyExpr. Only rendered, if the iterator expression is set and
+	 *         code. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
 	 */
-	String afterExpr() default "";
+	String afterIteratorCode() default "";
 
 	/**
 	 * 
 	 * @return an expression for the code to be generated if the iterator
 	 *         expression is set but does result in an empty iterator.
 	 */
-	String emptyExpr() default "";
+	String emptyIteratorCode() default "";
 
 	/**
 	 * 

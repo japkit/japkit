@@ -156,32 +156,32 @@ public @interface Field {
 	/**
 	 * 
 	 * @return an expression for the code to be generated before the repetitive
-	 *         initExpr. Only rendered, if the iterator expression is set and
+	 *         initCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
 	 */
-	String initBeforeExpr() default "";
+	String initBeforeIteratorCode() default "";
 
 	/**
 	 * 
 	 * @return an expression for the code to be generated after the repetitive
-	 *         initExpr. Only rendered, if the iterator expression is set and
+	 *         initCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
 	 */
-	String initAfterExpr() default "";
+	String initAfterIteratorCode() default "";
 
 	/**
 	 * 
 	 * @return an expression for the code to be generated if the iterator
 	 *         expression is set but does result in an empty iterator.
 	 */
-	String initEmptyExpr() default "";
+	String initEmptyIteratorCode() default "";
 
 	/**
 	 * 
 	 * @return a Java EL expression to generate the initializer. The root
-	 *         property "element" refers to the generated field.
+	 *         property "src" refers to the generated field or to the iterator variable.
 	 */
-	String initExpr() default "";
+	String initCode() default "";
 	
 	/**
 	 * If there is at least one of the given cases, where all matcher match, the according expression is use instead of initExpr.
