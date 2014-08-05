@@ -376,7 +376,20 @@ class JavaEmitter implements EmitterContext{
 		} else if(values.size==1 && values.head.key.simpleName.contentEquals("value")){
 			'''(«values.head.value.annotationValueCode»)'''
 		} else {
-			'''(«FOR av : values SEPARATOR ', '»«av.key.simpleName» = «av.value.annotationValueCode»«ENDFOR»)'''
+			val avCode = values.map[av | '''«av.key.simpleName» = «av.value.annotationValueCode»''']
+			val avCodeLength = avCode.map[length].reduce[l1, l2| l1 + l2]
+			
+			if(avCodeLength<150){
+				'''(«FOR av : avCode SEPARATOR ', '»«av»«ENDFOR»)'''			
+			} else {
+				'''
+				(
+					«FOR av : avCode SEPARATOR ', '»
+					«av»
+					«ENDFOR»
+				)
+				'''
+			}
 		}
 		
 		'''@«typeName»«elementValuePairs»'''
@@ -387,7 +400,11 @@ class JavaEmitter implements EmitterContext{
 	}
 	
 	def dispatch CharSequence annotationValueCode(String value) {
-		'''"«StringEscapeUtils.escapeJava(value)»"''' 
+		// buggy. Ein zeilenumbruch zu viel im letzten teilstring...
+		//if(value.length>50)
+		//	value.split("\\r?\\n").map['''"«StringEscapeUtils.escapeJava(it)»\n"'''].join("+\n")
+		//else
+			'''"«StringEscapeUtils.escapeJava(value)»"''' 
 	}
 	
 	def dispatch CharSequence annotationValueCode(TypeMirror type) {
@@ -400,7 +417,7 @@ class JavaEmitter implements EmitterContext{
 	
 	
 	def dispatch CharSequence annotationValueCode(AnnotationMirror a) {
-		a.annotationCode
+		'''«a.annotationCode»'''
 	}
 	
 	def dispatch CharSequence annotationValueCode(Void a) {
@@ -411,7 +428,21 @@ class JavaEmitter implements EmitterContext{
 		if(values.size==1){
 			values.head.annotationValueCode
 		} else {
-			'''{«FOR av : values SEPARATOR ', '»«av.annotationValueCode»«ENDFOR»}'''		
+			val avCode = values.map[annotationValueCode]
+			val avCodeLength = avCode.map[length].reduce[l1, l2| l1 + l2] ?: 0
+			
+			if(avCodeLength<150){
+				'''{«FOR av : avCode SEPARATOR ', '»«av»«ENDFOR»}'''			
+			} else {
+				'''
+				{
+					«FOR av : avCode SEPARATOR ', '»
+					«av»
+					«ENDFOR»
+				}
+				'''
+			}
+					
 		}
 	}
 	
