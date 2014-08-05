@@ -932,5 +932,30 @@ class ElementsExtensions {
 			typeElement
 		}
 	}
+	
+	//to get unique names for methods and constructors, the type parameters are appended
+	def dispatch uniqueSimpleName(ExecutableElement e){
+		'''«e.simpleName»(«FOR p : e.parameters SEPARATOR ','»«p.asType.qualifiedName»«ENDFOR»)'''
+	}
+	
+	def dispatch uniqueSimpleName(Element e){
+		e.simpleName
+	}
+	
+	def dispatch CharSequence uniqueName(QualifiedNameable e){
+		e.qualifiedName
+	}
+	
+	def dispatch CharSequence uniqueName(Element e){
+		'''«e.enclosingElement.uniqueName».«e.uniqueSimpleName»'''
+	}
+	
+	//quick and dirty. Should probably be an iterator instead.
+	def Iterable<? extends Element> elementAndAllEnclosedElements(Element e){
+		val List<Element> list = newArrayList()
+		list.add(e)
+		list.addAll(e.enclosedElements.map[elementAndAllEnclosedElements].flatten)
+		list
+	}
 
 }

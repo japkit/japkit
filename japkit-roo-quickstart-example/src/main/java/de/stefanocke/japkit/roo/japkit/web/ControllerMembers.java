@@ -19,11 +19,13 @@ import de.stefanocke.japkit.metaannotations.AnnotationMapping;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Param;
 import de.stefanocke.japkit.metaannotations.ParamNames;
+import de.stefanocke.japkit.metaannotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 
 @Controller
+@RuntimeMetadata
 @Template(annotationMappings=@AnnotationMapping(targetAnnotation = RequestMapping.class, valueMappings = @AVMapping(name = "value", expr = "/#{path}")))
 public abstract class ControllerMembers {
 	
@@ -96,16 +98,26 @@ public abstract class ControllerMembers {
 	@RequestMapping(produces = "text/html", value = "/{id}")
 	public abstract String show(@PathVariable("id") Long id, Model uiModel);
 
-	@Method(
-			bodyCode = "if (page != null || size != null) {\n"
-					+ "\tint sizeNo = size == null ? 10 : size.intValue();\n"
-					+ "\tfinal int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;\n"
-					+ "\tuiModel.addAttribute(\"#{modelAttribute}s\", crudOperations().findEntries(firstResult, sizeNo, sortFieldName, sortOrder));\n"
-					+ "\tfloat nrOfPages = (float) crudOperations().count() / sizeNo;\n"
-					+ "\tuiModel.addAttribute(\"maxPages\", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));\n"
-					+ "} else {\n"
-					+ "\tuiModel.addAttribute(\"#{modelAttribute}s\", crudOperations().findAll(sortFieldName, sortOrder));\n" + "}"
-					+ "addDateTimeFormatPatterns(uiModel);\n" + "return \"#{path}/list\";\n")
+	/**
+	 * @japkit.bodyCode <pre>
+	 * <code>
+	 * if (page != null || size != null) {
+	 * 	int sizeNo = size == null ? 10 : size.intValue();
+	 * 	final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
+	 * 	uiModel.addAttribute("#{modelAttribute}s", crudOperations().findEntries(firstResult, sizeNo, sortFieldName, sortOrder));
+	 * 	float nrOfPages = (float) crudOperations().count() / sizeNo;
+	 * 	uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
+	 * } else {
+	 * 	uiModel.addAttribute("#{modelAttribute}s", crudOperations().findAll(sortFieldName, sortOrder));
+	 * }
+	 * 
+	 * addDateTimeFormatPatterns(uiModel);
+	 * return "#{path}/list";
+	 * </code>
+	 * </pre>
+	 * 
+	 */
+	@Method()
 	@RequestMapping(produces = "text/html")
 	@ParamNames({ "page", "size", "sortFieldName", "sortOrder", "uiModel" })
 	public abstract String list(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size",
