@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.lang.model.element.Modifier;
 import javax.validation.constraints.NotNull;
 
+import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.AnnotationMapping;
 import de.stefanocke.japkit.metaannotations.Case;
 import de.stefanocke.japkit.metaannotations.CodeFragment;
@@ -16,7 +17,6 @@ import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Members;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.ParamNames;
-import de.stefanocke.japkit.metaannotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;

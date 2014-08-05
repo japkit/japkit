@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.AVMapping;
 import de.stefanocke.japkit.metaannotations.AnnotationMapping;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Param;
 import de.stefanocke.japkit.metaannotations.ParamNames;
-import de.stefanocke.japkit.metaannotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;
@@ -30,8 +30,7 @@ import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 public abstract class ControllerMembers {
 	
 	/**
-	 * Some comment...
-	 * 
+	 *  
 	 * @param fbo
 	 * 
 	 * @japkit.bodyCode <pre>

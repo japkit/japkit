@@ -1,9 +1,16 @@
-package de.stefanocke.japkit.metaannotations;
+package de.stefanocke.japkit.annotations;
 
 import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
 import static javax.lang.model.element.ElementKind.METHOD;
-import de.stefanocke.japkit.metaannotations.RuntimeMetadata.Element;
-import de.stefanocke.japkit.metaannotations.RuntimeMetadata.List;
+import de.stefanocke.japkit.annotations.RuntimeMetadata.Element;
+import de.stefanocke.japkit.annotations.RuntimeMetadata.List;
+import de.stefanocke.japkit.metaannotations.AVMapping;
+import de.stefanocke.japkit.metaannotations.AVMappingMode;
+import de.stefanocke.japkit.metaannotations.AnnotationMapping;
+import de.stefanocke.japkit.metaannotations.AnnotationMappingMode;
+import de.stefanocke.japkit.metaannotations.GenerateClass;
+import de.stefanocke.japkit.metaannotations.Matcher;
+import de.stefanocke.japkit.metaannotations.Var;
 
 @Var(name="srcClass", triggerAV="srcClass", setInShadowAnnotation=true, expr="#{currentAnnotatedClass.asType()}")
 @GenerateClass(nameSuffixToAppend=RuntimeMetadata.CLASS_SUFFIX, annotationMappings={
