@@ -634,11 +634,12 @@ class ElementsExtensions {
 	}
 
 	def coerceSingleValue(Object value, TypeMirror avType) {
-		var v = value
-
-		if (v instanceof String) {
-			v = toAnnotationValue(avType, v as String)
+		if(value==null){
+			//This is no valid annotation value but it just says not to set the AV
+			return null;
 		}
+		val v = toAnnotationValue(avType, value)
+		
 		if (!avType.toAnnotationValueClass.isInstance(v)) {
 			throw new IllegalArgumentException(
 				''''«v»' of type «v?.class» is not a valid value or element value for type «avType»''');
@@ -646,12 +647,22 @@ class ElementsExtensions {
 		v
 	}
 
-	def dispatch toAnnotationValue(DeclaredType avType, String s) {
+	def dispatch toAnnotationValue(DeclaredType avType, Object o) {
 		val e = avType.asTypeElement
 
+		if(e.hasFqn("java.lang.String")){
+			return o.toString
+		}
+		
+		if(!(o instanceof CharSequence)){
+			return o
+		}
+		
+		val s = o.toString
+		
 		switch (e) {
 			case e.hasFqn("java.lang.String"):
-				s
+				s?.toString
 			case e.hasFqn("java.lang.Class"): {
 
 				//FQN to type mirror
@@ -677,13 +688,13 @@ class ElementsExtensions {
 
 	}
 
-	def dispatch toAnnotationValue(TypeMirror type, String s) {
-		throw unsupportedAVType(type, s)
+	def dispatch toAnnotationValue(TypeMirror type, Object o) {
+		throw unsupportedAVType(type, o)
 	}
 
-	def static unsupportedAVType(TypeMirror type, String s) {
+	def static unsupportedAVType(TypeMirror type, Object o) {
 		new IllegalArgumentException(
-			'''An annotation value of type «type» cannot be created from string literal "«s»""''')
+			'''An annotation value of type «type» cannot be created from value "«o»" of type «o?.class»''')
 	}
 
 	def isAbstract(Element e) {
