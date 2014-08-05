@@ -39,6 +39,9 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
+import java.util.Set
+import java.util.HashSet
+import de.stefanocke.japkit.annotations.RuntimeMetadata
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -234,7 +237,7 @@ class ElementsExtensions {
 	 * @param annotationClass the annotation class
 	 */
 	def AnnotationMirror annotationMirror(Element annotatedElement, Class<? extends Annotation> annotationClass) {
-		annotatedElement.annotationMirror(annotationClass.name)
+		annotatedElement.annotationMirror(annotationClass.canonicalName)
 	}
 
 	/**
@@ -243,7 +246,7 @@ class ElementsExtensions {
 	 * TODO: Java 8?
 	 */
 	def List<AnnotationMirror> annotationMirrors(Element annotatedElement, Class<? extends Annotation> annotationClass) {
-		annotationMirrors(annotatedElement, annotationClass.name)
+		annotationMirrors(annotatedElement, annotationClass.canonicalName)
 	}
 
 	/**
@@ -747,20 +750,68 @@ class ElementsExtensions {
 		e1.getPackage?.qualifiedName?.toString == e2.getPackage?.qualifiedName?.toString
 	}
 
-	def private dispatch String docComment(GenElement e) {
+	def private dispatch String docComment(GenElement e, boolean useRuntimeMetadata) {
 		e.comment?.toString?.trim
 	}
 	
-	def private dispatch String docComment(Property p) {
-		p.fieldOrGetter?.docComment  //TODO: If getter, extract @return comment here?
+	def private dispatch String docComment(Property p, boolean useRuntimeMetadata) {
+		p.fieldOrGetter?.docComment(useRuntimeMetadata)  //TODO: If getter, extract @return comment here?
 	}
 
-	def private dispatch String docComment(Element e) {
-		elementUtils.getDocComment(e)?.trim
+	def private dispatch String docComment(Element e, boolean useRuntimeMetadata) {
+		val result = elementUtils.getDocComment(e)?.trim
+		if(result.nullOrEmpty && useRuntimeMetadata) getCommentFromRuntimeMetadata(e) else result
 	}
-
+		
 	def getDocComment(Element e) {
-		docComment(e)
+		docComment(e, false)
+	}
+	
+	def getDocCommentUsingRuntimeMetadata(Element e) {
+		docComment(e, true)
+	}
+	
+	
+	////////////////////////////////
+	//TODO: Move to separate class
+	//Unique element name -> comment
+	Map<String, String> commentsFromRuntimeMetadata = newHashMap()
+	
+	//FQNs of types for which RuntimeMetadata has been loaded or  does not exist
+	Set<String> typeElementsForWhichRuntimeMetadataHasBeenLoaded = new HashSet
+	
+	def getCommentFromRuntimeMetadata(Element element) {
+		loadRuntimeMetadata(element)
+		commentsFromRuntimeMetadata.get(element.uniqueName)
+	}
+	
+	def loadRuntimeMetadata(Element element) {
+		val typeElementFqn = element.getTopLevelEnclosingTypeElement.qualifiedName.toString
+		if(!typeElementsForWhichRuntimeMetadataHasBeenLoaded.contains(typeElementFqn)){
+			val runtimeMetadataTypeElement = findTypeElement(typeElementFqn + "_RuntimeMetadata") //TODO: Constant
+			if(runtimeMetadataTypeElement!=null){
+				runtimeMetadataTypeElement
+					.annotationMirror(RuntimeMetadata.List)
+					?.value("value", typeof(AnnotationMirror[]))
+					?.forEach[
+						val uniqueName = value("id", String)
+						val comment = value("comment", String)
+						val paramNames = value("paramNames",typeof(String[]))
+						commentsFromRuntimeMetadata.put(uniqueName, comment)
+					]
+			}
+			typeElementsForWhichRuntimeMetadataHasBeenLoaded.add(typeElementFqn)
+		}
+	}
+	
+	/////////////////////////////////
+
+	def dispatch TypeElement getTopLevelEnclosingTypeElement(TypeElement e){
+		if(e.enclosingElement?.kind == ElementKind.PACKAGE) e else e.enclosingElement?.topLevelEnclosingTypeElement
+	}
+	
+	def dispatch TypeElement getTopLevelEnclosingTypeElement(Element e){
+		e.enclosingElement?.topLevelEnclosingTypeElement
 	}
 
 	//TODO: No delegation but custom impl for GenElements
@@ -942,11 +993,11 @@ class ElementsExtensions {
 		e.simpleName
 	}
 	
-	def dispatch CharSequence uniqueName(QualifiedNameable e){
-		e.qualifiedName
+	def dispatch String uniqueName(QualifiedNameable e){
+		e.qualifiedName.toString
 	}
 	
-	def dispatch CharSequence uniqueName(Element e){
+	def dispatch String uniqueName(Element e){
 		'''«e.enclosingElement.uniqueName».«e.uniqueSimpleName»'''
 	}
 	

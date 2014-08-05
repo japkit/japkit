@@ -47,7 +47,7 @@ class CodeRule implements Function0<CharSequence> {
 		_metaAnnotation = metaAnnotation
 		_template=template
 		
-		val codeFromJavadoc = JavadocUtil.getCode(template?.getDocComment)
+		val codeFromJavadoc = JavadocUtil.getCode(template?.getDocCommentUsingRuntimeMetadata)
 		
 		_bodyExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "code".withPrefix(avPrefix))
 		
