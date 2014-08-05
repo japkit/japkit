@@ -1,6 +1,19 @@
 package de.stefanocke.japkit.metaannotations;
 
 public @interface AVMapping {
+	
+	/**
+	 * By default, this annotation mapping is active an will copy or map the AV.
+	 * To switch it on or of case by case, a Matcher can be used here. 
+	 * <p>
+	 * In case of multiple matchers, at least one must match to activate the
+	 * rule.
+	 * 
+	 * @return the matcher
+	 */
+	Matcher[] activation() default {};
+	
+	
 	/**
 	 * 
 	 * @return the name of the target annotation value

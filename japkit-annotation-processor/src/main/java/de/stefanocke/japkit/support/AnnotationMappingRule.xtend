@@ -50,12 +50,6 @@ class AnnotationMappingRule {
 	 * @param srcElement the source element
 	 */
 	def void mapOrCopyAnnotations(List<GenAnnotationMirror> annotations, Element srcElement, Map<String, AnnotationMappingRule> mappingsWithId) {
-		mapOrCopyAnnotations(annotations, srcElement, mappingsWithId, false)
-	}
-	
-	def void mapOrCopyAnnotations(List<GenAnnotationMirror> annotations, Element srcElement, Map<String, AnnotationMappingRule> mappingsWithId, 
-		 boolean srcElementChanged
-	) {
 		if (!activationRule.apply) {
 			return
 		}
@@ -64,7 +58,7 @@ class AnnotationMappingRule {
 		
 
 		if(!DefaultAnnotation.name.equals(targetAnnotation?.qualifiedName)){
-			mapAnnotation(srcElementChanged, srcElement, annotations, mappingsWithId)	
+			mapAnnotation(srcElement, annotations, mappingsWithId)	
 		}
 
 	}
@@ -106,7 +100,7 @@ class AnnotationMappingRule {
 		})
 	}
 	
-	def private void mapAnnotation(boolean srcElementChanged, Element srcElement, List<GenAnnotationMirror> annotations, Map<String, AnnotationMappingRule> mappingsWithId) {
+	def private void mapAnnotation(Element srcElement, List<GenAnnotationMirror> annotations, Map<String, AnnotationMappingRule> mappingsWithId) {
 		
 		
 		var am = annotations.findFirst[hasFqn(targetAnnotation.qualifiedName)]

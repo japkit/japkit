@@ -10,7 +10,6 @@ import java.util.Map
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import javax.lang.model.type.ArrayType
 import javax.lang.model.type.TypeMirror
 
 @Data
@@ -18,8 +17,9 @@ class AnnotationValueMappingRule {
 	val extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 	val extension ProcessingEnvironment procEnv = ExtensionRegistry.get(ProcessingEnvironment)
 	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	val extension RuleUtils =  ExtensionRegistry.get(RuleUtils)
 
-	//The name of the annotation value
+	()=>boolean activationRule
 	String name
 	String value
 	String expr
@@ -35,6 +35,10 @@ class AnnotationValueMappingRule {
 
 		//existing value (without considering defaults!)
 		val existingValue = annotation.getValueWithoutDefault(name)
+		
+		if(!activationRule.apply){
+			return existingValue
+		}
 
 		if (existingValue != null) {
 			switch (mode) {
@@ -64,7 +68,7 @@ class AnnotationValueMappingRule {
 				if(expr.nullOrEmpty){
 					
 						val annotations = newArrayList 
-						annotationMapping.mapOrCopyAnnotations(annotations, srcElement, mappingsWithId, false)
+						annotationMapping.mapOrCopyAnnotations(annotations, srcElement, mappingsWithId)
 						if(!annotations.empty){
 							coerceAnnotationValue(annotations.head, avType)
 						} else {
@@ -74,7 +78,7 @@ class AnnotationValueMappingRule {
 				} else {
 					val elements = eval(expr, lang, Iterable) as Iterable<Element>  //TODO: Check if instanceof element
 					val annotations = newArrayList 
-					elements.forEach[annotationMapping.mapOrCopyAnnotations(annotations, it, mappingsWithId, true)]
+					elements.forEach[annotationMapping.mapOrCopyAnnotations(annotations, it, mappingsWithId)]
 					coerceAnnotationValue(annotations, avType)
 				}
 				
@@ -121,6 +125,7 @@ class AnnotationValueMappingRule {
 		_mode = a.value(null, "mode", AVMappingMode)
 		_annotationMappingId = a.value(null, "annotationMappingId", String)
 		_mappingRuleAnnotation = a
+		_activationRule = createActivationRule(a, null)
 
 	}
 }
