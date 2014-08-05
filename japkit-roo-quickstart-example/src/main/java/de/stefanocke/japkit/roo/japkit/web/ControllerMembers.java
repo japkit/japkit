@@ -30,9 +30,6 @@ import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 public abstract class ControllerMembers {
 	
 	/**
-	 *  
-	 * @param fbo
-	 * 
 	 * @japkit.bodyCode <pre>
 	 * <code>
 	 * if (bindingResult.hasErrors()) {
@@ -52,47 +49,61 @@ public abstract class ControllerMembers {
 			HttpServletRequest httpServletRequest);
 
 	/**
-	 * @japkit.bodyBeforeIteratorCode <code>//blah</code>
-	 * 
 	 * @japkit.bodyCode 
 	 * <code>uiModel.addAttribute("#{dtfModelAttr.eval(src)}", ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));</code>
-	 * 
-	 * @japkit.bodyAfterIteratorCode <code>//blub</code>
 	 */
 	@Method(imports = ControllerUtil.class,	bodyIterator = "datetimeProperties")
 	@ParamNames("uiModel")
 	abstract void addDateTimeFormatPatterns(Model uiModel);
 
+	/**
+	 * @japkit.bodyCode <code>return "#{dtfAnnotation.style}";</code>
+	 */
 	@Method(src = "datetimeProperties", srcVar="p", nameExpr = "getDateTimeFormat#{p.name.toFirstUpper}", vars = @Var(
-			name = "dtfAnnotation", expr = "#{p}", annotation = DateTimeFormat.class),
-			bodyCode = "return \"#{dtfAnnotation.style}\";")
+			name = "dtfAnnotation", expr = "#{p}", annotation = DateTimeFormat.class))
 	abstract String getDateTimeFormat();
 
-	@Method(
-			imports = { Arrays.class }, 
-			bodyIterator="enumProperties",
-			// TODO: Eigentlich singleValueType.
-			bodyCode = "uiModel.addAttribute(\"${src.name}s\", Arrays.asList(${ec.typeRef(src.type)}.values()));\n"
-			)
+	//TODO: Eigentlich singleValueType.
+	/**
+	 * @japkit.bodyCode <code>uiModel.addAttribute("${src.name}s", Arrays.asList(${ec.typeRef(src.type)}.values()));</code>
+	 */
+	@Method(imports = Arrays.class, bodyIterator="enumProperties")
 	@ParamNames("uiModel")
 	abstract void addEnumChoices(Model uiModel);
 	
-	@Method(
-			bodyIterator="entityProperties",
-			// TODO: Eigentlich singleValueType.
-			bodyCode = "uiModel.addAttribute(\"${src.name}Choices\", get${src.name.toFirstUpper}Choices());\n"
-			)
+	//TODO: Eigentlich singleValueType.
+	/**
+	 * @japkit.bodyCode <code>uiModel.addAttribute("${src.name}Choices", get${src.name.toFirstUpper}Choices());</code>
+	 */
+	@Method(bodyIterator="entityProperties")
 	@ParamNames("uiModel")
 	abstract void addEntityChoices(Model uiModel);
 
-	// TODO: Help with escaping here.
-	@Method(bodyCode = "populateEditForm(uiModel, new ${ec.typeRef(fbo)}());\\n" + "return \\\"${path}/create\\\";", bodyLang = "GString")
+	/**
+	 * @japkit.bodyCode <pre>
+	 * <code>
+	 * populateEditForm(uiModel, new ${ec.typeRef(fbo)}()); 
+	 * return "${path}/create";
+	 * </code>
+	 * </pre>
+	 */
+	@Method(bodyLang = "GStringTemplateInline")
 	@ParamNames({ "uiModel" })
 	@RequestMapping(params = "form", produces = "text/html")
 	public abstract String createForm(Model uiModel);
 
-	@Method(bodyCode = "uiModel.addAttribute(\"#{modelAttribute}\", crudOperations().find(id));\n"
-			+ "uiModel.addAttribute(\"itemId\", id);\n" + "addDateTimeFormatPatterns(uiModel);\n" + "return \"#{path}/show\";")
+	/**
+	 * @japkit.bodyCode <pre>
+	 * <code>
+	 * uiModel.addAttribute("#{modelAttribute}", crudOperations().find(id));
+	 * uiModel.addAttribute("itemId", id);
+	 * addDateTimeFormatPatterns(uiModel);
+	 * return "#{path}/show";
+	 * </code>
+	 * </pre>
+	 */
+	
+	@Method
 	@ParamNames({ "id", "uiModel" })
 	@RequestMapping(produces = "text/html", value = "/{id}")
 	public abstract String show(@PathVariable("id") Long id, Model uiModel);
@@ -109,12 +120,10 @@ public abstract class ControllerMembers {
 	 * } else {
 	 * 	uiModel.addAttribute("#{modelAttribute}s", crudOperations().findAll(sortFieldName, sortOrder));
 	 * }
-	 * 
 	 * addDateTimeFormatPatterns(uiModel);
 	 * return "#{path}/list";
 	 * </code>
 	 * </pre>
-	 * 
 	 */
 	@Method()
 	@RequestMapping(produces = "text/html")
@@ -123,39 +132,67 @@ public abstract class ControllerMembers {
 			required = false) Integer size, @RequestParam(value = "sortFieldName", required = false) String sortFieldName, @RequestParam(
 			value = "sortOrder", required = false) String sortOrder, Model uiModel);
 
-	@Method(imports = ControllerUtil.class, 
-			bodyCode = "if (bindingResult.hasErrors()) {\n" 
-			+ "\tpopulateEditForm(uiModel, fbo);\n"
-			+ "\treturn \"#{path}/update\";\n" 
-			+ "}\n" 
-			+ "uiModel.asMap().clear();\n" 
-			+ "crudOperations().merge(fbo);\n"
-			+ "return \"redirect:/#{path}/\" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);\n")
+	/**
+	 * @japkit.bodyCode <pre>
+	 * <code>
+	 * if (bindingResult.hasErrors()) {
+	 * 	populateEditForm(uiModel, fbo);
+	 * 	return "#{path}/update";
+	 * }
+	 * uiModel.asMap().clear();
+	 * crudOperations().merge(fbo);
+	 * return "redirect:/#{path}/" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);
+	 * </code>
+	 * </pre>
+	 */
+	@Method(imports = ControllerUtil.class)
 	@ParamNames({ "fbo", "bindingResult", "uiModel", "httpServletRequest" })
 	@RequestMapping(produces = "text/html", method = RequestMethod.PUT)
 	public abstract String update(@Valid FormBackingObject fbo, BindingResult bindingResult, Model uiModel,
 			HttpServletRequest httpServletRequest);
 
-	@Method(bodyCode = "populateEditForm(uiModel, crudOperations().find(id));\n" + "return \"#{path}/update\";")
+	/**
+	 * @japkit.bodyCode <pre>
+	 * <code>
+	 * populateEditForm(uiModel, crudOperations().find(id)); 
+	 * return "${path}/update";
+	 * </code>
+	 * </pre>
+	 */
+	@Method
 	@ParamNames({ "id", "uiModel" })
 	@RequestMapping(value = "/{id}", params = "form", produces = "text/html")
 	public abstract String updateForm(@PathVariable("id") Long id, Model uiModel);
 
-	@Method(bodyCode = "crudOperations().remove(id);\n" 
-			+ "uiModel.asMap().clear();\n"
-			+ "uiModel.addAttribute(\"page\", (page == null) ? \"1\" : page.toString());\n"
-			+ "uiModel.addAttribute(\"size\", (size == null) ? \"10\" : size.toString());\n" + "return \"redirect:/#{path}\";")
+	/**
+	 * @japkit.bodyCode <pre>
+	 * <code>
+	 * crudOperations().remove(id);
+	 * uiModel.asMap().clear();
+	 * uiModel.addAttribute("page", (page == null) ? "1" : page.toString());
+	 * uiModel.addAttribute("size", (size == null) ? "10" : size.toString());
+	 * return "redirect:/#{path}";
+	 * </code>
+	 * </pre>
+	 */
+	@Method
 	@ParamNames({ "id", "page", "size", "uiModel" })
 	@RequestMapping(produces = "text/html", method = RequestMethod.DELETE, value = "/{id}")
 	public abstract String delete(@PathVariable("id") Long id, @RequestParam(required = false, value = "page") Integer page, @RequestParam(
 			required = false, value = "size") Integer size, Model uiModel);
 
 	// TODO: Conditional calls to addDateTimeFormatPatterns?
-	@Method(bodyCode = "uiModel.addAttribute(\"#{modelAttribute}\", #{modelAttribute});\n" 
-			+ "addDateTimeFormatPatterns(uiModel);\n"
-			+ "addEnumChoices(uiModel);\n"
-			+ "addEntityChoices(uiModel);\n"
-			)
+	/**
+	 * @japkit.bodyCode <pre>
+	 * <code>	
+	 * uiModel.addAttribute("#{modelAttribute}", #{modelAttribute});
+	 * addDateTimeFormatPatterns(uiModel);
+	 * addEnumChoices(uiModel);
+	 * addEntityChoices(uiModel);
+	 * </code>
+	 * </pre>
+	 */
+	@Method
 	@ParamNames({ "uiModel", "fbo" })
 	abstract void populateEditForm(Model uiModel,  @Param(nameExpr="#{modelAttribute}") FormBackingObject fbo);
 
