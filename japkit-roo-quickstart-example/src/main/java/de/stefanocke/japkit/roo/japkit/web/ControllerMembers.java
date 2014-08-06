@@ -19,7 +19,6 @@ import de.stefanocke.japkit.metaannotations.AVMapping;
 import de.stefanocke.japkit.metaannotations.AnnotationMapping;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Param;
-import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;
@@ -43,7 +42,6 @@ public abstract class ControllerMembers {
 	 * </pre>
 	 */
 	@Method(imports = ControllerUtil.class)
-	@ParamNames({ "fbo", "bindingResult", "uiModel", "httpServletRequest" })
 	@RequestMapping(method = RequestMethod.POST, produces = "text/html")
 	public abstract String create(@Valid FormBackingObject fbo, BindingResult bindingResult, Model uiModel,
 			HttpServletRequest httpServletRequest);
@@ -53,7 +51,6 @@ public abstract class ControllerMembers {
 	 * <code>uiModel.addAttribute("#{dtfModelAttr.eval(src)}", ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));</code>
 	 */
 	@Method(imports = ControllerUtil.class,	bodyIterator = "datetimeProperties")
-	@ParamNames("uiModel")
 	abstract void addDateTimeFormatPatterns(Model uiModel);
 
 	/**
@@ -68,7 +65,6 @@ public abstract class ControllerMembers {
 	 * @japkit.bodyCode <code>uiModel.addAttribute("${src.name}s", Arrays.asList(${ec.typeRef(src.type)}.values()));</code>
 	 */
 	@Method(imports = Arrays.class, bodyIterator="enumProperties")
-	@ParamNames("uiModel")
 	abstract void addEnumChoices(Model uiModel);
 	
 	//TODO: Eigentlich singleValueType.
@@ -76,7 +72,6 @@ public abstract class ControllerMembers {
 	 * @japkit.bodyCode <code>uiModel.addAttribute("${src.name}Choices", get${src.name.toFirstUpper}Choices());</code>
 	 */
 	@Method(bodyIterator="entityProperties")
-	@ParamNames("uiModel")
 	abstract void addEntityChoices(Model uiModel);
 
 	/**
@@ -88,7 +83,6 @@ public abstract class ControllerMembers {
 	 * </pre>
 	 */
 	@Method(bodyLang = "GStringTemplateInline")
-	@ParamNames({ "uiModel" })
 	@RequestMapping(params = "form", produces = "text/html")
 	public abstract String createForm(Model uiModel);
 
@@ -104,7 +98,6 @@ public abstract class ControllerMembers {
 	 */
 	
 	@Method
-	@ParamNames({ "id", "uiModel" })
 	@RequestMapping(produces = "text/html", value = "/{id}")
 	public abstract String show(@PathVariable("id") Long id, Model uiModel);
 
@@ -127,7 +120,6 @@ public abstract class ControllerMembers {
 	 */
 	@Method()
 	@RequestMapping(produces = "text/html")
-	@ParamNames({ "page", "size", "sortFieldName", "sortOrder", "uiModel" })
 	public abstract String list(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size",
 			required = false) Integer size, @RequestParam(value = "sortFieldName", required = false) String sortFieldName, @RequestParam(
 			value = "sortOrder", required = false) String sortOrder, Model uiModel);
@@ -146,7 +138,6 @@ public abstract class ControllerMembers {
 	 * </pre>
 	 */
 	@Method(imports = ControllerUtil.class)
-	@ParamNames({ "fbo", "bindingResult", "uiModel", "httpServletRequest" })
 	@RequestMapping(produces = "text/html", method = RequestMethod.PUT)
 	public abstract String update(@Valid FormBackingObject fbo, BindingResult bindingResult, Model uiModel,
 			HttpServletRequest httpServletRequest);
@@ -160,7 +151,6 @@ public abstract class ControllerMembers {
 	 * </pre>
 	 */
 	@Method
-	@ParamNames({ "id", "uiModel" })
 	@RequestMapping(value = "/{id}", params = "form", produces = "text/html")
 	public abstract String updateForm(@PathVariable("id") Long id, Model uiModel);
 
@@ -176,7 +166,6 @@ public abstract class ControllerMembers {
 	 * </pre>
 	 */
 	@Method
-	@ParamNames({ "id", "page", "size", "uiModel" })
 	@RequestMapping(produces = "text/html", method = RequestMethod.DELETE, value = "/{id}")
 	public abstract String delete(@PathVariable("id") Long id, @RequestParam(required = false, value = "page") Integer page, @RequestParam(
 			required = false, value = "size") Integer size, Model uiModel);
@@ -193,7 +182,6 @@ public abstract class ControllerMembers {
 	 * </pre>
 	 */
 	@Method
-	@ParamNames({ "uiModel", "fbo" })
 	abstract void populateEditForm(Model uiModel,  @Param(nameExpr="#{modelAttribute}") FormBackingObject fbo);
 
 }

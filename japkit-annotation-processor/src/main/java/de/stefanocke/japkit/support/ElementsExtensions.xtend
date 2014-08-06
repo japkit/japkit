@@ -2,6 +2,7 @@ package de.stefanocke.japkit.support
 
 import com.google.common.cache.CacheBuilder
 import de.stefanocke.japkit.annotations.Order
+import de.stefanocke.japkit.annotations.RuntimeMetadata
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenAnnotationValue
 import de.stefanocke.japkit.gen.GenElement
@@ -16,8 +17,10 @@ import java.lang.annotation.Annotation
 import java.lang.reflect.Array
 import java.util.Arrays
 import java.util.Collections
+import java.util.HashSet
 import java.util.List
 import java.util.Map
+import java.util.Set
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 import javax.lang.model.element.AnnotationMirror
@@ -39,9 +42,6 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
-import java.util.Set
-import java.util.HashSet
-import de.stefanocke.japkit.annotations.RuntimeMetadata
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -155,11 +155,21 @@ class ElementsExtensions {
 				mc.reportError("Then number of parameter names must match the number of parameters", e, am, "value")
 				params
 			} else {
-				(0 ..< params.size).map[i|new ParameterWrapper(params.get(i), new GenName(names.get(i)))].toList
+				wrapParams(params, names)
 			}
 		} else {
-			params
+			val names = getParamNamesFromRuntimeMetadata(e)
+			if(!names.nullOrEmpty){
+				wrapParams(params, names)
+			} else {
+				params
+			}
+			
 		}
+	}
+	
+	private def List<ParameterWrapper> wrapParams(List<? extends VariableElement> params, List<String> names) {
+		(0 ..< params.size).map[i|new ParameterWrapper(params.get(i), new GenName(names.get(i)))].toList
 	}
 
 	/**We cannot use the ElementUtils.override, since it does not work for our GenElements... */
@@ -776,29 +786,40 @@ class ElementsExtensions {
 	//TODO: Move to separate class
 	//Unique element name -> comment
 	Map<String, String> commentsFromRuntimeMetadata = newHashMap()
+	Map<String, List<String>> paramNamesFromRuntimeMetadata = newHashMap()
 	
 	//FQNs of types for which RuntimeMetadata has been loaded or  does not exist
 	Set<String> typeElementsForWhichRuntimeMetadataHasBeenLoaded = new HashSet
 	
-	def getCommentFromRuntimeMetadata(Element element) {
+	def String getCommentFromRuntimeMetadata(Element element) {
 		loadRuntimeMetadata(element)
 		commentsFromRuntimeMetadata.get(element.uniqueName)
 	}
 	
+	def List<String> getParamNamesFromRuntimeMetadata(Element element) {
+		loadRuntimeMetadata(element)
+		paramNamesFromRuntimeMetadata.get(element.uniqueName)
+	}
+	
+	
 	def loadRuntimeMetadata(Element element) {
-		val typeElementFqn = element.getTopLevelEnclosingTypeElement.qualifiedName.toString
-		if(!typeElementsForWhichRuntimeMetadataHasBeenLoaded.contains(typeElementFqn)){
-			val runtimeMetadataTypeElement = findTypeElement(typeElementFqn + "_RuntimeMetadata") //TODO: Constant
-			if(runtimeMetadataTypeElement!=null){
-				runtimeMetadataTypeElement
-					.annotationMirror(RuntimeMetadata.List)
-					?.value("value", typeof(AnnotationMirror[]))
-					?.forEach[
+		val topLevelEnclosingTypeElement = element.getTopLevelEnclosingTypeElement
+		val typeElementFqn = topLevelEnclosingTypeElement.qualifiedName.toString
+		if (!typeElementsForWhichRuntimeMetadataHasBeenLoaded.contains(typeElementFqn)) {
+			if (topLevelEnclosingTypeElement.annotationMirror(RuntimeMetadata) != null) {
+				val runtimeMetadataTypeElement = findTypeElement(typeElementFqn + "_RuntimeMetadata") //TODO: Constant
+				if (runtimeMetadataTypeElement != null) {
+					runtimeMetadataTypeElement.annotationMirror(RuntimeMetadata.List)?.value("value",
+						typeof(AnnotationMirror[]))?.forEach [
 						val uniqueName = value("id", String)
 						val comment = value("comment", String)
-						val paramNames = value("paramNames",typeof(String[]))
+						val paramNames = value("paramNames", typeof(String[]))
+						
 						commentsFromRuntimeMetadata.put(uniqueName, comment)
+						paramNamesFromRuntimeMetadata.put(uniqueName, paramNames)
 					]
+				}
+
 			}
 			typeElementsForWhichRuntimeMetadataHasBeenLoaded.add(typeElementFqn)
 		}
