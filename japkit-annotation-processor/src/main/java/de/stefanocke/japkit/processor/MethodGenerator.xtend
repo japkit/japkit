@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.processor
 
-import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Method
 import de.stefanocke.japkit.support.MethodRule
 import javax.lang.model.element.AnnotationMirror

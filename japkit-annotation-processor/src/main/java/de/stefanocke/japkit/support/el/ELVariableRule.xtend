@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.support.el
 
-import de.stefanocke.japkit.support.CodeFragmentRule
 import de.stefanocke.japkit.support.CodeFragmentRules
 import de.stefanocke.japkit.support.ElementMatcher
 import de.stefanocke.japkit.support.ElementsExtensions
@@ -10,6 +9,7 @@ import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.PropertyFilter
 import de.stefanocke.japkit.support.RuleFactory
 import de.stefanocke.japkit.support.TypeElementNotFoundException
+import de.stefanocke.japkit.support.TypeResolver
 import de.stefanocke.japkit.support.TypesExtensions
 import de.stefanocke.japkit.support.TypesRegistry
 import de.stefanocke.japkit.util.MoreCollectionExtensions
@@ -20,11 +20,10 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+import org.eclipse.xtext.xbase.lib.Functions.Function0
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.support.TypeResolver
-import org.eclipse.xtext.xbase.lib.Functions.Function1
-import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 @Data
 class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
@@ -164,9 +163,9 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 				
 			value = if (matcher != null) {
 					if (value instanceof Iterable<?>) {
-						matcher.filter(value as Iterable<?>)
+						matcher.filter(value)
 					} else if(value instanceof Element) {
-						matcher.matches(value as Element)
+						matcher.matches(value)
 					} else {
 						throw new IllegalArgumentException(
 							'''If matcher is set, expr must yield an element collection or an element, but not «value»''');
@@ -177,9 +176,9 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 				
 			if(!requiredTriggerAnnotation.nullOrEmpty){
 				if(value instanceof TypeElement){
-					value = generatedTypeElementAccordingToTriggerAnnotation(value as TypeElement, requiredTriggerAnnotation, false)
+					value = generatedTypeElementAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
 				} else if(value instanceof TypeMirror){
-					value = generatedTypeAccordingToTriggerAnnotation(value as TypeMirror, requiredTriggerAnnotation, false)
+					value = generatedTypeAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
 				}
 				
 			}

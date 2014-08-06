@@ -80,7 +80,7 @@ abstract class GenElement implements Element{
  		if(enclosingElement==null){
  			null
  		} else if(enclosingElement instanceof GenParameterizable){
- 			enclosingElement as GenParameterizable
+ 			enclosingElement
  		} else {
  			(enclosingElement as GenElement).enclosingParameterizable
  		}

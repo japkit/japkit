@@ -1,9 +1,8 @@
 package de.stefanocke.japkit.processor
 
-import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.gen.GenTypeElement
 import javax.lang.model.element.AnnotationMirror
-import java.util.Set
+import javax.lang.model.element.TypeElement
 
 interface MemberGenerator {
 	/**

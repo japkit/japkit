@@ -43,7 +43,7 @@ class ElExtensionPropertiesAndMethods {
 	}
 	
 	def private <V> V findClosure(Map<Class<?>, Map<String, V>> map, Object base, String name) {
-		base?.class?.findForClassOrSuperclass(map, name as String)
+		base?.class?.findForClassOrSuperclass(map, name)
 	}
 
 	def private <V> V findForClassOrSuperclass(Class<?> clazz, Map<Class<?>, Map<String, V>> map, String name){

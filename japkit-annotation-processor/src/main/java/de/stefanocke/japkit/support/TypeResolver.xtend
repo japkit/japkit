@@ -274,7 +274,7 @@ class TypeResolver {
 		
 		val e = enclosingClass.declaredTypes.findFirst[simpleName.contentEquals(innerClassName)]
 
-		if (mustExist && (e == null || !(e instanceof TypeElement))) {
+		if (mustExist && e == null) {
 			throw new TypeElementNotFoundException('''«enclosingClass».«innerClassName»''');
 		}
 		e

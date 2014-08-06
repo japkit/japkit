@@ -11,7 +11,6 @@ import java.net.URL
 import java.util.Map
 import java.util.ServiceLoader
 import java.util.concurrent.TimeUnit
-import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 
@@ -127,7 +126,7 @@ class ELSupport {
 			
 			val resultFromValueStack = evalFromValueStack(expr, lang)
 			
-			return resultFromValueStack ?: eval(expr, lang, expectedType)	as T
+			return resultFromValueStack ?: eval(expr, lang, expectedType)
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
 		} catch (Exception e) {

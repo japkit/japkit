@@ -3,13 +3,7 @@ package de.stefanocke.japkit.support;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.tools.Diagnostic.Kind;
-
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
-import org.eclipse.xtext.xbase.lib.Functions.Function1;
-
-import de.stefanocke.japkit.metaannotations.Param;
 
 /**
  * Holds all central stateful extensions in a thread local. So, we can get the

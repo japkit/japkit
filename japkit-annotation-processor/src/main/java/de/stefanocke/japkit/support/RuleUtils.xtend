@@ -59,7 +59,7 @@ class RuleUtils {
 						'''Src expression «srcExpr» could not be evaluated''', emptyList)
 						
 					if(elements instanceof Iterable<?>){	
-						(elements as Iterable<?>).filterInstanceOf(Element)					
+						elements.filterInstanceOf(Element)					
 					} else {
 						Collections.singleton(elements)
 					} 

@@ -141,6 +141,7 @@ class ElementMatcher {
 				case TypeCategory.LIST: type.list
 				case TypeCategory.SET: type.set
 				case TypeCategory.ENUM: type.enum	
+				default: throw new IllegalArgumentException('''Unknown type category «category»''')
 			}	
 		]
 	}

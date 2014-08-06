@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.support
 
-import de.stefanocke.japkit.support.el.ELSupport
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.VariableElement
 
@@ -14,7 +13,6 @@ class GetterSetterRules {
 	val extension ElementsExtensions  = ExtensionRegistry.get(ElementsExtensions)
 	val extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	
 	def MethodRule createGetterRuleFromGetterAV(AnnotationMirror metaAnnotation, VariableElement template) {
 		metaAnnotation?.value("getter", AnnotationMirror)?.createGetterRule(template, null)

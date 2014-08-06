@@ -1,6 +1,8 @@
 package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenDeclaredType
+import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.gen.GenTypeMirror
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Calendar
@@ -10,24 +12,19 @@ import java.util.List
 import java.util.Map
 import java.util.Set
 import java.util.SortedSet
+import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
+import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.WildcardType
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
-import javax.lang.model.element.Element
-import javax.lang.model.type.ExecutableType
-import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.gen.GenTypeMirror
-import javax.annotation.processing.ProcessingEnvironment
-import javax.tools.Diagnostic
-import javax.tools.Diagnostic.Kind
 
 class TypesExtensions /**implements Types*/{
 	Types typeUtils = ExtensionRegistry.get(Types)

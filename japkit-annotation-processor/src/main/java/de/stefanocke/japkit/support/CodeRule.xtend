@@ -133,7 +133,7 @@ class CodeRule implements Function0<CharSequence> {
 	
 	def static (GenElement)=>CodeBody createCodeBodyRule((GenElement)=>CharSequence codeRule, (CharSequence)=>CharSequence defaultFragments){
 		[genElement| 
-			CodeRule.getAsCodeBody(genElement, codeRule as (GenElement)=>CharSequence, defaultFragments)
+			CodeRule.getAsCodeBody(genElement, codeRule, defaultFragments)
 		]
 	}
 

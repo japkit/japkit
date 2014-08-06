@@ -15,7 +15,6 @@ import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.lang.annotation.Annotation
 import java.lang.reflect.Array
-import java.util.Arrays
 import java.util.Collections
 import java.util.HashSet
 import java.util.List
@@ -105,7 +104,7 @@ class ElementsExtensions {
 	/**Warning: Does not work for Gen-Elements! */
 	def allMethods(TypeElement type) {
 		if (type instanceof GenTypeElement) {
-			(type as GenTypeElement).allMethods
+			type.allMethods
 		} else {
 			methodsIn(type.allMembers)
 		}
@@ -477,7 +476,7 @@ class ElementsExtensions {
 	}
 
 	def singleAV(Iterable<AnnotationValue> values) {		
-		(MoreCollectionExtensions.singleValue(values) as AnnotationValue)?.value
+		(MoreCollectionExtensions.singleValue(values))?.value
 	}
 	
 
@@ -628,10 +627,10 @@ class ElementsExtensions {
 	def coerceAnnotationValue(Object value, TypeMirror avType) {
 		if (avType instanceof ArrayType) {
 
-			val compType = (avType as ArrayType).componentType
+			val compType = avType.componentType
 
 			if (value instanceof Iterable<?>) {
-				(value as Iterable<?>).map [
+				value.map [
 					new GenAnnotationValue(coerceSingleValue(it, compType))
 				].toList
 

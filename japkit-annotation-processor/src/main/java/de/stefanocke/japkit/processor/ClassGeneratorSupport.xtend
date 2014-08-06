@@ -19,6 +19,7 @@ import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.ProcessingException
 import de.stefanocke.japkit.support.RuleFactory
+import de.stefanocke.japkit.support.RuleUtils
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypeResolver
 import de.stefanocke.japkit.support.TypesExtensions
@@ -40,8 +41,6 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
-import de.stefanocke.japkit.support.RuleUtils
-import java.util.Collection
 
 class ClassGeneratorSupport {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -305,7 +304,7 @@ class ClassGeneratorSupport {
 					val valueAvType = annoTypeElement.declaredMethods.findFirst[simpleName.contentEquals('value')]?.
 						returnType
 					if (valueAvType instanceof ArrayType) {
-						(valueAvType as ArrayType).componentType.asTypeElement
+						valueAvType.componentType.asTypeElement
 					} else
 						annoTypeElement
 

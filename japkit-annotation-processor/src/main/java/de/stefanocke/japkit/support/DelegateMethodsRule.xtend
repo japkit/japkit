@@ -41,9 +41,9 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 		val delegate = valueStack.get("delegate") as Element
 		
 		val getDelegateMethod = if(delegate instanceof ExecutableElement){
-			 delegate as ExecutableElement
+			delegate
 		} else if(delegate instanceof Property){
-			(delegate as Property).getter
+			delegate.getter
 		} else {
 			null
 		}

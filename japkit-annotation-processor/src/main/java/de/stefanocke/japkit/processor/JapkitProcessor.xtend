@@ -471,25 +471,25 @@ class JapkitProcessor extends AbstractProcessor {
 		generatedTopLevelClasses
 	}
 
-	def private Map<GenTypeElement, TypeElement> processBehaviorAnnotation(TypeElement annotatedClass) {
-
-		val behaviorAnnotation = annotatedClass.annotationMirror(Behavior)
-		pushCurrentAnnotatedClass(annotatedClass)
-		setCurrentAnnotation(behaviorAnnotation)
-		try {
-			if (behaviorAnnotation != null) {
-				val typeElement = behaviorAnnotation.value(annotatedClass, "forClass", TypeElement, true);
-				return processAnnotatedClass(typeElement)
-			}
-		} catch (TypeElementNotFoundException tenfe) {
-			handleTypeElementNotFound(
-				'''The class for which «annotatedClass» is the behavioral class could not be found.''', tenfe.fqn,
-				annotatedClass)
-		} finally {
-			popCurrentAnnotatedClass
-		}
-		emptyMap
-	}
+//	def private Map<GenTypeElement, TypeElement> processBehaviorAnnotation(TypeElement annotatedClass) {
+//
+//		val behaviorAnnotation = annotatedClass.annotationMirror(Behavior)
+//		pushCurrentAnnotatedClass(annotatedClass)
+//		setCurrentAnnotation(behaviorAnnotation)
+//		try {
+//			if (behaviorAnnotation != null) {
+//				val typeElement = behaviorAnnotation.value(annotatedClass, "forClass", TypeElement, true);
+//				return processAnnotatedClass(typeElement)
+//			}
+//		} catch (TypeElementNotFoundException tenfe) {
+//			handleTypeElementNotFound(
+//				'''The class for which «annotatedClass» is the behavioral class could not be found.''', tenfe.fqn,
+//				annotatedClass)
+//		} finally {
+//			popCurrentAnnotatedClass
+//		}
+//		emptyMap
+//	}
 
 	def private Set<GenTypeElement> processTriggerAnnotations(TypeElement annotatedClass) {
 		val Set<GenTypeElement> generatedClasses = newHashSet

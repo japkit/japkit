@@ -5,8 +5,6 @@ import de.stefanocke.japkit.metaannotations.GenerateClass
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import java.util.List
-import java.util.ArrayList
 
 class TopLevelClassGenerator extends ClassGeneratorSupport{
 	

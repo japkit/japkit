@@ -21,7 +21,7 @@ class ELResolver extends SimpleResolver {
 	}
 
 	override getValue(ELContext context, Object base, Object property) {
-		val closure = if(property instanceof String) findPropertyClosure(base, property as String) else null
+		val closure = if(property instanceof String) findPropertyClosure(base, property) else null
 
 		val rootProperties = contextMap
 
@@ -50,7 +50,7 @@ class ELResolver extends SimpleResolver {
 
 		val rootProperties = contextMap
 		
-		val closure = if(method instanceof String) findMethodClosure(base, method as String) else null
+		val closure = if(method instanceof String) findMethodClosure(base, method) else null
 
 		if (closure != null) {
 			context.setPropertyResolved(true)

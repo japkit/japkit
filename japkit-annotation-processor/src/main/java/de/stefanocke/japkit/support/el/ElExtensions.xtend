@@ -2,19 +2,18 @@ package de.stefanocke.japkit.support.el
 
 import de.stefanocke.japkit.gen.EmitterContext
 import de.stefanocke.japkit.support.ElementsExtensions
+import de.stefanocke.japkit.support.JavaBeansExtensions
 import de.stefanocke.japkit.support.TypesExtensions
 import de.stefanocke.japkit.support.TypesRegistry
+import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.stefanocke.japkit.support.ExtensionRegistry.*
-import de.stefanocke.japkit.support.JavaBeansExtensions
-import javax.lang.model.element.TypeElement
-import javax.lang.model.element.AnnotationValue
-import de.stefanocke.japkit.util.MoreCollectionExtensions
 
 class ElExtensions {
 
@@ -202,9 +201,9 @@ class ElExtensions {
 	def static registerExtensionMethods(ElExtensionPropertiesAndMethods elExtensions) {
 		elExtensions.registerMethod(TypeMirror, "asElement", [context, type, paramTypes, params|type.asElement()])
 		
-		elExtensions.registerMethod(TypeMirror, "isSame", [context, type, paramTypes, params|type.isSame((params as Object[]).get(0) as TypeMirror)])
+		elExtensions.registerMethod(TypeMirror, "isSame", [context, type, paramTypes, params|type.isSame(params.get(0) as TypeMirror)])
 		
-		elExtensions.registerMethod(Element, "hasType", [context, e, paramTypes, params|e.hasType((params as Object[]).get(0) as CharSequence)])
+		elExtensions.registerMethod(Element, "hasType", [context, e, paramTypes, params|e.hasType(params.get(0) as CharSequence)])
 		
 //		elExtensions.registerMethod(String, "findAllTypeElementsWithTrigger", [context, triggerFqn, paramTypes, params|
 //			findAllTypeElementsWithTrigger(triggerFqn, (params as Object[]).get(0) as Boolean, context)

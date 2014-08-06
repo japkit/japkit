@@ -1,12 +1,8 @@
 package de.stefanocke.japkit.support
 
-import javax.lang.model.element.Element
-import de.stefanocke.japkit.support.ProcessingException
 import javax.lang.model.element.AnnotationMirror
-import java.util.regex.Pattern
-import javax.lang.model.element.TypeElement
 import javax.lang.model.element.PackageElement
-import de.stefanocke.japkit.support.ExtensionRegistry
+import javax.lang.model.element.TypeElement
 
 @Data
 class ClassNameRule {
@@ -19,7 +15,7 @@ class ClassNameRule {
 	
 	val extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 	
-	def generateClassName(TypeElement orgClass){
+	def String generateClassName(TypeElement orgClass){
 		val orgName = orgClass.simpleName.toString
 		if(!(classNameRule.empty)){	
 			return classNameRule.getName(orgName, orgClass)
@@ -53,31 +49,13 @@ class ClassNameRule {
 		name
 	}
 	
-	def generatePackageName(PackageElement orgPackage){
+	def String generatePackageName(PackageElement orgPackage){
 		var name = orgPackage.qualifiedName.toString
 		packageNameRule.getName(name, orgPackage)
 	}
 	
-	def generateQualifiedName(TypeElement orgClass){
+	def String generateQualifiedName(TypeElement orgClass){
 		'''«generatePackageName(orgClass.package)».«generateClassName(orgClass)»'''.toString
-	}
-	
-	def private replaceRegEx(String orgName, Pattern regEx, String regExReplace, Element orgElement){
-		val matcher = regEx.matcher(orgName)
-		
-		if(!matcher.matches){
-			throw new ProcessingException('''Naming rule violated: Name "«orgName»" must match pattern "«regEx.pattern»"''', orgElement)
-		}
-		try{
-			val name =  matcher.replaceFirst(regExReplace)	
-			if(name.empty){
-				throw new ProcessingException('''Naming rule violated: Name "«orgName»" must not be empty after replacing with "«regExReplace»"''', orgElement)
-			}
-			return name
-		} catch (RuntimeException e){
-			throw new ProcessingException('''Exception when replacing RegEx "«regEx.pattern»" with "«regExReplace»": «e.message»''', orgElement)
-		}
-		
 	}
 	
 	new (AnnotationMirror am, AnnotationMirror metaAnnotation){
