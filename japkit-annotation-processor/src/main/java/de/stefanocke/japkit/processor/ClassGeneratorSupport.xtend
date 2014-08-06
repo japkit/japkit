@@ -41,6 +41,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
 import de.stefanocke.japkit.support.RuleUtils
+import java.util.Collection
 
 class ClassGeneratorSupport {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -86,7 +87,7 @@ class ClassGeneratorSupport {
 			}
 			
 			generatedClass.annotationMirrors = mapTypeAnnotations(annotatedClass, triggerAnnotation, genClass, 
-				new ArrayList(generatedClass.annotationMirrors)
+				new ArrayList(generatedClass.annotationMirrors as List<GenAnnotationMirror>)
 			)
 			
 			

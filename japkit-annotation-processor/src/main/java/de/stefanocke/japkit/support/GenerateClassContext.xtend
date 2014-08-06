@@ -45,7 +45,7 @@ class GenerateClassContext {
 	Stack<Long> millis = new Stack<Long>
 	
 	def AnnotationMirror getCurrentMetaAnnotation(){
-		if(!metaAnnotations.empty) metaAnnotations.peek else null
+		if(!metaAnnotations.isEmpty()) metaAnnotations.peek else null
 	}
 	
 	def void pushCurrentMetaAnnotation(AnnotationMirror am){
@@ -66,7 +66,7 @@ class GenerateClassContext {
 	val currentGeneratedClasses = new Stack<GenTypeElement>
 	
 	def GenTypeElement getCurrentGeneratedClass(){
-		if(currentGeneratedClasses.empty) null else currentGeneratedClasses.peek
+		if(currentGeneratedClasses.isEmpty()) null else currentGeneratedClasses.peek
 	}
 	
 	def void pushCurrentGeneratedClass(GenTypeElement currentGeneratedClass){

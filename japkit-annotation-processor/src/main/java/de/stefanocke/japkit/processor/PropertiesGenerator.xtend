@@ -97,54 +97,51 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 		propertiesToGenerate.forEach [ p |
 			val ruleSourceElement = p.getSourceElement(ruleSource)
 			
-			scope(ruleSourceElement)[
-			
-			val overrideElement = overrideElementsByName.get(p.name)
-			
-			//TODO: Javadoc
-			if (createNameConstants) {
-				if (generatedClass.kind == ElementKind.ENUM) {
-					generatedClass.add(
-						new GenEnumConstant(p.name.toUpperCase, null) => [
-							annotationMirrors = mapAnnotations(ruleSourceElement, annotationMappingsForFields)
-						])
-				} else {
-					generatedClass.add(
-						new GenField(p.name.toUpperCase, getTypeElement(String.name).asType) => [
-							modifiers = #{Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL}
-							constantExpr = ['''"«p.name»"''']
-						])
-				}
+			scope(ruleSourceElement) [
+				val overrideElement = overrideElementsByName.get(p.name)
+				//TODO: Javadoc
+				if (createNameConstants) {
+					if (generatedClass.kind == ElementKind.ENUM) {
+						generatedClass.add(
+							new GenEnumConstant(p.name.toUpperCase, null) => [
+								annotationMirrors = mapAnnotations(ruleSourceElement, annotationMappingsForFields)
+							])
+					} else {
+						generatedClass.add(
+							new GenField(p.name.toUpperCase, getTypeElement(String.name).asType) => [
+								modifiers = #{Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL}
+								constantExpr = ['''"«p.name»"''']
+							])
+					}
 
-			}
-			if (createProperties) {
-			
-				//TODO: In case of getter, extract the @return
-				val srcComment = p.fieldOrGetter.docComment?.toString?.trim
-				
-				val genField = new GenField(p.name, p.type) => [
+				}
+				if (createProperties) {
+
+					//TODO: In case of getter, extract the @return
+					val srcComment = p.fieldOrGetter.docComment?.toString?.trim
+
+					val genField = new GenField(p.name, p.type) => [
 						modifiers = fieldModifiers.toSet
-						
-						annotationMirrors = overrideAnnotations(overrideElement, mapAnnotations(ruleSourceElement, annotationMappingsForFields))
-												
+						annotationMirrors = overrideAnnotations(overrideElement,
+							mapAnnotations(ruleSourceElement, annotationMappingsForFields))
 						comment = srcComment
 					//TODO: Make configurable whether just to use an @see here.
 					]
-				generatedClass.add(genField)
-								
-				val genGetter = getterRule?.apply(generatedClass)?.head as ExecutableElement
-							
-				val genSetter = setterRule?.apply(generatedClass)?.head as ExecutableElement
-				
-				val genProperty = new Property(genField, genGetter, genSetter)
-				
-				scope(genProperty) [
-					delegateMethodRules.forEach[apply(generatedClass)]
-				]
-			}
-			
-			templateRules.forEach[it.apply(generatedClass)]
-			
+					generatedClass.add(genField)
+
+					val genGetter = getterRule?.apply(generatedClass)?.head as ExecutableElement
+
+					val genSetter = setterRule?.apply(generatedClass)?.head as ExecutableElement
+
+					val genProperty = new Property(genField, genGetter, genSetter)
+
+					scope(genProperty) [
+						delegateMethodRules.forEach[apply(generatedClass)]
+						null
+					]
+				}
+				templateRules.forEach[it.apply(generatedClass)]
+				null
 			]
 			
 		]

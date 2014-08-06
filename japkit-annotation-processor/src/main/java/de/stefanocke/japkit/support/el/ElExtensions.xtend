@@ -43,7 +43,7 @@ class ElExtensions {
 	}
 
 	def static getAsElement(TypeMirror type) {
-		type.asElement
+		type.asElement()
 	}
 
 	def static asElement(TypeMirror type) {
@@ -176,7 +176,7 @@ class ElExtensions {
 
 	//Das kann man bestimmt auch fein generieren... :)
 	def static registerExtensionProperties(ElExtensionPropertiesAndMethods elExtensions) {
-		elExtensions.registerProperty(TypeMirror, "asElement", [context, type|type.asElement])
+		elExtensions.registerProperty(TypeMirror, "asElement", [context, type|type.asElement()])
 
 		elExtensions.registerProperty(Element, "singleValueType", [context, e|e.singleValueType])
 
@@ -200,7 +200,7 @@ class ElExtensions {
 	}
 
 	def static registerExtensionMethods(ElExtensionPropertiesAndMethods elExtensions) {
-		elExtensions.registerMethod(TypeMirror, "asElement", [context, type, paramTypes, params|type.asElement])
+		elExtensions.registerMethod(TypeMirror, "asElement", [context, type, paramTypes, params|type.asElement()])
 		
 		elExtensions.registerMethod(TypeMirror, "isSame", [context, type, paramTypes, params|type.isSame((params as Object[]).get(0) as TypeMirror)])
 		

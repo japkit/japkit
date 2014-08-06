@@ -157,7 +157,8 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 						//apply dependent rules. 
 						generatedMembers.addAll(r.apply(generatedClass))
 					
-					]			
+					]
+					null			
 				]
 				generatedMembers
 			]

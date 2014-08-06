@@ -37,7 +37,8 @@ class ELSupport {
 	}
 
 	new() {
-		val sw = Stopwatch.createStarted
+		val sw = new Stopwatch
+		sw.start
 		try {
 			printDiagnosticMessage[
 				'''Searching EL-Providers using classloader «ELProvider.classLoader». Context CL: «Thread.currentThread.
@@ -57,6 +58,7 @@ class ELSupport {
 		}
 
 		printDiagnosticMessage['''Init EL-Providers: «sw.elapsed(TimeUnit.MILLISECONDS)»''']
+		sw.stop
 
 		defaultElProvider = elProviders.get(defaultLanguage)
 	}
@@ -84,28 +86,28 @@ class ELSupport {
 		}
 	}
 
-	def void scope( Object e, (ValueStack)=>void closure) {
-		val vs = valueStack
-		try {
-			vs.push
-			vs.put("src", e)
-			closure.apply(vs)
-
-		} finally {
-			vs.pop
-		}
-	}
-	
-	def void scope((ValueStack)=>void closure) {
-		val vs = valueStack
-		try {
-			vs.push
-			closure.apply(vs)
-
-		} finally {
-			vs.pop
-		}
-	}
+//	def void scope( Object e, (ValueStack)=>void closure) {
+//		val vs = valueStack
+//		try {
+//			vs.push
+//			vs.put("src", e)
+//			closure.apply(vs)
+//
+//		} finally {
+//			vs.pop
+//		}
+//	}
+//	
+//	def void scope((ValueStack)=>void closure) {
+//		val vs = valueStack
+//		try {
+//			vs.push
+//			closure.apply(vs)
+//
+//		} finally {
+//			vs.pop
+//		}
+//	}
 	
 	def getCurrentSrcElement() {
 		getCurrentSrc(Element)

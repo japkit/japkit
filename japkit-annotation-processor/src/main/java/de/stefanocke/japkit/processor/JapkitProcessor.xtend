@@ -462,7 +462,8 @@ class JapkitProcessor extends AbstractProcessor {
 		removeDependenciesForAnnotatedClass(annotatedClass.qualifiedName.toString)
 
 		scope(annotatedClass)[
-			processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]		
+			processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]	
+			null	
 		]
 
 		//TODO: Reconsider. Is @Behavior considered as Trigger Annotation or as something else?
