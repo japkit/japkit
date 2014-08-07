@@ -42,4 +42,31 @@ public @interface Template {
 	 * @return the annotation mappings
 	 */
 	AnnotationMapping[] annotationMappings() default {};
+	
+	/**
+	 * If a Field annotation is set here, it defines default values for all Field annotations within the template.
+	 * <p>
+	 * For example, one can define a commom name rule for all fields in the template that appends the src simpleName to the template field's name.
+	 * Note that you can access the regarding template method as variable "template" on the value stack
+	 * @return
+	 */
+	Field[] fieldDefaults() default {}; 
+	
+	/**
+	 * If a Method annotation is set here, it defines default values for all Method annotations within the template.
+	 * <p>
+	 * For example, one can define a common name rule for all methods in the template that appends the src simpleName to the template field's name.
+	 * Note that you can access the regarding template method as variable "template" on the value stack
+	 * @return
+	 */
+	Method[] methodDefaults() default {}; 
+	
+	/**
+	 * If a Constructor annotation is set here, it defines default values for all Constructor annotations within the template.
+	 * <p>
+	 * For example, one can define a common expression language to be used for all constructors in the template.
+	 * Note that you can access the regarding template constructor as variable "template" on the value stack
+	 * @return
+	 */
+	Constructor[] constructorDefaults() default {}; 
 }

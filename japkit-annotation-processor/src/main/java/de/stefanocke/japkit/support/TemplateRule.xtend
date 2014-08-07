@@ -15,6 +15,8 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
+import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
+
 @Data
 class TemplateRule implements Function1<GenTypeElement, List<? extends GenElement>>{
 
@@ -30,10 +32,17 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
 	List<(GenTypeElement)=> List<? extends GenElement>> memberRules
 	((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> scopeRule
+	AnnotationMirror fieldDefaults
+	AnnotationMirror methodDefaults
+	AnnotationMirror constructorDefaults
 
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
 		_templateClass = templateClass
 		_templateAnnotation = templateAnnotation ?: templateClass.annotationMirror(Template)
+		_methodDefaults = templateAnnotation?.value("methodDefaults", typeof(AnnotationMirror[]))?.singleValue
+		_fieldDefaults = templateAnnotation?.value("fieldDefaults", typeof(AnnotationMirror[]))?.singleValue
+		_constructorDefaults = templateAnnotation?.value("constructorDefaults", typeof(AnnotationMirror[]))?.singleValue
+		
 		_memberRules=newArrayList()	
 		
 		memberRules.addAll(templateClass.declaredTypes.map[it -> annotationMirror(InnerClass)].filter[value != null].map [
@@ -41,7 +50,7 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 		])
 		
 		memberRules.addAll(templateClass.declaredFields.map [
-			new FieldRule(annotationMirror(Field), it)
+			new FieldRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotationMirror(Field), fieldDefaults), it)
 		])
 		
 		memberRules.addAll(templateClass.declaredFields.map[it -> annotationMirror(Getter)].filter[value != null].map [
@@ -53,11 +62,11 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 		])
 		
 		memberRules.addAll(templateClass.declaredConstructors.map[it -> annotationMirror(Constructor)].filter[value != null].map [
-			new ConstructorRule(value, key)
+			new ConstructorRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, constructorDefaults), key)
 		])
 		
 		memberRules.addAll(templateClass.declaredMethods.map[it -> annotationMirror(Method)].filter[value != null].map [
-			new MethodRule(value, key)
+			new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, methodDefaults), key)
 		])
 		
 		

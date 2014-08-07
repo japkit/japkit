@@ -41,6 +41,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
+import java.util.HashMap
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -851,15 +852,26 @@ class ElementsExtensions {
 		elementUtils.getConstantExpression(value)
 	}
 
-	def dispatch getElementValuesWithDefaults(AnnotationMirror a) {
-		elementUtils.getElementValuesWithDefaults(a)
+	
+	
+	def dispatch Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(
+		AnnotationWithDefaultAnnotation a) {
+		val result = new HashMap(getElementValuesWithDefaults(a.annotation))
+		result.putAll(a.elementValues)
+		result
 	}
 
-	def dispatch getElementValuesWithDefaults(GenAnnotationMirror am) {
+	def dispatch Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(
+		GenAnnotationMirror am) {
 		val result = am.annotationType.asTypeElement.declaredMethods.filter[defaultValue != null].toInvertedMap[
 			defaultValue]
 		result.putAll(am.elementValues)
 		result
+	}
+
+	def dispatch Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(
+		AnnotationMirror a) {
+		elementUtils.getElementValuesWithDefaults(a)
 	}
 
 	def getName(CharSequence cs) {

@@ -137,14 +137,18 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 
 	override apply(GenTypeElement generatedClass) {
 
-		if (!activationRule.apply) {
-			return emptyList
-		}
+		scope[
+			valueStack.put("template", template)
+			if (!activationRule.apply) {
+				return emptyList
+			}
+		]
 
 		try {
 			pushCurrentMetaAnnotation(metaAnnotation)
 
 			inScope [
+				valueStack.put("template", template)
 				val generatedMembers = newArrayList()
 				val member = createMember
 				generatedClass.add(member)

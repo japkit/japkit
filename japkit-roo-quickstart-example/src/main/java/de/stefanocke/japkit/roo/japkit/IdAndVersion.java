@@ -19,16 +19,17 @@ import de.stefanocke.japkit.metaannotations.Var;
 		@Var(name = "hasNoInheritedPropertyWithName", isFunction=true, expr="inheritedProperties.find{it.name.contentEquals(src)}==null", lang="GroovyScript"),
 
 
-})
+},
+fieldDefaults=@Field(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval(template.simpleName)}"), getter=@Getter, setter=@Setter))
 public class IdAndVersion {
 	/***/
-	@Field(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('id')}"), getter=@Getter, setter=@Setter)
+	@Field
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Long id;
 
-	@Field(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval('version')}"), getter=@Getter, setter=@Setter)
+	@Field
 	@Version
 	@Column(name = "version")
 	private Integer version;
