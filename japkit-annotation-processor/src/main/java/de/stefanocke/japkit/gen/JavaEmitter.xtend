@@ -22,9 +22,9 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.WildcardType
+import org.apache.commons.lang3.StringEscapeUtils
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import org.apache.commons.lang3.StringEscapeUtils
 
 class JavaEmitter implements EmitterContext{
 
@@ -211,7 +211,7 @@ class JavaEmitter implements EmitterContext{
 		'''
 		«e.docCommentCode»
 		«e.annotationsCode»
-		«e.modifiersCode»«e.typeParamsCode»«enclosingElement.simpleName»(«e.codeForParameters»)«e.codeForThrows»«block(e.codeForBody)»
+		«e.modifiersCode»«e.typeParamsCode»«enclosingElement.simpleName»«e.codeForParameters»«e.codeForThrows»«block(e.codeForBody)»
 		'''
 	}
 	
@@ -225,7 +225,7 @@ class JavaEmitter implements EmitterContext{
 		'''
 		«e.docCommentCode»
 		«e.annotationsCode»
-		«e.modifiersCode»«e.typeParamsCode»«returnType.typeRef» «simpleName»(«e.codeForParameters»)«e.codeForThrows»«body»
+		«e.modifiersCode»«e.typeParamsCode»«returnType.typeRef» «simpleName»«e.codeForParameters»«e.codeForThrows»«body»
 		'''
 	}
 	
@@ -256,7 +256,7 @@ class JavaEmitter implements EmitterContext{
 	}
 	
 	def codeForParameters(ExecutableElement ee){
-		'''«FOR p : ee.parameters SEPARATOR ', '»«p.codeForParameter»«ENDFOR»'''
+		codeListInlineOrWithLinebreaks(ee.parameters.map[codeForParameter].toList, '(', ', ',')')
 	}
 	
 	def codeForParameter(extension VariableElement p){
@@ -376,23 +376,26 @@ class JavaEmitter implements EmitterContext{
 		} else if(values.size==1 && values.head.key.simpleName.contentEquals("value")){
 			'''(«values.head.value.annotationValueCode»)'''
 		} else {
-			val avCode = values.map[av | '''«av.key.simpleName» = «av.value.annotationValueCode»''']
-			val avCodeLength = avCode.map[length].reduce[l1, l2| l1 + l2]
-			
-			if(avCodeLength<150){
-				'''(«FOR av : avCode SEPARATOR ', '»«av»«ENDFOR»)'''			
-			} else {
-				'''
-				(
-					«FOR av : avCode SEPARATOR ', '»
-					«av»
-					«ENDFOR»
-				)
-				'''
-			}
+			val avCode = values.map[av | '''«av.key.simpleName» = «av.value.annotationValueCode»'''].toList
+			codeListInlineOrWithLinebreaks(avCode, '(', ', ', ')')
 		}
 		
 		'''@«typeName»«elementValuePairs»'''
+	}
+	
+	def codeListInlineOrWithLinebreaks(Iterable<? extends CharSequence> codeList, String before, String separator, String after) {
+		val codeLength = codeList.map[length].reduce[l1, l2| l1 + l2] ?: 0
+		
+		if(codeLength<150){
+			'''«before»«FOR c : codeList SEPARATOR separator»«c»«ENDFOR»«after»'''			
+		} else {
+			'''
+			«before»
+				«FOR c : codeList SEPARATOR separator»
+				«c»
+				«ENDFOR»
+			«after»'''
+		}
 	}
 	
 	def dispatch CharSequence annotationValueCode(AnnotationValue value) {
@@ -428,20 +431,8 @@ class JavaEmitter implements EmitterContext{
 		if(values.size==1){
 			values.head.annotationValueCode
 		} else {
-			val avCode = values.map[annotationValueCode]
-			val avCodeLength = avCode.map[length].reduce[l1, l2| l1 + l2] ?: 0
-			
-			if(avCodeLength<150){
-				'''{«FOR av : avCode SEPARATOR ', '»«av»«ENDFOR»}'''			
-			} else {
-				'''
-				{
-					«FOR av : avCode SEPARATOR ', '»
-					«av»
-					«ENDFOR»
-				}
-				'''
-			}
+			val avCode = values.map[annotationValueCode].toList
+			codeListInlineOrWithLinebreaks(avCode, '{',', ','}')
 					
 		}
 	}
