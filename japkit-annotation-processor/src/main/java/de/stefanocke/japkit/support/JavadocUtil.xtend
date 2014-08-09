@@ -12,6 +12,8 @@ class JavadocUtil {
 	static val codePattern2 = Pattern.compile('''@japkit\.(\S+)\s*<pre>\s*<code>\s*([\s\S]*?)</code>\s*</pre>''')
 	static val codePattern3 = Pattern.compile('''@japkit\.(\S+)\s*<code>\s*([\s\S]*?)</code>''')
 	
+	static val leadingWhiteSpaceAfterLinebreak = Pattern.compile('''\n ''')
+	
 	def static getParams(CharSequence javadoc){
 		getMapFromTwoGroups(javadoc, paramPattern)
 	}
@@ -36,7 +38,9 @@ class JavadocUtil {
 	}
 	
 	def static getCode(CharSequence javadoc){
-		getMapFromTwoGroups(javadoc, codePattern1, codePattern2, codePattern3)	
+		getMapFromTwoGroups(javadoc, codePattern1, codePattern2, codePattern3).mapValues[
+			leadingWhiteSpaceAfterLinebreak.matcher(it).replaceAll('\n')
+		]	
 	}
 	
 	def static removeCode(CharSequence javadoc){

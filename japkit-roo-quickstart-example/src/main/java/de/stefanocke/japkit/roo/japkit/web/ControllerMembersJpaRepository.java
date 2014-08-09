@@ -21,13 +21,7 @@ import de.stefanocke.japkit.roo.base.web.RepositoryAdapter;
 						+ "relatedEntitiesWithJpaRepositories[p.singleValueType.asElement()]" + "]}.findAll{it.value!=null}",
 						lang = "GroovyScript") })
 public abstract class ControllerMembersJpaRepository {
-	/**
-	 * #{repository}
-	 * #{useFboRepository}
-	 */
-	@Method
-	public abstract void foobar();
-	
+
 	@Field(activation = @Matcher(condition = "useFboRepository"))
 	@Autowired
 	private Repository repository;
