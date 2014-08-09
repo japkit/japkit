@@ -70,13 +70,17 @@ class GroovyELProvider implements ELProvider {
 		if(!expectedType.isAssignableFrom(String)){
 			throw new ELProviderException("GStringTemplate is not allowed as expressions of type ${expectedType}");
 		}
-
-		//TODO: Caching!
-		Template template = gstringTemplates.get(expr) ?: gstringTemplateEngine.createTemplate((String) expr)
-		gstringTemplates.put(expr, template)
-
-		template.make(contextMap).toString()
-
+		
+		try{
+			ElExtensions.setContext(contextMap)
+	
+			Template template = gstringTemplates.get(expr) ?: gstringTemplateEngine.createTemplate((String) expr)
+			gstringTemplates.put(expr, template)
+	
+			template.make(contextMap).toString()
+		} finally {
+			ElExtensions.setContext(null)
+		}
 	}
 
 	private Object evalAsGString(Map contextMap, String expr, Class expectedType)throws ELProviderException {
