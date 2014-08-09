@@ -71,16 +71,12 @@ class GroovyELProvider implements ELProvider {
 			throw new ELProviderException("GStringTemplate is not allowed as expressions of type ${expectedType}");
 		}
 		
-		try{
-			ElExtensions.setContext(contextMap)
-	
-			Template template = gstringTemplates.get(expr) ?: gstringTemplateEngine.createTemplate((String) expr)
-			gstringTemplates.put(expr, template)
-	
-			template.make(contextMap).toString()
-		} finally {
-			ElExtensions.setContext(null)
-		}
+		
+		Template template = gstringTemplates.get(expr) ?: gstringTemplateEngine.createTemplate((String) expr)
+		gstringTemplates.put(expr, template)
+
+		template.make(contextMap).toString()
+		
 	}
 
 	private Object evalAsGString(Map contextMap, String expr, Class expectedType)throws ELProviderException {
@@ -91,36 +87,34 @@ class GroovyELProvider implements ELProvider {
 	static Map<String, Script> scripts = new HashMap(); //TODO: Static? Cache eviction? ...
 
 	private Object evalAsScript(Map contextMap, String expr, Class expectedType)throws ELProviderException {
-		try{
-			//make mutable copy
-			def mutableContextMap = new HashMap<String, Object>(contextMap);  //TODO: Da funktioniert aber der Zugriff auf den parent des value stack nicht mehr richtig...
+		
+		//make mutable copy
+		def mutableContextMap = new HashMap<String, Object>(contextMap);  //TODO: Da funktioniert aber der Zugriff auf den parent des value stack nicht mehr richtig...
 
-			ElExtensions.setContext(mutableContextMap)
+		
 
-			//TODO: Caching
-			Script script = scripts.get(expr) ?:  shell.parse(expr, "ELProviderScript" + counter++ + ".groovy");
-			scripts.put(expr, script)
+		//TODO: Caching
+		Script script = scripts.get(expr) ?:  shell.parse(expr, "ELProviderScript" + counter++ + ".groovy");
+		scripts.put(expr, script)
 
-			def scriptObject = InvokerHelper.createScript(script.getClass(), new Binding(mutableContextMap))
+		def scriptObject = InvokerHelper.createScript(script.getClass(), new Binding(mutableContextMap))
 
 
-			def result = scriptObject.run();
-			
-			if(result==null){
-				return null; //No type checks for null
-			}
-
-			if(expectedType == String){
-				return result?.toString()
-			}
-			if(!expectedType.isInstance(result)){
-				throw new ELProviderException("Cannot cast ${result} of type ${result?.getClass()} to ${expectedType}")
-			}
-
-			result;
-		} finally {
-			ElExtensions.setContext(null)
+		def result = scriptObject.run();
+		
+		if(result==null){
+			return null; //No type checks for null
 		}
+
+		if(expectedType == String){
+			return result?.toString()
+		}
+		if(!expectedType.isInstance(result)){
+			throw new ELProviderException("Cannot cast ${result} of type ${result?.getClass()} to ${expectedType}")
+		}
+
+		result;
+		
 	}
 
 	@Override
@@ -147,8 +141,7 @@ class GroovyELProvider implements ELProvider {
 		try{
 			//make mutable copy
 			def mutableContextMap = new HashMap<String, Object>(contextMap);  //TODO: Da funktioniert aber der Zugriff auf den parent des value stack nicht mehr richtig...
-			ElExtensions.setContext(mutableContextMap)
-
+			
 			def template = templates.get(templateUrl)
 			
 			if( template == null && templateLastModified != null){
@@ -181,9 +174,7 @@ class GroovyELProvider implements ELProvider {
 
 		} catch(GroovyRuntimeException ge) {
 			throw new ELProviderException(ge)
-		} finally {
-			ElExtensions.setContext(null)
-		}
+		} 
 
 	}
 

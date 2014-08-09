@@ -18,29 +18,10 @@ import de.stefanocke.japkit.support.ExtensionRegistry
 
 class ElExtensions {
 
-	val private static contextTL = new ThreadLocal<Map<String, Object>>
-
-	//TODO: Could be ValueStack
-	def static Map<String, Object> getContext() {
-		contextTL.get
+	def static Map<String, Object> getValueStack() {
+		ExtensionRegistry.get(ELSupport).valueStack
 	}
 
-	def static setContext(Map<String, Object> context) {
-		if (context != null) {
-			contextTL.set(context)
-		} else {
-			contextTL.remove
-		}
-	}
-
-	def static <T> T withContext(Map<String, Object> c, (Object)=>T closure) {
-		try {
-			contextTL.set(c)
-			closure.apply(null)
-		} finally {
-			contextTL.remove
-		}
-	}
 
 	def static getAsElement(TypeMirror type) {
 		type.asElement()
@@ -73,7 +54,7 @@ class ElExtensions {
 	 * annotation value name to annotation value.  "At" == @ == Annotation 
 	 */
 	def static getAt(Element e) {
-		e.getAt(context)
+		e.getAt(valueStack)
 	}
 	
 	def private static getAt(Element e, Map<String, Object> context) {
@@ -139,7 +120,7 @@ class ElExtensions {
 	}
 	
 	def static get(Element e, String functionName) {
-		get(e, functionName, context)
+		get(e, functionName, valueStack)
 	}
 	
 	//TODO: ggf. aus der Properties-Annotation einen "PropertyFilter" herauslösen und allgemein verfügbar machen...
@@ -161,7 +142,7 @@ class ElExtensions {
 	}
 	
 	def static getAsType(String qualName) {
-		qualName.getAsType(context)
+		qualName.getAsType(valueStack)
 	}
 	
 	/**Gets the name of a type in a way usable in code bodies. If possible, an according import statement is added.*/
@@ -170,7 +151,7 @@ class ElExtensions {
 	}
 	
 	def static getName(TypeMirror type) {
-		type.getName(context)
+		type.getName(valueStack)
 	}
 
 	def private static getCode(TypeMirror type, Map<String, Object> context){
@@ -178,7 +159,7 @@ class ElExtensions {
 	}
 	
 	def static getCode(TypeMirror type){
-		getCode(type, context)
+		getCode(type, valueStack)
 	}
 	
 	def static getToFirstUpper(CharSequence s) {
