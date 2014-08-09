@@ -62,7 +62,7 @@ public abstract class ControllerMembers {
 
 	//TODO: Eigentlich singleValueType.
 	/**
-	 * @japkit.bodyCode <code>uiModel.addAttribute("${src.name}s", Arrays.asList(${ec.typeRef(src.type)}.values()));</code>
+	 * @japkit.bodyCode <code>uiModel.addAttribute("${src.name}s", Arrays.asList(${src.type.name}.values()));</code>
 	 */
 	@Method(imports = Arrays.class, bodyIterator="enumProperties")
 	abstract void addEnumChoices(Model uiModel);
@@ -77,7 +77,7 @@ public abstract class ControllerMembers {
 	/**
 	 * @japkit.bodyCode <pre>
 	 * <code>
-	 * populateEditForm(uiModel, new ${ec.typeRef(fbo)}()); 
+	 * populateEditForm(uiModel, new ${fbo.code}()); 
 	 * return "${path}/create";
 	 * </code>
 	 * </pre>

@@ -14,7 +14,7 @@ import de.stefanocke.japkit.roo.base.web.LabelProvider;
 public abstract class ControllerConverterProviderMembers implements ConverterProvider, LabelProvider<FormBackingObject> {
 	
 	@Method(imports={EntityConverterUtil.class} ,
-			bodyCode="EntityConverterUtil.registerConverters(#{ec.typeRef(fbo)}.class, registry, crudOperations(), this);")
+			bodyCode="EntityConverterUtil.registerConverters(#{fbo.name}.class, registry, crudOperations(), this);")
 	@ParamNames("registry")
 	@Override
 	public void registerConverters(ConverterRegistry registry) {

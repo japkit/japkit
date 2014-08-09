@@ -179,6 +179,7 @@ class TypesExtensions /**implements Types*/{
 		typeUtils.erasure(type)
 	}
 
+	//TODO: Type arguments ???
 	def isSameType(TypeMirror t1, TypeMirror t2) {
 		if((t1 === null) || (t2 === null)){
 			return false

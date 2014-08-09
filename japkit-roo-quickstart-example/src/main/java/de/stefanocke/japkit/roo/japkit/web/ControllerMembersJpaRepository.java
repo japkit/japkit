@@ -32,7 +32,7 @@ public abstract class ControllerMembersJpaRepository {
 	private RelatedEntityRepository relatedEntityRepository;
 
 	@Method(activation = @Matcher(condition = "useFboRepository"), imports = RepositoryAdapter.class,
-			bodyCode = "return new RepositoryAdapter<#{ec.typeRef(fbo)}>(repository);")
+			bodyCode = "return new RepositoryAdapter<#{fbo.code}>(repository);")
 	protected abstract CrudOperations<FormBackingObject> crudOperations();
 
 	@Method(src = "#{entityPropertiesWithJpaRepositories.keySet()}", nameExpr = "get#{src.name.toFirstUpper}Choices", vars = {

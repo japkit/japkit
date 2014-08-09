@@ -14,6 +14,7 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.stefanocke.japkit.support.ExtensionRegistry.*
+import de.stefanocke.japkit.support.ExtensionRegistry
 
 class ElExtensions {
 
@@ -147,18 +148,39 @@ class ElExtensions {
 		e.properties(Object.name, false)
 	}
 
+
+	private def static getEmitterContext(Map<String, Object> context) {
+		context.get("ec") as EmitterContext
+	}
 	/**
 	 * Gets TypeMirror for qualified name and adds import statement,if possible.
 	 */
 	//TODO: Good name?
 	def private static getAsType(String qualName, Map<String, Object> context) {
-		(context.get("ec") as EmitterContext)?.staticTypeRef(get(TypesRegistry).findTypeElement(qualName).asType)
+		get(TypesRegistry).findTypeElement(qualName).asType.name
 	}
 	
 	def static getAsType(String qualName) {
 		qualName.getAsType(context)
 	}
+	
+	/**Gets the name of a type in a way usable in code bodies. If possible, an according import statement is added.*/
+	def private static getName(TypeMirror type, Map<String, Object> context) {
+		getEmitterContext(context)?.staticTypeRef(type) ?: ExtensionRegistry.get(TypesExtensions).qualifiedName(type)
+	}
+	
+	def static getName(TypeMirror type) {
+		type.getName(context)
+	}
 
+	def private static getCode(TypeMirror type, Map<String, Object> context){
+		getEmitterContext(context)?.typeRef(type) ?: type.toString
+	}
+	
+	def static getCode(TypeMirror type){
+		getCode(type, context)
+	}
+	
 	def static getToFirstUpper(CharSequence s) {
 		s.toString.toFirstUpper
 	}
@@ -173,7 +195,7 @@ class ElExtensions {
 		registerExtensionMethods
 	]
 
-	//Das kann man bestimmt auch fein generieren... :)
+	//TODO: Das kann man bestimmt auch fein generieren... :)
 	def static registerExtensionProperties(ElExtensionPropertiesAndMethods elExtensions) {
 		elExtensions.registerProperty(TypeMirror, "asElement", [context, type|type.asElement()])
 
@@ -190,6 +212,10 @@ class ElExtensions {
 		elExtensions.registerGetProperty(Element, [context, e, functionName|e.get(functionName, context)])
 
 		elExtensions.registerProperty(String, "asType", [context, qualName| qualName.getAsType(context)])
+		
+		elExtensions.registerProperty(TypeMirror, "name", [context, type| type.getName(context)])
+		
+		elExtensions.registerProperty(TypeMirror, "code", [context, type| type.getCode(context)])
 
 		elExtensions.registerProperty(CharSequence, "toFirstUpper", [context, s|s.toFirstUpper])
 
