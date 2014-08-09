@@ -137,12 +137,11 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 
 	override apply(GenTypeElement generatedClass) {
 
-		scope[
+		if(!scope[
 			valueStack.put("template", template)
-			if (!activationRule.apply) {
-				return emptyList
-			}
-		]
+			activationRule.apply			
+		]) 
+		return emptyList
 
 		try {
 			pushCurrentMetaAnnotation(metaAnnotation)
