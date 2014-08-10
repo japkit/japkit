@@ -41,6 +41,7 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
+import de.stefanocke.japkit.gen.GenAnnotationType
 
 class ClassGeneratorSupport {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -65,10 +66,10 @@ class ClassGeneratorSupport {
 	def GenTypeElement generateClass(TypeElement annotatedClass, GenTypeElement enclosingClass, AnnotationMirror triggerAnnotation, 
 		AnnotationMirror genClass, TypeElement templateClass, String name, Set<GenTypeElement> generatedTopLevelClasses
 	) {
-		try {
-			val isTopLevelClass = enclosingClass == null
-			pushCurrentMetaAnnotation(genClass)
 		
+		val isTopLevelClass = enclosingClass == null
+		pushCurrentMetaAnnotation(genClass)
+		try {
 			//superclass with type args
 			val generatedClass = createClass(annotatedClass, triggerAnnotation, genClass, enclosingClass, name)
 			
@@ -76,51 +77,56 @@ class ClassGeneratorSupport {
 			//Register generated class as early as possible to allow error type resolution in other classes
 			registerGeneratedTypeElement(generatedClass, annotatedClass, if(isTopLevelClass) triggerAnnotation else null)			
 			
-		
+			
 			pushCurrentGeneratedClass(generatedClass)
 		
-			setSuperClassAndInterfaces(annotatedClass, generatedClass, triggerAnnotation, genClass)
-		
-			if(isTopLevelClass){
-				createShadowAnnotation(triggerAnnotation, annotatedClass, genClass, generatedClass)	
-			}
+			try{
+				setSuperClassAndInterfaces(annotatedClass, generatedClass, triggerAnnotation, genClass)
 			
-			generatedClass.annotationMirrors = mapTypeAnnotations(annotatedClass, triggerAnnotation, genClass, 
-				new ArrayList(generatedClass.annotationMirrors as List<GenAnnotationMirror>)
-			)
-			
-			
-			processMemberGenerators(annotatedClass, generatedClass, triggerAnnotation, genClass)
-			
-			//For @InnerClass, the annotated inner class is the template
-			if(templateClass!=null){ 
-				ExtensionRegistry.get(FromTemplateGenerator).createMembers(templateClass, annotatedClass, generatedClass, triggerAnnotation, genClass)
-			}
-			
-			
-			behaviorDelegationGenerator.createBehaviorDelegation(annotatedClass, triggerAnnotation, generatedClass,
-					genClass)
-			
-			if(isTopLevelClass){
-				val Set<GenTypeElement> generatedClasses = newHashSet
-				generatedClasses.add(generatedClass)	
-				addAllAuxTopLevelClasses(generatedClasses, generatedClass)
-
-				generatedClasses.forEach[markAsGenerated(it, annotatedClass)]
-				generatedClasses.forEach[addOrderAnnotations]				
-				generatedClasses.forEach[addParamNamesAnnotations]		
-			
-			
-				if(generatedTopLevelClasses!=null){
-					generatedTopLevelClasses.addAll(generatedClasses)			
+				if(isTopLevelClass){
+					createShadowAnnotation(triggerAnnotation, annotatedClass, genClass, generatedClass)	
+				}
+				
+				generatedClass.annotationMirrors = mapTypeAnnotations(annotatedClass, triggerAnnotation, genClass, 
+					new ArrayList(generatedClass.annotationMirrors as List<GenAnnotationMirror>)
+				)
+				
+				
+				processMemberGenerators(annotatedClass, generatedClass, triggerAnnotation, genClass)
+				
+				//For @InnerClass, the annotated inner class is the template
+				if(templateClass!=null){ 
+					ExtensionRegistry.get(FromTemplateGenerator).createMembers(templateClass, annotatedClass, generatedClass, triggerAnnotation, genClass)
+				}
+				
+				
+				behaviorDelegationGenerator.createBehaviorDelegation(annotatedClass, triggerAnnotation, generatedClass,
+						genClass)
+				
+				if(isTopLevelClass){
+					val Set<GenTypeElement> generatedClasses = newHashSet
+					generatedClasses.add(generatedClass)	
+					addAllAuxTopLevelClasses(generatedClasses, generatedClass)
+	
+					generatedClasses.forEach[markAsGenerated(it, annotatedClass)]
+					generatedClasses.forEach[addOrderAnnotations]				
+					generatedClasses.forEach[addParamNamesAnnotations]		
+				
+				
+					if(generatedTopLevelClasses!=null){
+						generatedTopLevelClasses.addAll(generatedClasses)			
+					}
+				
 				}
 			
+				generatedClass
+			
+			} finally {
+				popCurrentGeneratedClass
 			}
 		
-			generatedClass
-		
 		} finally {
-			popCurrentGeneratedClass
+			
 			popCurrentMetaAnnotation
 		}
 	}
@@ -215,6 +221,8 @@ class ClassGeneratorSupport {
 				new GenEnum(enclosingElAndClassName.value, enclosingElAndClassName.key)
 			case ElementKind.INTERFACE:
 				new GenInterface(enclosingElAndClassName.value, enclosingElAndClassName.key)
+			case ElementKind.ANNOTATION_TYPE:
+				new GenAnnotationType(enclosingElAndClassName.value, enclosingElAndClassName.key)
 			default:
 				throw new ProcessingException('''Invalid element kind in GenClass annotation: «kind»''',
 					annotatedClass)

@@ -102,17 +102,29 @@ class JavaEmitter implements EmitterContext{
 		switch typeElement.kind {
 			case ElementKind.CLASS: codeForClass(typeElement)
 			case ElementKind.INTERFACE: codeForInterface(typeElement)
-			case ElementKind.ENUM: codeForEnum(typeElement) //TODO
-			case ElementKind.ANNOTATION_TYPE:  unknownElement(typeElement) //TODO
+			case ElementKind.ENUM: codeForEnum(typeElement) 
+			case ElementKind.ANNOTATION_TYPE:  codeForAnnotationType(typeElement) //TODO
 			default : unknownElement(typeElement)
 		}
 	}
+	
+	
 	
 	def codeForInterface(extension TypeElement element) {
 		'''
 		«element.docCommentCode»
 		«element.annotationsCode»
 		«element.modifiersCode»interface «simpleName» «element.typeParamsCode»«element.codeForInterfaces»{
+			«element.enclosedElementsCode»
+		}
+		'''
+	}
+	
+	def codeForAnnotationType(extension TypeElement element) {
+		'''
+		«element.docCommentCode»
+		«element.annotationsCode»
+		«element.modifiersCode»@interface «simpleName» {
 			«element.enclosedElementsCode»
 		}
 		'''
@@ -216,7 +228,7 @@ class JavaEmitter implements EmitterContext{
 	}
 	
 	def codeForMethod(extension ExecutableElement e) {
-		val body = if(e.abstract || enclosingElement.kind == ElementKind.INTERFACE){
+		val body = if(e.abstract || enclosingElement.kind == ElementKind.INTERFACE || enclosingElement.kind == ElementKind.ANNOTATION_TYPE ){
 			";"
 		} else {
 			'''«block(e.codeForBody)»'''
