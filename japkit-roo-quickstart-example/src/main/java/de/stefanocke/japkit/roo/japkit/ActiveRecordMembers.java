@@ -9,12 +9,13 @@ import javax.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Method;
-import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 
+@RuntimeMetadata
 @Template(vars = @Var(expr = "#{currentGenClass.simpleName}", name = "entityName", type = String.class))
 @Configurable
 public abstract class ActiveRecordMembers {
@@ -41,7 +42,6 @@ public abstract class ActiveRecordMembers {
 
 	@Method(nameExpr = "find#{entityName}", bodyCode = "if (id == null) return null;\n"
 			+ "return entityManager().find(#{entityName}.class, id);")
-	@ParamNames("id")
 	public static GeneratedClass find(Long id) {
 		return null;
 	}
@@ -52,13 +52,11 @@ public abstract class ActiveRecordMembers {
 	}
 
 	@Method(nameExpr = "findAll#{entityName}s", bodyCode = "return find#{entityName}Entries(null, null, sortFieldName, sortOrder);")
-	@ParamNames({ "sortFieldName", "sortOrder" })
 	public static List<GeneratedClass> findAll(String sortFieldName, String sortOrder) {
 		return null;
 	}
 
 	@Method(nameExpr = "find#{entityName}Entries", bodyCode = "return find#{entityName}Entries(firstResult, maxResults, null, null);")
-	@ParamNames({ "firstResult", "maxResults" })
 	public static List<GeneratedClass> findEntries(Integer firstResult, Integer maxResults) {
 		return null;
 	}
@@ -68,7 +66,6 @@ public abstract class ActiveRecordMembers {
 					+ "TypedQuery<#{entityName}> query =  entityManager().createQuery(jpaQuery, #{entityName}.class);\n"
 					+ "if(firstResult!=null && maxResults!=null){query.setFirstResult(firstResult).setMaxResults(maxResults);}\n"
 					+ "return query.getResultList();")
-	@ParamNames({ "firstResult", "maxResults", "sortFieldName", "sortOrder" })
 	public static List<GeneratedClass> findEntries(Integer firstResult, Integer maxResults, String sortFieldName, String sortOrder) {
 		return null;
 	}
@@ -82,7 +79,6 @@ public abstract class ActiveRecordMembers {
 			+ "\tif (\"ASC\".equalsIgnoreCase(sortOrder) || \"DESC\".equalsIgnoreCase(sortOrder)) {\n"
 			+ "\t\tjpaQueryWithOrderBy = jpaQueryWithOrderBy + \" \" + sortOrder;\n" + "\t}\n" + "\treturn jpaQueryWithOrderBy;\n" + "}\n"
 			+ "return jpaQuery;")
-	@ParamNames({ "jpaQuery", "sortFieldName", "sortOrder" })
 	private static String addOrderBy(String jpaQuery, String sortFieldName, String sortOrder) {
 		return null;
 	}
