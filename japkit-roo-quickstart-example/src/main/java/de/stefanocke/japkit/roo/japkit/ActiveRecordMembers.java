@@ -9,17 +9,16 @@ import javax.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.stefanocke.japkit.metaannotations.AnnotationMapping;
-import de.stefanocke.japkit.metaannotations.AnnotationMappingMode;
-import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
+import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 
-@AnnotationMapping(targetAnnotation = Configurable.class, mode = AnnotationMappingMode.IGNORE)
 @Template(vars = @Var(expr = "#{currentGenClass.simpleName}", name = "entityName", type = String.class))
+@Configurable
 public abstract class ActiveRecordMembers {
+	
 	@PersistenceContext
 	transient EntityManager entityManager;
 

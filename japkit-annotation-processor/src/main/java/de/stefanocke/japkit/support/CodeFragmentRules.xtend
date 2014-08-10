@@ -51,9 +51,9 @@ class CodeFragmentRules implements Function0<CharSequence>{
 	
 	def static (CharSequence)=>CharSequence createDefaultFragmentsRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-		val surroundingFragments = metaAnnotation.value("surroundingFragments".withPrefix(avPrefix), typeof(String[]))
-		val beforeFragments = metaAnnotation.value("beforeFragments".withPrefix(avPrefix), typeof(String[]))
-		val afterFragments = metaAnnotation.value("afterFragments".withPrefix(avPrefix), typeof(String[]));
+		val surroundingFragments = metaAnnotation?.value("surroundingFragments".withPrefix(avPrefix), typeof(String[]))
+		val beforeFragments = metaAnnotation?.value("beforeFragments".withPrefix(avPrefix), typeof(String[]))
+		val afterFragments = metaAnnotation?.value("afterFragments".withPrefix(avPrefix), typeof(String[]));
 		[ CharSequence code |
 			val before = CodeFragmentRules.code(beforeFragments)
 			val after = CodeFragmentRules.code(afterFragments)

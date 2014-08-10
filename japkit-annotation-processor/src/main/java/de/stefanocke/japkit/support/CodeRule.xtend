@@ -49,39 +49,39 @@ class CodeRule implements Function0<CharSequence> {
 		
 		val codeFromJavadoc = JavadocUtil.getCode(template?.getDocCommentUsingRuntimeMetadata)
 		
-		_bodyExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "code".withPrefix(avPrefix))
+		_bodyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "code".withPrefix(avPrefix))
 		
-		_lang = metaAnnotation.value("lang".withPrefix(avPrefix), String)
+		_lang = metaAnnotation?.value("lang".withPrefix(avPrefix), String)
 		
-		val bodyCaseAnnotations = metaAnnotation.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
+		val bodyCaseAnnotations = metaAnnotation?.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
 		
-		_bodyCases = bodyCaseAnnotations.map[
+		_bodyCases = bodyCaseAnnotations?.map[
 			elementMatchers('matcher', null) 
 			-> value('expr', String)
 		]?.toList ?: emptyList
 
 
-		_beforeExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "beforeIteratorCode".withPrefix(avPrefix)) 
-		_afterExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "afterIteratorCode".withPrefix(avPrefix)) 
-		_emptyExpr = metaAnnotation.stringFromAnnotationOrMap(codeFromJavadoc, "emptyIteratorCode".withPrefix(avPrefix)) 
+		_beforeExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "beforeIteratorCode".withPrefix(avPrefix)) 
+		_afterExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "afterIteratorCode".withPrefix(avPrefix)) 
+		_emptyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "emptyIteratorCode".withPrefix(avPrefix)) 
 
 		//body iterator
-		_iteratorExpr = metaAnnotation.value("iterator".withPrefix(avPrefix), String)
-		_iteratorLang = metaAnnotation.value("iteratorLang".withPrefix(avPrefix), String)
+		_iteratorExpr = metaAnnotation?.value("iterator".withPrefix(avPrefix), String)
+		_iteratorLang = metaAnnotation?.value("iteratorLang".withPrefix(avPrefix), String)
 
-		_separator = metaAnnotation.value("separator".withPrefix(avPrefix), String)
+		_separator = metaAnnotation?.value("separator".withPrefix(avPrefix), String)
 
-		_imports = metaAnnotation.value("imports", typeof(DeclaredType[]))
+		_imports = metaAnnotation?.value("imports", typeof(DeclaredType[]))
 		
  
 		_defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
 		
-		_linebreak = metaAnnotation.value("linebreak".withPrefix(avPrefix), boolean)
+		_linebreak = metaAnnotation?.value("linebreak".withPrefix(avPrefix), boolean) ?: false
 	}
 	
 	private def stringFromAnnotationOrMap(AnnotationMirror metaAnnotation, Map<String, String> map, String name){
-		 val av = metaAnnotation.value(name, String)
-		 if(av.nullOrEmpty) map.get(name) else av
+		 val av = metaAnnotation?.value(name, String)
+		 if(av.nullOrEmpty) map?.get(name) else av
 	}
 	
 	private static def withPrefix(String name, String prefix){
