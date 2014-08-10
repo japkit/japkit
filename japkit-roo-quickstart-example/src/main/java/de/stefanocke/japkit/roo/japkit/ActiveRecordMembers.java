@@ -25,7 +25,7 @@ public abstract class ActiveRecordMembers {
 	transient EntityManager entityManager;
 
 	@Method(imports = { EntityManager.class, IllegalStateException.class },
-			bodyCode = "EntityManager em = new #{entityName}().entityManager;\n"
+			bodyCode = "EntityManager em = new #{currentGenClass.asType().code}().entityManager;\n"
 					+ "if (em == null) throw new IllegalStateException(\"Entity manager has not been injected\");\n" + "return em;\n")
 	static final EntityManager entityManager() {
 		return null;
