@@ -20,6 +20,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 @Configurable
 public abstract class ActiveRecordMembers {
 	
+	/**@japkit.initCode <code>null</code>*/
 	@PersistenceContext
 	transient EntityManager entityManager;
 

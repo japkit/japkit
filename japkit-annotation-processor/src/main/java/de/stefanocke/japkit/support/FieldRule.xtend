@@ -49,7 +49,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	}
 	
 	def protected (GenField)=>CodeBody createInitCodeRule(){
-		val cr = new CodeRule(metaAnnotation, "init");
+		val cr = new CodeRule(metaAnnotation, template, "init");
 		[genElement | CodeRule.getAsCodeBody(genElement, cr)]
 	}
 

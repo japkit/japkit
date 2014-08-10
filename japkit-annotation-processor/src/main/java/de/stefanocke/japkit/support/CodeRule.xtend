@@ -25,7 +25,7 @@ class CodeRule implements Function0<CharSequence> {
 	
 	AnnotationMirror metaAnnotation
 	Element template
-	DeclaredType[] imports
+	List<DeclaredType> imports
 	String iteratorExpr
 	String iteratorLang
 	String bodyExpr
@@ -71,7 +71,7 @@ class CodeRule implements Function0<CharSequence> {
 
 		_separator = metaAnnotation?.value("separator".withPrefix(avPrefix), String)
 
-		_imports = metaAnnotation?.value("imports", typeof(DeclaredType[]))
+		_imports = metaAnnotation?.value("imports", typeof(DeclaredType[]))?.toList ?: emptyList
 		
  
 		_defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
