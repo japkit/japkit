@@ -34,39 +34,38 @@ public abstract class ActiveRecordMembers {
 	private void initEntityManager() {
 	}
 
-	@Method(nameExpr = "count#{entityName}s",
-			bodyCode = "return entityManager().createQuery(\"SELECT COUNT(o) FROM #{entityName} o\", Long.class).getSingleResult();")
-	public static long count() {
+	@Method(bodyCode = "return entityManager().createQuery(\"SELECT COUNT(o) FROM #{entityName} o\", Long.class).getSingleResult();")
+	public static long count$entityName$s() {
 		return 0;
 	}
 
-	@Method(nameExpr = "find#{entityName}", bodyCode = "if (id == null) return null;\n"
+	@Method(bodyCode = "if (id == null) return null;\n"
 			+ "return entityManager().find(#{entityName}.class, id);")
-	public static GeneratedClass find(Long id) {
+	public static GeneratedClass find$entityName$(Long id) {
 		return null;
 	}
 
-	@Method(nameExpr = "findAll#{entityName}s", bodyCode = "return find#{entityName}Entries(null, null, null, null);")
-	public static List<GeneratedClass> findAll() {
+	@Method(bodyCode = "return find#{entityName}Entries(null, null, null, null);")
+	public static List<GeneratedClass> findAll$entityName$s() {
 		return null;
 	}
 
-	@Method(nameExpr = "findAll#{entityName}s", bodyCode = "return find#{entityName}Entries(null, null, sortFieldName, sortOrder);")
-	public static List<GeneratedClass> findAll(String sortFieldName, String sortOrder) {
+	@Method(bodyCode = "return find#{entityName}Entries(null, null, sortFieldName, sortOrder);")
+	public static List<GeneratedClass> findAll$entityName$s(String sortFieldName, String sortOrder) {
 		return null;
 	}
 
-	@Method(nameExpr = "find#{entityName}Entries", bodyCode = "return find#{entityName}Entries(firstResult, maxResults, null, null);")
-	public static List<GeneratedClass> findEntries(Integer firstResult, Integer maxResults) {
+	@Method(bodyCode = "return find#{entityName}Entries(firstResult, maxResults, null, null);")
+	public static List<GeneratedClass> find$entityName$Entries(Integer firstResult, Integer maxResults) {
 		return null;
 	}
 
-	@Method(nameExpr = "find#{entityName}Entries", imports = TypedQuery.class,
+	@Method(imports = TypedQuery.class,
 			bodyCode = "String jpaQuery = \"SELECT o FROM #{entityName} o\";\n" + "addOrderBy(jpaQuery, sortFieldName, sortOrder);\n"
 					+ "TypedQuery<#{entityName}> query =  entityManager().createQuery(jpaQuery, #{entityName}.class);\n"
 					+ "if(firstResult!=null && maxResults!=null){query.setFirstResult(firstResult).setMaxResults(maxResults);}\n"
 					+ "return query.getResultList();")
-	public static List<GeneratedClass> findEntries(Integer firstResult, Integer maxResults, String sortFieldName, String sortOrder) {
+	public static List<GeneratedClass> find$entityName$Entries(Integer firstResult, Integer maxResults, String sortFieldName, String sortOrder) {
 		return null;
 	}
 

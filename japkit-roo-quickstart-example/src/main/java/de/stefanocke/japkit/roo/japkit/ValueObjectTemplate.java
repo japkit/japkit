@@ -62,7 +62,7 @@ public abstract class ValueObjectTemplate {
 					fluent=true,
 					surroundReturnExprFragments = "defensiveCopyFragment",
 					commentExpr = "Getter for #{src.simpleName}. \n@returns #{src.simpleName}\n"))
-	private SrcElementType srcElementName;
+	private SrcElementType $srcElementName$;
 
 	@Constructor(bodyCode="//Some ctor code")
 	private ValueObjectTemplate (){};

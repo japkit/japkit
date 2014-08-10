@@ -20,6 +20,8 @@ import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import static extension de.stefanocke.japkit.support.JavadocUtil.*
+import java.util.regex.Pattern
+import de.stefanocke.japkit.support.el.ElExtensions
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -122,23 +124,44 @@ class RuleUtils {
 	
 	public static val NO_NAME = [|null as String]
 	
+	
+	static val varInTemplateName = Pattern.compile('''\$(.+?)\$''')
+	
+	private def replaceVarsInTemplateName(CharSequence templateName) {
+		
+		val vs = ExtensionRegistry.get(ELSupport).valueStack
+		val matcher = varInTemplateName.matcher(templateName)
+		val	sb = new StringBuffer();
+		while (matcher.find()) {
+			val varName = matcher.group(1)
+			val value = if(varName=="srcElementName") currentSrcElement.simpleName.toString 
+				else  vs.get(varName)?.toString ?: {
+					reportError('''Variable «varName» in template name «templateName» could not be resolved.''', null, null, null)
+					varName
+				}
+			matcher.appendReplacement(sb, value);
+		}
+		matcher.appendTail(sb);
+	}
+	
 	/**
 	 * To set the name of the generated element either statically (AV: name) or dynamically (AV: nameExpr)
 	 */
 	public def ()=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
-		val nameFromTemplate = template?.simpleName?.toString
+		val nameFromTemplate = template?.simpleName
 		val name = metaAnnotation?.value("name".withPrefix(avPrefix), String)
 		val nameExpr = metaAnnotation?.value("nameExpr".withPrefix(avPrefix), String)
 		val nameLang = metaAnnotation?.value("nameLang".withPrefix(avPrefix), String);
 
 		[ |
+			val nameFromTemplateResolved = nameFromTemplate?.replaceVarsInTemplateName?.toString
 			val result = if (!nameExpr.nullOrEmpty) {
 				eval(nameExpr, nameLang, String, '''Member name could not be generated''',
-					nameFromTemplate ?: 'invalidMemberName')
+					nameFromTemplateResolved ?: 'invalidMemberName')
 			} else if(!name.nullOrEmpty) {
 				name
 			} else {
-				if(nameFromTemplate=="srcElementName") currentSrcElement.simpleName.toString else nameFromTemplate
+				nameFromTemplateResolved
 			}
 			if(result.nullOrEmpty) currentSrcElement.simpleName.toString else result
 		]
