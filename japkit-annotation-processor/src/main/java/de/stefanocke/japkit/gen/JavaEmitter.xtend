@@ -228,9 +228,11 @@ class JavaEmitter implements EmitterContext{
 	}
 	
 	def codeForMethod(extension ExecutableElement e) {
-		val body = if(e.abstract || enclosingElement.kind == ElementKind.INTERFACE || enclosingElement.kind == ElementKind.ANNOTATION_TYPE ){
+		val body = if(e.abstract || enclosingElement.kind == ElementKind.INTERFACE ){
 			";"
-		} else {
+		} else if(enclosingElement.kind == ElementKind.ANNOTATION_TYPE){
+			'''«IF e.defaultValue !=null» default «e.defaultValue.annotationValueCode»«ENDIF»;'''
+		}else {
 			'''«block(e.codeForBody)»'''
 		}
 		

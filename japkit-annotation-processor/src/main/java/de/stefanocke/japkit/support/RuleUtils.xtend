@@ -8,9 +8,11 @@ import de.stefanocke.japkit.metaannotations.Param
 import de.stefanocke.japkit.support.el.ELSupport
 import de.stefanocke.japkit.support.el.ELVariableRule
 import java.util.ArrayList
+import java.util.Arrays
 import java.util.Collections
 import java.util.List
 import java.util.Set
+import java.util.regex.Pattern
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
@@ -18,11 +20,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 
-import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import static extension de.stefanocke.japkit.support.JavadocUtil.*
-import java.util.regex.Pattern
-import de.stefanocke.japkit.support.el.ElExtensions
-import java.util.Arrays
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according

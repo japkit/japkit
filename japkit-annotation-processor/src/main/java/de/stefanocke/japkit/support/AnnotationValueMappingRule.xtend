@@ -34,7 +34,7 @@ class AnnotationValueMappingRule {
 		Map<String, AnnotationMappingRule> mappingsWithId) {
 
 		//existing value (without considering defaults!)
-		val existingValue = annotation.getValueWithoutDefault(name)
+		val existingValue = annotation?.getValueWithoutDefault(name)
 		
 		if(!activationRule.apply){
 			return existingValue
@@ -61,7 +61,7 @@ class AnnotationValueMappingRule {
 			if (!value.nullOrEmpty) {
 				coerceAnnotationValue(value, avType)
 			} else if (!annotationMappingId.nullOrEmpty){
-				val annotationMapping = mappingsWithId.get(annotationMappingId)
+				val annotationMapping = mappingsWithId?.get(annotationMappingId)
 				if(annotationMapping==null){
 					throw new IllegalArgumentException('''AnnotationMapping with id «annotationMappingId» not found.''')
 				}
