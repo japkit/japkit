@@ -10,6 +10,9 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
+import javax.lang.model.type.TypeKind
+import de.stefanocke.japkit.gen.GenArrayType
+import javax.lang.model.type.ArrayType
 
 /**Resolves type references / class selectors from templates and annotations.*/
 class TypeResolver {
@@ -54,6 +57,14 @@ class TypeResolver {
 	}
 
 	def TypeMirror resolveType(TypeMirror selector) {
+		if(selector instanceof ArrayType){
+			new GenArrayType(selector.componentType.resolveType)
+		} else {
+			selector.resolveType_
+		}
+	}
+	
+	def TypeMirror resolveType_(TypeMirror selector) {
 
 		
 		try {
