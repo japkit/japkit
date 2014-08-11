@@ -134,9 +134,9 @@ class TypeResolver {
 					case ClassSelectorKind.GENERATED_CLASS:
 						resolvedSelector.type = currentGeneratedClass?.asType
 					case ClassSelectorKind.SRC_ELEMENT_TYPE:
-						resolvedSelector.type = currentSrcElement.asType
+						resolvedSelector.type = currentSrcElement.srcType
 					case ClassSelectorKind.SRC_ELEMENT_SINGLE_VALUE_TYPE:
-						resolvedSelector.type = currentSrcElement.asType.singleValueType
+						resolvedSelector.type = currentSrcElement.srcType.singleValueType
 					case ClassSelectorKind.TYPE_MIRROR: {
 						resolvedSelector.type = currentAnnotation.value(classSelectorAnnotation.getClassSelectorAvName(te),
 							TypeMirror)
