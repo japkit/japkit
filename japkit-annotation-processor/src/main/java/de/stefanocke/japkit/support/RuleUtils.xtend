@@ -22,6 +22,7 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import static extension de.stefanocke.japkit.support.JavadocUtil.*
 import java.util.regex.Pattern
 import de.stefanocke.japkit.support.el.ElExtensions
+import java.util.Arrays
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -61,8 +62,12 @@ class RuleUtils {
 						'''Src expression «srcExpr» could not be evaluated''', emptyList)
 						
 					if(elements instanceof Iterable<?>){	
-						elements.filterInstanceOf(Element)					
-					} else {
+						elements				
+					}
+					else if(elements?.class.array) {
+						Arrays.asList(elements)
+					} 
+					else {
 						Collections.singleton(elements)
 					} 
 				} 
