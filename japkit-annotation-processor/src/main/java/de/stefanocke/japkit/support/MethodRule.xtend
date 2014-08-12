@@ -52,7 +52,7 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 		val avMapping = metaAnnotation?.value("defaultAnnotationValue", typeof(AnnotationMirror[]))?.map[new AnnotationValueMappingRule(it)]?.singleValue;
 		[m|
 			if (avMapping != null) {
-				avMapping.mapAnnotationValue(null, currentSrcElement, m.returnType, null)
+				avMapping.mapAnnotationValue(null, m.returnType, null)
 			} else if(avFromTemplate!=null) {
 				GenExtensions.copy(avFromTemplate)
 			} else {

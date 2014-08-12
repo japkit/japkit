@@ -25,7 +25,7 @@ val extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 		//Die default impl würde einfach eine schleife drehen. 
 		//Einzelne MemberGeneraatoren wie dieser hier könnten das aber überschreiben.
 		val amr = Collections.singleton(annotationMappingAnnotation.createAnnotationMappingRule)
-		generatedClass.annotationMirrors = mapAnnotations(annotatedClass, amr, 
+		generatedClass.annotationMirrors = mapAnnotations(amr, 
 			new ArrayList(generatedClass.annotationMirrors as List<GenAnnotationMirror>)
 		)
 	}

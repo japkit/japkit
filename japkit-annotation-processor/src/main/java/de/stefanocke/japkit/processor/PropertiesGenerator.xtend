@@ -104,7 +104,7 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 					if (generatedClass.kind == ElementKind.ENUM) {
 						generatedClass.add(
 							new GenEnumConstant(p.name.toUpperCase, null) => [
-								annotationMirrors = mapAnnotations(ruleSourceElement, annotationMappingsForFields)
+								annotationMirrors = mapAnnotations(annotationMappingsForFields)
 							])
 					} else {
 						generatedClass.add(
@@ -123,7 +123,7 @@ class PropertiesGenerator extends MemberGeneratorSupport implements MemberGenera
 					val genField = new GenField(p.name, p.type) => [
 						modifiers = fieldModifiers.toSet
 						annotationMirrors = overrideAnnotations(overrideElement,
-							mapAnnotations(ruleSourceElement, annotationMappingsForFields))
+							mapAnnotations(annotationMappingsForFields))
 						comment = srcComment
 					//TODO: Make configurable whether just to use an @see here.
 					]

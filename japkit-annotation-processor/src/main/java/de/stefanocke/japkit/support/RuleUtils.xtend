@@ -184,7 +184,7 @@ class RuleUtils {
 						
 			if(mappings.nullOrEmpty) return existingAnnotationsAndTemplateAnnotations
 			
-			mapAnnotations(currentSrcElement, mappings, existingAnnotationsAndTemplateAnnotations)
+			mapAnnotations(mappings, existingAnnotationsAndTemplateAnnotations)
 		]
 	}
 	

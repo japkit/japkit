@@ -237,7 +237,7 @@ class ClassGeneratorSupport {
 		List<GenAnnotationMirror> existingAnnotations) {
 		val annotationMappings = triggerAnnotation.valueOrMetaValue(annotatedClass, "annotationMappings", typeof(AnnotationMirror[]),
 			genClassAnnotation).map[createAnnotationMappingRule(it)]
-		mapAnnotations(annotatedClass, annotationMappings, existingAnnotations)
+		mapAnnotations(annotationMappings, existingAnnotations)
 	}
 	
 	def protected setModifiers(GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, AnnotationMirror genClassAnnotation) {

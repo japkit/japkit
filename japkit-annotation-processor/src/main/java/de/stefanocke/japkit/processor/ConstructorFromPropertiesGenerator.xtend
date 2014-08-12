@@ -15,6 +15,8 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.support.el.ELSupport
+import de.stefanocke.japkit.support.ExtensionRegistry
 
 class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implements MemberGenerator {
 
@@ -147,8 +149,13 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 				}
 
 			}
-			//TODO: Falls es schon einen gleichen Konstruktor gibt, sollen dann die Annotationen hinzugefügt werden?
-			c.annotationMirrors = mapAnnotations(sc, annotationMappings)
+			
+			val extension ELSupport = ExtensionRegistry.get(ELSupport)
+			scope(sc)[
+				//TODO: Falls es schon einen gleichen Konstruktor gibt, sollen dann die Annotationen hinzugefügt werden?
+				c.annotationMirrors = mapAnnotations(annotationMappings)		
+				null	
+			]
 			
 		]
 	}

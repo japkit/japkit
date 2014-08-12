@@ -8,12 +8,14 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import java.util.ArrayList
 import de.stefanocke.japkit.gen.GenExtensions
+import de.stefanocke.japkit.support.el.ELSupport
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	val extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 	val extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 	/**
 	 * Maps annotations from a source element.
@@ -25,25 +27,23 @@ class AnnotationExtensions {
 	 *
 	 * @return the list of generated annotations to be put on the target element. 
 	 */
-	def List<GenAnnotationMirror> mapAnnotations(Element srcElement, Iterable<? extends AnnotationMappingRule> mappings) {
-		mapAnnotations(srcElement, mappings, newArrayList)
+	def List<GenAnnotationMirror> mapAnnotations(Iterable<? extends AnnotationMappingRule> mappings) {
+		mapAnnotations(mappings, newArrayList)
 	}
-	def List<GenAnnotationMirror> mapAnnotations(Element srcElement, Iterable<? extends AnnotationMappingRule> mappings, List<GenAnnotationMirror> existingAnnotations) {
-		if(srcElement == null){
-			return emptyList; //This is okay. For instance, for derived properties, there are no fields to map annotations from...
-		}
+	def List<GenAnnotationMirror> mapAnnotations(Iterable<? extends AnnotationMappingRule> mappings, List<GenAnnotationMirror> existingAnnotations) {
+		
 		try {
 
 			val mappingsWithId = mappings.filter[!id.nullOrEmpty].toMap[id]
 
 			val annotations = existingAnnotations
-			mappings.filter[id.nullOrEmpty].forEach[mapOrCopyAnnotations(annotations, srcElement, mappingsWithId)]
+			mappings.filter[id.nullOrEmpty].forEach[mapOrCopyAnnotations(annotations, mappingsWithId)]
 			annotations
 
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe;
 		} catch (RuntimeException re) {
-			messageCollector.reportError("Error during annotation mapping.", re, srcElement, null, null)
+			messageCollector.reportError("Error during annotation mapping.", re, if(currentSrc instanceof Element) currentSrcElement, null, null)
 			emptyList
 		}
 
