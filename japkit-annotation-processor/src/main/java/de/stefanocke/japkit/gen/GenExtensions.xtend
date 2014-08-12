@@ -16,6 +16,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.support.TypeResolver
 
 class GenExtensions {
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -132,38 +133,43 @@ class GenExtensions {
 		japkitAnnotationPackages.contains(am.annotationAsTypeElement.package.qualifiedName.toString)
 	}
 	
-	val isNoJapkitAnnotationFilter = [AnnotationMirror am | 
+	public val isNoJapkitAnnotationFilter = [AnnotationMirror am | 
 		!(am.isJapkitAnnotation)
 	]	
 	
 	//Copies all annotations but Japkit metaannotations.
 	def copyAnnotations(Element src){
-		src.copyAnnotations(isNoJapkitAnnotationFilter)
+		src.copyAnnotations(isNoJapkitAnnotationFilter, [it])
 	}
 	
-	def static copyAnnotations(Element src, (AnnotationMirror)=>boolean filter){
-		new ArrayList(src.annotationMirrors.filter(filter).map[copy].toList)
+	def copyAnnotations(Element src, (AnnotationMirror)=>boolean filter, (Object)=>Object valueTransformer){
+		new ArrayList(src.annotationMirrors.filter(filter).map[copy(valueTransformer)].toList)
 	}
+	
 	
 	def static GenAnnotationMirror copy(AnnotationMirror am){
+		copy(am, [it])
+	}
+	
+	def static GenAnnotationMirror copy(AnnotationMirror am, (Object)=>Object valueTransformer ){
 		new GenAnnotationMirror(am.annotationType) => [ 
-			am.elementValues.entrySet.forEach[avEntry | setValue(avEntry.key.simpleName.toString, avEntry.value.copy)]
+			am.elementValues.entrySet.forEach[avEntry | setValue(avEntry.key.simpleName.toString, avEntry.value.copy(valueTransformer))]
 		]
 	}
 	
-	def static GenAnnotationValue copy(AnnotationValue av){
-		new GenAnnotationValue(av.value.copyAvValue)
+	def static GenAnnotationValue copy(AnnotationValue av,(Object)=>Object valueTransformer ){
+		new GenAnnotationValue(av.value.copyAvValue(valueTransformer))
 	}
 	
-	def static dispatch copyAvValue(List<? extends AnnotationValue> values){
-		new ArrayList(values.map[copy])
+	def static dispatch copyAvValue(List<? extends AnnotationValue> values, (Object)=>Object valueTransformer ){
+		new ArrayList(values.map[copy(valueTransformer)])
 	}
 	
-	def static dispatch copyAvValue(AnnotationMirror v){
-		v.copy
+	def static dispatch copyAvValue(AnnotationMirror v, (Object)=>Object valueTransformer ){
+		v.copy(valueTransformer)
 	}
 	
-	def static dispatch copyAvValue(Object v){
+	def static dispatch copyAvValue(Object v, (Object)=>Object valueTransformer ){
 		
 		//In Eclipse, annotation values with errors are returned as "<error>". F.e. constant values that use not-(yet)-existing types. 
 		//TODO: Same in javac?
@@ -171,6 +177,19 @@ class GenExtensions {
 		if(v == "<error>" ){
 			throw new TypeElementNotFoundException();
 		}
-		return v
+		
+		return valueTransformer.apply(v)	
+		
 	}
+	
+	//Transformer to be used when copying annotations from templates. Resolves types and evaluates expressions.
+	public val static templateAnnotationValueTransformer = [
+		if(it instanceof TypeMirror){
+			ExtensionRegistry.get(TypeResolver).resolveType(it)
+		} else if(it instanceof String){
+			it 
+		}  else {
+			it
+		}
+	]
 }

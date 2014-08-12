@@ -54,7 +54,7 @@ class RuleUtils {
 
 		[|
 			val srcElements = if (srcExpr.nullOrEmpty) {
-					Collections.singleton(currentSrcElement) //Use parent's src. 
+					Collections.singleton(currentSrc) //Use parent's src. 
 				} else {
 					val elements = eval(srcExpr, srcLang, Object,
 						'''Src expression «srcExpr» could not be evaluated''', emptyList)
@@ -180,7 +180,7 @@ class RuleUtils {
 		
 		[ genElement|
 			val existingAnnotationsAndTemplateAnnotations = new ArrayList(genElement.annotationMirrors.map[it as GenAnnotationMirror])
-			existingAnnotationsAndTemplateAnnotations.addAll(template?.copyAnnotations ?: emptyList)
+			existingAnnotationsAndTemplateAnnotations.addAll(template?.copyAnnotations(isNoJapkitAnnotationFilter, GenExtensions.templateAnnotationValueTransformer) ?: emptyList)
 						
 			if(mappings.nullOrEmpty) return existingAnnotationsAndTemplateAnnotations
 			
