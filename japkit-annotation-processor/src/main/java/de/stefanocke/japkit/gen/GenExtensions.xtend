@@ -17,6 +17,7 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 import de.stefanocke.japkit.support.TypeResolver
+import de.stefanocke.japkit.support.RuleUtils
 
 class GenExtensions {
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -183,11 +184,11 @@ class GenExtensions {
 	}
 	
 	//Transformer to be used when copying annotations from templates. Resolves types and evaluates expressions.
-	public val static templateAnnotationValueTransformer = [
+	public val static (Object)=>Object templateAnnotationValueTransformer = [
 		if(it instanceof TypeMirror){
 			ExtensionRegistry.get(TypeResolver).resolveType(it)
 		} else if(it instanceof String){
-			it 
+			ExtensionRegistry.get(RuleUtils).replaceExpressionInTemplate(it, true, null)?.toString //TODO: make lang configurable
 		}  else {
 			it
 		}

@@ -127,21 +127,29 @@ class RuleUtils {
 	
 	public static val NO_NAME = [|null as String]
 	
+	//There are some places in templates besides the meta-annotations where expressions or EL variables can be used:
+	//- Names of elements (methods, fields, params, ...).  (only variables)
+	//- String annotation values
+	//They have to be enclosed in $...$ there.
+	static val expressionInTemplate = Pattern.compile('''\$(.+?)\$''')
 	
-	static val varInTemplateName = Pattern.compile('''\$(.+?)\$''')
-	
-	private def replaceVarsInTemplateName(CharSequence templateName) {
+	public def replaceExpressionInTemplate(CharSequence template, boolean canBeExpression, String lang) {
 		
 		val vs = ExtensionRegistry.get(ELSupport).valueStack
-		val matcher = varInTemplateName.matcher(templateName)
+		val matcher = expressionInTemplate.matcher(template)
 		val	sb = new StringBuffer();
 		while (matcher.find()) {
-			val varName = matcher.group(1)
-			val value = if(varName=="srcElementName") currentSrcElement.simpleName.toString 
-				else  vs.get(varName)?.toString ?: {
-					reportError('''Variable «varName» in template name «templateName» could not be resolved.''', null, null, null)
-					varName
-				}
+			val expr = matcher.group(1)
+			val value = if(!canBeExpression){
+				//only variable names allowed, no expression
+				if(expr=="srcElementName") currentSrcElement.simpleName.toString 
+					else  vs.get(expr)?.toString ?: {
+						reportError('''Variable «expr» in "«template»"" could not be resolved.''', null, null, null)
+						expr
+					}			
+			} else {
+				eval(expr, lang, String, '''Expression «expr» in "«template»"" could not be resolved.''', expr) 
+			}
 			matcher.appendReplacement(sb, value);
 		}
 		matcher.appendTail(sb);
@@ -157,7 +165,7 @@ class RuleUtils {
 		val nameLang = metaAnnotation?.value("nameLang".withPrefix(avPrefix), String);
 
 		[ |
-			val nameFromTemplateResolved = nameFromTemplate?.replaceVarsInTemplateName?.toString
+			val nameFromTemplateResolved = nameFromTemplate?.replaceExpressionInTemplate(false, null)?.toString
 			val result = if (!nameExpr.nullOrEmpty) {
 				eval(nameExpr, nameLang, String, '''Member name could not be generated''',
 					nameFromTemplateResolved ?: 'invalidMemberName')
