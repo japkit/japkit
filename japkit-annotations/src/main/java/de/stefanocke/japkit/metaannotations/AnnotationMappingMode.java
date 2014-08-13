@@ -39,11 +39,4 @@ public enum AnnotationMappingMode {
 	 */
 	IGNORE,
 
-	/**
-	 * The annotation is used as annotation value within another annotation.
-	 * (Note: For this, it would be more consistent to allow AnnotationMappinngs
-	 * as values within AVMapping. However, this is not possible,
-	 * since the JLS forbids such recursive use of annotations)
-	 */
-	AS_ANNOTATION_VALUE
 }

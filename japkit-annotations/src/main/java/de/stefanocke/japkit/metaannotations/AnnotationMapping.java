@@ -72,25 +72,6 @@ public @interface AnnotationMapping {
 
 	AnnotationMappingMode mode() default AnnotationMappingMode.ERROR_IF_EXISTS;
 
-	/**
-	 * For mode AnnotationMappingMode.AS_ANNOTATION_VALUE: The annotation in
-	 * where to add / set the target annotation as annotation value. If it does
-	 * not exist (yet), it is created.
-	 */
-	Class<? extends Annotation> asAvAnnotation() default DefaultAnnotation.class;
-
-	/**
-	 * For mode AnnotationMappingMode.AS_ANNOTATION_VALUE: The name of the
-	 * annotation value where to add / set the target annotation.
-	 */
-	String asAvAnnotationValueName() default "value";
-
-	/**
-	 * For mode AnnotationMappingMode.AS_ANNOTATION_VALUE: the annotation value
-	 * mapping mode.
-	 * 
-	 */
-	AVMappingMode asAvMode() default AVMappingMode.ERROR_IF_EXISTS;
 	
 	@interface List {
 		AnnotationMapping[] value();
