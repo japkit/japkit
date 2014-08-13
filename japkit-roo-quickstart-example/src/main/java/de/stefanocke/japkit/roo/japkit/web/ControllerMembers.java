@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
-import de.stefanocke.japkit.metaannotations.AVMapping;
-import de.stefanocke.japkit.metaannotations.AnnotationMapping;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Param;
 import de.stefanocke.japkit.metaannotations.Template;
@@ -24,8 +22,9 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 
 @Controller
+@RequestMapping("/$path$")
 @RuntimeMetadata
-@Template(annotationMappings=@AnnotationMapping(targetAnnotation = RequestMapping.class, valueMappings = @AVMapping(name = "value", expr = "/#{path}")))
+@Template()
 public abstract class ControllerMembers {
 	
 	/**
