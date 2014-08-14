@@ -158,7 +158,7 @@ public @interface InnerClass {
 	 * @author stefan
 	 *
 	 */
-	@ClassSelector(kind=ClassSelectorKind.INNER_CLASS_NAME, avName="behaviorInnerClassName", expr="#{currentGenClass.simpleName}Behavior")
+	@ClassSelector(kind=ClassSelectorKind.INNER_CLASS_NAME, expr="#{currentGenClass.simpleName}Behavior")
 	public interface InnerClassBehaviorInnerClass{}
 
 

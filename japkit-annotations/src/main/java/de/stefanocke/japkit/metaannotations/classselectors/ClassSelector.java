@@ -38,5 +38,9 @@ public @interface ClassSelector {
 	
 	String lang() default "";
 	
-	
+	/**
+	 * 
+	 * @return for {@link ClassSelectorKind#INNER_CLASS_NAME} only: the enclosing class. Default is the annotated class.
+	 */
+	Class<?> enclosing() default AnnotatedClass.class;
 }

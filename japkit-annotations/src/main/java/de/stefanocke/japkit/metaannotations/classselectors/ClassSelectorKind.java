@@ -5,11 +5,10 @@ public enum ClassSelectorKind{
 	/**The class is given by an annotation value of type Class.*/
 	TYPE_MIRROR,
 	
-	/**The class is an inner class of the annotated class. The annotation value is the name of the inner class*/
+	/**The class is an inner class of the given enclosing class. The result of the expression is the name of the inner class. 
+	 * If no expression is set, the name of the class is used, where this annotation is located at.*/
 	INNER_CLASS_NAME,
 	
-	/**The class is an inner class of the generated class. The annotation value is the name of the inner class*/
-	GEN_INNER_CLASS_NAME,
 	
 	/**No class selected.
 	 * <p>

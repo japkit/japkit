@@ -1,5 +1,6 @@
 package de.stefanocke.japkit.support
 
+import de.stefanocke.japkit.gen.GenArrayType
 import de.stefanocke.japkit.gen.GenClass
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind
@@ -7,12 +8,10 @@ import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.type.TypeKind
-import de.stefanocke.japkit.gen.GenArrayType
-import javax.lang.model.type.ArrayType
 
 /**Resolves type references / class selectors from templates and annotations.*/
 class TypeResolver {
@@ -23,7 +22,7 @@ class TypeResolver {
 	extension ELSupport =  ExtensionRegistry.get(ELSupport)
 	MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	
-	def resolveType(
+	def TypeMirror resolveType(
 		AnnotationMirror metaAnnotation,
 		String typeAvName,
 		String typeArgsAvName
@@ -34,7 +33,7 @@ class TypeResolver {
 		)
 	}
 	
-	def private createTypeIfNecessary(TypeMirror type, List<TypeMirror> typeArgs) {
+	def private TypeMirror createTypeIfNecessary(TypeMirror type, List<? extends TypeMirror> typeArgs) {
 		if (type == null || typeArgs.nullOrEmpty || !(type instanceof DeclaredType)) {
 			type
 		} else {
@@ -42,14 +41,14 @@ class TypeResolver {
 		}
 	}
 
-	def resolveType(AnnotationMirror metaAnnotation, String typeAvName) { 
+	def TypeMirror resolveType(AnnotationMirror metaAnnotation, String typeAvName) { 
 
 		val selector = currentAnnotation.valueOrMetaValue(typeAvName, TypeMirror, metaAnnotation)
 		selector.resolveType
 
 	}
 
-	def resolveTypes(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
+	def List<? extends TypeMirror> resolveTypes(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
 
 		val selectors = currentAnnotation.valueOrMetaValue(typeArgsAvName, typeof(TypeMirror[]), metaAnnotation)
 		selectors.map(s|s.resolveType)
@@ -117,7 +116,7 @@ class TypeResolver {
 	/**
 	 * If the type element is annotated with @ClassSelector, the selector is resolved.
 	 */
-	def private resolveClassSelector(TypeMirror type, boolean throwTypeElementNotFound) {
+	def private ResolvedClassSelector resolveClassSelector(TypeMirror type, boolean throwTypeElementNotFound) {
 
 		val resolvedSelector = new ResolvedClassSelector
 		resolvedSelector.type = type
@@ -156,13 +155,10 @@ class TypeResolver {
 						}	
 					}
 					case ClassSelectorKind.INNER_CLASS_NAME:
-					{	val enclosingClass = currentAnnotatedClass
-						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te, enclosingClass, throwTypeElementNotFound)	
+					{	
+						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te, throwTypeElementNotFound)	
 					}
-					case ClassSelectorKind.GEN_INNER_CLASS_NAME:
-					{	val enclosingClass = currentGeneratedClass
-						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te, enclosingClass, throwTypeElementNotFound)	
-					}
+					
 					case ClassSelectorKind.EXPR : {
 						resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, TypeMirror)
 					}
@@ -181,18 +177,32 @@ class TypeResolver {
 		resolvedSelector
 	}
 	
-	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector, AnnotationMirror classSelectorAnnotation, TypeElement te, TypeElement enclosingClass, boolean throwTypeElementNotFound) {
-		resolvedSelector.innerClassName = currentAnnotation.value(currentAnnotatedClass, classSelectorAnnotation.getClassSelectorAvName(te), String)
-			
-		if(resolvedSelector.innerClassName == null){
-			resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, String)
-		} 
-		resolvedSelector.typeElement = findInnerClass(enclosingClass, resolvedSelector.innerClassName, throwTypeElementNotFound)
+	private def getEnclosingTypeElement(AnnotationMirror classSelectorAnnotation) {
+		val enclosing = classSelectorAnnotation.value("enclosing", TypeMirror)?.resolveType?.asTypeElement
+		enclosing
+	}
+	
+	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector, AnnotationMirror classSelectorAnnotation, TypeElement te, boolean throwTypeElementNotFound) {
+		resolvedSelector.enclosingTypeElement = getEnclosingTypeElement(classSelectorAnnotation)
+		if(resolvedSelector.enclosingTypeElement==null){
+			messageCollector.reportError('''Could not determine enclosing type element for inner class.''',
+							currentAnnotatedClass, currentAnnotation, null)
+			return
+		}
+		resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, String)
+		
+		//simple name of the type template as fallback
+		if(resolvedSelector.innerClassName==null){
+			resolvedSelector.innerClassName=te.simpleName.toString
+		}
+		
+		resolvedSelector.typeElement = findInnerClass(resolvedSelector.enclosingTypeElement , resolvedSelector.innerClassName, throwTypeElementNotFound)
 		resolvedSelector.type = resolvedSelector.typeElement?.asType
 	}
 	
 	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, Class<T> targetType) {
 		val expr = classSelectorAnnotation.value("expr", String);
+		if(expr.nullOrEmpty) return null
 		val lang = classSelectorAnnotation.value("lang", String);
 		ExtensionRegistry.get(ELSupport).eval(expr, lang, targetType,
 			'''Error when evaluating class selector expression '«expr»'  ''', null			
@@ -265,7 +275,7 @@ class TypeResolver {
 			} else if(selectorKind == ClassSelectorKind.INNER_CLASS_NAME){
 				
 					val proxy = new GenClass(resolved.innerClassName)
-					proxy.setEnclosingElement(currentAnnotatedClass)
+					proxy.setEnclosingElement(resolved.enclosingTypeElement )
 					proxy -> resolved.typeElement
 				
 			} else {

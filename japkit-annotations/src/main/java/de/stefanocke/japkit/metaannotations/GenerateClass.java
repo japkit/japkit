@@ -116,15 +116,11 @@ public @interface GenerateClass {
 	 */
 	boolean customBehavior() default false;
 
-	Class<?> behaviorClass() default BehaviorInnerClass.class;
-
 	/**
 	 * 
-	 * @return the name of the user written Behavior class, when it is an inner
-	 *         class of the annotated class (behaviorClass ==
-	 *         BehaviorInnerClass.class)
+	 * @return the behavior class. By default, it is an inner class of the annotated class with the name "Behavior". 
 	 */
-	String behaviorInnerClassName() default "Behavior";
+	Class<?> behaviorClass() default BehaviorInnerClass.class;
 
 	/**
 	 * 
