@@ -143,7 +143,7 @@ class TypesExtensions /**implements Types*/{
 	
 	
 	
-	def dispatch singleValueType(DeclaredType type) {
+	def dispatch TypeMirror singleValueType(DeclaredType type) {
 		if(type.collection){
 			type.getRequiredTypeArg(0)
 		} else if(type.map) {
@@ -153,7 +153,11 @@ class TypesExtensions /**implements Types*/{
 		}
 	}
 	
-	def dispatch singleValueType(TypeMirror type) {
+	def dispatch TypeMirror singleValueType(ArrayType type) {
+		type.componentType.singleValueType
+	}
+	
+	def dispatch TypeMirror singleValueType(TypeMirror type) {
 		type
 	}
 
