@@ -33,9 +33,7 @@ class AnnotationMappingRule {
 	DeclaredType targetAnnotation
 	AnnotationValueMappingRule[] valueMappings
 	AnnotationMappingMode mode
-	DeclaredType asAvAnnotation
-	String asAvAnnotationValueName
-	AVMappingMode asAvMode
+
 	Set<String> copyAnnotationsFqns
 	String[] copyAnnotationsFromPackages
 	boolean setShadowOnTriggerAnnotations
@@ -178,9 +176,7 @@ class AnnotationMappingRule {
 		_valueMappings = am.value("valueMappings", typeof(AnnotationMirror[])).map[
 			new AnnotationValueMappingRule(it)]
 		_mode = am.value("mode", AnnotationMappingMode)
-		_asAvAnnotation = am.value("asAvAnnotation", DeclaredType)
-		_asAvAnnotationValueName = am.value("asAvAnnotationValueName", String)
-		_asAvMode = am.value("asAvMode", AVMappingMode)
+		
 		_copyAnnotationsFqns = am.value("copyAnnotations", typeof(DeclaredType[])).map[qualifiedName].toSet
 		_copyAnnotationsFromPackages = am.value("copyAnnotationsFromPackages", typeof(String[]))
 		_setShadowOnTriggerAnnotations = am.value("setShadowOnTriggerAnnotations", Boolean)
