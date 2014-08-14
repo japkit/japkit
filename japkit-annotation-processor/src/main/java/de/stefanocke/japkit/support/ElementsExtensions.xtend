@@ -67,6 +67,14 @@ class ElementsExtensions {
 	def dispatch srcType(Element e) {
 		e.asType
 	}
+	
+	def dispatch srcType(TypeMirror t) {
+		t
+	}
+	
+	def dispatch srcType(Object o) {
+		mc.reportError('''Cannot determine type for source «o», since it is neither a type nor an element.''', null,null,null)
+	}
 
 	def declaredFields(TypeElement type) {
 		fieldsIn(type.enclosedElements).sortBy[ordinalNumber]

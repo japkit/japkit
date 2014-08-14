@@ -12,6 +12,7 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
+import javax.lang.model.element.Element
 
 /**Resolves type references / class selectors from templates and annotations.*/
 class TypeResolver {
@@ -143,10 +144,10 @@ class TypeResolver {
 						resolvedSelector.type = currentAnnotatedClass?.asType
 					case ClassSelectorKind.GENERATED_CLASS:
 						resolvedSelector.type = currentGeneratedClass?.asType
-					case ClassSelectorKind.SRC_ELEMENT_TYPE:
-						resolvedSelector.type = currentSrcElement.srcType
-					case ClassSelectorKind.SRC_ELEMENT_SINGLE_VALUE_TYPE:
-						resolvedSelector.type = currentSrcElement.srcType.singleValueType
+					case ClassSelectorKind.SRC_TYPE:
+						resolvedSelector.type = currentSrc.srcType
+					case ClassSelectorKind.SRC_SINGLE_VALUE_TYPE:
+						resolvedSelector.type = currentSrc.srcType?.singleValueType
 					case ClassSelectorKind.TYPE_MIRROR: {
 						resolvedSelector.type = currentAnnotation.value(classSelectorAnnotation.getClassSelectorAvName(te),
 							TypeMirror)
@@ -176,6 +177,7 @@ class TypeResolver {
 
 		resolvedSelector
 	}
+	
 	
 	private def getEnclosingTypeElement(AnnotationMirror classSelectorAnnotation) {
 		val enclosing = classSelectorAnnotation.value("enclosing", TypeMirror)?.resolveType?.asTypeElement

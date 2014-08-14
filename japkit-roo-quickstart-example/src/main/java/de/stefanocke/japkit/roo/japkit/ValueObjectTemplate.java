@@ -23,7 +23,7 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
-import de.stefanocke.japkit.metaannotations.classselectors.SrcElementType;
+import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 
 
 @RuntimeMetadata
@@ -63,7 +63,7 @@ public abstract class ValueObjectTemplate {
 					fluent=true,
 					surroundReturnExprFragments = "defensiveCopyFragment",
 					commentExpr = "Getter for #{src.simpleName}. \n@returns #{src.simpleName}\n"))
-	private SrcElementType $srcElementName$;
+	private SrcType $srcElementName$;
 
 	@Constructor(bodyCode="//Some ctor code")
 	private ValueObjectTemplate (){};

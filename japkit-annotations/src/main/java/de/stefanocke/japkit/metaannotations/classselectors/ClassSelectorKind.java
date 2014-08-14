@@ -26,14 +26,14 @@ public enum ClassSelectorKind{
 	GENERATED_CLASS,
 	
 	/**
-	 * To refer to the type of the current rule source element.
+	 * To refer to the type of the current source element or (if the source is a type itself) the source.
 	 */
-	SRC_ELEMENT_TYPE,
+	SRC_TYPE,
 	
 	/**
 	 * To refer to the type of the current rule source element. In case of a collection, the element type is used. In case of a map, the value type is used.
 	 */
-	SRC_ELEMENT_SINGLE_VALUE_TYPE,
+	SRC_SINGLE_VALUE_TYPE,
 	
 	/**
 	 * An EL expression is used to determine the type.
