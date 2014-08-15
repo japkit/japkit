@@ -1,6 +1,7 @@
 package de.stefanocke.japkit.metaannotations;
 
-public @interface AVMapping {
+/**Annotation value.*/
+public @interface AV {
 	
 	/**
 	 * By default, this annotation mapping is active an will copy or map the AV.
@@ -48,5 +49,5 @@ public @interface AVMapping {
 	 */
 	String annotationMappingId() default "";
 
-	AVMappingMode mode() default AVMappingMode.ERROR_IF_EXISTS;
+	AVMode mode() default AVMode.ERROR_IF_EXISTS;
 }

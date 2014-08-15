@@ -4,10 +4,10 @@ import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
 import static javax.lang.model.element.ElementKind.METHOD;
 import de.stefanocke.japkit.annotations.RuntimeMetadata.Element;
 import de.stefanocke.japkit.annotations.RuntimeMetadata.List;
-import de.stefanocke.japkit.metaannotations.AVMapping;
-import de.stefanocke.japkit.metaannotations.AVMappingMode;
+import de.stefanocke.japkit.metaannotations.AV;
+import de.stefanocke.japkit.metaannotations.AVMode;
 import de.stefanocke.japkit.metaannotations.Annotation;
-import de.stefanocke.japkit.metaannotations.AnnotationMappingMode;
+import de.stefanocke.japkit.metaannotations.AnnotationMode;
 import de.stefanocke.japkit.metaannotations.GenerateClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Var;
@@ -15,13 +15,13 @@ import de.stefanocke.japkit.metaannotations.Var;
 @Var(name="srcClass", triggerAV="srcClass", setInShadowAnnotation=true, expr="#{currentAnnotatedClass.asType()}")
 @GenerateClass(nameSuffixToAppend=RuntimeMetadata.CLASS_SUFFIX, annotations={
 	@Annotation(id="elementMetadata", targetAnnotation=Element.class, 
-			valueMappings={
-				@AVMapping(name="id", expr="#{elements.uniqueName(src)}"), //TODO: uniqueId
-				@AVMapping(name="comment", expr="#{elements.getDocComment(src)}"),
-				@AVMapping(activation=@Matcher(kind={METHOD, CONSTRUCTOR}), name="paramNames", expr="#{src.parameters}")
+			values={
+				@AV(name="id", expr="#{elements.uniqueName(src)}"), //TODO: uniqueId
+				@AV(name="comment", expr="#{elements.getDocComment(src)}"),
+				@AV(activation=@Matcher(kind={METHOD, CONSTRUCTOR}), name="paramNames", expr="#{src.parameters}")
 		}),
-	@Annotation(targetAnnotation=List.class, mode=AnnotationMappingMode.MERGE, 
-		valueMappings=@AVMapping(name = "value", expr="#{elements.elementAndAllEnclosedElements(src)}", mode=AVMappingMode.JOIN_LIST, annotationMappingId="elementMetadata"))
+	@Annotation(targetAnnotation=List.class, mode=AnnotationMode.MERGE, 
+		values=@AV(name = "value", expr="#{elements.elementAndAllEnclosedElements(src)}", mode=AVMode.JOIN_LIST, annotationMappingId="elementMetadata"))
 })
 
 public @interface RuntimeMetadata {

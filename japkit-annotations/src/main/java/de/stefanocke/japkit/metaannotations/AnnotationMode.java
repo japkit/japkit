@@ -5,7 +5,7 @@ package de.stefanocke.japkit.metaannotations;
  * @author stefan
  * 
  */
-public enum AnnotationMappingMode {
+public enum AnnotationMode {
 	/**
 	 * If the same annotation exists (due to previous mapping rule or due to
 	 * "copy"), it is an error.
@@ -15,7 +15,7 @@ public enum AnnotationMappingMode {
 	/**
 	 * If the same annotation exists, it is re-used and the value mappings will
 	 * be applied according to their mapping modes. (See
-	 * {@link AVMappingMode})
+	 * {@link AVMode})
 	 */
 	MERGE,
 

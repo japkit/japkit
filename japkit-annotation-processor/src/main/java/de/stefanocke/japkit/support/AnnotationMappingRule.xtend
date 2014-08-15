@@ -2,8 +2,7 @@ package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenExtensions
-import de.stefanocke.japkit.metaannotations.AVMappingMode
-import de.stefanocke.japkit.metaannotations.AnnotationMappingMode
+import de.stefanocke.japkit.metaannotations.AnnotationMode
 import de.stefanocke.japkit.metaannotations.DefaultAnnotation
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
@@ -14,7 +13,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
 
-import static de.stefanocke.japkit.metaannotations.AnnotationMappingMode.*
+import static de.stefanocke.japkit.metaannotations.AnnotationMode.*
 
 @Data
 class AnnotationMappingRule {
@@ -32,7 +31,7 @@ class AnnotationMappingRule {
 	()=>boolean activationRule
 	DeclaredType targetAnnotation
 	AnnotationValueMappingRule[] valueMappings
-	AnnotationMappingMode mode
+	AnnotationMode mode
 
 	Set<String> copyAnnotationsFqns
 	String[] copyAnnotationsFromPackages
@@ -141,17 +140,17 @@ class AnnotationMappingRule {
 		
 		}
 		
-		val annotation = am
+		val anno = am
 		
 		scope [ 
-			valueStack.put("targetAnnotation", annotation)
+			valueStack.put("targetAnnotation", anno)
 		
-			annotation => [
+			anno => [
 				valueMappings.forEach [ vm |
 					try {
 						setValue(vm.name,
 							[ avType |
-								vm.mapAnnotationValue(annotation, avType, mappingsWithId)
+								vm.mapAnnotationValue(anno, avType, mappingsWithId)
 							])
 			
 					} catch (RuntimeException e) {
@@ -173,9 +172,9 @@ class AnnotationMappingRule {
 		_id = am.value("id", String)
 		_activationRule = createActivationRule(am, null)
 		_targetAnnotation = am.value("targetAnnotation", DeclaredType)
-		_valueMappings = am.value("valueMappings", typeof(AnnotationMirror[])).map[
+		_valueMappings = am.value("values", typeof(AnnotationMirror[])).map[
 			new AnnotationValueMappingRule(it)]
-		_mode = am.value("mode", AnnotationMappingMode)
+		_mode = am.value("mode", AnnotationMode)
 		
 		_copyAnnotationsFqns = am.value("copyAnnotations", typeof(DeclaredType[])).map[qualifiedName].toSet
 		_copyAnnotationsFromPackages = am.value("copyAnnotationsFromPackages", typeof(String[]))

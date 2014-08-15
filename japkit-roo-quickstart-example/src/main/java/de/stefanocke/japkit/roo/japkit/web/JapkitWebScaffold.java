@@ -11,10 +11,10 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import de.stefanocke.japkit.metaannotations.AVMapping;
-import de.stefanocke.japkit.metaannotations.AVMappingMode;
+import de.stefanocke.japkit.metaannotations.AV;
+import de.stefanocke.japkit.metaannotations.AVMode;
 import de.stefanocke.japkit.metaannotations.Annotation;
-import de.stefanocke.japkit.metaannotations.AnnotationMappingMode;
+import de.stefanocke.japkit.metaannotations.AnnotationMode;
 import de.stefanocke.japkit.metaannotations.GenerateClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Members;
@@ -86,8 +86,8 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		
 		modifier = Modifier.PUBLIC,
 		annotations = {
-				@Annotation(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMappingMode.MERGE,
-						valueMappings = { @AVMapping(name = "propertyNames", mode = AVMappingMode.IGNORE,
+				@Annotation(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMode.MERGE,
+						values = { @AV(name = "propertyNames", mode = AVMode.IGNORE,
 								expr = "viewProperties.collect{it.name}", lang = "GroovyScript"), })},
 		members = {
 				@Members(ControllerMembers.class),

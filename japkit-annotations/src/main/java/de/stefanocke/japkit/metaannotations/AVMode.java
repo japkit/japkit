@@ -1,6 +1,6 @@
 package de.stefanocke.japkit.metaannotations;
 
-public enum AVMappingMode {
+public enum AVMode {
 	/**
 	 * If the annotation value already exists (due to previous mapping rule or due to
 	 * "copy"), it is an error.

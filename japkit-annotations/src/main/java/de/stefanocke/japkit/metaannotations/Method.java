@@ -249,7 +249,7 @@ public @interface Method {
 	 * If the method is an annotation value declaration, this is the default value. 
 	 * @return
 	 */
-	AVMapping[] defaultAnnotationValue() default {}; 
+	AV[] defaultAnnotationValue() default {}; 
 
 	/**
 	 * If dependent members are created, the generated method by default becomes the src element for the according rules.

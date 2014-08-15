@@ -67,9 +67,9 @@ public @interface Annotation {
 	 * 
 	 * @return mappings for the annotation values
 	 */
-	AVMapping[] valueMappings() default {};
+	AV[] values() default {};
 
-	AnnotationMappingMode mode() default AnnotationMappingMode.ERROR_IF_EXISTS;
+	AnnotationMode mode() default AnnotationMode.ERROR_IF_EXISTS;
 
 	
 	@interface List {
