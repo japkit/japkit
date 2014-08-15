@@ -61,7 +61,7 @@ public @interface DelegateMethods {
 	 * 
 	 * @return the annotation mappings
 	 */
-	_Annotation[] annotations() default {};
+	Annotation[] annotations() default {};
 
 	
 

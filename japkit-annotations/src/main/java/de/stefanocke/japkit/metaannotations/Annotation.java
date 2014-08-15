@@ -1,9 +1,8 @@
 package de.stefanocke.japkit.metaannotations;
 
-import java.lang.annotation.Annotation;
 
 @MemberGeneratorAnnotation
-public @interface _Annotation {
+public @interface Annotation {
 
 	/**
 	 * An identifier to refer to this annotation mapping within annotation value
@@ -33,7 +32,7 @@ public @interface _Annotation {
 	 * 
 	 * @return the annotations to copy from source to target element.
 	 */
-	Class<? extends Annotation>[] copyAnnotations() default {};
+	Class<? extends java.lang.annotation.Annotation>[] copyAnnotations() default {};
 
 	/**
 	 * 
@@ -62,7 +61,7 @@ public @interface _Annotation {
 	 * 
 	 * @return the annotation to be created on the target element.
 	 */
-	Class<? extends Annotation> targetAnnotation() default DefaultAnnotation.class;
+	Class<? extends java.lang.annotation.Annotation> targetAnnotation() default DefaultAnnotation.class;
 
 	/**
 	 * 
@@ -74,6 +73,6 @@ public @interface _Annotation {
 
 	
 	@interface List {
-		_Annotation[] value();
+		Annotation[] value();
 	}
 }

@@ -137,7 +137,7 @@ public @interface ConstructorFromProperties {
 	 * The source element is the called super constructor (might be the default
 	 * constructor).
 	 */
-	_Annotation[] annotations() default {};
+	Annotation[] annotations() default {};
 
 	@interface List {
 		ConstructorFromProperties[] value();

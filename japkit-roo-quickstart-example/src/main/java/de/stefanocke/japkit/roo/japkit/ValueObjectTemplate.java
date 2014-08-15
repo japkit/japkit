@@ -6,7 +6,7 @@ import javax.lang.model.element.Modifier;
 import javax.validation.constraints.NotNull;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
-import de.stefanocke.japkit.metaannotations._Annotation;
+import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.Case;
 import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Constructor;
@@ -44,7 +44,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 public abstract class ValueObjectTemplate {
 	
 	@InnerClass(members=@Members(Builder.class))
-	@Field(src = "#{properties}", modifiers=Modifier.PRIVATE, annotations = @_Annotation(
+	@Field(src = "#{properties}", modifiers=Modifier.PRIVATE, annotations = @Annotation(
 			copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 					"org.springframework.format.annotation" }), getter=@Getter(fluent=true), setter=@Setter(fluent=true, chain=true), commentFromSrc = true)
 	@ClassSelector(kind=ClassSelectorKind.INNER_CLASS_NAME, enclosing=GeneratedClass.class) 
@@ -58,7 +58,7 @@ public abstract class ValueObjectTemplate {
 	}
 	
 	@Field(src = "#{properties}", 
-			annotations = @_Annotation(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
+			annotations = @Annotation(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 					"org.springframework.format.annotation" }), commentFromSrc = true, getter = @Getter(
 					fluent=true,
 					surroundReturnExprFragments = "defensiveCopyFragment",

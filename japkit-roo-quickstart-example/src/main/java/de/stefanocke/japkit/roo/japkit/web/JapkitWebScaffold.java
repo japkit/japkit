@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import de.stefanocke.japkit.metaannotations.AVMapping;
 import de.stefanocke.japkit.metaannotations.AVMappingMode;
-import de.stefanocke.japkit.metaannotations._Annotation;
+import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.AnnotationMappingMode;
 import de.stefanocke.japkit.metaannotations.GenerateClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
@@ -86,7 +86,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		
 		modifier = Modifier.PUBLIC,
 		annotations = {
-				@_Annotation(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMappingMode.MERGE,
+				@Annotation(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMappingMode.MERGE,
 						valueMappings = { @AVMapping(name = "propertyNames", mode = AVMappingMode.IGNORE,
 								expr = "viewProperties.collect{it.name}", lang = "GroovyScript"), })},
 		members = {

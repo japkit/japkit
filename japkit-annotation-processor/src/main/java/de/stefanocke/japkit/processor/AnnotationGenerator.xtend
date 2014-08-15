@@ -9,7 +9,7 @@ import java.util.Collections
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import de.stefanocke.japkit.metaannotations._Annotation
+import de.stefanocke.japkit.metaannotations.Annotation
 
 /**
  * To add additional annotation mappings to the ones defined by @GenerateClass.
@@ -31,7 +31,7 @@ val extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 	}
 
 	override getSupportedMetaAnnotation() {
-		_Annotation.name
+		Annotation.name
 	}
 	
 	override createMemberRule(TypeElement membersClass, AnnotationMirror metaAnnotationToBeProcessed) {

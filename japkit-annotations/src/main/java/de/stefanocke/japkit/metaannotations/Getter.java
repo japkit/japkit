@@ -7,7 +7,7 @@ public @interface Getter {
 	
 	Modifier[] modifiers() default { Modifier.PUBLIC };
 
-	_Annotation[] annotations() default {};
+	Annotation[] annotations() default {};
 	
 	/**
 	 * 

@@ -3,7 +3,7 @@ package de.stefanocke.japkit.roo.japkit;
 import javax.lang.model.element.Modifier;
 import javax.persistence.Entity;
 
-import de.stefanocke.japkit.metaannotations._Annotation;
+import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.GenerateClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Members;
@@ -15,12 +15,12 @@ import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 
 @GenerateClass(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifier = Modifier.PUBLIC,
-		annotations = { @_Annotation(targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class,
+		annotations = { @Annotation(targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class,
 		members = { @Members(IdAndVersion.class), 
 				@Members,
 				@Members(ToString.class),
 				@Members(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"), value = ActiveRecordMembers.class) })
-@Properties(sourceClass = AnnotatedClass.class, fromFields = true, annotations = @_Annotation(copyAnnotationsFromPackages = {
+@Properties(sourceClass = AnnotatedClass.class, fromFields = true, annotations = @Annotation(copyAnnotationsFromPackages = {
 		"javax.persistence", "javax.validation.constraints", "org.springframework.format.annotation" })
 /* ,templates = PropertyTemplateTest.class */)
 @Var(name = "superclass", expr = "#{currentAnnotatedClass.superclass}", requiredTriggerAnnotation=JapkitEntity.class)
