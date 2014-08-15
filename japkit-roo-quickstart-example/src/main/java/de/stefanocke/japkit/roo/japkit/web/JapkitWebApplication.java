@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.roo.japkit.web;
 
 import de.stefanocke.japkit.metaannotations.Var;
-import de.stefanocke.japkit.metaannotations.GenerateClass;
+import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
@@ -15,7 +15,7 @@ import de.stefanocke.japkit.metaannotations.TypeQuery;
 				nameExpr = "application.properties", location = ResourceLocation.WEBINF),
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "menu.jspx", pathExpr = "views",
 				location = ResourceLocation.WEBINF) })
-@GenerateClass()
+@Clazz()
 public @interface JapkitWebApplication {
 	boolean shadow() default false;
 

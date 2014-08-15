@@ -2,13 +2,13 @@ package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenAnnotationValue
-import de.stefanocke.japkit.metaannotations.GenerateClass
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import java.util.ArrayList
 import de.stefanocke.japkit.gen.GenExtensions
 import de.stefanocke.japkit.support.el.ELSupport
+import de.stefanocke.japkit.metaannotations.Clazz
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -95,7 +95,7 @@ class AnnotationExtensions {
 	
 	//TODO: Verallgemeinern. Ggf. @Trigger
 	def isTriggerAnnotation(GenAnnotationMirror am) {
-		am.hasMetaAnnotation(GenerateClass.name)
+		am.hasMetaAnnotation(Clazz.name)
 	}
 	
 	/**

@@ -19,7 +19,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.ANNOTATION_TYPE)
-public @interface GenerateClass {
+public @interface Clazz {
 	
 	/**
 	 * 

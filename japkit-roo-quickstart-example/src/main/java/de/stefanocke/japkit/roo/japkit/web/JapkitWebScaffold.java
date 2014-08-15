@@ -15,7 +15,7 @@ import de.stefanocke.japkit.metaannotations.AV;
 import de.stefanocke.japkit.metaannotations.AVMode;
 import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.AnnotationMode;
-import de.stefanocke.japkit.metaannotations.GenerateClass;
+import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Members;
 import de.stefanocke.japkit.metaannotations.Properties;
@@ -79,7 +79,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 				setInShadowAnnotation = true),
 
 })
-@GenerateClass(
+@Clazz(
 		nameSuffixToRemove = "Def",
 		nameSuffixToAppend = "",
 		//superclassTypeArgs=FormBackingObject.class,

@@ -4,7 +4,7 @@ import javax.lang.model.element.Modifier;
 import javax.persistence.Entity;
 
 import de.stefanocke.japkit.metaannotations.Annotation;
-import de.stefanocke.japkit.metaannotations.GenerateClass;
+import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Members;
 import de.stefanocke.japkit.metaannotations.Properties;
@@ -14,7 +14,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 
-@GenerateClass(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifier = Modifier.PUBLIC,
+@Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifier = Modifier.PUBLIC,
 		annotations = { @Annotation(targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class,
 		members = { @Members(IdAndVersion.class), 
 				@Members,

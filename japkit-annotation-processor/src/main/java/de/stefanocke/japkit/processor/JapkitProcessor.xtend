@@ -4,7 +4,6 @@ import de.stefanocke.japkit.annotations.Behavior
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.gen.JavaEmitter
 import de.stefanocke.japkit.metaannotations.Var
-import de.stefanocke.japkit.metaannotations.GenerateClass
 import de.stefanocke.japkit.support.AnnotationExtensions
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
@@ -35,6 +34,7 @@ import javax.tools.Diagnostic.Kind
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import de.stefanocke.japkit.support.TypeResolver
 import de.stefanocke.japkit.support.el.ELVariableRule
+import de.stefanocke.japkit.metaannotations.Clazz
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -535,7 +535,7 @@ class JapkitProcessor extends AbstractProcessor {
 
 	//TODO: Some Caching.
 	def List<Pair<AnnotationMirror, Boolean>> getTriggerAnnotations(TypeElement annotatedClass) {
-		annotatedClass.annotationsWithMetaAnnotation(GenerateClass).map[it -> it.shadowAnnotation].toList
+		annotatedClass.annotationsWithMetaAnnotation(Clazz).map[it -> it.shadowAnnotation].toList
 	}
 
 	val Set<String> writtenTypeElements = newHashSet

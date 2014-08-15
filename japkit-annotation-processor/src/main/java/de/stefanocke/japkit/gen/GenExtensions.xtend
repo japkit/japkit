@@ -1,7 +1,6 @@
 package de.stefanocke.japkit.gen
 
 import de.stefanocke.japkit.annotations.Order
-import de.stefanocke.japkit.metaannotations.GenerateClass
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.TypeElementNotFoundException
@@ -18,6 +17,7 @@ import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 import de.stefanocke.japkit.support.TypeResolver
 import de.stefanocke.japkit.support.RuleUtils
+import de.stefanocke.japkit.metaannotations.Clazz
 
 class GenExtensions {
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -128,7 +128,7 @@ class GenExtensions {
 	}
 	
 	//do never copy japkit meta-annotations
-	val japkitAnnotationPackages = #{GenerateClass.package.name, Order.package.name}
+	val japkitAnnotationPackages = #{Clazz.package.name, Order.package.name}
 	
 	def boolean isJapkitAnnotation(AnnotationMirror am){
 		japkitAnnotationPackages.contains(am.annotationAsTypeElement.package.qualifiedName.toString)

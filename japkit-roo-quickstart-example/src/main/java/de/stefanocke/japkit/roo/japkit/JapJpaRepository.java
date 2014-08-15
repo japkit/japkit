@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import de.stefanocke.japkit.metaannotations.Annotation;
-import de.stefanocke.japkit.metaannotations.GenerateClass;
+import de.stefanocke.japkit.metaannotations.Clazz;
 
-@GenerateClass(nameSuffixToRemove = "RepositoryDef", nameSuffixToAppend = "Repository", modifier = Modifier.PUBLIC,
+@Clazz(nameSuffixToRemove = "RepositoryDef", nameSuffixToAppend = "Repository", modifier = Modifier.PUBLIC,
 		kind = ElementKind.INTERFACE, interface1 = JpaRepository.class, interface1TypeArgs = { DomainType.class, Long.class },
 		interface2 = JpaSpecificationExecutor.class, interface2TypeArgs = DomainType.class, annotations = @Annotation(
 				targetAnnotation = Repository.class))
