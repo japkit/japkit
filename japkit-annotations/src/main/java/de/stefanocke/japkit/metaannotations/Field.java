@@ -108,7 +108,7 @@ public @interface Field {
 	 * 
 	 * @return the annotation mappings
 	 */
-	AnnotationMapping[] annotationMappings() default {};
+	_Annotation[] annotations() default {};
 
 	/**
 	 * Classes to be imported for the initializer. Allows to use short class

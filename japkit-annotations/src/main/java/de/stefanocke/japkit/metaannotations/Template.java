@@ -41,7 +41,7 @@ public @interface Template {
 	 * 
 	 * @return the annotation mappings
 	 */
-	AnnotationMapping[] annotationMappings() default {};
+	_Annotation[] annotations() default {};
 	
 	/**
 	 * If a Field annotation is set here, it defines default values for all Field annotations within the template.

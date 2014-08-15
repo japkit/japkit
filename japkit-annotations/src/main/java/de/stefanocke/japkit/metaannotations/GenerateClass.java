@@ -101,7 +101,7 @@ public @interface GenerateClass {
 	 * 
 	 * @return the annotation mappings
 	 */
-	AnnotationMapping[] annotationMappings() default {};
+	_Annotation[] annotations() default {};
 	
 	/**
 	 * 

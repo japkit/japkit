@@ -38,7 +38,7 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 		val createInitMethod = annotation.valueOrMetaValue("createInitMethod", Boolean, constructorAnnotation);
 		val initMethodName = annotation.valueOrMetaValue("initMethodName", String, constructorAnnotation);
 		val superConstructorMatchers = annotation.elementMatchers("superConstructors", constructorAnnotation);
-		val annotationMappings = annotation.annotationMappings("annotationMappings", constructorAnnotation);
+		val annotationMappings = annotation.annotationMappings("annotations", constructorAnnotation);
 
 		val propertyFilter = new PropertyFilter(annotation, constructorAnnotation)
 

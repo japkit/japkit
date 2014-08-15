@@ -2,7 +2,6 @@ package de.stefanocke.japkit.processor
 
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.metaannotations.AnnotationMapping
 import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.RuleFactory
 import java.util.ArrayList
@@ -10,6 +9,7 @@ import java.util.Collections
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.metaannotations._Annotation
 
 /**
  * To add additional annotation mappings to the ones defined by @GenerateClass.
@@ -31,7 +31,7 @@ val extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 	}
 
 	override getSupportedMetaAnnotation() {
-		AnnotationMapping.name
+		_Annotation.name
 	}
 	
 	override createMemberRule(TypeElement membersClass, AnnotationMirror metaAnnotationToBeProcessed) {

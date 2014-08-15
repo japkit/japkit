@@ -43,7 +43,7 @@ public @interface Param {
 	 * 
 	 * @return the annotation mappings
 	 */
-	AnnotationMapping[] annotationMappings() default {};
+	_Annotation[] annotations() default {};
 	
 	/** name of the parameter*/
 	String name() default "";

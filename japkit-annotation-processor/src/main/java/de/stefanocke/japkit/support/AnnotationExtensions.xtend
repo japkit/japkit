@@ -23,7 +23,7 @@ class AnnotationExtensions {
 	 * @param srcElement the source element
 	 * @param annotatedClass the annotated class
 	 * @param annotation the annotation that triggered the annotation processor
-	 * @param the meta annotation that contains a value "annotationMappings" which is an array of @AnnotationMapping annotations that specify how to map the annotations.
+	 * @param the meta annotation that contains a value "annotations" which is an array of @_Annotation annotations that specify how to map the annotations.
 	 *
 	 * @return the list of generated annotations to be put on the target element. 
 	 */

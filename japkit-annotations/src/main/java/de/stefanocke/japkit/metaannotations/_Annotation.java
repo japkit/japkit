@@ -3,7 +3,7 @@ package de.stefanocke.japkit.metaannotations;
 import java.lang.annotation.Annotation;
 
 @MemberGeneratorAnnotation
-public @interface AnnotationMapping {
+public @interface _Annotation {
 
 	/**
 	 * An identifier to refer to this annotation mapping within annotation value
@@ -74,6 +74,6 @@ public @interface AnnotationMapping {
 
 	
 	@interface List {
-		AnnotationMapping[] value();
+		_Annotation[] value();
 	}
 }

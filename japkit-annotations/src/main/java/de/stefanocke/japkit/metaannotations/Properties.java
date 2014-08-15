@@ -114,7 +114,7 @@ public @interface Properties {
 	 * 
 	 * @return the annotation mappings.
 	 */
-	AnnotationMapping[] annotationMappings() default {};
+	_Annotation[] annotations() default {};
 
 	/**
 	 * A class to customize the properties. So far, you can override the annotations of the properties.

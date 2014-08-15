@@ -108,7 +108,7 @@ public @interface Method {
 	 * 
 	 * @return the annotation mappings
 	 */
-	AnnotationMapping[] annotationMappings() default {};
+	_Annotation[] annotations() default {};
 
 	/**
 	 * 

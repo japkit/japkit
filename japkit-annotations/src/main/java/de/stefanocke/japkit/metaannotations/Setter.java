@@ -7,9 +7,9 @@ public @interface Setter {
 	
 	Modifier[] modifiers() default { Modifier.PUBLIC };
 
-	AnnotationMapping[] annotationMappings() default {};
+	_Annotation[] annotations() default {};
 	
-	AnnotationMapping[] paramAnnotationMappings() default {};
+	_Annotation[] paramAnnotationMappings() default {};
 	
 	/**
 	 * 

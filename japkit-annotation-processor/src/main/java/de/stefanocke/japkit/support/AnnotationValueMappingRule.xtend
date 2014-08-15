@@ -61,7 +61,7 @@ class AnnotationValueMappingRule {
 			} else if (!annotationMappingId.nullOrEmpty){
 				val annotationMapping = mappingsWithId?.get(annotationMappingId)
 				if(annotationMapping==null){
-					throw new IllegalArgumentException('''AnnotationMapping with id «annotationMappingId» not found.''')
+					throw new IllegalArgumentException('''Annotation rule with id «annotationMappingId» not found.''')
 				}
 				if(expr.nullOrEmpty){
 					
