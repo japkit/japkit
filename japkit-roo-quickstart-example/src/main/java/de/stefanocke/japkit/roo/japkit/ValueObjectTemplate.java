@@ -53,7 +53,7 @@ public abstract class ValueObjectTemplate {
 		@ClassSelector(kind=ClassSelectorKind.EXPR, expr="#{currentGenClass.enclosingElement.asType()}")
 		abstract static class EnclosingClass{}
 		
-		@Method(bodyCode="return new #{currentGenClass.enclosingElement.simpleName}(this);") 
+		@Method(bodyCode="return new #{genElement.returnType.code}(this);") 
 		public abstract EnclosingClass build();
 	}
 	
