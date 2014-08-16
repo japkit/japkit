@@ -181,6 +181,6 @@ public abstract class ControllerMembers {
 	 * </pre>
 	 */
 	@Method
-	abstract void populateEditForm(Model uiModel,  @Param(nameExpr="#{modelAttribute}") FormBackingObject fbo);
+	abstract void populateEditForm(Model uiModel, FormBackingObject $modelAttribute$);
 
 }
