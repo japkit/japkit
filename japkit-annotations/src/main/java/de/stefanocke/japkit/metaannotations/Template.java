@@ -109,10 +109,11 @@ public @interface Template {
 	 * templates for constructors to be generated, even if they have no @Constructor
 	 * annotation. When setting this to false, you have to put @Constructor at
 	 * each constructor that shall be a template. Other constructors are
-	 * ignored. The default is false, since true would always consider the
-	 * default constructor of the template class as a template.
+	 * ignored. <p>
+	 * If a default constructor shall be generated, it is always required to annotate the template with @Constructor.
+	 * (Otherwise, the implicit constructors of the template classes would always generate default constructors.)
 	 * 
 	 * @return
 	 */
-	boolean allConstructorsAreTemplates() default false;
+	boolean allConstructorsAreTemplates() default true;
 }

@@ -16,6 +16,7 @@ import javax.lang.model.element.TypeElement
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
+import javax.lang.model.element.ExecutableElement
 
 @Data
 class TemplateRule implements Function1<GenTypeElement, List<? extends GenElement>>{
@@ -46,7 +47,7 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 		
 		val allFieldsAreTemplates = templateAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
 		val allMethodsAreTemplates = templateAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
-		val allConstructorsAreTemplates = templateAnnotation?.value("allConstructorsAreTemplates", boolean) ?: false
+		val allConstructorsAreTemplates = templateAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
 		
 		_memberRules=newArrayList()	
 		
@@ -70,7 +71,7 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 		//		])
 		memberRules.addAll(
 			templateClass.declaredConstructors.map[it -> annotationMirror(Constructor)].filter[
-				allConstructorsAreTemplates || value != null].map [
+				(allConstructorsAreTemplates && !key.isDefaultConstructor) || value != null].map [
 				new ConstructorRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, constructorDefaults), key)
 			])
 
@@ -83,6 +84,10 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 		_annotationsRule = ru.createAnnotationMappingRules(templateAnnotation, templateClass, null)
 		_scopeRule = ru.createScopeRule(templateAnnotation, null)
 
+	}
+	
+	def boolean isDefaultConstructor(ExecutableElement ctor){
+		ctor.parameters.nullOrEmpty
 	}
 
 	override apply(GenTypeElement generatedClass) {
