@@ -6,7 +6,6 @@ import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.roo.base.web.ConverterProvider;
-import de.stefanocke.japkit.roo.base.web.CrudOperations;
 import de.stefanocke.japkit.roo.base.web.EntityConverterUtil;
 import de.stefanocke.japkit.roo.base.web.LabelProvider;
 
@@ -18,7 +17,7 @@ public abstract class ControllerConverterProviderMembers implements ConverterPro
 	@ParamNames("registry")
 	@Override
 	public void registerConverters(ConverterRegistry registry) {
-		EntityConverterUtil.registerConverters(FormBackingObject.class, registry, crudOperations(), this);		
+		//EntityConverterUtil.registerConverters(FormBackingObject.class, registry, crudOperations(), this);		
 	}
 	
 	
@@ -30,6 +29,6 @@ public abstract class ControllerConverterProviderMembers implements ConverterPro
 		return null;
 	}	
 
-	abstract CrudOperations<FormBackingObject> crudOperations();
+	//abstract CrudOperations<FormBackingObject> crudOperations();
 
 }

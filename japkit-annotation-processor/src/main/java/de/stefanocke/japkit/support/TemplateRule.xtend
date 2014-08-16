@@ -36,6 +36,7 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 	AnnotationMirror methodDefaults
 	AnnotationMirror constructorDefaults
 
+
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
 		_templateClass = templateClass
 		_templateAnnotation = templateAnnotation ?: templateClass.annotationMirror(Template)
@@ -43,35 +44,44 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 		_fieldDefaults = templateAnnotation?.value("fieldDefaults", typeof(AnnotationMirror[]))?.singleValue
 		_constructorDefaults = templateAnnotation?.value("constructorDefaults", typeof(AnnotationMirror[]))?.singleValue
 		
+		val allFieldsAreTemplates = templateAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
+		val allMethodsAreTemplates = templateAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
+		val allConstructorsAreTemplates = templateAnnotation?.value("allConstructorsAreTemplates", boolean) ?: false
+		
 		_memberRules=newArrayList()	
 		
-		memberRules.addAll(templateClass.declaredTypes.map[it -> annotationMirror(InnerClass)].filter[value != null].map [
-			new InnerClassRule(value, key)
-		])
-		
-		memberRules.addAll(templateClass.declaredFields.map [
-			new FieldRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotationMirror(Field), fieldDefaults), it)
-		])
-		
-		memberRules.addAll(templateClass.declaredFields.map[it -> annotationMirror(Getter)].filter[value != null].map [
-			gs.createGetterRule(value, key, null)
-		])
-		
-		memberRules.addAll(templateClass.declaredFields.map[it -> annotationMirror(Setter)].filter[value != null].map [
-			gs.createSetterRule(value, key, null)
-		])
-		
-		memberRules.addAll(templateClass.declaredConstructors.map[it -> annotationMirror(Constructor)].filter[value != null].map [
-			new ConstructorRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, constructorDefaults), key)
-		])
-		
-		memberRules.addAll(templateClass.declaredMethods.map[it -> annotationMirror(Method)].filter[value != null].map [
-			new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, methodDefaults), key)
-		])
-		
-		
-		_annotationsRule=ru.createAnnotationMappingRules(templateAnnotation, templateClass, null)
-		_scopeRule=ru.createScopeRule(templateAnnotation, null)
+		memberRules.addAll(
+			templateClass.declaredTypes.map[it -> annotationMirror(InnerClass)].filter[value != null].map [
+				new InnerClassRule(value, key)
+			])
+
+		memberRules.addAll(
+			templateClass.declaredFields.map[it -> annotationMirror(Field)].filter[
+				allFieldsAreTemplates || value != null].map [
+				new FieldRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, fieldDefaults), key)
+			])
+
+		//		memberRules.addAll(templateClass.declaredFields.map[it -> annotationMirror(Getter)].filter[value != null].map [
+		//			gs.createGetterRule(value, key, null)
+		//		])
+		//		
+		//		memberRules.addAll(templateClass.declaredFields.map[it -> annotationMirror(Setter)].filter[value != null].map [
+		//			gs.createSetterRule(value, key, null)
+		//		])
+		memberRules.addAll(
+			templateClass.declaredConstructors.map[it -> annotationMirror(Constructor)].filter[
+				allConstructorsAreTemplates || value != null].map [
+				new ConstructorRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, constructorDefaults), key)
+			])
+
+		memberRules.addAll(
+			templateClass.declaredMethods.map[it -> annotationMirror(Method)].filter[
+				allMethodsAreTemplates || value != null].map [
+				new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, methodDefaults), key)
+			])
+
+		_annotationsRule = ru.createAnnotationMappingRules(templateAnnotation, templateClass, null)
+		_scopeRule = ru.createScopeRule(templateAnnotation, null)
 
 	}
 

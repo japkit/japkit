@@ -47,7 +47,7 @@ public abstract class ControllerMembers {
 
 	/**
 	 * @japkit.bodyCode 
-	 * <code>uiModel.addAttribute("#{dtfModelAttr.eval(src)}", ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));</code>
+	 * <code>uiModel.addAttribute("#{src.dtfModelAttr}", ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));</code>
 	 */
 	@Method(imports = ControllerUtil.class,	bodyIterator = "datetimeProperties")
 	abstract void addDateTimeFormatPatterns(Model uiModel);
