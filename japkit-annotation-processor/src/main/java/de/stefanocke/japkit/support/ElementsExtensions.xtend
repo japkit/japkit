@@ -8,6 +8,7 @@ import de.stefanocke.japkit.gen.GenAnnotationValue
 import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenName
 import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.ParamNames
 import de.stefanocke.japkit.metaannotations.RequiredTriggerAnnotation
 import de.stefanocke.japkit.util.MoreCollectionExtensions
@@ -15,6 +16,7 @@ import java.io.Writer
 import java.lang.annotation.Annotation
 import java.lang.reflect.Array
 import java.util.Collections
+import java.util.HashMap
 import java.util.HashSet
 import java.util.List
 import java.util.Map
@@ -40,8 +42,6 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
-import java.util.HashMap
-import de.stefanocke.japkit.metaannotations.Clazz
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -801,12 +801,13 @@ class ElementsExtensions {
 	
 	def String getCommentFromRuntimeMetadata(Element element) {
 		loadRuntimeMetadata(element)
-		commentsFromRuntimeMetadata.get(element.uniqueName)
+		commentsFromRuntimeMetadata.get(uniqueNameWithinTopLevelEnclosingTypeElement(element))
 	}
+
 	
 	def List<String> getParamNamesFromRuntimeMetadata(Element element) {
 		loadRuntimeMetadata(element)
-		paramNamesFromRuntimeMetadata.get(element.uniqueName)
+		paramNamesFromRuntimeMetadata.get(uniqueNameWithinTopLevelEnclosingTypeElement(element))
 	}
 	
 	
@@ -1039,6 +1040,25 @@ class ElementsExtensions {
 	
 	def dispatch String uniqueName(Element e){
 		'''«e.enclosingElement.uniqueName».«e.uniqueSimpleName»'''
+	}
+	
+	def String uniqueNameWithin(Element e, TypeElement enclosing) {
+		if(e==enclosing)
+			''
+		else if (e.enclosingElement == enclosing)
+			e.uniqueSimpleName.toString
+		else {
+			if (e?.enclosingElement == null) {
+				throw new IllegalArgumentException('''«e» is not enclosed by element «enclosing»''')
+			}
+			'''«e.enclosingElement.uniqueNameWithin(enclosing)».«e.uniqueSimpleName.toString»'''
+
+		}
+	}
+	
+	
+	def uniqueNameWithinTopLevelEnclosingTypeElement(Element element) {
+		element.uniqueNameWithin(element.topLevelEnclosingTypeElement)
 	}
 	
 	//quick and dirty. Should probably be an iterator instead.

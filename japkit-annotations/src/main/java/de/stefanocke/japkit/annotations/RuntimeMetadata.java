@@ -16,7 +16,7 @@ import de.stefanocke.japkit.metaannotations.Var;
 @Clazz(nameSuffixToAppend=RuntimeMetadata.CLASS_SUFFIX, annotations={
 	@Annotation(id="elementMetadata", targetAnnotation=Element.class, 
 			values={
-				@AV(name="id", expr="#{elements.uniqueName(src)}"), //TODO: uniqueId
+				@AV(name="id", expr="#{elements.uniqueNameWithinTopLevelEnclosingTypeElement(src)}"), 
 				@AV(name="comment", expr="#{elements.getDocComment(src)}"),
 				@AV(activation=@Matcher(kind={METHOD, CONSTRUCTOR}), name="paramNames", expr="#{src.parameters}")
 		}),
