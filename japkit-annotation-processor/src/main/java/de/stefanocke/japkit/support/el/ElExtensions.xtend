@@ -128,6 +128,26 @@ class ElExtensions {
 		val extension JavaBeansExtensions = get(JavaBeansExtensions)
 		e.properties(Object.name, false)
 	}
+	
+	def static getDeclaredFields(TypeElement type) {
+		val extension ElementsExtensions = get(ElementsExtensions)
+		type.declaredFields()
+	}
+
+	def static getDeclaredMethods(TypeElement type) {
+		val extension ElementsExtensions = get(ElementsExtensions)
+		type.declaredMethods()
+	}
+
+	def static getDeclaredConstructors(TypeElement type) {
+		val extension ElementsExtensions = get(ElementsExtensions)
+		type.declaredConstructors()
+	}
+
+	def static getDeclaredTypes(TypeElement type) {
+		val extension ElementsExtensions = get(ElementsExtensions)
+		type.declaredTypes()
+	}
 
 
 	private def static getEmitterContext(Map<String, Object> context) {
@@ -203,6 +223,14 @@ class ElExtensions {
 		elExtensions.registerProperty(CharSequence, "toFirstLower", [context, s|s.toFirstLower])
 		
 		elExtensions.registerProperty(TypeElement, "properties", [context, t|t.properties])
+		
+		elExtensions.registerProperty(TypeElement, "declaredFields", [context, t|t.declaredFields])
+		
+		elExtensions.registerProperty(TypeElement, "declaredConstructors", [context, t|t.declaredConstructors])
+		
+		elExtensions.registerProperty(TypeElement, "declaredTypes", [context, t|t.declaredTypes])
+		
+		elExtensions.registerProperty(TypeElement, "declaredMethods", [context, t|t.declaredMethods])
 	}
 
 	def static registerExtensionMethods(ElExtensionPropertiesAndMethods elExtensions) {
