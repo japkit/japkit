@@ -291,4 +291,25 @@ class RuleUtils {
 		]
 	}
 	
+	//A predicate that checks whether a given name is amongst a set of names given by an expression
+	def (CharSequence)=>boolean createNameInSetRule(AnnotationMirror metaAnnotation, String avName, boolean defaultResult){
+		val expr = metaAnnotation?.value(avName, String)
+		val lang = metaAnnotation?.value('''«avName»Lang''', String);
+		
+		if(expr.nullOrEmpty) [defaultResult] else
+		[
+			val nameSet = eval(expr, lang, Iterable, '''Name set expression could not be evaluated.''',
+					emptySet).map[
+						if(it instanceof Element){
+							it.simpleName.toString
+						} else {
+							it.toString  //TODO: Das is etwas lax.
+						}
+					].toSet
+					
+			nameSet.contains(it.toString)
+			
+		]
+	}
+	
 }

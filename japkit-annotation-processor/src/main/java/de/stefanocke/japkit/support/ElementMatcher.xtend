@@ -21,6 +21,7 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	val extension TypesExtensions typesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val extension RuleUtils ruleUtils = ExtensionRegistry.get(RuleUtils)
 
 	String srcExpr
 	String srcLang
@@ -47,6 +48,9 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 	String conditionLang
 	ConstraintRule[] constraints
 	AnnotationMirror am
+	
+	(CharSequence)=>boolean nameIn
+	(CharSequence)=>boolean nameNotIn
 
 	def filter(Iterable<?> elements){
 		elements.filter[
@@ -71,6 +75,8 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 		scope(e)[
 			val result = (e!=null)
 			&& (name.nullOrEmpty || name.contentEquals(e.simpleName))
+			&& nameIn.apply(e.simpleName)
+			&& !nameNotIn.apply(e.simpleName)
 			&& e.hasAllModifiers(modifiers)
 			&& e.hasNotModifiers(modifiersNot)
 			&& e.hasAnyKind(kind)
@@ -229,6 +235,8 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 		_conditionLang =  am.value("conditionLang", String)
 		_constraints = am.value("constraints", typeof(AnnotationMirror[])).map[new ConstraintRule(it)]	
 		_am = am
+		_nameIn = createNameInSetRule(am, "nameIn", true)
+		_nameNotIn = createNameInSetRule(am, "nameNotIn", false)
 		
 	}
 	

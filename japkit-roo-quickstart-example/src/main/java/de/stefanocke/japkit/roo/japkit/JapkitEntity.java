@@ -9,6 +9,7 @@ import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.Getter;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Members;
+import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
@@ -20,7 +21,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 				@Members,
 				@Members(ToString.class),
 				@Members(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"), value = ActiveRecordMembers.class) })
-@Field(src="#{src.declaredFields}", getter=@Getter, annotations = @Annotation(copyAnnotationsFromPackages = {
+@Field(src="#{src.declaredFields}", getter=@Getter, setter=@Setter, annotations = @Annotation(copyAnnotationsFromPackages = {
 		"javax.persistence", "javax.validation.constraints", "org.springframework.format.annotation" })
 /* ,templates = PropertyTemplateTest.class */)
 @Var(name = "superclass", expr = "#{currentAnnotatedClass.superclass}", requiredTriggerAnnotation=JapkitEntity.class)

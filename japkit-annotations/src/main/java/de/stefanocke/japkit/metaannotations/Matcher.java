@@ -34,6 +34,24 @@ public @interface Matcher {
 	String name() default "";
 	
 	/**
+	 * If set, the source element must have a name that is amongst the names given by the expression. The expression must evaluate to an Iterable of 
+	 * CharSequence or to an Iterable of Element. In the latter case, the simple names of the elements are considered.
+	 * @return
+	 */
+	String nameIn() default "";
+	
+	String nameInLang() default "";
+	
+	/**
+	 * If set, the source element must have a name that is not amongst the names given by the expression. The expression must evaluate to an Iterable of 
+	 * CharSequence or to an Iterable of Element. In the latter case, the simple names of the elements are considered.
+	 * @return
+	 */
+	String nameNotIn() default "";
+	
+	String nameNotInLang() default "";
+	
+	/**
 	 * All of those modifiers must be present at the source element for the rule
 	 * to apply.
 	 * 

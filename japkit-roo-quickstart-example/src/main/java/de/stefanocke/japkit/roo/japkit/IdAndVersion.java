@@ -15,12 +15,9 @@ import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 
 @Template(vars={
-		@Var(name = "inheritedProperties", propertyFilter=@Properties(sourceClass=GeneratedClassSuperClass.class)),
-		@Var(name = "hasNoInheritedPropertyWithName", isFunction=true, expr="inheritedProperties.find{it.name.contentEquals(src)}==null", lang="GroovyScript"),
-
-
+		@Var(name = "inheritedProperties", propertyFilter=@Properties(sourceClass=GeneratedClassSuperClass.class))
 },
-fieldDefaults=@Field(activation=@Matcher(condition="#{hasNoInheritedPropertyWithName.eval(template.simpleName)}"), getter=@Getter, setter=@Setter))
+fieldDefaults=@Field(activation=@Matcher(src="template", nameNotIn="inheritedProperties"), getter=@Getter, setter=@Setter))
 public class IdAndVersion {
 	/***/
 	@Field
