@@ -156,7 +156,11 @@ class ClassGeneratorSupport {
 				putShadowAnnotation(shadowAnnotation)
 			}
 		
-		} catch (RuntimeException re){
+		} 
+		catch (TypeElementNotFoundException tenfe) {
+			throw tenfe
+		}
+		catch (RuntimeException re){
 			reportError('''Error when creating shadow annotation:''', re, annotatedClass, triggerAnnotation, null)
 		}
 	}
