@@ -36,7 +36,7 @@ class AnnotationMappingRule {
 	Set<String> copyAnnotationsFqns
 	String[] copyAnnotationsFromPackages
 	boolean setShadowOnTriggerAnnotations
-	
+	((Object)=>Object)=>Iterable<Object> scopeRule
 
 
 	/**
@@ -50,12 +50,15 @@ class AnnotationMappingRule {
 			return
 		}
 		
-		copyAnnotations(annotations)
-		
-
-		if(!DefaultAnnotation.name.equals(targetAnnotation?.qualifiedName)){
-			mapAnnotation(annotations, mappingsWithId)	
-		}
+		scopeRule.apply[
+			copyAnnotations(annotations)
+			
+	
+			if(!DefaultAnnotation.name.equals(targetAnnotation?.qualifiedName)){
+				mapAnnotation(annotations, mappingsWithId)	
+			}
+			null //TODO.
+		]
 
 	}
 	
@@ -142,28 +145,28 @@ class AnnotationMappingRule {
 		
 		val anno = am
 		
-		scope [ 
-			valueStack.put("targetAnnotation", anno)
 		
-			anno => [
-				valueMappings.forEach [ vm |
-					try {
-						setValue(vm.name,
-							[ avType |
-								vm.mapAnnotationValue(anno, avType, mappingsWithId)
-							])
-			
-					} catch (RuntimeException e) {
-			
-						messageCollector.reportError('''
-								Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
-								Cause: «e.message»
-							''', e, if(currentSrc instanceof Element) currentSrcElement, null, null)
-					}
-				]
+		valueStack.put("targetAnnotation", anno)
+	
+		anno => [
+			valueMappings.forEach [ vm |
+				try {
+					setValue(vm.name,
+						[ avType |
+							vm.mapAnnotationValue(anno, avType, mappingsWithId)
+						])
+		
+				} catch (RuntimeException e) {
+		
+					messageCollector.reportError('''
+							Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
+							Cause: «e.message»
+						''', e, if(currentSrc instanceof Element) currentSrcElement, null, null)
+				}
 			]
-		
 		]
+		
+		
 	}
 	
 
@@ -179,7 +182,7 @@ class AnnotationMappingRule {
 		_copyAnnotationsFqns = am.value("copyAnnotations", typeof(DeclaredType[])).map[qualifiedName].toSet
 		_copyAnnotationsFromPackages = am.value("copyAnnotationsFromPackages", typeof(String[]))
 		_setShadowOnTriggerAnnotations = am.value("setShadowOnTriggerAnnotations", Boolean)
-
+		_scopeRule = createScopeRule(am, null)
 	}
 	
 	

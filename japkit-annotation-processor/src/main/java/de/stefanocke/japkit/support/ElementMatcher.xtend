@@ -11,9 +11,11 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.element.ElementKind
 import java.util.Set
 import javax.lang.model.element.TypeElement
+import org.eclipse.xtext.xbase.lib.Functions.Function0
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
-class ElementMatcher {
+class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>{
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
@@ -53,6 +55,14 @@ class ElementMatcher {
 			}
 			matches(it as Element)
 		]
+	}
+	
+	override apply() {
+		currentSrcElement.matches
+	}
+	
+	override apply(Element originalSrcElement) {
+		originalSrcElement.matches
 	}
 
 	def boolean matches(Element originalSrcElement) {
@@ -221,5 +231,7 @@ class ElementMatcher {
 		_am = am
 		
 	}
+	
+	
 	
 }

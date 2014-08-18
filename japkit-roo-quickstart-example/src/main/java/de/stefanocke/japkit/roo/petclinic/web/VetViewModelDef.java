@@ -18,6 +18,5 @@ public class VetViewModelDef {
 	//
 	@TableColumn
 	String lastName;
-	
-	//boolean nonExistingProperty;
+
 }

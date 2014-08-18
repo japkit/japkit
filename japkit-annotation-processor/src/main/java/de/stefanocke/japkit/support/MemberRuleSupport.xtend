@@ -37,6 +37,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
 	()=>CharSequence commentRule
 	boolean genElementIsSrcForDependentRules
+	ManualOverrideRule manualOverrideRule
 	
 	//members to be created for the generated member. for instance, getters and setters to  be created for the generated field
 	List<(GenTypeElement) => List<? extends GenElement>> dependentMemberRules = newArrayList()
@@ -58,6 +59,8 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_commentRule = createCommentRule
 		_genElementIsSrcForDependentRules = genElementIsSrcForDependentRulesAV
 		createAndAddDelegateMethodRules
+		
+		_manualOverrideRule = new ManualOverrideRule(metaAnnotation)
 	}
 	
 	
@@ -74,6 +77,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_commentRule = commentRule ?: createCommentRule
 		_genElementIsSrcForDependentRules = genElementIsSrcForDependentRulesAV
 		createAndAddDelegateMethodRules
+		_manualOverrideRule = new ManualOverrideRule(metaAnnotation)
 	}
 	
 	new(()=>boolean activationRule,
@@ -90,6 +94,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		_annotationsRule = annotationsRule ?: [g |emptyList]
 		_commentRule = commentRule ?: [|""]
 		_genElementIsSrcForDependentRules = true
+		_manualOverrideRule = null
 	}
 	
 	protected def genElementIsSrcForDependentRulesAV(){
@@ -146,7 +151,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		try {
 			pushCurrentMetaAnnotation(metaAnnotation)
 
-			inScope [
+			val result = scopeRule.apply [
 				valueStack.put("template", template)
 				val generatedMembers = newArrayList()
 				val member = createMember
@@ -166,6 +171,10 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 				generatedMembers
 			]
 			
+			manualOverrideRule?.apply(result.map[head])  
+			
+			result.flatten.toList
+			
 		} catch(Exception re) {
 			//don't let one member screw up the whole class
 			reportError('''Error in meta annotation «metaAnnotation» «IF template !=null»in template «template» «ENDIF»''', 
@@ -182,10 +191,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		if (genElementIsSrcForDependentRules) genElement else currentSrcElement
 	}
 	
-	protected def inScope((Object)=>Iterable<? extends GenElement> closure){
-		val result = scopeRule.apply(closure)  
-		result.flatten.toList
-	}
+	
 
 
 	/**
@@ -217,4 +223,6 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		]
 		
 	}
+	
+	
 }

@@ -73,7 +73,6 @@ class RuleUtils {
 		]
 	}
 	
-
 	/**Scope rule that gets the source element from "src" AV */
 	public def <T> ((Object)=>T)=>Iterable<T>  createScopeRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		createScopeRule(metaAnnotation, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
@@ -184,7 +183,7 @@ class RuleUtils {
 	public def (GenElement)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
 		AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 				
-		val mappings = metaAnnotation?.annotationMappings("annotationMappings".withPrefix(avPrefix), null);
+		val mappings = metaAnnotation?.annotationMappings("annotations".withPrefix(avPrefix), null);
 		
 		[ genElement|
 			val existingAnnotationsAndTemplateAnnotations = new ArrayList(genElement.annotationMirrors.map[it as GenAnnotationMirror])

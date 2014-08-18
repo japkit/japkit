@@ -1,6 +1,7 @@
 package de.stefanocke.japkit.metaannotations;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
 import de.stefanocke.japkit.metaannotations.classselectors.None;
@@ -246,6 +247,29 @@ public @interface Field {
 	 * @return the setter annotation
 	 */
 	Getter[] getter() default {};
+	
+	/**
+	 * A class to customize the generated fields. So far, you can override the annotations of the field or add new annotations.
+	 * <p>
+	 * TODO: Remove annotations?  f.e.  @Not({NotNull.class, ...}) 
+	 * Enforce Field order? 
+	 * Complex annotation mapping modes?
+	 * 
+	 * @return
+	 */
+	Class<?> manualOverrides() default None.class;
+
+	/**
+	 * By default, all fields of the "overrides" class are considered. This can
+	 * be changed by setting another matcher here. For example, only fields with
+	 * some specific annotation could be considered. Or, methods could be
+	 * considered that are named like the properties.
+	 * 
+	 * @return
+	 */
+	Matcher manualOverridesMatcher() default @Matcher(kind = ElementKind.FIELD);
+	
+	
 	
 	@interface List {
 		Field[] value();

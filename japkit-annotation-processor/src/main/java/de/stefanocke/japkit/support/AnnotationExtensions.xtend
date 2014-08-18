@@ -53,7 +53,7 @@ class AnnotationExtensions {
 	
 	def List<GenAnnotationMirror> overrideAnnotations(Element overrideElement, List<GenAnnotationMirror> existingAnnotations) {
 		if(overrideElement==null){
-			return existingAnnotations
+			return new ArrayList(existingAnnotations)
 		}
 		
 		val result = new ArrayList(existingAnnotations.filter[am | !overrideElement.annotationMirrors.exists[fqn.equals(am.fqn)]].toList)
