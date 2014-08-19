@@ -2,9 +2,6 @@ package de.stefanocke.japkit.metaannotations;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
@@ -44,14 +41,6 @@ public @interface Properties {
 		GETTER
 	}
 
-	/**
-	 * By default, this Property annotation is active an will generate
-	 * properties. To switch it on or of case by case, a Matcher can be used
-	 * here. The element on which the matcher is applied is the annotated class.
-	 * 
-	 * @return
-	 */
-	Matcher[] activation() default {};
 
 	/**
 	 * When the annotated annotation wants to override annotation values of the
@@ -68,22 +57,7 @@ public @interface Properties {
 	 */
 	Class<?> sourceClass() default None.class;
 
-	/**
-	 * 
-	 * Creates constants for the names of the properties. If we are in an enum,
-	 * enum constants will be created.
-	 * 
-	 * @return
-	 */
-	boolean createNameConstants() default false;
 
-	/**
-	 * Whether to create properties at all. Can be switched of to only create
-	 * name constants. See above.
-	 * 
-	 * @return
-	 */
-	boolean createProperties() default true;
 
 	/**
 	 * 
@@ -108,33 +82,6 @@ public @interface Properties {
 	 * @return
 	 */
 	RuleSource ruleSource() default RuleSource.PROPERTY;
-
-	/**
-	 * Maps annotations from source class properties to target class fields.
-	 * 
-	 * @return the annotation mappings.
-	 */
-	Annotation[] annotations() default {};
-
-	/**
-	 * A class to customize the properties. So far, you can override the annotations of the properties.
-	 * 
-	 * @return
-	 */
-	Class<?> overrides() default None.class;
-
-	/**
-	 * By default, all fields of the "overrides" class are considered. This can
-	 * be changed by setting another matcher here. For example, only fields with
-	 * some specific annotation could be considered. Or, methods could be
-	 * considered that are named like the properties.
-	 * 
-	 * @return
-	 */
-	Matcher overridesMatcher() default @Matcher(kind = ElementKind.FIELD);
-
-
-	Modifier[] fieldModifiers() default { Modifier.PRIVATE };
 
 
 	/**
@@ -164,49 +111,4 @@ public @interface Properties {
 	 */
 	Matcher[] excludeRules() default {};
 
-	/**
-	 * If true, properties that already exist in the superclass of the generated
-	 * class, are not generated again.
-	 * 
-	 * @return
-	 */
-	boolean excludePropertiesFromSuperclass() default true;
-	
-	
-
-	/**
-	 * A Setter annotation here means to generate a setter for the field. The
-	 * annotation can be used to further customize the setter, but all values
-	 * are optional.
-	 * 
-	 * @return the setter annotation
-	 */
-	Setter[] setter() default @Setter;
-
-	/**
-	 * A Getter annotation here means to generate a getter for the field. The
-	 * annotation can be used to further customize the getter, but all values
-	 * are optional.
-	 * 
-	 * @return the setter annotation
-	 */
-	Getter[] getter() default @Getter;
-
-	/**
-	 * The delegate methods to create. The delegate is the property.
-	 * 
-	 * @return
-	 */
-	DelegateMethods[] delegateMethods() default {};
-
-	/**
-	 * Templates to apply per property.
-	 * 
-	 * @return
-	 */
-	Class<?>[] templates() default {};
-
-	@interface List {
-		Properties[] value();
-	}
 }
