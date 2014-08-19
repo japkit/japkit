@@ -40,7 +40,7 @@ class ConstructorFromPropertiesGenerator extends MemberGeneratorSupport implemen
 		val superConstructorMatchers = annotation.elementMatchers("superConstructors", constructorAnnotation);
 		val annotationMappings = annotation.annotationMappings("annotations", constructorAnnotation);
 
-		val propertyFilter = new PropertyFilter(annotation, constructorAnnotation)
+		val propertyFilter = new PropertyFilter(constructorAnnotation)
 
 		val fromFields = true //TODO: If this shall be configurable for some reason, TENFE must be handled below.
 

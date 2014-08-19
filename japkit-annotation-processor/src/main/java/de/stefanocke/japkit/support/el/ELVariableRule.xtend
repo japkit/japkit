@@ -149,8 +149,8 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 				} else if (!propertyFilterAnnotations.nullOrEmpty) {
 
 					//TODO: Rule caching?
-					val propertyFilters = propertyFilterAnnotations.map[new PropertyFilter(triggerAnnotation, it)]
-					propertyFilters.map[getFilteredProperties(currentAnnotatedClass, currentGeneratedClass)].flatten.
+					val propertyFilters = propertyFilterAnnotations.map[new PropertyFilter(it)]
+					propertyFilters.map[getFilteredProperties()].flatten.
 						toList
 
 				} else if (typeQuery != null) {

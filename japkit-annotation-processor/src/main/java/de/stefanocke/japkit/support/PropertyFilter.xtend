@@ -5,6 +5,8 @@ import de.stefanocke.japkit.metaannotations.Properties
 import java.util.List
 import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.gen.GenTypeElement
+import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.support.el.ELSupport
 
 @Data
 class PropertyFilter {
@@ -14,13 +16,14 @@ class PropertyFilter {
 	val extension JavaBeansExtensions javaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
 	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
+	val extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
 
+	TypeMirror sourceClass
 	String[] includeNames
 	List<ElementMatcher> includeRules
 	List<ElementMatcher> excludeRules
 	Properties.RuleSource ruleSource
 
-	AnnotationMirror am;
 	AnnotationMirror metaAnnotation;
 
 	boolean fromFields;
@@ -28,14 +31,14 @@ class PropertyFilter {
 	/**
 	 * Property source is determined by AV "sourceClass"
 	 */
-	def List<Property> getFilteredProperties(TypeElement annotatedClass, GenTypeElement generatedClass) {
+	def List<Property> getFilteredProperties() {
 		val propertySource = handleTypeElementNotFound(null,
-			'''Could not find property source for «annotatedClass». No properties will be generated.''', annotatedClass) [
-			resolveType(metaAnnotation, "sourceClass")?.asTypeElement
+			'''Could not find property source. No properties will be generated.''', currentAnnotatedClass ) [
+			sourceClass.resolveType.asTypeElement
 		]
 		if (propertySource != null) {
 			handleTypeElementNotFound(emptyList,
-				'''Could not determine properties of source «propertySource.qualifiedName».''', annotatedClass) [
+				'''Could not determine properties of source «propertySource.qualifiedName».''', currentAnnotatedClass ) [
 				getFilteredProperties(propertySource)
 			]
 		} else
@@ -45,10 +48,12 @@ class PropertyFilter {
 	def List<Property> getFilteredProperties(TypeElement propertySource) {
 
 		val properties = propertySource.properties(Object.name, fromFields)
+		
+		//TODO: Should be an expression.
 		includeNames.forEach [
 			if (!properties.exists[p|it.equals(p.name)]) {
-				reportError('''Property with name «it» does not exist in source class.''', null, am,
-					metaAnnotation.getPrefixedAvName("includeNames"))
+				reportError('''Property with name «it» does not exist in source class.''', null, null,
+					null)
 			}
 		]
 
@@ -57,16 +62,17 @@ class PropertyFilter {
 		].filter[excludeRules.forall[r|!r.matches(getSourceElement(ruleSource))]].toList
 	}
 
-	new(AnnotationMirror annotation, AnnotationMirror metaAnnotation) {
+	new(AnnotationMirror metaAnnotation) {
 
-		_am = annotation
+
 		_metaAnnotation = metaAnnotation
-		_includeNames = annotation.valueOrMetaValue("includeNames", typeof(String[]), metaAnnotation)
-		_includeRules = annotation.valueOrMetaValue("includeRules", typeof(AnnotationMirror[]), metaAnnotation).map[
+		_sourceClass = metaAnnotation.value("sourceClass", TypeMirror)
+		_includeNames = metaAnnotation.value("includeNames", typeof(String[]))
+		_includeRules = metaAnnotation.value("includeRules", typeof(AnnotationMirror[])).map[
 			createElementMatcher(it)]
-		_excludeRules = annotation.valueOrMetaValue("excludeRules", typeof(AnnotationMirror[]), metaAnnotation).map[
+		_excludeRules = metaAnnotation.value("excludeRules", typeof(AnnotationMirror[])).map[
 			createElementMatcher(it)]
-		_ruleSource = annotation.valueOrMetaValue("ruleSource", Properties.RuleSource, metaAnnotation)
-		_fromFields = annotation.valueOrMetaValue("fromFields", Boolean, metaAnnotation)
+		_ruleSource = metaAnnotation.value("ruleSource", Properties.RuleSource)
+		_fromFields = metaAnnotation.value("fromFields", Boolean)
 	}
 }
