@@ -430,8 +430,6 @@ class JapkitProcessor extends AbstractProcessor {
 
 	def writeSourceFileAndCommitTypeElement(GenTypeElement genTypeElement, TypeElement original,
 		Set<GenTypeElement> writtenTypeElementsInCurrentRound) {
-		pushCurrentAnnotatedClass(original)
-		pushCurrentGeneratedClass(genTypeElement)
 
 		try {
 			if (writeSourceFile(genTypeElement, original)) {
@@ -445,11 +443,7 @@ class JapkitProcessor extends AbstractProcessor {
 				original)
 
 			throw e
-		} finally {
-			popCurrentGeneratedClass
-			popCurrentAnnotatedClass
 		}
-
 	}
 
 	def Map<GenTypeElement, TypeElement> processAnnotatedClass(TypeElement annotatedClass) {
