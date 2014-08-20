@@ -5,29 +5,32 @@ import de.stefanocke.japkit.support.el.ELSupport
 import java.util.Stack
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.support.el.ValueStack
 
 /**
  * Provides access currently generated class and annotated class.
  */
 class GenerateClassContext {
-	Stack<TypeElement> currentAnnotatedClasses = new Stack<TypeElement>
 	
-	
-
-	def pushCurrentAnnotatedClass(TypeElement annotatedClass) {
-		currentAnnotatedClasses.push(annotatedClass)
-		ExtensionRegistry.get(ELSupport).valueStack.pushAndPutAll(#{"currentAnnotatedClass" -> annotatedClass})
+	def ValueStack currentValueStack() {
+		ExtensionRegistry.get(ELSupport).getValueStack()
 	}
 
-	def popCurrentAnnotatedClass() {
-		currentAnnotatedClasses.pop
-		ExtensionRegistry.get(ELSupport).valueStack.pop
+	def setCurrentAnnotatedClass(TypeElement annotatedClass) {	
+		currentValueStack.put("currentAnnotatedClass" , annotatedClass)
 	}
 	
 	def currentAnnotatedClass() {
-		if(currentAnnotatedClasses.empty()) null else currentAnnotatedClasses.peek
+		currentValueStack.get("currentAnnotatedClass") as TypeElement
 	}
 
+	def GenTypeElement getCurrentGeneratedClass(){
+		currentValueStack.get("currentGenClass") as GenTypeElement
+	}
+	
+	def void setCurrentGeneratedClass(GenTypeElement currentGeneratedClass){
+		currentValueStack.put("currentGenClass" , currentGeneratedClass)
+	}
 	
 	AnnotationMirror currentAnnotation
 	
@@ -63,26 +66,13 @@ class GenerateClassContext {
 		//]
 	}
 	
-	val currentGeneratedClasses = new Stack<GenTypeElement>
 	
-	def GenTypeElement getCurrentGeneratedClass(){
-		if(currentGeneratedClasses.isEmpty()) null else currentGeneratedClasses.peek
-	}
 	
-	def void pushCurrentGeneratedClass(GenTypeElement currentGeneratedClass){
-		currentGeneratedClasses.push(currentGeneratedClass)
-		//new value stack scope for each generated class to handle inner classes properly
-		ExtensionRegistry.get(ELSupport).valueStack.pushAndPutAll(#{"currentGenClass" -> currentGeneratedClass})
-	}
 	
-	def void popCurrentGeneratedClass(){
-		currentGeneratedClasses.pop		
-		ExtensionRegistry.get(ELSupport).valueStack.pop
-		
-	}
+	
+	
 	
 	def putShadowAnnotation(AnnotationMirror shadowAnnotation) {
-		val extension ELSupport = ExtensionRegistry.get(ELSupport)
-		valueStack.put("shadowAnnotation", shadowAnnotation)
+		currentValueStack.put("shadowAnnotation", shadowAnnotation)
 	}
 }

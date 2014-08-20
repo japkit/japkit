@@ -12,7 +12,7 @@ class GenClass extends GenTypeElement implements TypeElement{
 	public static val kind = CLASS	
 	
 	override getSuperclass(){
-		super.superclass ?: ExtensionRegistry.get(TypesExtensions).OBJECT
+		super.superclass ?: ExtensionRegistry.get(TypesExtensions).javaLangObject
 	}
 	
 }

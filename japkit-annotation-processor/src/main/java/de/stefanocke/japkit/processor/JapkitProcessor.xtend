@@ -456,6 +456,7 @@ class JapkitProcessor extends AbstractProcessor {
 		removeDependenciesForAnnotatedClass(annotatedClass.qualifiedName.toString)
 
 		scope(annotatedClass)[
+			setCurrentAnnotatedClass(annotatedClass)
 			processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]	
 			null	
 		]
@@ -495,7 +496,7 @@ class JapkitProcessor extends AbstractProcessor {
 
 		triggerAnnotations.filter[!value].forEach [ //value tells whether it is a shadow annotation
 			val triggerAnnotation = it.key
-			pushCurrentAnnotatedClass(annotatedClass)
+			
 			setCurrentAnnotation(triggerAnnotation)
 			try {
 				printDiagnosticMessage
@@ -516,7 +517,7 @@ class JapkitProcessor extends AbstractProcessor {
 			} catch (TypeElementNotFoundException tenfe) {
 				handleTypeElementNotFound(tenfe, annotatedClass)
 			} finally {
-				popCurrentAnnotatedClass
+				
 				printDiagnosticMessage
 				[
 					'''Processed annotated class «annotatedClass». Duration: «System.currentTimeMillis - startMillis»''']

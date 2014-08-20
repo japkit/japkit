@@ -34,6 +34,7 @@ class ELSupport {
 	def getValueStack() {
 		ExtensionRegistry.get(ValueStack, [|new ValueStack(#{"elements" -> elements, "types" -> types}, null)])
 	}
+	
 
 	new() {
 		val sw = new Stopwatch

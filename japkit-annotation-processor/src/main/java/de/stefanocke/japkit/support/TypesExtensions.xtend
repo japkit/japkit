@@ -31,8 +31,10 @@ class TypesExtensions /**implements Types*/{
 	extension Elements elementUtils = ExtensionRegistry.get(Elements)
 	extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
 	
-	public val OBJECT = findTypeElement(Object.name).asType
-
+	public def TypeMirror getJavaLangObject(){
+		findTypeElement(Object.name).asType
+	}
+	
 	def boxed(TypeKind typeKind) {
 		typeKind.primitiveType.boxedClass.asType
 	}

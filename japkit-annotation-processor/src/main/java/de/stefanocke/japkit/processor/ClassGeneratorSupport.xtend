@@ -75,12 +75,11 @@ class ClassGeneratorSupport {
 			
 			
 			//Register generated class as early as possible to allow error type resolution in other classes
-			registerGeneratedTypeElement(generatedClass, annotatedClass, if(isTopLevelClass) triggerAnnotation else null)			
-			
-			
-			pushCurrentGeneratedClass(generatedClass)
+			registerGeneratedTypeElement(generatedClass, annotatedClass, if(isTopLevelClass) triggerAnnotation else null)	
 		
-			try{
+			scope[
+				setCurrentGeneratedClass(generatedClass)
+				
 				setSuperClassAndInterfaces(annotatedClass, generatedClass, triggerAnnotation, genClass)
 			
 				if(isTopLevelClass){
@@ -121,9 +120,7 @@ class ClassGeneratorSupport {
 			
 				generatedClass
 			
-			} finally {
-				popCurrentGeneratedClass
-			}
+			]
 		
 		} finally {
 			
