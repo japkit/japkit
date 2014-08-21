@@ -1010,8 +1010,7 @@ class ElementsExtensions {
 				
 			//TODO: Zumindest Teile davon können in die Type Registry
 			val triggerAnnotation = annotations.head
-			val nameRule = new ClassNameRule(triggerAnnotation,
-				triggerAnnotation.metaAnnotation(Clazz))
+			val nameRule = new ClassNameRule(triggerAnnotation.metaAnnotation(Clazz))
 			val fqn = nameRule.generateQualifiedName(typeElement)
 			val generatedTypeElement = findTypeElement(fqn)
 			if (generatedTypeElement == null) {

@@ -15,12 +15,12 @@ class NameRule {
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension ELSupport = ExtensionRegistry.get(ELSupport)
 	
-	new(AnnotationMirror am, AnnotationMirror metaAnnotation, String avPrefix){
+	new(AnnotationMirror metaAnnotation, String avPrefix){
 		val prefix = if(avPrefix==null) "name" else avPrefix
-		_regEx = am.valueOrMetaValue('''«prefix»RegEx''', Pattern, metaAnnotation)
-		_regExReplace = am.valueOrMetaValue('''«prefix»RegExReplace''', String, metaAnnotation)		
-		_expr =  am.valueOrMetaValue('''«prefix»Expr''', String, metaAnnotation)		
-		_lang =  am.valueOrMetaValue('''«prefix»Lang''', String, metaAnnotation)		
+		_regEx = metaAnnotation.value('''«prefix»RegEx''', Pattern)
+		_regExReplace = metaAnnotation.value('''«prefix»RegExReplace''', String)		
+		_expr =  metaAnnotation.value('''«prefix»Expr''', String)		
+		_lang =  metaAnnotation.value('''«prefix»Lang''', String)		
 	}
 	
 	def isEmpty(){

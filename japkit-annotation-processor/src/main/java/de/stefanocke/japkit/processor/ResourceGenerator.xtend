@@ -47,8 +47,8 @@ class ResourceGenerator {
 			val templatePackagePath = triggerAnnotation.annotationAsTypeElement.package.qualifiedName.toString.replace('.', '/')
 			
 			
-			val resoureNameRule = new NameRule(triggerAnnotation, resourceTemplateAnnotation, "name")
-			val resourePathNameRule = new NameRule(triggerAnnotation, resourceTemplateAnnotation, "path")
+			val resoureNameRule = new NameRule(resourceTemplateAnnotation, "name")
+			val resourePathNameRule = new NameRule(resourceTemplateAnnotation, "path")
 			
 			val resourceLocation = resourceTemplateAnnotation.value("location", ResourceLocation);	
 			val scopeRule = createScopeRule(resourceTemplateAnnotation, null)

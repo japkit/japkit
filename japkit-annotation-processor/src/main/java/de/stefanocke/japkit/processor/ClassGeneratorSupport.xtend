@@ -206,7 +206,7 @@ class ClassGeneratorSupport {
 		
 		val enclosingElAndClassName = if(enclosingClass==null){
 			//For top level classes, apply the name rule to get class and package name
-			val nameRule = new ClassNameRule(am, genClass)
+			val nameRule = new ClassNameRule(genClass)
 			GenPackage.forName(nameRule.generatePackageName(annotatedClass.packageOf)) -> nameRule.generateClassName(annotatedClass)
 		} else {
 			//For inner classes, use provided class name

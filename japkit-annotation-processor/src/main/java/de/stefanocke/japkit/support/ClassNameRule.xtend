@@ -58,16 +58,16 @@ class ClassNameRule {
 		'''«generatePackageName(orgClass.package)».«generateClassName(orgClass)»'''.toString
 	}
 	
-	new (AnnotationMirror am, AnnotationMirror metaAnnotation){
+	new (AnnotationMirror metaAnnotation){
 		//this(suffixToAppend, suffixToRemove, prefixToPrepend, prefixToRemove, regEx, regExReplace, packageRegEx, packageRegExReplace)
 		
-		_classSuffixToAppend = am.valueOrMetaValue("nameSuffixToAppend", String, metaAnnotation)
-		_classSuffixToRemove = am.valueOrMetaValue("nameSuffixToRemove", String, metaAnnotation)
-		_classPrefixToPrepend = am.valueOrMetaValue("namePrefixToPrepend", String, metaAnnotation)
-		_classPrefixToRemove = am.valueOrMetaValue("namePrefixToRemove", String, metaAnnotation)
+		_classSuffixToAppend = metaAnnotation.value("nameSuffixToAppend", String)
+		_classSuffixToRemove = metaAnnotation.value("nameSuffixToRemove", String)
+		_classPrefixToPrepend = metaAnnotation.value("namePrefixToPrepend", String)
+		_classPrefixToRemove = metaAnnotation.value("namePrefixToRemove", String)
 		
-		_classNameRule = new NameRule(am, metaAnnotation, "name")
-		_packageNameRule = new NameRule(am, metaAnnotation, "packageName")	
+		_classNameRule = new NameRule(metaAnnotation, "name")
+		_packageNameRule = new NameRule(metaAnnotation, "packageName")	
 		
 	}
 	
