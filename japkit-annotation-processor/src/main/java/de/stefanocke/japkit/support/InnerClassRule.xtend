@@ -21,7 +21,7 @@ class InnerClassRule extends MemberRuleSupport<TypeElement, GenTypeElement> {
 			
 		
 		//TODO: Avoid those params, if possible
-		val clazz = generateClass(currentAnnotatedClass, currentGeneratedClass, currentAnnotation, metaAnnotation, template, name, null)
+		val clazz = generateClass(currentAnnotatedClass, currentGeneratedClass, currentTriggerAnnotation, metaAnnotation, template, name, null)
 		
 		clazz.comment = commentRule.apply
 		

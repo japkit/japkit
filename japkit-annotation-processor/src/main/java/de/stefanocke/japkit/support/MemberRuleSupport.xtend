@@ -178,7 +178,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		} catch(Exception re) {
 			//don't let one member screw up the whole class
 			reportError('''Error in meta annotation «metaAnnotation» «IF template !=null»in template «template» «ENDIF»''', 
-				re, currentAnnotatedClass, currentAnnotation, null
+				re, currentAnnotatedClass, currentTriggerAnnotation, null
 			)
 			emptyList
 		} finally {

@@ -44,14 +44,14 @@ class TypeResolver {
 
 	def TypeMirror resolveType(AnnotationMirror metaAnnotation, String typeAvName) { 
 
-		val selector = currentAnnotation.valueOrMetaValue(typeAvName, TypeMirror, metaAnnotation)
+		val selector = currentTriggerAnnotation.valueOrMetaValue(typeAvName, TypeMirror, metaAnnotation)
 		selector.resolveType
 
 	}
 
 	def List<? extends TypeMirror> resolveTypes(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
 
-		val selectors = currentAnnotation.valueOrMetaValue(typeArgsAvName, typeof(TypeMirror[]), metaAnnotation)
+		val selectors = currentTriggerAnnotation.valueOrMetaValue(typeArgsAvName, typeof(TypeMirror[]), metaAnnotation)
 		selectors.map(s|s.resolveType)
 
 	}
@@ -149,7 +149,7 @@ class TypeResolver {
 					case ClassSelectorKind.SRC_SINGLE_VALUE_TYPE:
 						resolvedSelector.type = currentSrc.srcType?.singleValueType
 					case ClassSelectorKind.TYPE_MIRROR: {
-						resolvedSelector.type = currentAnnotation.value(classSelectorAnnotation.getClassSelectorAvName(te),
+						resolvedSelector.type = currentTriggerAnnotation.value(classSelectorAnnotation.getClassSelectorAvName(te),
 							TypeMirror)
 						if(resolvedSelector.type == null){
 							resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, TypeMirror)
@@ -166,7 +166,7 @@ class TypeResolver {
 					default: {
 						resolvedSelector.type = null
 						messageCollector.reportError('''Selector «resolvedSelector.kind» not supported''',
-							currentAnnotatedClass, currentAnnotation, null)
+							currentAnnotatedClass, currentTriggerAnnotation, null)
 					}
 						
 				}
@@ -188,7 +188,7 @@ class TypeResolver {
 		resolvedSelector.enclosingTypeElement = getEnclosingTypeElement(classSelectorAnnotation)
 		if(resolvedSelector.enclosingTypeElement==null){
 			messageCollector.reportError('''Could not determine enclosing type element for inner class.''',
-							currentAnnotatedClass, currentAnnotation, null)
+							currentAnnotatedClass, currentTriggerAnnotation, null)
 			return
 		}
 		resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, String)
@@ -231,7 +231,7 @@ class TypeResolver {
 	 */
 	def relatedTypeElementWithProxy(AnnotationMirror metaAnnotation, CharSequence annotationValueName) {
 
-		val selector = currentAnnotation.valueOrMetaValue(annotationValueName, TypeMirror, metaAnnotation)
+		val selector = currentTriggerAnnotation.valueOrMetaValue(annotationValueName, TypeMirror, metaAnnotation)
 		relatedTypeElementWithProxy(selector)
 
 	}
@@ -281,7 +281,7 @@ class TypeResolver {
 					proxy -> resolved.typeElement
 				
 			} else {
-				throw new ProcessingException('''Selector «selectorKind» not supported''', currentAnnotatedClass, currentAnnotation,
+				throw new ProcessingException('''Selector «selectorKind» not supported''', currentAnnotatedClass, currentTriggerAnnotation,
 							null, null)
 			}
 

@@ -497,7 +497,7 @@ class JapkitProcessor extends AbstractProcessor {
 		triggerAnnotations.filter[!value].forEach [ //value tells whether it is a shadow annotation
 			val triggerAnnotation = it.key
 			
-			setCurrentAnnotation(triggerAnnotation)
+			setCurrentTriggerAnnotation(triggerAnnotation)
 			try {
 				printDiagnosticMessage
 				[

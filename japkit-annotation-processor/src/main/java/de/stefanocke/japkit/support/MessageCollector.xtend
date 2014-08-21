@@ -136,7 +136,7 @@ class MessageCollector {
 		}
 		var annotation = pe.annotationMirror
 		if (annotation == null) {
-			annotation = currentAnnotation
+			annotation = currentTriggerAnnotation
 		}
 
 		addMessage(Kind.ERROR, msg, element, annotation, pe.annotationValueName?.toString)
@@ -144,16 +144,16 @@ class MessageCollector {
 		if (currentAnnotatedClass!=null) {
 
 			//Make sure, the error is reported for an element within the project, even if the original cause is an element outside the project
-			addMessage(Kind.ERROR, msg, currentAnnotatedClass, currentAnnotation, null)
+			addMessage(Kind.ERROR, msg, currentAnnotatedClass, currentTriggerAnnotation, null)
 		}
 
 	}
 	
 	def reportMessage(String msg, Element element, Kind kind) {
-		addMessage(kind, msg, element, currentAnnotation, null)
+		addMessage(kind, msg, element, currentTriggerAnnotation, null)
 		//If the element is not the current annotated class or is not contained in it, report one more message for the annotated class
 		if (currentAnnotatedClass!=null && element.enclosingTopLevelElement != currentAnnotatedClass) {
-			addMessage(kind, msg, currentAnnotatedClass, currentAnnotation, null)
+			addMessage(kind, msg, currentAnnotatedClass, currentTriggerAnnotation, null)
 		}
 	}
 	

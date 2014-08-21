@@ -127,7 +127,7 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 	}
 	
 	def Object eval() {
-		val triggerAnnotation = currentAnnotation
+		val triggerAnnotation = currentTriggerAnnotation
 		
 		pushCurrentMetaAnnotation(elVarAnnotation)
 		try {
@@ -138,7 +138,7 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 			var Object value = currentSrc
 			
 			value = if (!triggerAv.nullOrEmpty && {
-					av = currentAnnotation.value(triggerAv, type);
+					av = currentTriggerAnnotation.value(triggerAv, type);
 					!av.nullOrEmptyAV
 				}) {
 

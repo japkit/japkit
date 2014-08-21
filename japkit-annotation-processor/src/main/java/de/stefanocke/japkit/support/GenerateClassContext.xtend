@@ -12,35 +12,33 @@ import de.stefanocke.japkit.support.el.ValueStack
  */
 class GenerateClassContext {
 	
-	def ValueStack currentValueStack() {
+	def private ValueStack valueStack() {
 		ExtensionRegistry.get(ELSupport).getValueStack()
 	}
 
 	def setCurrentAnnotatedClass(TypeElement annotatedClass) {	
-		currentValueStack.put("currentAnnotatedClass" , annotatedClass)
+		valueStack.put("currentAnnotatedClass" , annotatedClass)
 	}
 	
 	def currentAnnotatedClass() {
-		currentValueStack.get("currentAnnotatedClass") as TypeElement
+		valueStack.get("currentAnnotatedClass") as TypeElement
 	}
 
 	def GenTypeElement getCurrentGeneratedClass(){
-		currentValueStack.get("currentGenClass") as GenTypeElement
+		valueStack.get("currentGenClass") as GenTypeElement
 	}
 	
 	def void setCurrentGeneratedClass(GenTypeElement currentGeneratedClass){
-		currentValueStack.put("currentGenClass" , currentGeneratedClass)
+		valueStack.put("currentGenClass" , currentGeneratedClass)
+	}
+
+	
+	def AnnotationMirror getCurrentTriggerAnnotation(){
+		valueStack.get("currentAnnotation") as AnnotationMirror
 	}
 	
-	AnnotationMirror currentAnnotation
-	
-	def AnnotationMirror getCurrentAnnotation(){
-		currentAnnotation
-	}
-	
-	def void  setCurrentAnnotation(AnnotationMirror currentAnnotation){
-		this.currentAnnotation = currentAnnotation
-		ExtensionRegistry.get(ELSupport).valueStack.put("currentAnnotation", currentAnnotation)
+	def void  setCurrentTriggerAnnotation(AnnotationMirror currentAnnotation){
+		valueStack.put("currentAnnotation", currentAnnotation)
 	}
 	
 	//Primarily for debugging purposes ...
@@ -73,6 +71,6 @@ class GenerateClassContext {
 	
 	
 	def putShadowAnnotation(AnnotationMirror shadowAnnotation) {
-		currentValueStack.put("shadowAnnotation", shadowAnnotation)
+		valueStack.put("shadowAnnotation", shadowAnnotation)
 	}
 }
