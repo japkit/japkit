@@ -455,11 +455,9 @@ class JapkitProcessor extends AbstractProcessor {
 		//Whatever type dependecies we had so far - they will be re-created. Especially UNKNOWN_TYPE dependencies might be replaced by normal ones
 		removeDependenciesForAnnotatedClass(annotatedClass.qualifiedName.toString)
 
-		scope(annotatedClass)[
-			setCurrentAnnotatedClass(annotatedClass)
-			processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]	
-			null	
-		]
+		
+		processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]		
+		
 
 		//TODO: Reconsider. Is @Behavior considered as Trigger Annotation or as something else?
 		//generatedTopLevelClasses.putAll(processBehaviorAnnotation(annotatedClass))
@@ -497,31 +495,30 @@ class JapkitProcessor extends AbstractProcessor {
 		triggerAnnotations.filter[!value].forEach [ //value tells whether it is a shadow annotation
 			val triggerAnnotation = it.key
 			
-			setCurrentTriggerAnnotation(triggerAnnotation)
-			try {
-				printDiagnosticMessage
-				[
-					'''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
+			scope(annotatedClass) [
+				setCurrentAnnotatedClass(annotatedClass)
+				setCurrentTriggerAnnotation(triggerAnnotation)
+				try {
+					printDiagnosticMessage['''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
 
-				//EL Variables			
-				triggerAnnotation.metaAnnotations(Var).forEach[new ELVariableRule(it).putELVariable]
+					//EL Variables			
+					triggerAnnotation.metaAnnotations(Var).forEach[new ELVariableRule(it).putELVariable]
 
-				//@GenerateClass
-				generatedClasses.addAll(classGenerator.processGenClassAnnotation(annotatedClass, triggerAnnotation))
+					//@Clazz
+					generatedClasses.addAll(classGenerator.processGenClassAnnotation(annotatedClass, triggerAnnotation))
 
-				//@ResourceTemplate
-				resourceGenerator.processResourceTemplatesAnnotation(annotatedClass, triggerAnnotation)
+					//@ResourceTemplate
+					resourceGenerator.processResourceTemplatesAnnotation(annotatedClass, triggerAnnotation)
 
-			} catch (ProcessingException pe) {
-				reportError(pe)
-			} catch (TypeElementNotFoundException tenfe) {
-				handleTypeElementNotFound(tenfe, annotatedClass)
-			} finally {
-				
-				printDiagnosticMessage
-				[
-					'''Processed annotated class «annotatedClass». Duration: «System.currentTimeMillis - startMillis»''']
-			}
+				} catch (ProcessingException pe) {
+					reportError(pe)
+				} catch (TypeElementNotFoundException tenfe) {
+					handleTypeElementNotFound(tenfe, annotatedClass)
+				} finally {
+					printDiagnosticMessage['''Processed annotated class «annotatedClass». Duration: «System.currentTimeMillis - startMillis»''']
+				}
+				null
+			]
 		]
 
 		generatedClasses
