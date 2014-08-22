@@ -10,10 +10,16 @@ import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.AnnotatedClass;
 
-@Clazz(nameSuffixToRemove = "ViewModelDef", nameSuffixToAppend = "ViewModel", modifier = Modifier.ABSTRACT, vars = @Var(
-		name = "properties", propertyFilter = @Properties(sourceClass = FormBackingObject.class)))
-@Field(src="properties", manualOverrides= AnnotatedClass.class,  
-	annotations = @Annotation(src="#{src.field}", copyAnnotationsFromPackages = "*") , getter=@Getter)
+@Clazz(nameSuffixToRemove = "ViewModelDef",
+		nameSuffixToAppend = "ViewModel",
+		modifier = Modifier.ABSTRACT,
+		vars = @Var(name = "properties",
+				propertyFilter = @Properties(sourceClass = FormBackingObject.class)),
+		fields = @Field(src = "properties",
+				manualOverrides = AnnotatedClass.class,
+				annotations = @Annotation(src = "#{src.field}",
+						copyAnnotationsFromPackages = "*"),
+				getter = @Getter))
 public @interface ViewModel {
 	boolean shadow() default false;
 

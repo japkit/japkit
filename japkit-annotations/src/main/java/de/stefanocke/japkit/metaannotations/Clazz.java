@@ -163,6 +163,32 @@ public @interface Clazz {
 	String behaviorGenMethodRenamePrefix() default "gen";
 	
 	/**
+	 * 
+	 * @return the fields to be generated for this class.
+	 */
+	Field[] fields() default {};
+	
+	/**
+	 * 
+	 * @return the methods to be generated for this class.
+	 */
+	Method[] methods() default {};
+	
+	/**
+	 * 
+	 * @return the constructors to be generated for this class.
+	 */
+	Constructor[] constructors() default {};
+	
+	/**
+	 * 
+	 * @return the inner classes to be generated for this class.
+	 */
+	InnerClass[] innerClasses() default {};
+	
+	
+	
+	/**
 	 * EL Variables in the scope of the generated class. 
 	 * @return
 	 */

@@ -15,16 +15,14 @@ import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 
-@Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifier = Modifier.PUBLIC,
-		annotations = { @Annotation(targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class,
-		members = { @Members(IdAndVersion.class), 
-				@Members,
-				@Members(ToString.class),
-				@Members(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"), value = ActiveRecordMembers.class) })
-@Field(src="#{src.declaredFields}", getter=@Getter, setter=@Setter, annotations = @Annotation(copyAnnotationsFromPackages = {
-		"javax.persistence", "javax.validation.constraints", "org.springframework.format.annotation" })
-/* ,templates = PropertyTemplateTest.class */)
-@Var(name = "superclass", expr = "#{currentAnnotatedClass.superclass}", requiredTriggerAnnotation=JapkitEntity.class)
+@Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifier = Modifier.PUBLIC, annotations = { @Annotation(
+		targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class, members = { @Members(IdAndVersion.class), @Members,
+		@Members(ToString.class),
+		@Members(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"), value = ActiveRecordMembers.class) },
+		fields = @Field(src = "#{src.declaredFields}", getter = @Getter, setter = @Setter, annotations = @Annotation(
+				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
+						"org.springframework.format.annotation" })))
+@Var(name = "superclass", expr = "#{currentAnnotatedClass.superclass}", requiredTriggerAnnotation = JapkitEntity.class)
 public @interface JapkitEntity {
 	// Modifier[] modifier() default {};
 

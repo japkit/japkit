@@ -1,6 +1,8 @@
 package de.stefanocke.japkit.metaannotations;
 
-import javax.lang.model.element.Element;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
@@ -13,6 +15,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * 
  */
 @MemberGeneratorAnnotation
+@Target(ElementType.FIELD)
 public @interface Field {
 	/**
 	 * When the annotated annotation wants to override annotation values of the
@@ -269,9 +272,5 @@ public @interface Field {
 	 */
 	Matcher manualOverridesMatcher() default @Matcher(kind = ElementKind.FIELD);
 	
-	
-	
-	@interface List {
-		Field[] value();
-	}
+
 }

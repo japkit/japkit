@@ -1,9 +1,8 @@
 package de.stefanocke.japkit.metaannotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
@@ -19,7 +18,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * 
  */
 @MemberGeneratorAnnotation
-@Retention(RetentionPolicy.CLASS)
+@Target(ElementType.TYPE)
 public @interface InnerClass {
 	
 	/**
@@ -225,5 +224,25 @@ public @interface InnerClass {
 	 * @return
 	 */
 	Var[] vars() default {};
+	
+	/**
+	 * 
+	 * @return the fields to be generated for this class.
+	 */
+	Field[] fields() default {};
+	
+	/**
+	 * 
+	 * @return the methods to be generated for this class.
+	 */
+	Method[] methods() default {};
+	
+	/**
+	 * 
+	 * @return the constructors to be generated for this class.
+	 */
+	Constructor[] constructors() default {};
+	
+	
 
 }

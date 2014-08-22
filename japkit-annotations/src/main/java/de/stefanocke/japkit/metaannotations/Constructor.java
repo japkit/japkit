@@ -1,9 +1,9 @@
 package de.stefanocke.japkit.metaannotations;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.Modifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 
-import de.stefanocke.japkit.metaannotations.classselectors.None;
+import javax.lang.model.element.Modifier;
 
 /**
  * Annotation to add a method to a generated class.
@@ -12,6 +12,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * 
  */
 @MemberGeneratorAnnotation
+@Target(ElementType.CONSTRUCTOR)
 public @interface Constructor {
 	/**
 	 * When the annotated annotation wants to override annotation values of the
@@ -217,7 +218,5 @@ public @interface Constructor {
 	 */
 	boolean genElementIsSrcForDependentRules() default true;
 	
-	@interface List {
-		Constructor[] value();
-	}
+	
 }

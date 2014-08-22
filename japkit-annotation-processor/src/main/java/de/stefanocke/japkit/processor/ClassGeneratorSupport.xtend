@@ -42,6 +42,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.tools.Diagnostic.Kind
 import de.stefanocke.japkit.gen.GenAnnotationType
+import de.stefanocke.japkit.support.MembersRule
 
 class ClassGeneratorSupport {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -91,11 +92,12 @@ class ClassGeneratorSupport {
 				)
 				
 				
+				new MembersRule(genClass).apply(generatedClass)
 				processMemberGenerators(annotatedClass, generatedClass, triggerAnnotation, genClass)
 				
 				//For @InnerClass, the annotated inner class is the template
 				if(templateClass!=null){ 
-					ExtensionRegistry.get(FromTemplateGenerator).createMembers(templateClass, annotatedClass, generatedClass, triggerAnnotation, genClass)
+					ExtensionRegistry.get(FromTemplateGenerator).createMembers(templateClass, annotatedClass, generatedClass, triggerAnnotation, null)
 				}
 				
 				
@@ -263,7 +265,8 @@ class ClassGeneratorSupport {
 			interfaces.forEach[i|addInterface(i.key, i.value)]
 		]
 	}
-
+	
+	@Deprecated
 	def protected processMemberGenerators(TypeElement annotatedClass, GenTypeElement generatedClass,
 		AnnotationMirror triggerAnnotation, AnnotationMirror genClassMetaAnnotation) {
 
@@ -289,6 +292,7 @@ class ClassGeneratorSupport {
 
 	}
 
+	@Deprecated
 	def protected void processMemberGenerator(
 		AnnotationMirror memberGeneratorMetaAnnotation,
 		TypeElement membersClass,
@@ -370,6 +374,7 @@ class ClassGeneratorSupport {
 		}
 	}
 
+	@Deprecated
 	val builtInMemberGenerators = #{
 		ConstructorGenerator,
 		FieldGenerator,
@@ -378,8 +383,11 @@ class ClassGeneratorSupport {
 		AnnotationGenerator, 
 		InnerClassGenerator
 	}
+	
+	@Deprecated
 	var Map<String, MemberGenerator> memberGenerators;
 
+	@Deprecated
 	def MemberGenerator getMemberGenerator(String metaAnnotationFqn) {
 		if (memberGenerators == null) {
 			memberGenerators = new HashMap();

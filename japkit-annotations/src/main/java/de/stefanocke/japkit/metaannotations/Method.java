@@ -1,5 +1,8 @@
 package de.stefanocke.japkit.metaannotations;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+
 import javax.lang.model.element.Modifier;
 
 import de.stefanocke.japkit.metaannotations.classselectors.None;
@@ -11,6 +14,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * 
  */
 @MemberGeneratorAnnotation
+@Target(ElementType.METHOD)
 public @interface Method {
 	/**
 	 * When the annotated annotation wants to override annotation values of the
@@ -266,7 +270,5 @@ public @interface Method {
 	 */
 	DelegateMethods[] delegateMethods() default {};
 
-	@interface List {
-		Method[] value();
-	}
+	
 }

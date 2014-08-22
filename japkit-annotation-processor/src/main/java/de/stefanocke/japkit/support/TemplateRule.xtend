@@ -4,24 +4,22 @@ import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Constructor
 import de.stefanocke.japkit.metaannotations.Field
-import de.stefanocke.japkit.metaannotations.Getter
 import de.stefanocke.japkit.metaannotations.InnerClass
 import de.stefanocke.japkit.metaannotations.Method
-import de.stefanocke.japkit.metaannotations.Setter
 import de.stefanocke.japkit.metaannotations.Template
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
-import javax.lang.model.element.ExecutableElement
 
 @Data
 class TemplateRule implements Function1<GenTypeElement, List<? extends GenElement>>{
 
-	protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
@@ -50,6 +48,11 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 		val allConstructorsAreTemplates = templateAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
 		
 		_memberRules=newArrayList()	
+		
+		if(templateAnnotation!=null){
+			//Members from AVs
+			memberRules.add(new MembersRule(templateAnnotation))
+		}
 		
 		memberRules.addAll(
 			templateClass.declaredTypes.map[it -> annotationMirror(InnerClass)].filter[value != null].map [

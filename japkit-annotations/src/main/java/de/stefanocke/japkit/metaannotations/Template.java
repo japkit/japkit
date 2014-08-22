@@ -109,11 +109,49 @@ public @interface Template {
 	 * templates for constructors to be generated, even if they have no @Constructor
 	 * annotation. When setting this to false, you have to put @Constructor at
 	 * each constructor that shall be a template. Other constructors are
-	 * ignored. <p>
-	 * If a default constructor shall be generated, it is always required to annotate the template with @Constructor.
-	 * (Otherwise, the implicit constructors of the template classes would always generate default constructors.)
+	 * ignored.
+	 * <p>
+	 * If a default constructor shall be generated, it is always required to
+	 * annotate the template with @Constructor. (Otherwise, the implicit
+	 * constructors of the template classes would always generate default
+	 * constructors.)
 	 * 
 	 * @return
 	 */
 	boolean allConstructorsAreTemplates() default true;
+
+	/**
+	 * 
+	 * @return the fields to be generated additional to the ones in the
+	 *         template. This can be used for cases where there is little
+	 *         "static" code to be generated and a field template would provide
+	 *         little benefit.
+	 */
+	Field[] fields() default {};
+
+	/**
+	 * 
+	 * @return the methods to be generated for this class. This can be used for
+	 *         cases where there is little "static" code to be generated and a
+	 *         method template would provide little benefit.
+	 */
+	Method[] methods() default {};
+
+	/**
+	 * 
+	 * @return the methods to be generated for this class. This can be used for
+	 *         cases where there is little "static" code to be generated and a
+	 *         constructor template would provide little benefit.
+	 */
+	Constructor[] constructors() default {};
+
+	/**
+	 * 
+	 * @return the inner classes to be generated for this class. 	/**
+	 * 
+	 * @return the methods to be generated for this class. This can be used for
+	 *         cases where there is little "static" code to be generated and a
+	 *         template inner class would provide little benefit.
+	 */
+	InnerClass[] innerClasses() default {};
 }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Method;
-import de.stefanocke.japkit.metaannotations.Param;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;

@@ -1,5 +1,6 @@
 package de.stefanocke.japkit.metaannotations;
 
+@Deprecated
 public @interface Members {
 	
 	String _prefix() default "members";
