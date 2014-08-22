@@ -52,8 +52,7 @@ public @interface Method {
 	String srcVar() default "";
 
 	/**
-	 * EL Variables within the scope of the method. The root property "element"
-	 * refers to the enclosing class or to the current element of the iterator.
+	 * EL Variables within the scope of the method.
 	 * 
 	 * @return
 	 */
@@ -78,8 +77,7 @@ public @interface Method {
 
 	/**
 	 * For more complex cases: a Java EL expression to generate the name of the
-	 * method. The root property "element" refers to the enclosing class or to
-	 * the current element of the iterator..
+	 * method. 
 	 * 
 	 * @return
 	 */

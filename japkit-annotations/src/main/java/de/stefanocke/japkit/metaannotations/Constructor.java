@@ -50,8 +50,7 @@ public @interface Constructor {
 	String srcVar() default "";
 
 	/**
-	 * EL Variables within the scope of the method. The root property "element"
-	 * refers to the enclosing class or to the current element of the iterator.
+	 * EL Variables within the scope of the method.
 	 * 
 	 * @return
 	 */

@@ -74,14 +74,14 @@ class RuleUtils {
 	}
 	
 	/**Scope rule that gets the source element from "src" AV */
-	public def <T> ((Object)=>T)=>Iterable<T>  createScopeRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		createScopeRule(metaAnnotation, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
 	}
 	
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
 	 */
-	public def <T> ((Object)=>T)=>Iterable<T>  createScopeRule(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
+	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
 			
 		val srcVarName = metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
 		val varRules = createELVariableRules(metaAnnotation, avPrefix);

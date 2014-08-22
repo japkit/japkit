@@ -34,12 +34,15 @@ class MembersRule implements Function1<GenTypeElement, List<? extends GenElement
 	
 	def (GenTypeElement)=>List<? extends GenElement> createTemplateCallRule(AnnotationMirror templateCallAnnotation) {
 		val activationRule = createActivationRule(templateCallAnnotation, null)
+		val scopeRule = createScopeRule(templateCallAnnotation, null)
 		val templateRule = createTemplateRule(templateCallAnnotation.value("value", TypeElement));
-		[
+		[genClass |
 			if (!activationRule.apply) {
 				emptyList
 			} else {
-				templateRule.apply(it)
+				scopeRule.apply[
+					templateRule.apply(genClass)		
+				].flatten.toList
 			}]
 
 	}

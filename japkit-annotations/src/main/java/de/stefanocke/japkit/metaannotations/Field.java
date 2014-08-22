@@ -53,8 +53,7 @@ public @interface Field {
 	String srcVar() default "";
 
 	/**
-	 * EL Variables within the scope of the field. The root property "element"
-	 * refers to the enclosing class or to the current element of the iterator.
+	 * EL Variables within the scope of the field.
 	 * 
 	 * @return
 	 */
@@ -79,7 +78,7 @@ public @interface Field {
 
 	/**
 	 * For more complex cases: a Java EL expression to generate the name of the
-	 * field. The root property "element" refers to the enclosing class.
+	 * field.
 	 * 
 	 * @return
 	 */
