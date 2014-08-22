@@ -17,28 +17,28 @@ class GenerateClassContext {
 	}
 
 	def setCurrentAnnotatedClass(TypeElement annotatedClass) {	
-		valueStack.put("currentAnnotatedClass" , annotatedClass)
+		valueStack.put("annotatedClass" , annotatedClass)
 	}
 	
 	def currentAnnotatedClass() {
-		valueStack.get("currentAnnotatedClass") as TypeElement
+		valueStack.get("annotatedClass") as TypeElement
 	}
 
 	def GenTypeElement getCurrentGeneratedClass(){
-		valueStack.get("currentGenClass") as GenTypeElement
+		valueStack.get("genClass") as GenTypeElement
 	}
 	
 	def void setCurrentGeneratedClass(GenTypeElement currentGeneratedClass){
-		valueStack.put("currentGenClass" , currentGeneratedClass)
+		valueStack.put("genClass" , currentGeneratedClass)
 	}
 
 	
 	def AnnotationMirror getCurrentTriggerAnnotation(){
-		valueStack.get("currentAnnotation") as AnnotationMirror
+		valueStack.get("triggerAnnotation") as AnnotationMirror
 	}
 	
 	def void  setCurrentTriggerAnnotation(AnnotationMirror currentAnnotation){
-		valueStack.put("currentAnnotation", currentAnnotation)
+		valueStack.put("triggerAnnotation", currentAnnotation)
 	}
 	
 	//Primarily for debugging purposes ...

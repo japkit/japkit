@@ -12,7 +12,7 @@ import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Var;
 
-@Var(name="srcClass", triggerAV="srcClass", setInShadowAnnotation=true, expr="#{currentAnnotatedClass.asType()}")
+@Var(name="srcClass", triggerAV="srcClass", setInShadowAnnotation=true, expr="#{annotatedClass.asType()}")
 @Clazz(nameSuffixToAppend=RuntimeMetadata.CLASS_SUFFIX, annotations={
 	@Annotation(id="elementMetadata", targetAnnotation=Element.class, 
 			values={

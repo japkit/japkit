@@ -18,11 +18,11 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 @Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifier = Modifier.PUBLIC, annotations = { @Annotation(
 		targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class, templates = { @TemplateCall(IdAndVersion.class),
 		@TemplateCall(ToString.class),
-		@TemplateCall(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"), value = ActiveRecordMembers.class) },
+		@TemplateCall(activation = @Matcher(condition = "#{triggerAnnotation.activeRecord}"), value = ActiveRecordMembers.class) },
 		fields = @Field(src = "#{src.declaredFields}", getter = @Getter, setter = @Setter, annotations = @Annotation(
 				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 						"org.springframework.format.annotation" })))
-@Var(name = "superclass", expr = "#{currentAnnotatedClass.superclass}", requiredTriggerAnnotation = JapkitEntity.class)
+@Var(name = "superclass", expr = "#{annotatedClass.superclass}", requiredTriggerAnnotation = JapkitEntity.class)
 public @interface JapkitEntity {
 	// Modifier[] modifier() default {};
 

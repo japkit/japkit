@@ -16,7 +16,7 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 
 @RuntimeMetadata
-@Template(vars = @Var(expr = "#{currentGenClass.simpleName}", name = "entityName", type = String.class))
+@Template(vars = @Var(expr = "#{genClass.simpleName}", name = "entityName", type = String.class))
 @Configurable
 public abstract class ActiveRecordMembers {
 	
@@ -25,7 +25,7 @@ public abstract class ActiveRecordMembers {
 	transient EntityManager entityManager;
 
 	@Method(imports = { EntityManager.class, IllegalStateException.class },
-			bodyCode = "EntityManager em = new #{currentGenClass.asType().code}().entityManager;\n"
+			bodyCode = "EntityManager em = new #{genClass.asType().code}().entityManager;\n"
 					+ "if (em == null) throw new IllegalStateException(\"Entity manager has not been injected\");\n" + "return em;\n")
 	static final EntityManager entityManager() {
 		return null;

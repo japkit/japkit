@@ -15,6 +15,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.stefanocke.japkit.support.ExtensionRegistry.*
 import de.stefanocke.japkit.support.ExtensionRegistry
+import de.stefanocke.japkit.support.GenerateClassContext
 
 class ElExtensions {
 
@@ -59,8 +60,8 @@ class ElExtensions {
 	
 	def private static getAt(Element e, Map<String, Object> context) {
 		val extension ElementsExtensions = get(ElementsExtensions)
-		val packageForSimpleNames = (context?.get("currentAnnotation") as AnnotationMirror)?.annotationAsTypeElement.
-			package.qualifiedName.toString
+		val extension GenerateClassContext = get(GenerateClassContext)
+		val packageForSimpleNames = currentTriggerAnnotation.annotationAsTypeElement.package.qualifiedName.toString
 		e.annotationsByName(packageForSimpleNames);
 	}
 	
@@ -98,7 +99,7 @@ class ElExtensions {
 	}
 
 	/**
-	 * Allows to write something like "currentAnnotation.entityClass" to access the annotation value "entityClass" of currentAnnotation
+	 * Allows to write something like "annotation.entityClass" to access the annotation value "entityClass" of the annotation
 	 */
 	def static get(AnnotationMirror am, String avName) {
 		val extension ElementsExtensions = get(ElementsExtensions)
