@@ -8,7 +8,7 @@ import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.Getter;
 import de.stefanocke.japkit.metaannotations.Matcher;
-import de.stefanocke.japkit.metaannotations.Members;
+import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
@@ -16,9 +16,9 @@ import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 
 @Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifier = Modifier.PUBLIC, annotations = { @Annotation(
-		targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class, members = { @Members(IdAndVersion.class), @Members,
-		@Members(ToString.class),
-		@Members(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"), value = ActiveRecordMembers.class) },
+		targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class, templates = { @TemplateCall(IdAndVersion.class),
+		@TemplateCall(ToString.class),
+		@TemplateCall(activation = @Matcher(condition = "#{currentAnnotation.activeRecord}"), value = ActiveRecordMembers.class) },
 		fields = @Field(src = "#{src.declaredFields}", getter = @Getter, setter = @Setter, annotations = @Annotation(
 				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 						"org.springframework.format.annotation" })))

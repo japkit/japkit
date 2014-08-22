@@ -13,7 +13,6 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * @author stefan
  * 
  */
-@MemberGeneratorAnnotation
 @Target(ElementType.METHOD)
 public @interface Method {
 	/**

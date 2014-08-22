@@ -17,7 +17,7 @@ import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.AnnotationMode;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Matcher;
-import de.stefanocke.japkit.metaannotations.Members;
+import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
@@ -89,11 +89,11 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 				@Annotation(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMode.MERGE,
 						values = { @AV(name = "propertyNames", mode = AVMode.IGNORE,
 								expr = "viewProperties.collect{it.name}", lang = "GroovyScript"), })},
-		members = {
-				@Members(ControllerMembers.class),
-				@Members(activation = @Matcher(condition = "#{entityAnnotation.activeRecord}"), value = ControllerMembersActiveRecord.class),
-				@Members(ControllerMembersJpaRepository.class) ,
-				@Members(ControllerConverterProviderMembers.class)
+		templates = {
+				@TemplateCall(ControllerMembers.class),
+				@TemplateCall(activation = @Matcher(condition = "#{entityAnnotation.activeRecord}"), value = ControllerMembersActiveRecord.class),
+				@TemplateCall(ControllerMembersJpaRepository.class) ,
+				@TemplateCall(ControllerConverterProviderMembers.class)
 				})
 @ResourceTemplate.List({
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",

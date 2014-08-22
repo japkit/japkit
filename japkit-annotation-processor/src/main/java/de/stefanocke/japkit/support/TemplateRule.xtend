@@ -35,23 +35,22 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 	AnnotationMirror methodDefaults
 	AnnotationMirror constructorDefaults
 
-
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
 		_templateClass = templateClass
 		_templateAnnotation = templateAnnotation ?: templateClass.annotationMirror(Template)
-		_methodDefaults = templateAnnotation?.value("methodDefaults", typeof(AnnotationMirror[]))?.singleValue
-		_fieldDefaults = templateAnnotation?.value("fieldDefaults", typeof(AnnotationMirror[]))?.singleValue
-		_constructorDefaults = templateAnnotation?.value("constructorDefaults", typeof(AnnotationMirror[]))?.singleValue
+		_methodDefaults = _templateAnnotation?.value("methodDefaults", typeof(AnnotationMirror[]))?.singleValue
+		_fieldDefaults = _templateAnnotation?.value("fieldDefaults", typeof(AnnotationMirror[]))?.singleValue
+		_constructorDefaults = _templateAnnotation?.value("constructorDefaults", typeof(AnnotationMirror[]))?.singleValue
 		
-		val allFieldsAreTemplates = templateAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
-		val allMethodsAreTemplates = templateAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
-		val allConstructorsAreTemplates = templateAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
+		val allFieldsAreTemplates = _templateAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
+		val allMethodsAreTemplates = _templateAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
+		val allConstructorsAreTemplates = _templateAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
 		
 		_memberRules=newArrayList()	
 		
-		if(templateAnnotation!=null){
+		if(_templateAnnotation!=null){
 			//Members from AVs
-			memberRules.add(new MembersRule(templateAnnotation))
+			memberRules.add(new MembersRule(_templateAnnotation))
 		}
 		
 		memberRules.addAll(
@@ -84,8 +83,8 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 				new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, methodDefaults), key)
 			])
 
-		_annotationsRule = ru.createAnnotationMappingRules(templateAnnotation, templateClass, null)
-		_scopeRule = ru.createScopeRule(templateAnnotation, null)
+		_annotationsRule = ru.createAnnotationMappingRules(_templateAnnotation, templateClass, null)
+		_scopeRule = ru.createScopeRule(_templateAnnotation, null)
 
 	}
 	

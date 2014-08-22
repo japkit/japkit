@@ -105,9 +105,9 @@ public @interface Clazz {
 	
 	/**
 	 * 
-	 * @return the members to be generated for this class. By default, the trigger annotation itself is searched for member annotations.
+	 * @return the templates to be called to contribute members to the generated class
 	 */
-	Members[] members() default @Members;
+	TemplateCall[] templates() default {};
 
 	/**
 	 * If true, a custom behavior delegation mechanism is generated. Woohaa...

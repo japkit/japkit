@@ -14,7 +14,6 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * @author stefan
  * 
  */
-@MemberGeneratorAnnotation
 @Target(ElementType.FIELD)
 public @interface Field {
 	/**

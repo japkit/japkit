@@ -5,11 +5,15 @@ import de.stefanocke.japkit.gen.GenTypeElement
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import org.eclipse.xtext.xbase.lib.Functions.Function1
+import javax.lang.model.type.TypeMirror
+import javax.lang.model.element.TypeElement
 
 /**supports generating members  from annotation values "fields", "methods", "constructors" and "innerClasses"*/
 @Data
 class MembersRule implements Function1<GenTypeElement, List<? extends GenElement>> {
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val extension RuleUtils = ExtensionRegistry.get(RuleUtils)
+	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 
 	AnnotationMirror metaAnnotation
 	List<(GenTypeElement)=>List<? extends GenElement>> memberRules
@@ -23,7 +27,20 @@ class MembersRule implements Function1<GenTypeElement, List<? extends GenElement
 		addMemberRules("fields", [new FieldRule(it, null)])
 		addMemberRules("constructors", [new ConstructorRule(it, null)])
 		addMemberRules("methods", [new MethodRule(it, null)])
+		addMemberRules("templates", [createTemplateCallRule(it)])
 		
+
+	}
+	
+	def (GenTypeElement)=>List<? extends GenElement> createTemplateCallRule(AnnotationMirror templateCallAnnotation) {
+		val activationRule = createActivationRule(templateCallAnnotation, null)
+		val templateRule = createTemplateRule(templateCallAnnotation.value("value", TypeElement));
+		[
+			if (!activationRule.apply) {
+				emptyList
+			} else {
+				templateRule.apply(it)
+			}]
 
 	}
 

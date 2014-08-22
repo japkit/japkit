@@ -14,12 +14,14 @@ import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 
-@Template(vars={
-		@Var(name = "inheritedProperties", propertyFilter=@Properties(sourceClass=GeneratedClassSuperClass.class))
-},
-fieldDefaults=@Field(activation=@Matcher(src="template", nameNotIn="inheritedProperties"), getter=@Getter, setter=@Setter))
+@Template(vars = @Var(name = "inheritedProperties",
+		propertyFilter = @Properties(sourceClass = GeneratedClassSuperClass.class)),
+		fieldDefaults = @Field(activation = @Matcher(src = "template",
+				nameNotIn = "inheritedProperties"),
+				getter = @Getter,
+				setter = @Setter))
 public class IdAndVersion {
-	/***/
+
 	@Field
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

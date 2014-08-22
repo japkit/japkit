@@ -154,4 +154,10 @@ public @interface Template {
 	 *         template inner class would provide little benefit.
 	 */
 	InnerClass[] innerClasses() default {};
+	
+	/**
+	 * 
+	 * @return the templates to be called by this template.
+	 */
+	TemplateCall[] templates() default {};
 }

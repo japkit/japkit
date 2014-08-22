@@ -11,7 +11,6 @@ import javax.lang.model.element.Modifier;
  * @author stefan
  * 
  */
-@MemberGeneratorAnnotation
 @Target(ElementType.CONSTRUCTOR)
 public @interface Constructor {
 	/**

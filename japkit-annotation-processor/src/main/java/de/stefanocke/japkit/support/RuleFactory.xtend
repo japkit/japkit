@@ -28,6 +28,11 @@ class RuleFactory {
 		[TypeElement templateClass|new TemplateRule(templateClass, templateAnnotation)]
 	}
 
+	def createTemplateRule(TypeElement templateClass) {
+		//let the rule find the @Template annotation
+		createTemplateRule(templateClass, null)
+	}
+	
 	def createTemplateRule(TypeElement templateClass, AnnotationMirror templateAnnotation) {
 		getOrCreate(templateCache, templateClass, templateFactory(templateAnnotation))
 	}

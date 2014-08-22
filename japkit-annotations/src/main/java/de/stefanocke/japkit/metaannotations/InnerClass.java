@@ -17,7 +17,6 @@ import de.stefanocke.japkit.metaannotations.classselectors.None;
  * @author stefan
  * 
  */
-@MemberGeneratorAnnotation
 @Target(ElementType.TYPE)
 public @interface InnerClass {
 	
@@ -139,9 +138,9 @@ public @interface InnerClass {
 	
 	/**
 	 * 
-	 * @return the members to be generated for this class. 
+	 * @return the templates to be called to contribute members to the generated class
 	 */
-	Members[] members() default {};
+	TemplateCall[] templates() default {};
 
 	/**
 	 * If true, a custom behavior delegation mechanism is generated. Woohaa...
