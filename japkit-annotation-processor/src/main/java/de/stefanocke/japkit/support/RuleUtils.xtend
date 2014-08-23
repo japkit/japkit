@@ -113,13 +113,18 @@ class RuleUtils {
 	}
 	
 	public static val ALWAYS_ACTIVE = [| true]
+	
+	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
+		createActivationRule(metaAnnotation, avPrefix, true)
+	}
+	
 	/**
 	 * AV "activation" to enable or disable a rule
 	 */
-	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, boolean defaultValue) {
 
 		val activation = metaAnnotation?.elementMatchers("activation".withPrefix(avPrefix), null)
-		if(activation.nullOrEmpty) return ALWAYS_ACTIVE;
+		if(activation.nullOrEmpty) return [|defaultValue];
 
 		[|activation.exists[matches(currentSrcElement)]]
 	}

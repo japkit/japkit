@@ -147,7 +147,7 @@ public @interface InnerClass {
 	 * 
 	 * @return
 	 */
-	boolean customBehavior() default false;
+	Matcher[]  customBehaviorActivation() default {};
 
 	Class<?> behaviorClass() default InnerClassBehaviorInnerClass.class;
 	

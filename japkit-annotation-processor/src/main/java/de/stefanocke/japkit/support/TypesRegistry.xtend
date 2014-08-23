@@ -306,6 +306,10 @@ class TypesRegistry {
 		annotatedClassesFqn.exists[dependsOnUnknownTypes]
 	}
 
+	def registerGeneratedTypeElement(GenTypeElement genTypeElement){
+		registerGeneratedTypeElement(genTypeElement, currentAnnotatedClass, currentTriggerAnnotation)
+	}
+	
 	def registerGeneratedTypeElement(GenTypeElement genTypeElement, TypeElement annotatedClass, AnnotationMirror trigger) {
 		val genTypeFqn = genTypeElement.qualifiedName.toString
 		val genTypeSimpleName = getSimpleOrPartiallyQualifiedName(genTypeElement).toString

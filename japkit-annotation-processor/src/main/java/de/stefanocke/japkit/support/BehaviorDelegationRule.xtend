@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.processor
+package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenClass
 import de.stefanocke.japkit.gen.GenConstructor
@@ -8,26 +8,42 @@ import de.stefanocke.japkit.gen.GenInterface
 import de.stefanocke.japkit.gen.GenMethod
 import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.support.ElementsExtensions
-import de.stefanocke.japkit.support.ExtensionRegistry
-import de.stefanocke.japkit.support.TypeResolver
-import de.stefanocke.japkit.support.TypesExtensions
-import de.stefanocke.japkit.support.TypesRegistry
 import java.util.ArrayList
 import java.util.IdentityHashMap
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
-import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 
-class BehaviorDelegationGenerator {
+@Data
+class BehaviorDelegationRule {
 	
 	
-	protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	protected extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
-	protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
+	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	extension RuleUtils = ExtensionRegistry.get(RuleUtils)
+	
+	()=>boolean activationRule
+	TypeMirror behaviorClass	
+	String renamePrefix
+	String internalInterfaceName
+	Boolean internalInterfaceIsInnerClass
+	String internalInterfaceImplName
+	String abstractBehaviorClassName
+	
+	new(AnnotationMirror metaAnnotation){
+		_activationRule= metaAnnotation.createActivationRule("customBehavior", false)
+		_behaviorClass= metaAnnotation.value("behaviorClass", TypeMirror)
+		_renamePrefix = metaAnnotation.value("behaviorGenMethodRenamePrefix", String)
+		_internalInterfaceName = metaAnnotation.value("behaviorInternalInterface", String)
+		_internalInterfaceIsInnerClass = metaAnnotation.value("behaviorInternalInterfaceIsInnerClass", Boolean)
+		_internalInterfaceImplName = metaAnnotation.value("behaviorInternalInterfaceImpl", String)
+		_abstractBehaviorClassName = metaAnnotation.value("behaviorAbstractClass", String)
+	}
 	
 	def getGenExtensions(){
 		ExtensionRegistry.get(GenExtensions)
@@ -36,16 +52,15 @@ class BehaviorDelegationGenerator {
 		/**
 	 * Creates a mechanism to delegate behavior to a separate class that can be changed manually.
 	 */
-	def void createBehaviorDelegation(TypeElement annotatedClass, AnnotationMirror am, GenTypeElement c,
-		AnnotationMirror genClassAnnotation) {
+	def void createBehaviorDelegation(GenTypeElement c) {
 
-		if (!am.valueOrMetaValue(annotatedClass, "customBehavior", Boolean, genClassAnnotation)) {
+		if (!activationRule.apply) {
 			return
 		}
 
 		//TODO: Name of interface and base class configurable
 		//TODO: Visibility of interface and base class configurable
-		val behaviorProxyAndTypeElement = relatedTypeElementWithProxy(genClassAnnotation, "behaviorClass")
+		val behaviorProxyAndTypeElement = behaviorClass.resolveTypeAndCreateProxy
 
 		val behaviorClass = behaviorProxyAndTypeElement.key
 
@@ -53,8 +68,7 @@ class BehaviorDelegationGenerator {
 			behaviorClass.package.qualifiedName)
 
 		val allInstanceMethods = handleTypeElementNotFound(emptyList, 
-			'''Could not determine all methods of generated class «c.qualifiedName», probably due to some missing supertype.''',
-			annotatedClass)[
+			'''Could not determine all methods of generated class «c.qualifiedName», probably due to some missing supertype.''')[
 			c.allMethods.filter[!isStatic]
 		]
 
@@ -83,8 +97,7 @@ class BehaviorDelegationGenerator {
 			}
 		]
 
-		val renamePrefix = am.valueOrMetaValue(annotatedClass, "behaviorGenMethodRenamePrefix", String,
-			genClassAnnotation)
+		
 
 	//printDiagnosticMessage('''collidingBehaviorMethods: «collidingBehaviorMethods»''')
 
@@ -103,10 +116,7 @@ class BehaviorDelegationGenerator {
 
 		val Map<ExecutableElement, ExecutableElement> orgMethod = new IdentityHashMap
 
-		val internalInterfaceName = am.valueOrMetaValue(annotatedClass, "behaviorInternalInterface", String,
-			genClassAnnotation)
-		val internalInterfaceIsInnerClass = am.valueOrMetaValue(annotatedClass, "behaviorInternalInterfaceIsInnerClass",
-			Boolean, genClassAnnotation)
+		
 
 		val internalInterface = if (internalInterfaceIsInnerClass) {
 				new GenInterface(internalInterfaceName) => [c.add(it);]
@@ -115,7 +125,7 @@ class BehaviorDelegationGenerator {
 					//remember that we have created a new top level class so that it can be found
 					//and rendered later.
 					c.auxTopLevelClasses.add(it)
-					registerGeneratedTypeElement(it, annotatedClass, null)
+					registerGeneratedTypeElement(it, currentAnnotatedClass, null)
 				]
 			}
 
@@ -133,14 +143,6 @@ class BehaviorDelegationGenerator {
 			]
 		]
 
-		//if(!internalInterfaceIsInnerClass){
-		//Das Interface ist nur deshalb in einer separaten Compilation Unit, weil Eclipse APT das sonst beim Clean nicht compiliert bekommt
-		//(anscheindend wegen der zyklischen Abhängigkeit?) 
-		//writeSourceFile(internalInterface, annotatedClass);
-		//}
-		val internalInterfaceImplName = am.valueOrMetaValue(annotatedClass, "behaviorInternalInterfaceImpl", String,
-			genClassAnnotation)
-
 		val internalInterfaceImpl = new GenClass(internalInterfaceImplName) => [
 			addModifier(Modifier.PRIVATE) //Führt z.Z. zu einem Fehler bei den Import Statements
 			addInterface(internalInterface.asType)
@@ -155,8 +157,6 @@ class BehaviorDelegationGenerator {
 		]
 		c.add(internalInterfaceImpl)
 
-		val abstractBehaviorClassName = am.valueOrMetaValue(annotatedClass, "behaviorAbstractClass", String,
-			genClassAnnotation)
 
 		val abstractBehaviorClass = new GenClass(abstractBehaviorClassName) => [
 			copyTypeParametersFrom(c) //TODO: We may only need a subset of the type params...

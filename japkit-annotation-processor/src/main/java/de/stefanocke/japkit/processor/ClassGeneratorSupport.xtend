@@ -36,6 +36,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
+import de.stefanocke.japkit.support.BehaviorDelegationRule
 
 class ClassGeneratorSupport {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -50,7 +51,6 @@ class ClassGeneratorSupport {
 	protected val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 	protected val extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	
-	protected BehaviorDelegationGenerator behaviorDelegationGenerator = new BehaviorDelegationGenerator
 	
 	/**
 	 * Generates a top level or inner class and potentially some auxillary classes.
@@ -94,8 +94,7 @@ class ClassGeneratorSupport {
 				}
 				
 				
-				behaviorDelegationGenerator.createBehaviorDelegation(annotatedClass, triggerAnnotation, generatedClass,
-						genClass)
+				new BehaviorDelegationRule(genClass).createBehaviorDelegation(generatedClass)
 				
 				if(isTopLevelClass){
 					val Set<GenTypeElement> generatedClasses = newHashSet

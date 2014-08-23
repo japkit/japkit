@@ -229,14 +229,20 @@ class TypeResolver {
 	 * This proxy can be used by the code generator to state requirements for the type element, for example, which superclasses to extend. 
 	 * 
 	 */
-	def relatedTypeElementWithProxy(AnnotationMirror metaAnnotation, CharSequence annotationValueName) {
+	@Deprecated
+	def resolveTypeAndCreateProxy(AnnotationMirror metaAnnotation, CharSequence annotationValueName) {
 
 		val selector = currentTriggerAnnotation.valueOrMetaValue(annotationValueName, TypeMirror, metaAnnotation)
-		relatedTypeElementWithProxy(selector)
+		resolveTypeAndCreateProxy(selector)
 
 	}
-
-	def private relatedTypeElementWithProxy(TypeMirror selector) {
+	
+	/**Resolves the class selector and creates a "proxy" for the type element so that it is available even if it does not really exist yet.
+	 * TODO: Braucht man hier wirklich einen separaten Proxy? Ggf spezieller "UnresolvedType" der bei asElement das TypeElement liefert?
+	 * Vllt kann man das dann auch mit der anderen resolve-MEthode vereinheitlichen und generell per Flag steuern, ob eine TENFE geworfen wird
+	 * oder auf den Proxy verwiesen wird.
+	 */
+	def public resolveTypeAndCreateProxy(TypeMirror selector) {
 		try {
 
 			var resolved = resolveClassSelector(selector, false)

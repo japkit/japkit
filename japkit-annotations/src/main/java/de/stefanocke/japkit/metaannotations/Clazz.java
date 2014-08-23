@@ -114,7 +114,8 @@ public @interface Clazz {
 	 * 
 	 * @return
 	 */
-	boolean customBehavior() default false;
+	Matcher[]  customBehaviorActivation() default {};
+	
 
 	/**
 	 * 

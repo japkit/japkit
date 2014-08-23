@@ -89,6 +89,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 				@Annotation(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMode.MERGE,
 						values = { @AV(name = "propertyNames", mode = AVMode.IGNORE,
 								expr = "viewProperties.collect{it.name}", lang = "GroovyScript"), })},
+		customBehaviorActivation=@Matcher(condition="#{triggerAnnotation.customBehavior}"),
 		templates = {
 				@TemplateCall(ControllerMembers.class),
 				@TemplateCall(activation = @Matcher(condition = "#{entityAnnotation.activeRecord}"), value = ControllerMembersActiveRecord.class),
