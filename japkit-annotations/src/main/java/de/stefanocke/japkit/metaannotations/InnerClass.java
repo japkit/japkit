@@ -117,7 +117,7 @@ public @interface InnerClass {
 	 * 
 	 * @return the modifiers for the generated class
 	 */
-	Modifier[] modifier() default {};
+	Modifier[] modifiers() default {};
 
 
 	/**

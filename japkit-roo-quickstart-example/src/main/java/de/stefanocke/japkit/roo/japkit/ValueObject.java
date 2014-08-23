@@ -12,7 +12,7 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.AnnotatedClass;
 
 @Target(ElementType.TYPE)
-@Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifier = { Modifier.PUBLIC, Modifier.FINAL }, templates = {
+@Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifiers = { Modifier.PUBLIC, Modifier.FINAL }, templates = {
 		@TemplateCall(ValueObjectTemplate.class), @TemplateCall(ToString.class) })
 @Var(name = "properties", propertyFilter = @Properties(sourceClass = AnnotatedClass.class, fromFields = true))
 public @interface ValueObject {

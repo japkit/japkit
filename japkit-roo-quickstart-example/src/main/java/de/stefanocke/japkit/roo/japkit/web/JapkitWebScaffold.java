@@ -84,7 +84,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		nameSuffixToAppend = "",
 		//superclassTypeArgs=FormBackingObject.class,
 		
-		modifier = Modifier.PUBLIC,
+		modifiers = Modifier.PUBLIC,
 		annotations = {
 				@Annotation(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMode.MERGE,
 						values = { @AV(name = "propertyNames", mode = AVMode.IGNORE,

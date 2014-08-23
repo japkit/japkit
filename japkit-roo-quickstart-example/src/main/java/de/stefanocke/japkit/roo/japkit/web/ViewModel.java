@@ -12,7 +12,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.AnnotatedClass;
 
 @Clazz(nameSuffixToRemove = "ViewModelDef",
 		nameSuffixToAppend = "ViewModel",
-		modifier = Modifier.ABSTRACT,
+		modifiers = Modifier.ABSTRACT,
 		vars = @Var(name = "properties",
 				propertyFilter = @Properties(sourceClass = FormBackingObject.class)),
 		fields = @Field(src = "properties",

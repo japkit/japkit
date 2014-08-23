@@ -236,7 +236,7 @@ class ClassGeneratorSupport {
 	}
 	
 	def protected setModifiers(GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, AnnotationMirror genClassAnnotation) {
-		val modifier = triggerAnnotation.valueOrMetaValue("modifier", typeof(Modifier[]), genClassAnnotation)
+		val modifier = triggerAnnotation.valueOrMetaValue("modifiers", typeof(Modifier[]), genClassAnnotation)
 		
 		generatedClass => [
 			modifier.forEach[m|addModifier(m)]

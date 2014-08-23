@@ -69,7 +69,7 @@ public @interface Clazz {
 	 * 
 	 * @return the modifiers for the generated class
 	 */
-	Modifier[] modifier() default {};
+	Modifier[] modifiers() default {};
 
 	String nameSuffixToRemove() default "";
 
