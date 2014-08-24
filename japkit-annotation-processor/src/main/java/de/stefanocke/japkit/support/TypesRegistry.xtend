@@ -576,6 +576,11 @@ class TypesRegistry {
 	//		val annotatedClass = messageCollector.currentAnnotatedClass //TODO: Ugly	?
 	//		handleTypeElementNotFound(msg, typeFqnOrShortname, annotatedClass)
 	//	}
+	
+	def handleTypeElementNotFound(CharSequence msg, String typeFqnOrShortname){
+		handleTypeElementNotFound(msg, typeFqnOrShortname, currentAnnotatedClass)
+	}
+	
 	def handleTypeElementNotFound(CharSequence msg, String typeFqnOrShortname, TypeElement annotatedClass) {
 
 		val errorMsg = '''«msg» Missing type: «typeFqnOrShortname»'''

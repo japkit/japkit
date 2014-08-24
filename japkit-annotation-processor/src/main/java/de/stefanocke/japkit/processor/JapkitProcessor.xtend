@@ -36,6 +36,8 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.metaannotations.ResourceTemplate
+import de.stefanocke.japkit.support.ResourceRule
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -488,7 +490,12 @@ class JapkitProcessor extends AbstractProcessor {
 					generatedClasses.addAll(processGenClassAnnotation(annotatedClass, triggerAnnotation))
 
 					//@ResourceTemplate
-					resourceGenerator.processResourceTemplatesAnnotation(annotatedClass, triggerAnnotation)
+					val resourcePackage = triggerAnnotation.annotationAsTypeElement.package
+					val resourceRules = triggerAnnotation.metaAnnotations(ResourceTemplate).map[new ResourceRule(it, resourcePackage)]
+					
+					resourceRules.forEach[
+						generateResource						
+					]
 
 				} catch (ProcessingException pe) {
 					reportError(pe)
