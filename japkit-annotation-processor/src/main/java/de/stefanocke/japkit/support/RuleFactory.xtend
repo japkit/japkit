@@ -23,7 +23,7 @@ class RuleFactory {
 	}
 
 	val templateCache = CacheBuilder.newBuilder.maximumSize(100).weakKeys.<TypeElement, TemplateRule>build
-
+	
 	def templateFactory(AnnotationMirror templateAnnotation) {
 		[TypeElement templateClass|new TemplateRule(templateClass, templateAnnotation)]
 	}
@@ -35,6 +35,12 @@ class RuleFactory {
 	
 	def createTemplateRule(TypeElement templateClass, AnnotationMirror templateAnnotation) {
 		getOrCreate(templateCache, templateClass, templateFactory(templateAnnotation))
+	}
+	
+	val triggerAnnotationCache = CacheBuilder.newBuilder.maximumSize(100).weakKeys.<TypeElement, TriggerAnnotationRule>build
+	
+	def createTriggerAnnotationRule(TypeElement triggerAnnotationClass){
+		getOrCreate(triggerAnnotationCache, triggerAnnotationClass, [new TriggerAnnotationRule(triggerAnnotationClass)])
 	}
 
 	def static <K, V> V getOrCreate(Cache<K, V> cache, K key, (K)=>V factory) {

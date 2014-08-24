@@ -470,7 +470,7 @@ class JapkitProcessor extends AbstractProcessor {
 		val triggerAnnotations = getTriggerAnnotations(annotatedClass)
 
 		triggerAnnotations.filter[!value].map [ 
-			val triggerAnnotationRule = new TriggerAnnotationRule(it.key.annotationAsTypeElement)
+			val triggerAnnotationRule = createTriggerAnnotationRule(it.key.annotationAsTypeElement)
 			triggerAnnotationRule.processTriggerAnnotation(annotatedClass, it.key)		
 		].flatten.toSet
 
