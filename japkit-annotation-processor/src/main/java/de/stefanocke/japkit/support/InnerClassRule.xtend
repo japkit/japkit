@@ -1,15 +1,17 @@
 package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.processor.ClassGeneratorSupport
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 
+@Data
 class InnerClassRule extends MemberRuleSupport<TypeElement, GenTypeElement> {
-	val extension ClassGeneratorSupport = ExtensionRegistry.get(ClassGeneratorSupport)
+	
+	ClassRule classRule
 
 	new(AnnotationMirror metaAnnotation, TypeElement template) {
 		super(metaAnnotation, template)
+		_classRule = new ClassRule(metaAnnotation, template, false)
 	}
 
 	override protected GenTypeElement createMember() {
@@ -20,9 +22,9 @@ class InnerClassRule extends MemberRuleSupport<TypeElement, GenTypeElement> {
 		val name = nameRule.apply
 			
 		
-		//TODO: Avoid those params, if possible
-		val clazz = generateClass(currentAnnotatedClass, currentGeneratedClass, currentTriggerAnnotation, metaAnnotation, template, name, null)
 		
+		val clazz = classRule.generateClass(name, null)
+			
 		clazz.comment = commentRule.apply
 		
 		clazz

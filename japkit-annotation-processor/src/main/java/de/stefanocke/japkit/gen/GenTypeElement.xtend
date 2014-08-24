@@ -76,8 +76,8 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 		}
 	}
 	
-	def void setSuperclass(TypeMirror type){
-		setSuperclass(type as DeclaredType, {})
+	def void setSuperclass(DeclaredType type){
+		setSuperclass(type, type?.typeArguments ?: {})
 	}
 
 	/**

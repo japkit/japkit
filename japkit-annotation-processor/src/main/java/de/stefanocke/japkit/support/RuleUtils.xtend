@@ -37,8 +37,8 @@ class RuleUtils {
 	val protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	
 	
-	public static def withPrefix(String name, String prefix){
-		(if(prefix.nullOrEmpty) name else '''«prefix»«name.toFirstUpper»''').toString
+	public static def withPrefix(CharSequence name, String prefix){
+		(if(prefix.nullOrEmpty) name else '''«prefix»«name.toString.toFirstUpper»''').toString
 	}
 	
 	public static val ()=>Iterable<? extends Object> SINGLE_SRC_ELEMENT = [|  Collections.singleton(ExtensionRegistry.get(ELSupport).currentSrc)]
@@ -217,17 +217,20 @@ class RuleUtils {
 		]
 	}
 	
-	//TODO: AV-overriding überdenken. 
-	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template,
-		String avPrefix) {
+	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avPrefix) {
+		createTypeRule(metaAnnotation, template, "type", avPrefix, [| currentSrcElement.srcType])
+	}
+	
+	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avName,
+		String avPrefix, ()=>TypeMirror defaultValue) {
 
 		[  |
 			val typeFromTemplate = template?.resolveType
-			val type = metaAnnotation?.resolveType("type".withPrefix(avPrefix), "typeArgs".withPrefix(avPrefix))
+			val type = metaAnnotation?.resolveType(avName.withPrefix(avPrefix), '''«avName»Args'''.withPrefix(avPrefix))
 			if (!type.isVoid) {
 				type
 			} else {
-				typeFromTemplate ?: currentSrcElement.srcType
+				typeFromTemplate ?: defaultValue?.apply 
 			}
 		]
 	}

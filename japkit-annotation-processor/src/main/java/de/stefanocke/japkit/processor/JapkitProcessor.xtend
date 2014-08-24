@@ -3,8 +3,10 @@ package de.stefanocke.japkit.processor
 import de.stefanocke.japkit.annotations.Behavior
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.gen.JavaEmitter
+import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.Var
 import de.stefanocke.japkit.support.AnnotationExtensions
+import de.stefanocke.japkit.support.ClassRule
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
@@ -12,9 +14,11 @@ import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.ProcessingException
 import de.stefanocke.japkit.support.RuleFactory
 import de.stefanocke.japkit.support.TypeElementNotFoundException
+import de.stefanocke.japkit.support.TypeResolver
 import de.stefanocke.japkit.support.TypesExtensions
 import de.stefanocke.japkit.support.TypesRegistry
 import de.stefanocke.japkit.support.el.ELSupport
+import de.stefanocke.japkit.support.el.ELVariableRule
 import java.util.HashMap
 import java.util.HashSet
 import java.util.List
@@ -32,9 +36,6 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.support.TypeResolver
-import de.stefanocke.japkit.support.el.ELVariableRule
-import de.stefanocke.japkit.metaannotations.Clazz
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -58,7 +59,6 @@ class JapkitProcessor extends AbstractProcessor {
 	extension ELSupport elSupport
 
 	ResourceGenerator resourceGenerator
-	TopLevelClassGenerator classGenerator
 
 	//annotated classes that have to be re-considered in a later round
 	val Map<String, TypeElementNotFoundException> deferredClasses = new HashMap
@@ -89,7 +89,6 @@ class JapkitProcessor extends AbstractProcessor {
 		elSupport = ExtensionRegistry.get(ELSupport)
 
 		resourceGenerator = new ResourceGenerator
-		classGenerator = new TopLevelClassGenerator
 
 	}
 
@@ -486,7 +485,7 @@ class JapkitProcessor extends AbstractProcessor {
 					triggerAnnotation.metaAnnotations(Var).forEach[new ELVariableRule(it).putELVariable]
 
 					//@Clazz
-					generatedClasses.addAll(classGenerator.processGenClassAnnotation(annotatedClass, triggerAnnotation))
+					generatedClasses.addAll(processGenClassAnnotation(annotatedClass, triggerAnnotation))
 
 					//@ResourceTemplate
 					resourceGenerator.processResourceTemplatesAnnotation(annotatedClass, triggerAnnotation)
@@ -504,6 +503,18 @@ class JapkitProcessor extends AbstractProcessor {
 
 		generatedClasses
 
+	}
+	
+	def Set<GenTypeElement> processGenClassAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation) {
+
+		val genClass = triggerAnnotation.metaAnnotation(Clazz)
+		if(genClass == null) return emptySet;
+	
+		val generatedClasses = newHashSet
+
+		new ClassRule(genClass, null, true).generateClass(null, generatedClasses)		
+
+		generatedClasses
 	}
 
 	//TODO: Some Caching.

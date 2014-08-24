@@ -85,7 +85,7 @@ public @interface InnerClass {
 	 * 
 	 * @return the type arguments for the superclass
 	 */
-	Class<?>[] superclassTypeArgs() default {};
+	Class<?>[] superclassArgs() default {};
 
 	/**
 	 * 
@@ -98,7 +98,7 @@ public @interface InnerClass {
 	 * 
 	 * @return the type arguments for the interface
 	 */
-	Class<?>[] interface1TypeArgs() default {};
+	Class<?>[] interface1Args() default {};
 
 	/**
 	 * 
@@ -111,7 +111,7 @@ public @interface InnerClass {
 	 * 
 	 * @return the type arguments for the second interface
 	 */
-	Class<?>[] interface2TypeArgs() default {};
+	Class<?>[] interface2Args() default {};
 	
 	/**
 	 * 

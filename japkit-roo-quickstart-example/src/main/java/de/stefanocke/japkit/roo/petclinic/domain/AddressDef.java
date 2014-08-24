@@ -29,4 +29,6 @@ public class AddressDef {
 	@NotNull
 	String zip;
 	
+	
+	
 }

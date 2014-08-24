@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.processor
+package de.stefanocke.japkit.support
 
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenAnnotationType
@@ -11,22 +11,7 @@ import de.stefanocke.japkit.gen.GenExtensions
 import de.stefanocke.japkit.gen.GenInterface
 import de.stefanocke.japkit.gen.GenPackage
 import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.support.AnnotationExtensions
-import de.stefanocke.japkit.support.ClassNameRule
-import de.stefanocke.japkit.support.ElementsExtensions
-import de.stefanocke.japkit.support.ExtensionRegistry
-import de.stefanocke.japkit.support.GenerateClassContext
-import de.stefanocke.japkit.support.MembersRule
-import de.stefanocke.japkit.support.MessageCollector
-import de.stefanocke.japkit.support.ProcessingException
-import de.stefanocke.japkit.support.RuleFactory
-import de.stefanocke.japkit.support.RuleUtils
-import de.stefanocke.japkit.support.TypeElementNotFoundException
-import de.stefanocke.japkit.support.TypeResolver
-import de.stefanocke.japkit.support.TypesExtensions
-import de.stefanocke.japkit.support.TypesRegistry
 import de.stefanocke.japkit.support.el.ELSupport
-import java.util.ArrayList
 import java.util.List
 import java.util.Set
 import javax.annotation.processing.ProcessingEnvironment
@@ -36,9 +21,12 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
-import de.stefanocke.japkit.support.BehaviorDelegationRule
+import javax.lang.model.type.TypeMirror
+import org.eclipse.xtext.xbase.lib.Functions.Function1
+import de.stefanocke.japkit.support.el.ELVariableRule
 
-class ClassGeneratorSupport {
+@Data
+class ClassRule {
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	protected val extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
 	protected val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
@@ -51,57 +39,110 @@ class ClassGeneratorSupport {
 	protected val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 	protected val extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	
+	AnnotationMirror metaAnnotation
+	TemplateRule templateRule
+	MembersRule membersRule
+	ElementKind kind
+	()=>Set<Modifier> modifiersRule	
+	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
+	boolean isTopLevelClass	
+	ClassNameRule nameRule
+	BehaviorDelegationRule behaviorRule
+	
+	()=>TypeMirror superclassRule
+	List<()=>TypeMirror> interfaceRules
+	
+	boolean shallCreateShadowAnnotation
+	
+	List<ELVariableRule> varRules
+		
+	
+	new(AnnotationMirror metaAnnotation, TypeElement templateClass, boolean isTopLevelClass){
+		_metaAnnotation = metaAnnotation
+		_templateRule= templateClass?.createTemplateRule
+		_membersRule = new MembersRule(metaAnnotation)
+		_kind = metaAnnotation.value('kind', ElementKind)
+		_modifiersRule = createModifiersRule(metaAnnotation, templateClass, null)
+		
+		//TODO: Das template wird hier nicht mit hineingegeben, da die Template rule bereits selbst die annotationen des Templates kopiert.
+		//Es gibt recht viele Redundanzen zwischen @InnerClass und @Template. Vielleicht lässt sich das zusammenführen... z.B. könnte die @InnerClass
+		//Annotation STATT @Template verwendet werden. Das wäre dann aber auch für @Clazz zu überlegen. 
+		_annotationsRule = createAnnotationMappingRules(metaAnnotation, null, null)
+		
+		_shallCreateShadowAnnotation = metaAnnotation.value("createShadowAnnotation", Boolean) ?: false
+		_isTopLevelClass = isTopLevelClass
+		_nameRule = if(isTopLevelClass) new ClassNameRule(metaAnnotation) else null
+		_behaviorRule = new BehaviorDelegationRule(metaAnnotation)
+		_superclassRule = createTypeRule(metaAnnotation, null, "superclass", null, null)
+		_interfaceRules = (1 .. 2).map[createTypeRule(metaAnnotation, null, '''interface«it»''', null, null)].toList
+		
+		//Supports ELVariables in the scope of the generated class. For inner classes, this is already done in the inner class rule
+		//Note: src expression is currently not supported in the annotation, since generating multiple classes is not supported
+		//and would for instance be in conflict with ElementExtensions.generatedTypeElementAccordingToTriggerAnnotation 
+		_varRules = if(isTopLevelClass) createELVariableRules(metaAnnotation, null) else null;
+	}
 	
 	/**
 	 * Generates a top level or inner class and potentially some auxillary classes.
 	 * 
 	 * @return the set of generated top level classes. 
 	 */
-	def GenTypeElement generateClass(TypeElement annotatedClass, GenTypeElement enclosingClass, AnnotationMirror triggerAnnotation, 
-		AnnotationMirror genClass, TypeElement templateClass, String name, Set<GenTypeElement> generatedTopLevelClasses
+	def GenTypeElement generateClass(String name, Set<GenTypeElement> generatedTopLevelClasses
 	) {
+		val enclosingClass = currentGeneratedClass
 		
-		val isTopLevelClass = enclosingClass == null
-		pushCurrentMetaAnnotation(genClass)
+		if(isTopLevelClass != (enclosingClass==null)){
+			throw new IllegalArgumentException("currentGeneratedClass must be available when it is a rule for an inner class.")
+		}
+		
+		pushCurrentMetaAnnotation(metaAnnotation)
 		try {
-			//superclass with type args
-			val generatedClass = createClass(annotatedClass, triggerAnnotation, genClass, enclosingClass, name)
-			
-			
-			//Register generated class as early as possible to allow error type resolution in other classes
-			registerGeneratedTypeElement(generatedClass, annotatedClass, if(isTopLevelClass) triggerAnnotation else null)	
-		
 			scope[
+				varRules?.forEach[it.putELVariable]
+				//superclass with type args
+				val generatedClass = createClass(enclosingClass, name)
+				
+				
+				//Register generated class as early as possible to allow error type resolution in other classes
+				registerGeneratedTypeElement(generatedClass, currentAnnotatedClass, if(isTopLevelClass) currentTriggerAnnotation else null)	
+		
+			 
 				setCurrentGeneratedClass(generatedClass)
 				
-				setSuperClassAndInterfaces(annotatedClass, generatedClass, triggerAnnotation, genClass)
-			
-				if(isTopLevelClass){
-					createShadowAnnotation(triggerAnnotation, annotatedClass, genClass, generatedClass)	
+				generatedClass.modifiers = modifiersRule.apply
+				
+				//TODO: Move to modifiers rule ?
+				if(templateRule != null){
+					generatedClass.removeModifier(Modifier.ABSTRACT) //Templates are usually abstract
 				}
 				
-				generatedClass.annotationMirrors = mapTypeAnnotations(annotatedClass, triggerAnnotation, genClass, 
-					new ArrayList(generatedClass.annotationMirrors as List<GenAnnotationMirror>)
-				)
+				generatedClass.setSuperclass(superclassRule.apply)
+				interfaceRules.map[apply].filter[it!=null].forEach[
+					generatedClass.addInterface(it)
+				]
+				
+				if(isTopLevelClass){
+					createShadowAnnotation(generatedClass)	
+				}
 				
 				
-				new MembersRule(genClass).apply(generatedClass)
+				generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
+				
+				
+				membersRule.apply(generatedClass)
 				
 				
 				//For @InnerClass, the annotated inner class is the template
-				if(templateClass!=null){ 
-					createTemplateRule(templateClass, null).apply(generatedClass)
-				}
-				
-				
-				new BehaviorDelegationRule(genClass).createBehaviorDelegation(generatedClass)
+				templateRule?.apply(generatedClass)
+								
+				behaviorRule.createBehaviorDelegation(generatedClass)
 				
 				if(isTopLevelClass){
 					val Set<GenTypeElement> generatedClasses = newHashSet
 					generatedClasses.add(generatedClass)	
 					addAllAuxTopLevelClasses(generatedClasses, generatedClass)
 	
-					generatedClasses.forEach[markAsGenerated(it, annotatedClass)]
+					generatedClasses.forEach[markAsGenerated(it, currentAnnotatedClass)]
 					generatedClasses.forEach[addOrderAnnotations]				
 					generatedClasses.forEach[addParamNamesAnnotations]		
 				
@@ -129,11 +170,11 @@ class ClassGeneratorSupport {
 	
 	
 	
-	def createShadowAnnotation(AnnotationMirror triggerAnnotation, TypeElement annotatedClass, AnnotationMirror genClass, GenTypeElement generatedClass) {
+	def createShadowAnnotation(GenTypeElement generatedClass) {
 		try{
-			val shallCreateShadowAnnotation = triggerAnnotation.valueOrMetaValue(annotatedClass, "createShadowAnnotation", Boolean, genClass)
+			
 			if(shallCreateShadowAnnotation){
-				val shadowAnnotation = GenExtensions.copy(triggerAnnotation) => [it.setShadowIfAppropriate]
+				val shadowAnnotation = GenExtensions.copy(currentTriggerAnnotation) => [it.setShadowIfAppropriate]
 				
 				valueStack.getVariablesForShadowAnnotation().forEach[name, value |
 					shadowAnnotation.setValue(name, [t| 
@@ -152,7 +193,7 @@ class ClassGeneratorSupport {
 			throw tenfe
 		}
 		catch (RuntimeException re){
-			reportError('''Error when creating shadow annotation:''', re, annotatedClass, triggerAnnotation, null)
+			reportError('''Error when creating shadow annotation:''', re, null, null, null)
 		}
 	}
 
@@ -194,20 +235,15 @@ class ClassGeneratorSupport {
 	}
 	
 	
-	def GenTypeElement createClass(TypeElement annotatedClass, AnnotationMirror am, AnnotationMirror genClass, GenTypeElement enclosingClass,
-		String name
+	def GenTypeElement createClass(GenTypeElement enclosingClass, String name
 	) {
 		
-		val enclosingElAndClassName = if(enclosingClass==null){
-			//For top level classes, apply the name rule to get class and package name
-			val nameRule = new ClassNameRule(genClass)
-			GenPackage.forName(nameRule.generatePackageName(annotatedClass.packageOf)) -> nameRule.generateClassName(annotatedClass)
+		val enclosingElAndClassName = if(isTopLevelClass){
+			GenPackage.forName(nameRule.generatePackageName(currentAnnotatedClass.packageOf)) -> nameRule.generateClassName(currentAnnotatedClass)
 		} else {
 			//For inner classes, use provided class name
 			enclosingClass -> name
-		}
-
-		val kind = am.valueOrMetaValue(annotatedClass, 'kind', ElementKind, genClass)
+		}		
 
 		val generatedClass = switch (kind) {
 			case ElementKind.CLASS:
@@ -220,42 +256,11 @@ class ClassGeneratorSupport {
 				new GenAnnotationType(enclosingElAndClassName.value, enclosingElAndClassName.key)
 			default:
 				throw new ProcessingException('''Invalid element kind in GenClass annotation: «kind»''',
-					annotatedClass)
+					currentAnnotatedClass)
 		}
 
-		setModifiers(generatedClass, am, genClass)
 
 		generatedClass
-	}
-	
-	def protected mapTypeAnnotations(TypeElement annotatedClass, AnnotationMirror triggerAnnotation, AnnotationMirror genClassAnnotation, 
-		List<GenAnnotationMirror> existingAnnotations) {
-		val annotationMappings = triggerAnnotation.valueOrMetaValue(annotatedClass, "annotations", typeof(AnnotationMirror[]),
-			genClassAnnotation).map[createAnnotationMappingRule(it)]
-		mapAnnotations(annotationMappings, existingAnnotations)
-	}
-	
-	def protected setModifiers(GenTypeElement generatedClass, AnnotationMirror triggerAnnotation, AnnotationMirror genClassAnnotation) {
-		val modifier = triggerAnnotation.valueOrMetaValue("modifiers", typeof(Modifier[]), genClassAnnotation)
-		
-		generatedClass => [
-			modifier.forEach[m|addModifier(m)]
-		]
-	}
-	
-		def setSuperClassAndInterfaces(TypeElement annotatedClass, GenTypeElement generatedClass, AnnotationMirror am,
-		AnnotationMirror genClass) {
-		val superclass = resolveType(genClass, "superclass") as DeclaredType ->	resolveTypes(genClass, "superclassTypeArgs") 
-		//interfaces with type args
-		val interfaces = (1 .. 2).map[i|
-			resolveType(genClass, '''interface«i»''') as DeclaredType ->
-				resolveTypes(genClass, '''interface«i»TypeArgs''')].filter[
-			key != null].toList
-
-		generatedClass => [
-			setSuperclass(superclass.key, superclass.value)
-			interfaces.forEach[i|addInterface(i.key, i.value)]
-		]
 	}
 
 

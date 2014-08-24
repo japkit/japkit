@@ -11,8 +11,8 @@ import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.Clazz;
 
 @Clazz(nameSuffixToRemove = "RepositoryDef", nameSuffixToAppend = "Repository", modifiers = Modifier.PUBLIC,
-		kind = ElementKind.INTERFACE, interface1 = JpaRepository.class, interface1TypeArgs = { DomainType.class, Long.class },
-		interface2 = JpaSpecificationExecutor.class, interface2TypeArgs = DomainType.class, annotations = @Annotation(
+		kind = ElementKind.INTERFACE, interface1 = JpaRepository.class, interface1Args = { DomainType.class, Long.class },
+		interface2 = JpaSpecificationExecutor.class, interface2Args = DomainType.class, annotations = @Annotation(
 				targetAnnotation = Repository.class))
 public @interface JapJpaRepository {
 	boolean shadow() default false;
