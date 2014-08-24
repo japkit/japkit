@@ -12,6 +12,7 @@ import de.stefanocke.japkit.gen.GenInterface
 import de.stefanocke.japkit.gen.GenPackage
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.support.el.ELSupport
+import de.stefanocke.japkit.support.el.ELVariableRule
 import java.util.List
 import java.util.Set
 import javax.annotation.processing.ProcessingEnvironment
@@ -22,8 +23,6 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtext.xbase.lib.Functions.Function1
-import de.stefanocke.japkit.support.el.ELVariableRule
 
 @Data
 class ClassRule {

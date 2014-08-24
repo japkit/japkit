@@ -4,6 +4,7 @@ import de.stefanocke.japkit.annotations.Behavior
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.gen.JavaEmitter
 import de.stefanocke.japkit.metaannotations.Clazz
+import de.stefanocke.japkit.metaannotations.ResourceTemplate
 import de.stefanocke.japkit.metaannotations.Var
 import de.stefanocke.japkit.support.AnnotationExtensions
 import de.stefanocke.japkit.support.ClassRule
@@ -12,6 +13,7 @@ import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
 import de.stefanocke.japkit.support.ProcessingException
+import de.stefanocke.japkit.support.ResourceRule
 import de.stefanocke.japkit.support.RuleFactory
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypeResolver
@@ -36,8 +38,7 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.metaannotations.ResourceTemplate
-import de.stefanocke.japkit.support.ResourceRule
+import de.stefanocke.japkit.support.TriggerAnnotationRule
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -59,8 +60,6 @@ class JapkitProcessor extends AbstractProcessor {
 	extension TypesRegistry typesRegistry
 	extension RuleFactory ruleFactory
 	extension ELSupport elSupport
-
-	ResourceGenerator resourceGenerator
 
 	//annotated classes that have to be re-considered in a later round
 	val Map<String, TypeElementNotFoundException> deferredClasses = new HashMap
@@ -89,8 +88,6 @@ class JapkitProcessor extends AbstractProcessor {
 		typesRegistry = ExtensionRegistry.get(TypesRegistry)
 		ruleFactory = ExtensionRegistry.get(RuleFactory)
 		elSupport = ExtensionRegistry.get(ELSupport)
-
-		resourceGenerator = new ResourceGenerator
 
 	}
 
@@ -467,63 +464,19 @@ class JapkitProcessor extends AbstractProcessor {
 
 
 	def private Set<GenTypeElement> processTriggerAnnotations(TypeElement annotatedClass) {
-		val Set<GenTypeElement> generatedClasses = newHashSet
-		val startMillis = System.currentTimeMillis
-
+		
 		//TODO: Maybe we could make Trigger annotations more explicit by some meta annotation @Trigger
 		//At least, it should not be necessary to always have @GenerateClass ...
 		val triggerAnnotations = getTriggerAnnotations(annotatedClass)
 
-		triggerAnnotations.filter[!value].forEach [ //value tells whether it is a shadow annotation
-			val triggerAnnotation = it.key
-			
-			scope(annotatedClass) [
-				setCurrentAnnotatedClass(annotatedClass)
-				setCurrentTriggerAnnotation(triggerAnnotation)
-				try {
-					printDiagnosticMessage['''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
-
-					//EL Variables			
-					triggerAnnotation.metaAnnotations(Var).forEach[new ELVariableRule(it).putELVariable]
-
-					//@Clazz
-					generatedClasses.addAll(processGenClassAnnotation(annotatedClass, triggerAnnotation))
-
-					//@ResourceTemplate
-					val resourcePackage = triggerAnnotation.annotationAsTypeElement.package
-					val resourceRules = triggerAnnotation.metaAnnotations(ResourceTemplate).map[new ResourceRule(it, resourcePackage)]
-					
-					resourceRules.forEach[
-						generateResource						
-					]
-
-				} catch (ProcessingException pe) {
-					reportError(pe)
-				} catch (TypeElementNotFoundException tenfe) {
-					handleTypeElementNotFound(tenfe, annotatedClass)
-				} finally {
-					printDiagnosticMessage['''Processed annotated class «annotatedClass». Duration: «System.currentTimeMillis - startMillis»''']
-				}
-				null
-			]
-		]
-
-		generatedClasses
+		triggerAnnotations.filter[!value].map [ 
+			val triggerAnnotationRule = new TriggerAnnotationRule(it.key.annotationAsTypeElement)
+			triggerAnnotationRule.processTriggerAnnotation(annotatedClass, it.key)		
+		].flatten.toSet
 
 	}
 	
-	def Set<GenTypeElement> processGenClassAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation) {
-
-		val genClass = triggerAnnotation.metaAnnotation(Clazz)
-		if(genClass == null) return emptySet;
 	
-		val generatedClasses = newHashSet
-
-		new ClassRule(genClass, null, true).generateClass(null, generatedClasses)		
-
-		generatedClasses
-	}
-
 	//TODO: Some Caching.
 	def List<Pair<AnnotationMirror, Boolean>> getTriggerAnnotations(TypeElement annotatedClass) {
 		annotatedClass.annotationsWithMetaAnnotation(Clazz).map[it -> it.shadowAnnotation].toList
