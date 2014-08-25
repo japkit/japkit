@@ -4,9 +4,8 @@ import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenTypeElement
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
-import org.eclipse.xtext.xbase.lib.Functions.Function1
-import javax.lang.model.type.TypeMirror
 import javax.lang.model.element.TypeElement
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 /**supports generating members  from annotation values "fields", "methods", "constructors" and "innerClasses"*/
 @Data

@@ -4,13 +4,10 @@ import de.stefanocke.japkit.metaannotations.ResourceLocation
 import de.stefanocke.japkit.support.el.ELSupport
 import java.io.File
 import java.io.FileWriter
-import java.io.IOException
+import java.net.URL
 import java.util.List
-import java.util.Set
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.TypeElement
-import java.net.URL
 import javax.lang.model.element.PackageElement
 
 @Data

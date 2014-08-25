@@ -43,7 +43,7 @@ class GenerateClassContext {
 	
 	//Primarily for debugging purposes ...
 	Stack<AnnotationMirror> metaAnnotations = new Stack<AnnotationMirror>
-	Stack<Long> millis = new Stack<Long>
+
 	
 	def AnnotationMirror getCurrentMetaAnnotation(){
 		if(!metaAnnotations.isEmpty()) metaAnnotations.peek else null
@@ -57,7 +57,7 @@ class GenerateClassContext {
 	}
 	
 	def void popCurrentMetaAnnotation(){
-		val am = metaAnnotations.pop()
+		metaAnnotations.pop()
 		//val startMillis = millis.pop
 		//ExtensionRegistry.get(MessageCollector).printDiagnosticMessage[
 		//	'''Finished processing Meta Annotation «am». Duration: «System.currentTimeMillis-startMillis»'''

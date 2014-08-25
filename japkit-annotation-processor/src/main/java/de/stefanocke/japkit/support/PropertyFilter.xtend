@@ -1,12 +1,10 @@
 package de.stefanocke.japkit.support
 
-import javax.lang.model.element.AnnotationMirror
 import de.stefanocke.japkit.metaannotations.Properties
 import java.util.List
+import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import de.stefanocke.japkit.gen.GenTypeElement
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.support.el.ELSupport
 
 @Data
 class PropertyFilter {

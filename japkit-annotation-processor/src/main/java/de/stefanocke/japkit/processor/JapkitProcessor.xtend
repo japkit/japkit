@@ -4,23 +4,17 @@ import de.stefanocke.japkit.annotations.Behavior
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.gen.JavaEmitter
 import de.stefanocke.japkit.metaannotations.Clazz
-import de.stefanocke.japkit.metaannotations.ResourceTemplate
-import de.stefanocke.japkit.metaannotations.Var
 import de.stefanocke.japkit.support.AnnotationExtensions
-import de.stefanocke.japkit.support.ClassRule
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
 import de.stefanocke.japkit.support.MessageCollector
-import de.stefanocke.japkit.support.ProcessingException
-import de.stefanocke.japkit.support.ResourceRule
 import de.stefanocke.japkit.support.RuleFactory
 import de.stefanocke.japkit.support.TypeElementNotFoundException
 import de.stefanocke.japkit.support.TypeResolver
 import de.stefanocke.japkit.support.TypesExtensions
 import de.stefanocke.japkit.support.TypesRegistry
 import de.stefanocke.japkit.support.el.ELSupport
-import de.stefanocke.japkit.support.el.ELVariableRule
 import java.util.HashMap
 import java.util.HashSet
 import java.util.List
@@ -38,7 +32,6 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.support.TriggerAnnotationRule
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
