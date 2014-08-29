@@ -5,7 +5,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 
 @Data
-class SwitchRule {
+class SwitchRule extends AbstractRule{
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	
@@ -23,6 +23,7 @@ class SwitchRule {
 	}
 	
 	new(AnnotationMirror switchAm){
+		super(switchAm, null)
 		_cases = switchAm.value("value", typeof(AnnotationMirror[])).map[ caseAm |
 			{
 				val matcherAm = caseAm.value("matcher", AnnotationMirror)

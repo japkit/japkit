@@ -14,7 +14,7 @@ import java.util.Map
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 @Data
-class CodeRule implements Function0<CharSequence> {
+class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	val protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val protected extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	val protected extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
@@ -23,7 +23,7 @@ class CodeRule implements Function0<CharSequence> {
 	val protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	val protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	
-	AnnotationMirror metaAnnotation
+
 	Element template
 	List<DeclaredType> imports
 	String iteratorExpr
@@ -44,7 +44,7 @@ class CodeRule implements Function0<CharSequence> {
 	}
 	
 	new(AnnotationMirror metaAnnotation, Element template, String avPrefix){
-		_metaAnnotation = metaAnnotation
+		super(metaAnnotation, template)
 		_template=template
 		
 		val codeFromJavadoc = JavadocUtil.getCode(template?.getDocCommentUsingRuntimeMetadata)

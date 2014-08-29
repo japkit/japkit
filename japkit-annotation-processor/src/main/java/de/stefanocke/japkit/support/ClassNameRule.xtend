@@ -5,7 +5,7 @@ import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement
 
 @Data
-class ClassNameRule {
+class ClassNameRule extends AbstractRule{
 	String classSuffixToAppend
 	String classSuffixToRemove
 	String classPrefixToPrepend
@@ -59,8 +59,7 @@ class ClassNameRule {
 	}
 	
 	new (AnnotationMirror metaAnnotation){
-		//this(suffixToAppend, suffixToRemove, prefixToPrepend, prefixToRemove, regEx, regExReplace, packageRegEx, packageRegExReplace)
-		
+		super(metaAnnotation, null)
 		_classSuffixToAppend = metaAnnotation.value("nameSuffixToAppend", String)
 		_classSuffixToRemove = metaAnnotation.value("nameSuffixToRemove", String)
 		_classPrefixToPrepend = metaAnnotation.value("namePrefixToPrepend", String)

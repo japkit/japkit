@@ -13,7 +13,7 @@ import javax.lang.model.type.TypeMirror
 import de.stefanocke.japkit.metaannotations.AVMode
 
 @Data
-class AnnotationValueMappingRule {
+class AnnotationValueMappingRule extends AbstractRule{
 	val extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 	val extension ProcessingEnvironment procEnv = ExtensionRegistry.get(ProcessingEnvironment)
 	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
@@ -27,8 +27,6 @@ class AnnotationValueMappingRule {
 	String annotationMappingId
 	AVMode mode
 
-	//for error reporting
-	AnnotationMirror mappingRuleAnnotation
 
 	def GenAnnotationValue mapAnnotationValue(GenAnnotationMirror annotation, TypeMirror avType, Map<String, AnnotationMappingRule> mappingsWithId) {
 
@@ -120,14 +118,13 @@ class AnnotationValueMappingRule {
 
 
 	new(AnnotationMirror a) {
-
+		super(a, null)
 		_name = a.value(null, "name", String)
 		_value = a.value(null, "value", String)
 		_expr = a.value(null, "expr", String)
 		_lang = a.value(null, "lang", String)
 		_mode = a.value(null, "mode", AVMode)
 		_annotationMappingId = a.value(null, "annotationMappingId", String)
-		_mappingRuleAnnotation = a
 		_activationRule = createActivationRule(a, null)
 
 	}

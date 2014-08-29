@@ -6,7 +6,7 @@ import javax.lang.model.element.Element
 import de.stefanocke.japkit.support.el.ELSupport
 
 @Data
-class NameRule {
+class NameRule extends AbstractRule{
 	Pattern regEx
 	String regExReplace
 	String expr
@@ -16,6 +16,7 @@ class NameRule {
 	val extension ELSupport = ExtensionRegistry.get(ELSupport)
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
+		super(metaAnnotation, null)
 		val prefix = if(avPrefix==null) "name" else avPrefix
 		_regEx = metaAnnotation.value('''«prefix»RegEx''', Pattern)
 		_regExReplace = metaAnnotation.value('''«prefix»RegExReplace''', String)		

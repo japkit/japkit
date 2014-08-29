@@ -88,7 +88,7 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 			if (isFunction) {
 				valueStack.put(name, this)
 			} else {
-				val value = eval()
+				val value = eval(currentSrc)
 				valueStack.put(name, value)
 			}
 		} catch (TypeElementNotFoundException tenfe) {
@@ -103,35 +103,25 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 		}
 	}
 
-	//For use in EL to customize src
-	def Object eval(Object src) {
-		scope(src)[
-			eval()
-		]		
-	}
+
 	
 	def Object filter(Iterable<? extends Element> collection) {
 		collection.filter[
-			scope(it)[
-				eval() as Boolean
-			]
+			eval(it) as Boolean
 		]
 	}
 	
 	def Object map(Iterable<? extends Element> collection) {
 		collection.map[
-			scope(it)[
-				eval()			
-			]
+			eval(it)			
 		]
 	}
 	
-	def Object eval() {
-		val triggerAnnotation = currentTriggerAnnotation
+	def Object eval(Object src) {
 		
-		pushCurrentMetaAnnotation(elVarAnnotation)
-		try {
-
+		val result = scope(src)[
+			
+	
 			var Object av
 			
 			//Be default, the value is the current src. This is useful for matcher and retrieveAV
@@ -141,18 +131,18 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 					av = currentTriggerAnnotation.value(triggerAv, type);
 					!av.nullOrEmptyAV
 				}) {
-
+	
 					av
-
+	
 				} else if (!expr.nullOrEmpty) {					
 					eval(expr, lang, type);									
 				} else if (!propertyFilterAnnotations.nullOrEmpty) {
-
+	
 					//TODO: Rule caching?
 					val propertyFilters = propertyFilterAnnotations.map[new PropertyFilter(it)]
 					propertyFilters.map[getFilteredProperties()].flatten.
 						toList
-
+	
 				} else if (typeQuery != null) {
 					evalTypeQuery(typeQuery)
 				} else if (codeFragments!=null){
@@ -182,26 +172,25 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 				}
 				
 			}
-
+	
 			val valueForVariable = if (annotationToRetrieve == null) {
 					value
 				} else {
 					value.retrieveAnnotationMirrors(annotationToRetrieve.qualifiedName)
 				}
-
-			//Das hier funktioniert so nicht, wenn isFunction true ist. Macht aber nichts.
-			if (setInShadowAnnotation && !triggerAv.nullOrEmpty) {
-
-				//TODO: Es dürfte ungewöhnlich sein, hier einen AnnotationMirror zu setzen. Daher nehmen wir value anstatt valueForVariable.
-				//Ist das sinnvoll oder eher verwirrend? 
-				valueStack.getVariablesForShadowAnnotation().put(triggerAv, value)
-			}
-
+	
+			
+	
 			valueForVariable
 
-		} finally {
-			popCurrentMetaAnnotation()
-		}
+		]
+		
+		//Das hier funktioniert so nicht, wenn isFunction true ist. Macht aber nichts.
+			if (setInShadowAnnotation && !triggerAv.nullOrEmpty) {
+				valueStack.getVariablesForShadowAnnotation().put(triggerAv, result)
+			}
+		
+		result
 
 	}
 
@@ -263,7 +252,7 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 	}
 	
 	override apply() {
-		eval
+		eval(currentSrc)
 	}
 	
 }

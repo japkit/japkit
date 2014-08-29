@@ -512,7 +512,7 @@ class TypesRegistry {
 
 		if (isNewDependency) {
 			messageCollector.printDiagnosticMessage[
-				'''Registered dependency from «annotatedClassFqn» to «typeFqn». Currently processed meta annotation: «currentMetaAnnotation». Details: «causeMsg»''']
+				'''Registered dependency from «annotatedClassFqn» to «typeFqn». Details: «causeMsg»''']
 		}
 	}
 

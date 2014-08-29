@@ -16,7 +16,7 @@ import javax.lang.model.type.DeclaredType
 import static de.stefanocke.japkit.metaannotations.AnnotationMode.*
 
 @Data
-class AnnotationMappingRule {
+class AnnotationMappingRule extends AbstractRule{
 	val extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 	val extension ProcessingEnvironment procEnv = ExtensionRegistry.get(ProcessingEnvironment)
 	//val extension RoundEnvironment roundEnv = ExtensionRegistry.get(RoundEnvironment)
@@ -172,6 +172,7 @@ class AnnotationMappingRule {
 
 
 	new(AnnotationMirror am) {
+		super(am, null)
 		_id = am.value("id", String)
 		_activationRule = createActivationRule(am, null)
 		_targetAnnotation = am.value("targetAnnotation", DeclaredType)
@@ -182,7 +183,7 @@ class AnnotationMappingRule {
 		_copyAnnotationsFqns = am.value("copyAnnotations", typeof(DeclaredType[])).map[qualifiedName].toSet
 		_copyAnnotationsFromPackages = am.value("copyAnnotationsFromPackages", typeof(String[]))
 		_setShadowOnTriggerAnnotations = am.value("setShadowOnTriggerAnnotations", Boolean)
-		_scopeRule = createScopeRule(am, null)
+		_scopeRule = createScopeRule(am, null, null)
 	}
 	
 	

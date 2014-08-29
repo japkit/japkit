@@ -12,7 +12,7 @@ import javax.lang.model.element.Modifier
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
-public abstract class MemberRuleSupport<E extends Element, T extends GenElement> implements Function1<GenTypeElement, List<? extends GenElement>>{
+public abstract class MemberRuleSupport<E extends Element, T extends GenElement> extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
 	val protected extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 
 	val protected extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
@@ -25,7 +25,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	val protected extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	val protected RuleUtils ru = ExtensionRegistry.get(RuleUtils)
 
-	AnnotationMirror metaAnnotation
+
 	E template
 	String avPrefix
 	
@@ -47,7 +47,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}
 	
 	new(AnnotationMirror metaAnnotation, E template, String avPrefix){
-		_metaAnnotation = metaAnnotation
+		super(metaAnnotation, template)
 		_template = template
 		_avPrefix = avPrefix
 		_activationRule	= createActivationRule	
@@ -65,7 +65,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Object> srcRule, ()=>String nameRule, ()=>CharSequence commentRule){
-		_metaAnnotation = metaAnnotation
+		super(metaAnnotation, null)
 		_template = null
 		_avPrefix = avPrefix
 		_activationRule	= createActivationRule
@@ -83,7 +83,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	new(()=>boolean activationRule,
 		()=>Iterable<? extends Object> srcRule, ()=>String nameRule,
 		()=>Set<Modifier> modifiersRule, (GenElement)=>List<? extends AnnotationMirror> annotationsRule, ()=>CharSequence commentRule) {
-		_metaAnnotation = null
+		super(null, null)
 		_template = null
 		_avPrefix = null
 		_activationRule = activationRule ?: RuleUtils.ALWAYS_ACTIVE
@@ -116,7 +116,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}
 	
 	protected def ((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> createScopeRule(()=>Iterable<? extends Object> srcRule){
-		ru.createScopeRule(metaAnnotation, avPrefix, srcRule)  
+		ru.createScopeRule(metaAnnotation, template, avPrefix, srcRule)  
 	}
 	
 	protected def ()=>Set<Modifier> createModifiersRule(){
@@ -148,10 +148,11 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		]) 
 		return emptyList
 
-		try {
-			pushCurrentMetaAnnotation(metaAnnotation)
+		try{
 
 			val result = scopeRule.apply [
+				
+				//TODO
 				valueStack.put("template", template)
 				val generatedMembers = newArrayList()
 				val member = createMember
@@ -176,14 +177,15 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 			result.flatten.toList
 			
 		} catch(Exception re) {
-			//don't let one member screw up the whole class
+			//TODO: What about TENFE?
+			//TODO: Should we move this to scope rule?
+			
+			//don't let one member rule screw up the whole class
 			reportError('''Error in meta annotation «metaAnnotation» «IF template !=null»in template «template» «ENDIF»''', 
 				re, currentAnnotatedClass, currentTriggerAnnotation, null
 			)
 			emptyList
-		} finally {
-			popCurrentMetaAnnotation
-		}
+		} 
 
 	}
 	

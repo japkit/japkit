@@ -12,7 +12,7 @@ import javax.lang.model.element.TypeElement
 import java.util.List
 
 @Data
-class TriggerAnnotationRule {
+class TriggerAnnotationRule extends AbstractRule{
 	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	protected val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	protected val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
@@ -25,6 +25,7 @@ class TriggerAnnotationRule {
 	List<ResourceRule> resourceRules
 	
 	new(TypeElement triggerAnnotationTypeElement){
+		super(null, triggerAnnotationTypeElement)
 		_triggerAnnotationTypeElement = triggerAnnotationTypeElement
 		//TODO: Could be an AV in @TriggerAnnotation
 		_varRules=triggerAnnotationTypeElement.annotationMirrors(Var).map[new ELVariableRule(it)].toList
@@ -44,6 +45,7 @@ class TriggerAnnotationRule {
 			val generatedClasses = newHashSet
 			setCurrentAnnotatedClass(annotatedClass)
 			setCurrentTriggerAnnotation(triggerAnnotation)
+			
 			try {
 				printDiagnosticMessage['''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
 	

@@ -123,11 +123,6 @@ class MessageCollector {
 				''
 			}
 		
-		val metaAnnotationStr = if (currentMetaAnnotation != null) {
-				'''Meta Annotation: «currentMetaAnnotation»'''
-			} else {
-				''
-			}
 
 		val msg = '''«elementStr»«annotationStr»«annotationValueStr»«pe.message»'''
 		var element = pe.element

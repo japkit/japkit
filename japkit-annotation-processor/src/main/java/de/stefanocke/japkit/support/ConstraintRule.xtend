@@ -6,7 +6,7 @@ import javax.lang.model.element.Element
 import javax.tools.Diagnostic.Kind
 
 @Data
-class ConstraintRule {
+class ConstraintRule extends AbstractRule{
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension ELSupport = ExtensionRegistry.get(ELSupport)
 	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
@@ -31,6 +31,7 @@ class ConstraintRule {
 	}
 	
 	new(AnnotationMirror am){
+		super(am, null)
 		_expr = am.value("expr", String)
 		_msg = am.value("msg", String)
 		_msgKind = am.value("msgKind", Kind)

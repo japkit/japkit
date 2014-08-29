@@ -17,7 +17,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
 
 @Data
-class BehaviorDelegationRule {
+class BehaviorDelegationRule extends AbstractRule{
 	
 	
 	extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
@@ -36,6 +36,7 @@ class BehaviorDelegationRule {
 	String abstractBehaviorClassName
 	
 	new(AnnotationMirror metaAnnotation){
+		super(metaAnnotation, null)
 		_activationRule= metaAnnotation.createActivationRule("customBehavior", false)
 		_behaviorClass= metaAnnotation.value("behaviorClass", TypeMirror)
 		_renamePrefix = metaAnnotation.value("behaviorGenMethodRenamePrefix", String)

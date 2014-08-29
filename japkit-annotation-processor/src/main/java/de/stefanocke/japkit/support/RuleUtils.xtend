@@ -74,34 +74,36 @@ class RuleUtils {
 	}
 	
 	/**Scope rule that gets the source element from "src" AV */
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, String avPrefix) {
-		createScopeRule(metaAnnotation, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
+	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
+		createScopeRule(metaAnnotation, metaElement, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
 	}
 	
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
 	 */
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
+	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
 			
 		val srcVarName = metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
 		val varRules = createELVariableRules(metaAnnotation, avPrefix);
 
 		[(Object)=>T closure |
-			val srcElements = srcRule?.apply ?: Collections.singleton(currentSrcElement)	
 			
-				
+			//TODO setCurrentMetaElement(metaElement)
+			val srcElements = srcRule?.apply ?: Collections.singleton(currentSrcElement)		
+
 			(srcElements ?: Collections.singleton(currentSrc)).map [ e |
 				scope(e) [
+					
 					if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
 					varRules?.forEach[it.putELVariable]
 					closure.apply(e)
 				]
 			].toList
-					
+							
 		]
 	}
 	
-	val SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null)
+	val SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null, null)
 	
 	public def <T> ((Object)=>T)=>Iterable<T> scopeWithCurrentSrc(){		
 		SCOPE_WITH_CURRENT_SRC	as ((Object)=>T)=>Iterable<T>
@@ -250,7 +252,7 @@ class RuleUtils {
 	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template, String avPrefix){
 		
 		val srcRule = createSrcExpressionRule(paramAnnotation, avPrefix)
-		val scopeRule = createScopeRule(paramAnnotation, avPrefix, srcRule)
+		val scopeRule = createScopeRule(paramAnnotation, template, avPrefix, srcRule)
 		val nameRule = createNameExprRule(paramAnnotation, template, avPrefix)
 		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation, template,  avPrefix)
 		val typeRule = createTypeRule(paramAnnotation, template?.asType, avPrefix);

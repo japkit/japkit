@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder
 import javax.lang.model.element.AnnotationMirror
 import com.google.common.cache.Cache
 import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.metaannotations.Template
 
 class RuleFactory {
 
@@ -25,7 +26,8 @@ class RuleFactory {
 	val templateCache = CacheBuilder.newBuilder.maximumSize(100).weakKeys.<TypeElement, TemplateRule>build
 	
 	def templateFactory(AnnotationMirror templateAnnotation) {
-		[TypeElement templateClass|new TemplateRule(templateClass, templateAnnotation)]
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+		[TypeElement templateClass|new TemplateRule(templateClass, templateAnnotation ?: templateClass.annotationMirror(Template))]
 	}
 
 	def createTemplateRule(TypeElement templateClass) {

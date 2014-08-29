@@ -17,7 +17,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
 
 @Data
-class TemplateRule implements Function1<GenTypeElement, List<? extends GenElement>>{
+class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
 
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
@@ -27,7 +27,6 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 	val GetterSetterRules gs = ExtensionRegistry.get(GetterSetterRules)
 
 	TypeElement templateClass
-	AnnotationMirror templateAnnotation
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
 	List<(GenTypeElement)=> List<? extends GenElement>> memberRules
 	((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> scopeRule
@@ -35,22 +34,24 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 	AnnotationMirror methodDefaults
 	AnnotationMirror constructorDefaults
 
+	
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
+		super(templateAnnotation, templateClass)
 		_templateClass = templateClass
-		_templateAnnotation = templateAnnotation ?: templateClass.annotationMirror(Template)
-		_methodDefaults = _templateAnnotation?.value("methodDefaults", typeof(AnnotationMirror[]))?.singleValue
-		_fieldDefaults = _templateAnnotation?.value("fieldDefaults", typeof(AnnotationMirror[]))?.singleValue
-		_constructorDefaults = _templateAnnotation?.value("constructorDefaults", typeof(AnnotationMirror[]))?.singleValue
 		
-		val allFieldsAreTemplates = _templateAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
-		val allMethodsAreTemplates = _templateAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
-		val allConstructorsAreTemplates = _templateAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
+		_methodDefaults = metaAnnotation?.value("methodDefaults", typeof(AnnotationMirror[]))?.singleValue
+		_fieldDefaults = metaAnnotation?.value("fieldDefaults", typeof(AnnotationMirror[]))?.singleValue
+		_constructorDefaults = metaAnnotation?.value("constructorDefaults", typeof(AnnotationMirror[]))?.singleValue
+		
+		val allFieldsAreTemplates = metaAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
+		val allMethodsAreTemplates = metaAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
+		val allConstructorsAreTemplates = metaAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
 		
 		_memberRules=newArrayList()	
 		
-		if(_templateAnnotation!=null){
+		if(metaAnnotation!=null){
 			//Members from AVs
-			memberRules.add(new MembersRule(_templateAnnotation))
+			memberRules.add(new MembersRule(metaAnnotation))
 		}
 		
 		memberRules.addAll(
@@ -83,8 +84,8 @@ class TemplateRule implements Function1<GenTypeElement, List<? extends GenElemen
 				new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, methodDefaults), key)
 			])
 
-		_annotationsRule = ru.createAnnotationMappingRules(_templateAnnotation, templateClass, null)
-		_scopeRule = ru.createScopeRule(_templateAnnotation, null)
+		_annotationsRule = ru.createAnnotationMappingRules(metaAnnotation, templateClass, null)
+		_scopeRule = ru.createScopeRule(metaAnnotation, _templateClass, null)
 
 	}
 	
