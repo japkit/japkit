@@ -9,4 +9,8 @@ class AbstractRule implements Rule {
 	AnnotationMirror metaAnnotation
 	Element metaElement
 	
+	
+	def protected <T> T inRule((Object)=>T closure){
+		closure.apply(null)
+	}
 }

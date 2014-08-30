@@ -15,7 +15,10 @@ class ClassNameRule extends AbstractRule{
 	
 	val extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 	
-	def String generateClassName(TypeElement orgClass){
+	
+	
+	
+	def private String generateClassName(TypeElement orgClass){
 		val orgName = orgClass.simpleName.toString
 		if(!(classNameRule.empty)){	
 			return classNameRule.getName(orgName, orgClass)
@@ -49,13 +52,20 @@ class ClassNameRule extends AbstractRule{
 		name
 	}
 	
-	def String generatePackageName(PackageElement orgPackage){
+	def private String generatePackageName(PackageElement orgPackage){
 		var name = orgPackage.qualifiedName.toString
 		packageNameRule.getName(name, orgPackage)
 	}
 	
+	def Pair<String,String> generateClassAndPackageName(TypeElement orgClass){
+		inRule[
+			generatePackageName(orgClass.package)->generateClassName(orgClass)		
+		]
+	}
+	
 	def String generateQualifiedName(TypeElement orgClass){
-		'''«generatePackageName(orgClass.package)».«generateClassName(orgClass)»'''.toString
+		val names = generateClassAndPackageName(orgClass)
+		'''«names.key».«names.value»'''.toString
 	}
 	
 	new (AnnotationMirror metaAnnotation){

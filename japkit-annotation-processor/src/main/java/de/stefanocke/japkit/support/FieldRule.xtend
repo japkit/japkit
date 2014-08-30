@@ -24,11 +24,11 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 		
 	}
 	
-	def addGetterRule() {
+	def protected addGetterRule() {
 		addDependentMemberRule(createGetterRuleFromGetterAV(metaAnnotation, null))
 	}
 	
-	def addSetterRule() {
+	def protected addSetterRule() {
 		addDependentMemberRule(createSetterRuleFromSetterAV(metaAnnotation, null))
 	}
 	

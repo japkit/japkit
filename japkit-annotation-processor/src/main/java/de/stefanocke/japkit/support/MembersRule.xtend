@@ -31,7 +31,8 @@ class MembersRule extends AbstractRule implements Function1<GenTypeElement, List
 
 	}
 	
-	def (GenTypeElement)=>List<? extends GenElement> createTemplateCallRule(AnnotationMirror templateCallAnnotation) {
+	//TODO: separate class and inherit from AbstractRule
+	def private (GenTypeElement)=>List<? extends GenElement> createTemplateCallRule(AnnotationMirror templateCallAnnotation) {
 		val activationRule = createActivationRule(templateCallAnnotation, null)
 		val scopeRule = createScopeRule(templateCallAnnotation, null, null)
 		val templateRule = createTemplateRule(templateCallAnnotation.value("value", TypeElement));
@@ -53,7 +54,9 @@ class MembersRule extends AbstractRule implements Function1<GenTypeElement, List
 	}
 
 	override apply(GenTypeElement generatedClass) {
-		memberRules.map[it.apply(generatedClass)].flatten.toList
+		inRule[
+			memberRules.map[it.apply(generatedClass)].flatten.toList		
+		]
 	}
 
 }

@@ -73,11 +73,10 @@ class ResourceRule extends AbstractRule{
 		options.get("templateDir")
 	}
 
-	def generateResource() {		
+	def void generateResource() {		
 			
-			
+		inRule[	
 			try {
-								
 				scopeRule.apply [
 					
 					// filer.getResource(StandardLocation.CLASS_OUTPUT, triggerAnnotation.annotationAsTypeElement.package.qualifiedName, templateName).toUri;
@@ -112,7 +111,8 @@ class ResourceRule extends AbstractRule{
 				printDiagnosticMessage['''Error when processing resource template «templateName». «e»''']
 				reportError('''Error when processing resource template  «templateName».''', e, null, null, null)
 			} 
-		
+			null
+		]
 
 	}
 	       

@@ -17,17 +17,20 @@ class ConstraintRule extends AbstractRule{
 	Kind msgKind
 	String lang
 	
-	def validate(){
+	def void validate(){
 		
-		val result = 
-		handleTypeElementNotFound(true, '''Constraint «expr» could not be evaluated.''')[
-			eval(expr, lang, Boolean, '''Constraint «expr» could not be evaluated''', true)
+		inRule[
+			val result = 
+			handleTypeElementNotFound(true, '''Constraint «expr» could not be evaluated.''')[
+				eval(expr, lang, Boolean, '''Constraint «expr» could not be evaluated''', true)
+			]
+			
+			
+			if(result == null || !result){
+				reportMessage(msg, if(currentSrc instanceof Element) currentSrcElement, msgKind)
+			}
+			null
 		]
-		
-		
-		if(result == null || !result){
-			reportMessage(msg, if(currentSrc instanceof Element) currentSrcElement, msgKind)
-		}
 	}
 	
 	new(AnnotationMirror am){

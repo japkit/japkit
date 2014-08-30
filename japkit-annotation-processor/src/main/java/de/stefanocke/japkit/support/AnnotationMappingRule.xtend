@@ -46,18 +46,21 @@ class AnnotationMappingRule extends AbstractRule{
 	 * @param srcElement the source element
 	 */
 	def void mapOrCopyAnnotations(List<GenAnnotationMirror> annotations, Map<String, AnnotationMappingRule> mappingsWithId) {
-		if (!activationRule.apply) {
-			return
-		}
-		
-		scopeRule.apply[
-			copyAnnotations(annotations)
-			
-	
-			if(!DefaultAnnotation.name.equals(targetAnnotation?.qualifiedName)){
-				mapAnnotation(annotations, mappingsWithId)	
+		inRule[
+			if (!activationRule.apply) {
+				return null
 			}
-			null //TODO.
+			
+			scopeRule.apply[
+				copyAnnotations(annotations)
+				
+		
+				if(!DefaultAnnotation.name.equals(targetAnnotation?.qualifiedName)){
+					mapAnnotation(annotations, mappingsWithId)	
+				}
+				null //TODO.
+			]
+		
 		]
 
 	}

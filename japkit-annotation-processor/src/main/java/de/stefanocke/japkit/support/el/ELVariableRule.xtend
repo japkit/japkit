@@ -24,9 +24,10 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.support.AbstractRule
 
 @Data
-class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
+class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
 	val extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
 
 	extension TypesExtensions types = ExtensionRegistry.get(TypesExtensions)
@@ -36,7 +37,6 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	val extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 
-	AnnotationMirror elVarAnnotation
 	String name
 	boolean isFunction
 	String triggerAv
@@ -56,7 +56,7 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 	ElementMatcher matcher
 
 	new(AnnotationMirror elVarAnnotation) {
-		_elVarAnnotation = elVarAnnotation
+		super(elVarAnnotation, null)
 
 		_name = elVarAnnotation.value("name", String);
 		_isFunction = elVarAnnotation.value("isFunction", Boolean);
@@ -99,7 +99,7 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 			//dann dazu genutzt werden kann die Flut an gemeldeten Folgefehlern einzudämmen. 
 			reportError(
 				'''Could not evaluate EL variable «name»: «e.message» EL expression: «expr», Property Filter: «propertyFilterAnnotations».''',
-				e, if(currentSrc instanceof Element) currentSrcElement, elVarAnnotation, null)
+				e, if(currentSrc instanceof Element) currentSrcElement, metaAnnotation, null)
 		}
 	}
 
@@ -118,80 +118,80 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 	}
 	
 	def Object eval(Object src) {
-		
-		val result = scope(src)[
-			
-	
-			var Object av
-			
-			//Be default, the value is the current src. This is useful for matcher and retrieveAV
-			var Object value = currentSrc
-			
-			value = if (!triggerAv.nullOrEmpty && {
-					av = currentTriggerAnnotation.value(triggerAv, type);
-					!av.nullOrEmptyAV
-				}) {
-	
-					av
-	
-				} else if (!expr.nullOrEmpty) {					
-					eval(expr, lang, type);									
-				} else if (!propertyFilterAnnotations.nullOrEmpty) {
-	
-					//TODO: Rule caching?
-					val propertyFilters = propertyFilterAnnotations.map[new PropertyFilter(it)]
-					propertyFilters.map[getFilteredProperties()].flatten.
-						toList
-	
-				} else if (typeQuery != null) {
-					evalTypeQuery(typeQuery)
-				} else if (codeFragments!=null){
-					codeFragments
-				} else {
-					value
-				}
+		inRule[
+			val result = scope(src)[
 				
-			value = if (matcher != null) {
-					if (value instanceof Iterable<?>) {
-						matcher.filter(value)
-					} else if(value instanceof Element) {
-						matcher.matches(value)
+		
+				var Object av
+				
+				//Be default, the value is the current src. This is useful for matcher and retrieveAV
+				var Object value = currentSrc
+				
+				value = if (!triggerAv.nullOrEmpty && {
+						av = currentTriggerAnnotation.value(triggerAv, type);
+						!av.nullOrEmptyAV
+					}) {
+		
+						av
+		
+					} else if (!expr.nullOrEmpty) {					
+						eval(expr, lang, type);									
+					} else if (!propertyFilterAnnotations.nullOrEmpty) {
+		
+						//TODO: Rule caching?
+						val propertyFilters = propertyFilterAnnotations.map[new PropertyFilter(it)]
+						propertyFilters.map[getFilteredProperties()].flatten.
+							toList
+		
+					} else if (typeQuery != null) {
+						evalTypeQuery(typeQuery)
+					} else if (codeFragments!=null){
+						codeFragments
 					} else {
-						throw new IllegalArgumentException(
-							'''If matcher is set, expr must yield an element collection or an element, but not «value»''');
+						value
 					}
-				} else {
-					value
+					
+				value = if (matcher != null) {
+						if (value instanceof Iterable<?>) {
+							matcher.filter(value)
+						} else if(value instanceof Element) {
+							matcher.matches(value)
+						} else {
+							throw new IllegalArgumentException(
+								'''If matcher is set, expr must yield an element collection or an element, but not «value»''');
+						}
+					} else {
+						value
+					}
+					
+				if(!requiredTriggerAnnotation.nullOrEmpty){
+					if(value instanceof TypeElement){
+						value = generatedTypeElementAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
+					} else if(value instanceof TypeMirror){
+						value = generatedTypeAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
+					}
+					
 				}
+		
+				val valueForVariable = if (annotationToRetrieve == null) {
+						value
+					} else {
+						value.retrieveAnnotationMirrors(annotationToRetrieve.qualifiedName)
+					}
+		
 				
-			if(!requiredTriggerAnnotation.nullOrEmpty){
-				if(value instanceof TypeElement){
-					value = generatedTypeElementAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
-				} else if(value instanceof TypeMirror){
-					value = generatedTypeAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
-				}
-				
-			}
+		
+				valueForVariable
 	
-			val valueForVariable = if (annotationToRetrieve == null) {
-					value
-				} else {
-					value.retrieveAnnotationMirrors(annotationToRetrieve.qualifiedName)
-				}
-	
+			]
 			
-	
-			valueForVariable
-
+			//Das hier funktioniert so nicht, wenn isFunction true ist. Macht aber nichts.
+				if (setInShadowAnnotation && !triggerAv.nullOrEmpty) {
+					valueStack.getVariablesForShadowAnnotation().put(triggerAv, result)
+				}
+			
+			result
 		]
-		
-		//Das hier funktioniert so nicht, wenn isFunction true ist. Macht aber nichts.
-			if (setInShadowAnnotation && !triggerAv.nullOrEmpty) {
-				valueStack.getVariablesForShadowAnnotation().put(triggerAv, result)
-			}
-		
-		result
-
 	}
 
 	def private dispatch Object retrieveAnnotationMirrors(Iterable<?> iterable, String annotationFqn) {
@@ -210,7 +210,7 @@ class ELVariableRule implements Function1<Object, Object>,  Function0<Object> {
 		throw new IllegalArgumentException('''Cannot retrieve annotation «annotationFqn» for «object»''')
 	}
 
-	def evalTypeQuery(AnnotationMirror typeQuery) {
+	def private evalTypeQuery(AnnotationMirror typeQuery) {
 		val triggerAnnotation = typeQuery.value("annotation", TypeMirror);
 		val shadow = typeQuery.value("shadow", Boolean);
 		val unique = typeQuery.value("unique", Boolean);

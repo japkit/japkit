@@ -15,7 +15,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
-class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>{
+class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Function1<Element, Boolean>{
 	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
@@ -47,7 +47,7 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 	String condition
 	String conditionLang
 	ConstraintRule[] constraints
-	AnnotationMirror am
+	
 	
 	(CharSequence)=>boolean nameIn
 	(CharSequence)=>boolean nameNotIn
@@ -70,6 +70,7 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 	}
 
 	def boolean matches(Element originalSrcElement) {
+		inRule[
 		val e = srcElement(originalSrcElement) 
 		
 		scope(e)[
@@ -108,9 +109,11 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 			result
 		
 		]
+		
+		]
 	}
 	
-	def Element srcElement(Element element) {
+	def private Element srcElement(Element element) {
 			if(srcExpr.nullOrEmpty) element else 
 				eval(srcExpr, srcLang, Element, '''Could not evaluate source element expression '«srcExpr»' in element matcher. ''', null)
 			
@@ -118,33 +121,33 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 	}
 	
 	
-	def boolean isNotDeclaredBy(Element element, Set<String> notDeclaredByFqns){
+	def private boolean isNotDeclaredBy(Element element, Set<String> notDeclaredByFqns){
 		notDeclaredByFqns.nullOrEmpty || !notDeclaredByFqns.contains((element.enclosingElement as TypeElement).qualifiedName.toString)
 	}
 	
-	def boolean hasAnyKind(Element element, ElementKind[] kinds){
+	def private boolean hasAnyKind(Element element, ElementKind[] kinds){
 		kinds.nullOrEmpty || kinds.contains(element.kind) 
 	}
 	
 	
-	def boolean hasAllModifiers(Element e, Modifier[] modifiers){
+	def private boolean hasAllModifiers(Element e, Modifier[] modifiers){
 		modifiers.nullOrEmpty || modifiers.forall[e.modifiers.contains(it)]
 	}
 	
-	def boolean hasNotModifiers(Element e, Modifier[] modifiers){
+	def private boolean hasNotModifiers(Element e, Modifier[] modifiers){
 		modifiers.nullOrEmpty || modifiers.forall[!e.modifiers.contains(it)]
 	}
 	
-	def isSubtype(TypeMirror t1, TypeMirror type) {
+	def private boolean isSubtype(TypeMirror t1, TypeMirror type) {
 		type.isJavaLangObject ||  //shortcut to avoid unnecessary type lookups
 		typesExtensions.isSubtype(t1, type) //TODO: Für generierte Typen funzt das nicht... Mit generierten Typen hingegen  (Stichwort: asTypeElement) führt es zu (ggf. zirkulären) dependencies
 	}
 	
-	def boolean belongsToOneOfCategories(TypeMirror type, TypeCategory[] categories){
+	def private boolean belongsToOneOfCategories(TypeMirror type, TypeCategory[] categories){
 		categories.exists[type.belongsToCategory(it)]	
 	}
 	
-	def Boolean belongsToCategory(TypeMirror type, TypeCategory category){
+	def private Boolean belongsToCategory(TypeMirror type, TypeCategory category){
 		handleTypeElementNotFound(false, '''Could not determine type category of type «type»''')[
 			switch(category){
 				case TypeCategory.PRIMITIVE: type.primitive || type.boxed
@@ -164,52 +167,53 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 	
 	
 	
-	def boolean fulfillsCondition(Element element) {
+	def private boolean fulfillsCondition(Element element) {
 			condition.nullOrEmpty || 
 				eval(condition, conditionLang, Boolean, '''Could not evaluate condition '«condition»' in element matcher. ''', false)		
 	}
 
-	def hasAllAnnotations(TypeMirror type, DeclaredType[] annotations) {
+	def private boolean hasAllAnnotations(TypeMirror type, DeclaredType[] annotations) {
 		annotations.nullOrEmpty ||		//avoid to get type element as far as possible	
 		type.typeElementHasAllAnnotations(annotations)
 	}
 	
-	def srcTypeArgHasAllAnnotations(Element e, DeclaredType[] annotations, int argIndex) {
+	def private boolean srcTypeArgHasAllAnnotations(Element e, DeclaredType[] annotations, int argIndex) {
 		annotations.nullOrEmpty ||		//avoid to get type element as far as possible	
 		e.srcType.getTypeArg(argIndex).typeElementHasAllAnnotations(annotations)	 
 	}
 	
-	def srcSingleValueType(Element e){
+	def private TypeMirror srcSingleValueType(Element e){
 		singleValueType(e.srcType)
 	}
 	
 	
 	
 	
-	def dispatch typeElementHasAllAnnotations(DeclaredType type, DeclaredType[] annotations) {
+	def private dispatch boolean typeElementHasAllAnnotations(DeclaredType type, DeclaredType[] annotations) {
 		handleTypeElementNotFound(true, '''Matcher cannot determine annotations of type «type»''')[
 			type!=null && type.asTypeElement.hasAllAnnotations(annotations)	
 		]		
 	}
 	
-	def dispatch typeElementHasAllAnnotations(TypeMirror type, DeclaredType[] annotations) {
+	def private dispatch boolean typeElementHasAllAnnotations(TypeMirror type, DeclaredType[] annotations) {
 		annotations.nullOrEmpty
 	}
 	
-	def hasAllAnnotations(Element e, DeclaredType[] annotations) {
+	def private boolean hasAllAnnotations(Element e, DeclaredType[] annotations) {
 		annotations.forall[e.hasAnnotation(it)]
 	}
 	
-	def hasNotAnnotations(Element e, DeclaredType[] annotations) {
+	def private boolean hasNotAnnotations(Element e, DeclaredType[] annotations) {
 		annotations.forall[!e.hasAnnotation(it)]
 	}
 	
-	def hasAnnotation(Element e, DeclaredType annotationType) {
+	def private boolean hasAnnotation(Element e, DeclaredType annotationType) {
 		e.annotationMirrors.exists[am|am.hasFqn(annotationType.qualifiedName)]
 	}
 	
 	
 	new(AnnotationMirror am) {
+		super(am, null)
 		_srcExpr =  am.value("src", String)
 		_srcLang =  am.value("srcLang", String)
 		_name = am.value("name", String)
@@ -234,7 +238,6 @@ class ElementMatcher implements Function0<Boolean>,  Function1<Element, Boolean>
 		_condition =  am.value("condition", String)
 		_conditionLang =  am.value("conditionLang", String)
 		_constraints = am.value("constraints", typeof(AnnotationMirror[])).map[new ConstraintRule(it)]	
-		_am = am
 		_nameIn = createNameInSetRule(am, "nameIn", true)
 		_nameNotIn = createNameInSetRule(am, "nameNotIn", false)
 		

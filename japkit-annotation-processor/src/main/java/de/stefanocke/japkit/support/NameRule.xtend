@@ -29,34 +29,35 @@ class NameRule extends AbstractRule{
 	}
 		
 	def String getName(CharSequence orgName, Element orgElement){
-		if(regEx != null){
-		
-			val matcher = regEx.matcher(orgName)
+		inRule[
+			if(regEx != null){
 			
-			if(!matcher.matches){
-				throw new ProcessingException('''Naming rule violated: Name "«orgName»" must match pattern "«regEx.pattern»"''', orgElement)
-			}
-			try{
-				val name =  matcher.replaceFirst(regExReplace)	
-				if(name.empty){
-					throw new ProcessingException('''Naming rule violated: Name "«orgName»" must not be empty after replacing with "«regExReplace»"''', orgElement)
+				val matcher = regEx.matcher(orgName)
+				
+				if(!matcher.matches){
+					throw new ProcessingException('''Naming rule violated: Name "«orgName»" must match pattern "«regEx.pattern»"''', orgElement)
 				}
-				return name
-			} catch (RuntimeException e){
-				throw new ProcessingException('''Exception when replacing RegEx "«regEx.pattern»" with "«regExReplace»": «e.message»''', orgElement)
+				try{
+					val name =  matcher.replaceFirst(regExReplace)	
+					if(name.empty){
+						throw new ProcessingException('''Naming rule violated: Name "«orgName»" must not be empty after replacing with "«regExReplace»"''', orgElement)
+					}
+					return name
+				} catch (RuntimeException e){
+					throw new ProcessingException('''Exception when replacing RegEx "«regEx.pattern»" with "«regExReplace»": «e.message»''', orgElement)
+				}
+			
+			} else if(!expr.nullOrEmpty) {
+				//The extra scoping for src element is required here since in ElementsExtensions.generatedTypeElementAccordingToTriggerAnnotation
+				//the name of the generated class for a different annotated class than the current one is determined.
+				//This has nevertheless some flaws, since there could be other context variables that were different when the other class has been generated.
+				//Maybe, the typesRegistry could be used in generatedTypeElementAccordingToTriggerAnnotation instead of calculating the name? 
+				scope(orgElement)[
+					eval(expr, lang, String)			
+				]
+			} else {
+				orgName.toString
 			}
-		
-		} else if(!expr.nullOrEmpty) {
-			//The extra scoping for src element is required here since in ElementsExtensions.generatedTypeElementAccordingToTriggerAnnotation
-			//the name of the generated class for a different annotated class than the current one is determined.
-			//This has nevertheless some flaws, since there could be other context variables that were different when the other class has been generated.
-			//Maybe, the typesRegistry could be used in generatedTypeElementAccordingToTriggerAnnotation instead of calculating the name? 
-			scope(orgElement)[
-				eval(expr, lang, String)			
-			]
-		} else {
-			orgName.toString
-		}
-		
+		]
 	}
 }

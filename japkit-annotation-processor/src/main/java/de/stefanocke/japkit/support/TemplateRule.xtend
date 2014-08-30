@@ -6,7 +6,6 @@ import de.stefanocke.japkit.metaannotations.Constructor
 import de.stefanocke.japkit.metaannotations.Field
 import de.stefanocke.japkit.metaannotations.InnerClass
 import de.stefanocke.japkit.metaannotations.Method
-import de.stefanocke.japkit.metaannotations.Template
 import de.stefanocke.japkit.support.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
@@ -89,29 +88,24 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 
 	}
 	
-	def boolean isDefaultConstructor(ExecutableElement ctor){
+	def private boolean isDefaultConstructor(ExecutableElement ctor){
 		ctor.parameters.nullOrEmpty
 	}
 
 	override apply(GenTypeElement generatedClass) {
+		inRule[
+			
+			scopeRule.apply [
+				generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
+				addInterfaces(generatedClass)				
+				memberRules.map[it.apply(generatedClass)].flatten.toList	
+			].flatten.toList
 		
-			
-		scopeRule.apply [
-			
-			generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
-
-			addInterfaces(generatedClass)
-			
-			val generatedMembers = newArrayList
-			
-			memberRules.forEach [generatedMembers.addAll(it.apply(generatedClass))]	
-			
-			generatedMembers
-		].flatten.toList
+		]
 
 	}
 
-	def addInterfaces(GenTypeElement generatedClass) {
+	def private addInterfaces(GenTypeElement generatedClass) {
 		templateClass.interfaces.forEach [
 			generatedClass.addInterface(it.resolveType) //TODO: Check , if interface already exists? 
 		]

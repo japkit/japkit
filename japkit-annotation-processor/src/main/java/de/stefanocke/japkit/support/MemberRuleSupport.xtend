@@ -141,51 +141,53 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}
 
 	override apply(GenTypeElement generatedClass) {
-
-		if(!scope[
-			valueStack.put("template", template)
-			activationRule.apply			
-		]) 
-		return emptyList
-
-		try{
-
-			val result = scopeRule.apply [
-				
-				//TODO
+		inRule[
+			if(!scope[
 				valueStack.put("template", template)
-				val generatedMembers = newArrayList()
-				val member = createMember
-				generatedClass.add(member)
-				generatedMembers.add(member)
-				
-				scope(getSrcElementForDependentRules(member))[
-					//make the member just generated available on value stack
-					valueStack.put("genElement", member)
-					dependentMemberRules.forEach [ r |
-						//apply dependent rules. 
-						generatedMembers.addAll(r.apply(generatedClass))
+				activationRule.apply			
+			]) 
+			return emptyList
+	
+			try{
+	
+				val result = scopeRule.apply [
 					
+					//TODO
+					valueStack.put("template", template)
+					val generatedMembers = newArrayList()
+					val member = createMember
+					generatedClass.add(member)
+					generatedMembers.add(member)
+					
+					scope(getSrcElementForDependentRules(member))[
+						//make the member just generated available on value stack
+						valueStack.put("genElement", member)
+						dependentMemberRules.forEach [ r |
+							//apply dependent rules. 
+							generatedMembers.addAll(r.apply(generatedClass))
+						
+						]
+						null			
 					]
-					null			
+					generatedMembers
 				]
-				generatedMembers
-			]
-			
-			manualOverrideRule?.apply(result.map[head])  
-			
-			result.flatten.toList
-			
-		} catch(Exception re) {
-			//TODO: What about TENFE?
-			//TODO: Should we move this to scope rule?
-			
-			//don't let one member rule screw up the whole class
-			reportError('''Error in meta annotation «metaAnnotation» «IF template !=null»in template «template» «ENDIF»''', 
-				re, currentAnnotatedClass, currentTriggerAnnotation, null
-			)
-			emptyList
-		} 
+				
+				manualOverrideRule?.apply(result.map[head])  
+				
+				result.flatten.toList
+				
+			} catch(Exception re) {
+				//TODO: What about TENFE?
+				//TODO: Should we move this to scope rule?
+				
+				//don't let one member rule screw up the whole class
+				reportError('''Error in meta annotation «metaAnnotation» «IF template !=null»in template «template» «ENDIF»''', 
+					re, currentAnnotatedClass, currentTriggerAnnotation, null
+				)
+				emptyList
+			} 
+		
+		]
 
 	}
 	

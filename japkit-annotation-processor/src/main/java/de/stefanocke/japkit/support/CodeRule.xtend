@@ -147,38 +147,41 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	}
 	
 	public def CharSequence code(EmitterContext ec) {
-		if(bodyExpr.nullOrEmpty && bodyCases.empty) return null //Really?
-
-		imports.forEach [
-			if (!ec.importIfPossible(it)) {
-				reportError('''Import for «it» not possible since it conflicts with existing import''', null,
-					metaAnnotation, 'imports')
-			}
-		]
-		handleTypeElementNotFound(null, '''Code body «bodyExpr» could not be generated''') [
-			val result = if (iteratorExpr.nullOrEmpty) {
-					code(bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
-				} else {
-					val bodyIterator = eval(iteratorExpr, iteratorLang, Iterable,
-						'''Error in code body iterator expression.''', emptyList)
-					if (!bodyIterator.nullOrEmpty) {
-						val before = eval(beforeExpr, lang, String,
-							'''Error in code body before expression.''', '').withLinebreakIfRequested
-						val after = eval(afterExpr, lang, String,
-							'''Error in code body after expression.''', '').withLinebreakIfRequested
-						'''
-							«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»«scope(e as Element) [
-								code(bodyCases, bodyExpr, lang, '')
-							]»«ENDFOR»
-						'''
-					} else {
-						eval(emptyExpr, lang, String, '''Error in code body empty expression.''',
-							'throw new UnsupportedOperationException();')
-					}
+		inRule[
+			if(bodyExpr.nullOrEmpty && bodyCases.empty) return null //Really?
+	
+			imports.forEach [
+				if (!ec.importIfPossible(it)) {
+					reportError('''Import for «it» not possible since it conflicts with existing import''', null,
+						metaAnnotation, 'imports')
 				}
-			
-			defaultFragmentsRule.apply(result)
-			
+			]
+			handleTypeElementNotFound(null, '''Code body «bodyExpr» could not be generated''') [
+				val result = if (iteratorExpr.nullOrEmpty) {
+						code(bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
+					} else {
+						val bodyIterator = eval(iteratorExpr, iteratorLang, Iterable,
+							'''Error in code body iterator expression.''', emptyList)
+						if (!bodyIterator.nullOrEmpty) {
+							val before = eval(beforeExpr, lang, String,
+								'''Error in code body before expression.''', '').withLinebreakIfRequested
+							val after = eval(afterExpr, lang, String,
+								'''Error in code body after expression.''', '').withLinebreakIfRequested
+							'''
+								«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»«scope(e as Element) [
+									code(bodyCases, bodyExpr, lang, '')
+								]»«ENDFOR»
+							'''
+						} else {
+							eval(emptyExpr, lang, String, '''Error in code body empty expression.''',
+								'throw new UnsupportedOperationException();')
+						}
+					}
+				
+				defaultFragmentsRule.apply(result)
+				
+			]
+		
 		]
 	}
 	
@@ -189,7 +192,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 			!matcher.nullOrEmpty && matcher.exists[matches(currentSrcElement)]
 		]?.value ?: bodyExpr
 		
-		//TODO: remove valuestack parameter
+		
 		eval(bodyExprToUse, lang, String, '''Error in code body expression.''',	errorResult).withLinebreakIfRequested
 	}
 	

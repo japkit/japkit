@@ -88,75 +88,76 @@ class ClassRule extends AbstractRule{
 	 */
 	def GenTypeElement generateClass(String name, Set<GenTypeElement> generatedTopLevelClasses
 	) {
-		val enclosingClass = currentGeneratedClass
-		
-		if(isTopLevelClass != (enclosingClass==null)){
-			throw new IllegalArgumentException("currentGeneratedClass must be available when it is a rule for an inner class.")
-		}
-		
-		
-		scope[
+		inRule[
+			val enclosingClass = currentGeneratedClass
 			
-			varRules?.forEach[it.putELVariable]
-			//superclass with type args
-			val generatedClass = createClass(enclosingClass, name)
+			if(isTopLevelClass != (enclosingClass==null)){
+				throw new IllegalArgumentException("currentGeneratedClass must be available when it is a rule for an inner class.")
+			}
 			
 			
-			//Register generated class as early as possible to allow error type resolution in other classes
-			registerGeneratedTypeElement(generatedClass, currentAnnotatedClass, if(isTopLevelClass) currentTriggerAnnotation else null)	
+			scope[
+				
+				varRules?.forEach[it.putELVariable]
+				//superclass with type args
+				val generatedClass = createClass(enclosingClass, name)
+				
+				
+				//Register generated class as early as possible to allow error type resolution in other classes
+				registerGeneratedTypeElement(generatedClass, currentAnnotatedClass, if(isTopLevelClass) currentTriggerAnnotation else null)	
+		
+			 
+				setCurrentGeneratedClass(generatedClass)
+				
+				generatedClass.modifiers = modifiersRule.apply
+				
+				//TODO: Move to modifiers rule ?
+				if(templateRule != null){
+					generatedClass.removeModifier(Modifier.ABSTRACT) //Templates are usually abstract
+				}
+				
+				generatedClass.setSuperclass(superclassRule.apply)
+				interfaceRules.map[apply].filter[it!=null].forEach[
+					generatedClass.addInterface(it)
+				]
+				
+				if(isTopLevelClass){
+					createShadowAnnotation(generatedClass)	
+				}
+				
+				
+				generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
+				
+				
+				membersRule.apply(generatedClass)
+				
+				
+				//For @InnerClass, the annotated inner class is the template
+				templateRule?.apply(generatedClass)
+								
+				behaviorRule.createBehaviorDelegation(generatedClass)
+				
+				if(isTopLevelClass){
+					val Set<GenTypeElement> generatedClasses = newHashSet
+					generatedClasses.add(generatedClass)	
+					addAllAuxTopLevelClasses(generatedClasses, generatedClass)
 	
-		 
-			setCurrentGeneratedClass(generatedClass)
-			
-			generatedClass.modifiers = modifiersRule.apply
-			
-			//TODO: Move to modifiers rule ?
-			if(templateRule != null){
-				generatedClass.removeModifier(Modifier.ABSTRACT) //Templates are usually abstract
-			}
-			
-			generatedClass.setSuperclass(superclassRule.apply)
-			interfaceRules.map[apply].filter[it!=null].forEach[
-				generatedClass.addInterface(it)
-			]
-			
-			if(isTopLevelClass){
-				createShadowAnnotation(generatedClass)	
-			}
-			
-			
-			generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
-			
-			
-			membersRule.apply(generatedClass)
-			
-			
-			//For @InnerClass, the annotated inner class is the template
-			templateRule?.apply(generatedClass)
-							
-			behaviorRule.createBehaviorDelegation(generatedClass)
-			
-			if(isTopLevelClass){
-				val Set<GenTypeElement> generatedClasses = newHashSet
-				generatedClasses.add(generatedClass)	
-				addAllAuxTopLevelClasses(generatedClasses, generatedClass)
-
-				generatedClasses.forEach[markAsGenerated(it, currentAnnotatedClass)]
-				generatedClasses.forEach[addOrderAnnotations]				
-				generatedClasses.forEach[addParamNamesAnnotations]		
-			
-			
-				if(generatedTopLevelClasses!=null){
-					generatedTopLevelClasses.addAll(generatedClasses)			
+					generatedClasses.forEach[markAsGenerated(it, currentAnnotatedClass)]
+					generatedClasses.forEach[addOrderAnnotations]				
+					generatedClasses.forEach[addParamNamesAnnotations]		
+				
+				
+					if(generatedTopLevelClasses!=null){
+						generatedTopLevelClasses.addAll(generatedClasses)			
+					}
+				
 				}
 			
-			}
-		
-			generatedClass
+				generatedClass
+			
+			]
 		
 		]
-		
-		
 	}
 	
 	def void addAllAuxTopLevelClasses(Set<GenTypeElement> result, GenTypeElement typeElement) {
@@ -235,7 +236,8 @@ class ClassRule extends AbstractRule{
 	) {
 		
 		val enclosingElAndClassName = if(isTopLevelClass){
-			GenPackage.forName(nameRule.generatePackageName(currentAnnotatedClass.packageOf)) -> nameRule.generateClassName(currentAnnotatedClass)
+			val names = nameRule.generateClassAndPackageName(currentAnnotatedClass)
+			GenPackage.forName(names.key) -> names.value
 		} else {
 			//For inner classes, use provided class name
 			enclosingClass -> name

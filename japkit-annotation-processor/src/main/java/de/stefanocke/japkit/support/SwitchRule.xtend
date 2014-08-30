@@ -13,13 +13,16 @@ class SwitchRule extends AbstractRule{
 	List<Pair<ElementMatcher, String>> cases
 	
 	def String caseName(Element e){
-		val theCase = cases.findFirst[
-			key == null || key.matches(e)
+		inRule[
+			val theCase = cases.findFirst[
+				key == null || key.matches(e)
+			]
+			if(theCase == null){
+				throw new IllegalArgumentException('''The switcher could not match element «e».''')
+			}
+			theCase.value
+		
 		]
-		if(theCase == null){
-			throw new IllegalArgumentException('''The switcher could not match element «e».''')
-		}
-		theCase.value
 	}
 	
 	new(AnnotationMirror switchAm){
