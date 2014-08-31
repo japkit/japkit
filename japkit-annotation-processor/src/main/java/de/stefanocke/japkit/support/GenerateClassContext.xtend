@@ -4,8 +4,8 @@ import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.support.el.ELSupport
 import de.stefanocke.japkit.support.el.ValueStack
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import java.util.Stack
 
 /**
  * Provides access currently generated class and annotated class.
@@ -41,11 +41,23 @@ class GenerateClassContext {
 		valueStack.put("triggerAnnotation", currentAnnotation)
 	}
 	
-	
-	
-	
-	
 	def putShadowAnnotation(AnnotationMirror shadowAnnotation) {
 		valueStack.put("shadowAnnotation", shadowAnnotation)
 	}
+	
+	
+	private val Stack<Rule> currentRules = new Stack()
+	
+	def getCurrentRule(){
+		if(currentRules.empty()) null else currentRules.peek
+	}
+	
+	def void pushCurrentRule(Rule rule){
+		currentRules.push(rule)
+	}
+	
+	def Rule popCurrentRule(){
+		currentRules.pop
+	}
+	 
 }
