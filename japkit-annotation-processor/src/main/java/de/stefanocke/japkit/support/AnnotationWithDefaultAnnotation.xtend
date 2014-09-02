@@ -4,7 +4,7 @@ import javax.lang.model.element.AnnotationMirror
 import java.util.HashMap
 
 @Data
-class AnnotationWithDefaultAnnotation  implements AnnotationMirror{
+class AnnotationWithDefaultAnnotation implements AnnotationMirror{
 	AnnotationMirror annotation
 	AnnotationMirror defaultAnnotation
 	

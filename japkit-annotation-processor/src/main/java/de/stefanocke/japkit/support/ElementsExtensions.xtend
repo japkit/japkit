@@ -243,7 +243,8 @@ class ElementsExtensions {
 	 * @param annotationFqn the qualified name of the annotation class
 	 */
 	def AnnotationMirror annotationMirror(Element annotatedElement, CharSequence annotationFqn) {
-		annotatedElement.annotationMirrors.findFirst[hasFqn(annotationFqn)]
+		val am = annotatedElement.annotationMirrors.findFirst[hasFqn(annotationFqn)]
+		if(am==null) null else new AnnotationAndParent(am, null, null, null, annotatedElement)
 	}
 
 	/**
@@ -357,8 +358,12 @@ class ElementsExtensions {
 		loadAnnotationValues(annotationMirror).get(name.toString)
 	}
 
+	def dispatch Map<String, AnnotationValue> loadAnnotationValues(AnnotationWrapper wrapper) {
+		loadAnnotationValues(wrapper.annotation)
+	}
+
 	//Gets the annotation vlaues from cache and loads them if not yet in cache.
-	def loadAnnotationValues(AnnotationMirror annotationMirror) {
+	def dispatch Map<String, AnnotationValue> loadAnnotationValues(AnnotationMirror annotationMirror) {
 		var valuesMap = annotationValuesCache.getIfPresent(annotationMirror)
 
 		if (valuesMap == null) {
@@ -401,7 +406,7 @@ class ElementsExtensions {
 			}
 		}
 
-		av.mapAs(av.value, annotationMirror, annotatedElement, name, avType)
+		av.mapAs(av.value, annotationMirror, annotatedElement, name, null, avType)
 	}
 	
 	def isNullOrEmptyAV(Object value) {
@@ -432,14 +437,14 @@ class ElementsExtensions {
 	}
 
 	private def <T> T mapAs(AnnotationValue av, Object value, AnnotationMirror annotationMirror,
-		Element annotatedElement, CharSequence name, Class<T> avType) {
+		Element annotatedElement, CharSequence name, Integer index, Class<T> avType) {
 		handleErrorAnnotationValues(av, annotationMirror, name)
 		
 		if(value==null) {return null;}
 
 		//Arrays can be converted to single values to support optionality. The array may contain zero or one element then.
 		if (!avType.array && value instanceof Iterable<?>) {	
-			return av.mapAs(singleAV(value as Iterable<AnnotationValue>), annotationMirror, annotatedElement, name, avType)
+			return av.mapAs(singleAV(value as Iterable<AnnotationValue>), annotationMirror, annotatedElement, name, 0, avType)
 		}
 		
 
@@ -467,14 +472,31 @@ class ElementsExtensions {
 			Enum.valueOf(enumClazz, ve.simpleName.toString) as T
 
 		} else if (avType.array) {
-			val arr = Array.newInstance(avType.componentType, 0)
-			(value as Iterable<AnnotationValue>).map[
-				it.mapAs(it.value, annotationMirror, annotatedElement, name, avType.componentType)].toList.toArray(
-				arr as Object[]) as T
+			val arr = Array.newInstance(avType.componentType, (value as List<AnnotationValue>).size)
+			
+			(value as List<AnnotationValue>).forEach[avInList , i|
+				Array.set(arr, i, avInList.mapAs(avInList.value, annotationMirror, annotatedElement, name, i, avType.componentType))
+			]
+			arr as T
+		} else if(avType==AnnotationMirror){
+			val avAsAnnotation = av.cast(value, annotationMirror, annotatedElement, name, AnnotationMirror)			
+			createAnnotationAndParent(annotationMirror, avAsAnnotation, name, index) as T			
 		} else {
 
 			av.cast(value, annotationMirror, annotatedElement, name, avType)
 		}
+	}
+	
+	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationAndParent annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
+		new AnnotationAndParent(avAsAnnotation, name.toString, index, annotationMirror, null)
+	}
+	
+	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationWithDefaultAnnotation annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
+		createAnnotationAndParent(annotationMirror.annotation, avAsAnnotation, name, index)
+	}
+	
+	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationMirror annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
+		avAsAnnotation
 	}
 	
 	
@@ -878,6 +900,12 @@ class ElementsExtensions {
 		result
 	}
 
+	def dispatch Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(
+		AnnotationWrapper annotationWrapper
+	){
+		annotationWrapper.annotation.elementValuesWithDefaults
+	}
+	
 	def dispatch Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(
 		AnnotationMirror a) {
 		elementUtils.getElementValuesWithDefaults(a)

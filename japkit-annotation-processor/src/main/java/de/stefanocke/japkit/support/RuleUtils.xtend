@@ -95,6 +95,7 @@ class RuleUtils {
 				scope(e) [
 					
 					if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
+					valueStack.put("currentRule", currentRule)
 					varRules?.forEach[it.putELVariable]
 					closure.apply(e)
 				]

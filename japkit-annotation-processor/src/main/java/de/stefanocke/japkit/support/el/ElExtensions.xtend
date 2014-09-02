@@ -16,6 +16,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1
 import static de.stefanocke.japkit.support.ExtensionRegistry.*
 import de.stefanocke.japkit.support.ExtensionRegistry
 import de.stefanocke.japkit.support.GenerateClassContext
+import de.stefanocke.japkit.support.Rule
 
 class ElExtensions {
 
