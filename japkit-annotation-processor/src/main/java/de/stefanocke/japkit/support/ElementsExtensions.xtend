@@ -73,7 +73,8 @@ class ElementsExtensions {
 	}
 	
 	def dispatch srcType(Object o) {
-		mc.reportError('''Cannot determine type for source «o», since it is neither a type nor an element.''', null,null,null)
+		mc.reportRuleError('''Cannot determine type for source «o», since it is neither a type nor an element.''')
+		null as TypeMirror
 	}
 
 	def declaredFields(TypeElement type) {
@@ -160,7 +161,10 @@ class ElementsExtensions {
 					namesAv.toList
 
 			if (params.size != names.size) {
-				mc.reportError("Then number of parameter names must match the number of parameters", e, am, "value")
+				mc.reportRuleError("Then number of parameter names must match the number of parameters: "+e)
+				
+				//TODO?
+				//mc.reportError("Then number of parameter names must match the number of parameters", e, am, "value")
 				params
 			} else {
 				wrapParams(params, names)
@@ -1010,9 +1014,8 @@ class ElementsExtensions {
 		
 		if (annotations.empty) {
 			if (mustHaveTrigger) {
-				mc.reportError(
-					'''Related type «typeElement.qualifiedName» must have one of the trigger annotations «triggerAnnotationTypeFqns».''',
-					null, null, null);
+				mc.reportRuleError(
+					'''Related type «typeElement.qualifiedName» must have one of the trigger annotations «triggerAnnotationTypeFqns».''');
 				null
 
 			} else {
@@ -1022,10 +1025,9 @@ class ElementsExtensions {
 		
 		else if (annotations.size > 1) {
 		
-			mc.reportError(
+			mc.reportRuleError(
 				'''Related type «typeElement.qualifiedName» has more than one of the trigger annotations «triggerAnnotationTypeFqns».
-				 Thus, the generated type to use is not unique.''',
-				null, null, null);
+				 Thus, the generated type to use is not unique.''');
 			null
 		}
 		else if(!typeElement.generated && 

@@ -50,8 +50,7 @@ class PropertyFilter {
 		//TODO: Should be an expression.
 		includeNames.forEach [
 			if (!properties.exists[p|it.equals(p.name)]) {
-				reportError('''Property with name «it» does not exist in source class.''', null, null,
-					null)
+				reportRuleError('''Property with name «it» does not exist in source class.''')
 			}
 		]
 

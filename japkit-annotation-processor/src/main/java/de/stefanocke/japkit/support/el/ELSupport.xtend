@@ -120,6 +120,15 @@ class ELSupport {
 	def Object getCurrentSrc(){
 		valueStack.getRequired("src")
 	}
+	
+	def Element getNearestSrcElement(){
+		valueStack.nearestSrcElement
+	}
+	
+	def Element getNearestSrcElement(ValueStack vs){
+		val src = vs.get("src")
+		if(src instanceof Element) src else vs.parent?.nearestSrcElement
+	}
 
 	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
 		T errorResult) {
@@ -131,8 +140,7 @@ class ELSupport {
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
 		} catch (Exception e) {
-			reportError('''«errorMessage»: «e.message» EL expression: «expr»''', if(currentSrc instanceof Element) getCurrentSrcElement else null ,
-				null, null)
+			reportRuleError('''«errorMessage»: «e.message» EL expression: «expr»''')
 			errorResult
 		}
 	}

@@ -323,9 +323,8 @@ class TypesRegistry {
 		val exisitingFqn = typeElementSimpleNameToFqn.get(genTypeSimpleName)
 
 		if (exisitingFqn != null && !exisitingFqn.equals(genTypeFqn)) {
-			messageCollector.reportError(
-				'''The simple names of generated classes must be unique. Found «exisitingFqn» and «genTypeFqn»''', null,
-				null, null)
+			messageCollector.reportRuleError(
+				'''The simple names of generated classes must be unique. Found «exisitingFqn» and «genTypeFqn»''')
 		} else if (exisitingFqn == null) {
 			messageCollector.printDiagnosticMessage[
 				'''Register fqn for simple name: «genTypeSimpleName» -> «genTypeFqn»''']
@@ -588,7 +587,7 @@ class TypesRegistry {
 		registerTypeDependencyForAnnotatedClassByFqn(annotatedClass.qualifiedName.toString, typeFqnOrShortname, msg)
 
 		//Report the error. This might be remover later, when the class is generated again
-		messageCollector.reportError(errorMsg, annotatedClass, null, null)
+		messageCollector.reportRuleError(errorMsg)
 	}
 
 	//Whether asTypeElement shall return generated types, if "real" type is not found (yet).

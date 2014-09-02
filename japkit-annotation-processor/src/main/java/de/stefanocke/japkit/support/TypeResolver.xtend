@@ -164,8 +164,7 @@ class TypeResolver {
 					}
 					default: {
 						resolvedSelector.type = null
-						messageCollector.reportError('''Selector «resolvedSelector.kind» not supported''',
-							currentAnnotatedClass, currentTriggerAnnotation, null)
+						messageCollector.reportRuleError('''Selector «resolvedSelector.kind» not supported''')
 					}
 						
 				}
@@ -186,8 +185,7 @@ class TypeResolver {
 	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector, AnnotationMirror classSelectorAnnotation, TypeElement te, boolean throwTypeElementNotFound) {
 		resolvedSelector.enclosingTypeElement = getEnclosingTypeElement(classSelectorAnnotation)
 		if(resolvedSelector.enclosingTypeElement==null){
-			messageCollector.reportError('''Could not determine enclosing type element for inner class.''',
-							currentAnnotatedClass, currentTriggerAnnotation, null)
+			messageCollector.reportRuleError('''Could not determine enclosing type element for inner class.''')
 			return
 		}
 		resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, String)

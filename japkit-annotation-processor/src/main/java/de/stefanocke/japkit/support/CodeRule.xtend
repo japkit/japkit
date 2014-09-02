@@ -152,8 +152,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	
 			imports.forEach [
 				if (!ec.importIfPossible(it)) {
-					reportError('''Import for «it» not possible since it conflicts with existing import''', null,
-						metaAnnotation, 'imports')
+					reportRuleError('''Import for «it» not possible since it conflicts with existing import''', 'imports')
 				}
 			]
 			handleTypeElementNotFound(null, '''Code body «bodyExpr» could not be generated''') [

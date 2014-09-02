@@ -151,7 +151,7 @@ class RuleUtils {
 				//only variable names allowed, no expression
 				if(expr=="srcElementName") currentSrcElement.simpleName.toString 
 					else  vs.get(expr)?.toString ?: {
-						reportError('''Variable «expr» in "«template»"" could not be resolved.''', null, null, null)
+						reportRuleError('''Variable «expr» in "«template»"" could not be resolved.''')
 						expr
 					}			
 			} else {

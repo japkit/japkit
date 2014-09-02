@@ -12,6 +12,7 @@ import javax.lang.model.util.Elements
 import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.support.el.ELSupport
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -96,9 +97,26 @@ class MessageCollector {
 		messagesPerAnnotatedClass.remove(annotatedClassFqn)
 	}
 	
-	def reportError(CharSequence msg, Element element, AnnotationMirror annotation, CharSequence annotationValueName){
-		reportError(new ProcessingException(msg?.toString, element, annotation, annotationValueName, null))  //TODO: Refactor
+	def reportRuleError(CharSequence msg){
+		reportRuleError(msg, null)
 	}
+	
+	def reportRuleError(CharSequence msg, CharSequence metaAnnotationValueName){
+		val extension ELSupport = ExtensionRegistry.get(ELSupport)
+		
+		val rule = currentRule
+		
+		val metaAnnotation = rule?.metaAnnotation 
+		val metaElement = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotatedElement else rule?.metaElement   //There are rules without any meta annotation. They only have a template element.
+		
+		addMessage(Kind.ERROR, msg?.toString, nearestSrcElement ?: currentAnnotatedClass, null, null)
+		
+		addMessage(Kind.ERROR, msg?.toString, metaElement, metaAnnotation, metaAnnotationValueName?.toString)
+		
+		
+	}
+	
+	
 	
 	def reportError(CharSequence msg, Exception ex, Element element, AnnotationMirror annotation, CharSequence annotationValueName){
 		reportError(new ProcessingException('''«msg» Cause: «ex»: «ex.message»\n at «ex.stackTrace.join("\n at ")»''', element, annotation, annotationValueName, null))  //TODO: Refactor

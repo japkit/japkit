@@ -24,12 +24,18 @@ class ValueStack implements Map<String, Object> {
 		this.parent = parent
 	}
 	
+	
+	
 	//deep copy
 	new(ValueStack other){
 		this.current = new HashMap(other.current)
 		if(other.parent != null){
 			this.parent = new ValueStack(other.parent)	
 		}
+	}
+	
+	def public getParent(){
+		parent
 	}
 	
 	def void push(){

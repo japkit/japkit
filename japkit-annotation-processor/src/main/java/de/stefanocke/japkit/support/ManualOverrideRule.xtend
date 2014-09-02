@@ -6,6 +6,8 @@ import javax.lang.model.element.AnnotationMirror
 import de.stefanocke.japkit.gen.GenElement
 import java.util.List
 import de.stefanocke.japkit.gen.GenAnnotationMirror
+import de.stefanocke.japkit.support.el.ElExtensions
+import de.stefanocke.japkit.support.el.ELSupport
 
 @Data
 class ManualOverrideRule {
@@ -14,6 +16,7 @@ class ManualOverrideRule {
 	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	val extension ELSupport =  ExtensionRegistry.get(ELSupport)
 	val protected extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 
 	//The class selector for manual overrides
@@ -36,10 +39,11 @@ class ManualOverrideRule {
 		//Validate that an according property exists for each override element 
 		overrideElementsByName.forEach [ oeName, oe |
 			if (!elementsToOverrideNames.contains(oeName)) {
-				reportError(
-					'''No generated element exists with name «oeName». Generated elements are: «elementsToOverrideNames»''',
-					overrideElementsByName.get(oeName), null, null
-				)
+				scope(oe)[
+					//TODO: Das ist kein Error in einer Rule, sondern eben nur in einer annotierten Klasse bzw Hilfsklasse.
+					reportRuleError('''No generated element exists with name «oeName». Generated elements are: «elementsToOverrideNames»''')	
+					null		
+				]
 			}
 		]
 		
