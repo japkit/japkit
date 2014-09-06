@@ -170,9 +170,13 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 						}
 
 					valueForVariable
-				} catch (TypeElementNotFoundException tenfe) {
+				} catch(ElVariableError e){
+					//Do not report the error again to avoid error flooding
+					e
+				} 
+				catch (TypeElementNotFoundException tenfe) {
 					ExtensionRegistry.get(TypesRegistry).handleTypeElementNotFound(tenfe, currentAnnotatedClass)
-					null
+					new ElVariableError(_name)
 				} catch (Exception e) {
 
 					//Idee: Hier auf dem ValueStack speziell markieren, dass es mit der Varaiable einen Fehler gab
@@ -180,11 +184,13 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 					//dann dazu genutzt werden kann die Flut an gemeldeten Folgefehlern einzudämmen. 
 					reportRuleError(
 						'''Could not evaluate EL variable «name»: «e.message» EL expression: «expr», Property Filter: «propertyFilterAnnotations».''')
-					null
+					new ElVariableError(_name)
 				}
 			]
+			
+			
 			//Das hier funktioniert so nicht, wenn isFunction true ist. Macht aber nichts.
-			if (setInShadowAnnotation && !triggerAv.nullOrEmpty) {
+			if (!(result instanceof ElVariableError) && setInShadowAnnotation && !triggerAv.nullOrEmpty) {
 				valueStack.getVariablesForShadowAnnotation().put(triggerAv, result)
 			}
 			result

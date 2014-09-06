@@ -139,6 +139,9 @@ class ELSupport {
 			return resultFromValueStack ?: eval(expr, lang, expectedType)
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
+		} catch(ElVariableError e){
+			//Do not report the error again to avoid error flooding
+			errorResult
 		} catch (Exception e) {
 			reportRuleError('''«errorMessage»: «e.message» EL expression: «expr»''')
 			errorResult

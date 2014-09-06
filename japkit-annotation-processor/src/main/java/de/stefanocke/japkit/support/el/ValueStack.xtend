@@ -76,8 +76,13 @@ class ValueStack implements Map<String, Object> {
 	}
 	
 	override get(Object key) {
-		if("parent" == key) parent else 
+		val result = if("parent" == key) parent else 
 		current.get(key) ?: parent?.get(key)
+		
+		//Exceptions are used to indicate failures when evaluating EL variables. Instead returning them as values, they are thrown.
+		if(result instanceof Exception) throw result
+		
+		result 
 	}
 	
 	def <T> T get(Object key, Class<T> clazz) {
