@@ -41,29 +41,32 @@ class TriggerAnnotationRule extends AbstractRule{
 	
 	
 	def Set<GenTypeElement> processTriggerAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation){
-		scope(annotatedClass) [
-			val generatedClasses = newHashSet
-			setCurrentAnnotatedClass(annotatedClass)
-			setCurrentTriggerAnnotation(triggerAnnotation)
-			
-			try {
-				printDiagnosticMessage['''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
-	
-				//EL Variables			
-				varRules.forEach[putELVariable]
-			
-				classRules.forEach[generateClass(null, generatedClasses)]
+		inRule[
+			scope(annotatedClass) [
+				val generatedClasses = newHashSet
+				setCurrentAnnotatedClass(annotatedClass)
+				setCurrentTriggerAnnotation(triggerAnnotation)
+				
+				try {
+					printDiagnosticMessage['''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
+		
+					//EL Variables			
+					varRules.forEach[putELVariable]
+				
+					classRules.forEach[generateClass(null, generatedClasses)]
+						
+					resourceRules.forEach[generateResource]
 					
-				resourceRules.forEach[generateResource]
-				
-			} catch (ProcessingException pe) {
-				reportError(pe)
-				
-			} catch (TypeElementNotFoundException tenfe) {
-				handleTypeElementNotFound(tenfe, annotatedClass)
-				
-			}
-			generatedClasses
+				} catch (ProcessingException pe) {
+					reportError(pe)
+					
+				} catch (TypeElementNotFoundException tenfe) {
+					handleTypeElementNotFound(tenfe, annotatedClass)
+					
+				}
+				generatedClasses
+			]
+		
 		]
 	}
 	

@@ -88,7 +88,7 @@ class MessageCollector {
 			messager.printMessage(m.kind, m.msg, element, annotation, annotationValue)
 			
 			//Make it appear at least in error log...
-			messager.printMessage(m.kind, m.msg)
+			messager.printMessage(m.kind, '''«m.msg» «m.typeElementFqn» «m.annotationFqn» «m.annotationValueName»''')
 		]
 		messagesPerAnnotatedClass.clear
 	}
@@ -109,9 +109,12 @@ class MessageCollector {
 		val metaAnnotation = rule?.metaAnnotation 
 		val metaElement = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotatedElement else rule?.metaElement   //There are rules without any meta annotation. They only have a template element.
 		
+		val rootMetaAnnotation = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotation else metaAnnotation
+		
+		
 		addMessage(Kind.ERROR, msg?.toString, nearestSrcElement ?: currentAnnotatedClass, null, null)
 		
-		addMessage(Kind.ERROR, msg?.toString, metaElement, metaAnnotation, metaAnnotationValueName?.toString)
+		addMessage(Kind.ERROR, msg?.toString, metaElement, rootMetaAnnotation, metaAnnotationValueName?.toString)
 		
 		
 	}

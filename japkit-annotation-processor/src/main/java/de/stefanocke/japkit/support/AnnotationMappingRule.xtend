@@ -161,10 +161,9 @@ class AnnotationMappingRule extends AbstractRule{
 		
 				} catch (RuntimeException e) {
 		
-					messageCollector.reportError('''
+					messageCollector.reportRuleError('''
 							Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
-							Cause: «e.message»
-						''', e, if(currentSrc instanceof Element) currentSrcElement, null, null)
+							Cause: «e.message»''')
 				}
 			]
 		]

@@ -84,23 +84,13 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	}
 
 	def void putELVariable() {
-		try {
+		
 			if (isFunction) {
 				valueStack.put(name, this)
 			} else {
 				val value = eval(currentSrc)
 				valueStack.put(name, value)
 			}
-		} catch (TypeElementNotFoundException tenfe) {
-			ExtensionRegistry.get(TypesRegistry).handleTypeElementNotFound(tenfe, currentAnnotatedClass)
-		} catch (Exception e) {
-			//Idee: Hier auf dem ValueStack speziell markieren, dass es mit der Varaiable einen Fehler gab
-			//Der ValueStack kann dann beim Zugriff auf die Variable eine spezielle Exception werfen, die 
-			//dann dazu genutzt werden kann die Flut an gemeldeten Folgefehlern einzudämmen. 
-			reportError(
-				'''Could not evaluate EL variable «name»: «e.message» EL expression: «expr», Property Filter: «propertyFilterAnnotations».''',
-				e, if(currentSrc instanceof Element) currentSrcElement, metaAnnotation, null)
-		}
 	}
 
 
@@ -119,42 +109,41 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	
 	def Object eval(Object src) {
 		inRule[
-			val result = scope(src)[
-				
-		
-				var Object av
-				
-				//Be default, the value is the current src. This is useful for matcher and retrieveAV
-				var Object value = currentSrc
-				
-				value = if (!triggerAv.nullOrEmpty && {
+			val result = scope(src) [
+				try {
+
+					var Object av
+
+					//Be default, the value is the current src. This is useful for matcher and retrieveAV
+					var Object value = currentSrc
+
+					value = if (!triggerAv.nullOrEmpty && {
 						av = currentTriggerAnnotation.value(triggerAv, type);
 						!av.nullOrEmptyAV
 					}) {
-		
+
 						av
-		
-					} else if (!expr.nullOrEmpty) {					
-						eval(expr, lang, type);									
+
+					} else if (!expr.nullOrEmpty) {
+						eval(expr, lang, type);
 					} else if (!propertyFilterAnnotations.nullOrEmpty) {
-		
+
 						//TODO: Rule caching?
 						val propertyFilters = propertyFilterAnnotations.map[new PropertyFilter(it)]
-						propertyFilters.map[getFilteredProperties()].flatten.
-							toList
-		
+						propertyFilters.map[getFilteredProperties()].flatten.toList
+
 					} else if (typeQuery != null) {
 						evalTypeQuery(typeQuery)
-					} else if (codeFragments!=null){
+					} else if (codeFragments != null) {
 						codeFragments
 					} else {
 						value
 					}
-					
-				value = if (matcher != null) {
+
+					value = if (matcher != null) {
 						if (value instanceof Iterable<?>) {
 							matcher.filter(value)
-						} else if(value instanceof Element) {
+						} else if (value instanceof Element) {
 							matcher.matches(value)
 						} else {
 							throw new IllegalArgumentException(
@@ -163,33 +152,41 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 					} else {
 						value
 					}
-					
-				if(!requiredTriggerAnnotation.nullOrEmpty){
-					if(value instanceof TypeElement){
-						value = generatedTypeElementAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
-					} else if(value instanceof TypeMirror){
-						value = generatedTypeAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
+
+					if (!requiredTriggerAnnotation.nullOrEmpty) {
+						if (value instanceof TypeElement) {
+							value = generatedTypeElementAccordingToTriggerAnnotation(value, requiredTriggerAnnotation,
+								false)
+						} else if (value instanceof TypeMirror) {
+							value = generatedTypeAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
+						}
+
 					}
-					
+
+					val valueForVariable = if (annotationToRetrieve == null) {
+							value
+						} else {
+							value.retrieveAnnotationMirrors(annotationToRetrieve.qualifiedName)
+						}
+
+					valueForVariable
+				} catch (TypeElementNotFoundException tenfe) {
+					ExtensionRegistry.get(TypesRegistry).handleTypeElementNotFound(tenfe, currentAnnotatedClass)
+					null
+				} catch (Exception e) {
+
+					//Idee: Hier auf dem ValueStack speziell markieren, dass es mit der Varaiable einen Fehler gab
+					//Der ValueStack kann dann beim Zugriff auf die Variable eine spezielle Exception werfen, die 
+					//dann dazu genutzt werden kann die Flut an gemeldeten Folgefehlern einzudämmen. 
+					reportRuleError(
+						'''Could not evaluate EL variable «name»: «e.message» EL expression: «expr», Property Filter: «propertyFilterAnnotations».''')
+					null
 				}
-		
-				val valueForVariable = if (annotationToRetrieve == null) {
-						value
-					} else {
-						value.retrieveAnnotationMirrors(annotationToRetrieve.qualifiedName)
-					}
-		
-				
-		
-				valueForVariable
-	
 			]
-			
 			//Das hier funktioniert so nicht, wenn isFunction true ist. Macht aber nichts.
-				if (setInShadowAnnotation && !triggerAv.nullOrEmpty) {
-					valueStack.getVariablesForShadowAnnotation().put(triggerAv, result)
-				}
-			
+			if (setInShadowAnnotation && !triggerAv.nullOrEmpty) {
+				valueStack.getVariablesForShadowAnnotation().put(triggerAv, result)
+			}
 			result
 		]
 	}

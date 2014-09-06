@@ -43,7 +43,7 @@ class AnnotationExtensions {
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe;
 		} catch (RuntimeException re) {
-			messageCollector.reportError("Error during annotation mapping.", re, if(currentSrc instanceof Element) currentSrcElement, null, null)
+			messageCollector.reportRuleError("Error during annotation mapping." + re)
 			emptyList
 		}
 

@@ -109,7 +109,7 @@ class ResourceRule extends AbstractRule{
 					'''Type element not found when processing resource template «templateName».''',	tenfe.fqn)
 			} catch (Exception e) {
 				printDiagnosticMessage['''Error when processing resource template «templateName». «e»''']
-				reportError('''Error when processing resource template  «templateName».''', e, null, null, null)
+				reportRuleError('''Error when processing resource template  «templateName»: «e»''')
 			} 
 			null
 		]

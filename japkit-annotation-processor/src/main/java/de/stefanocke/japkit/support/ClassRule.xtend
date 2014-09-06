@@ -190,7 +190,7 @@ class ClassRule extends AbstractRule{
 			throw tenfe
 		}
 		catch (RuntimeException re){
-			reportError('''Error when creating shadow annotation:''', re, null, null, null)
+			reportRuleError('''Error when creating shadow annotation: «re»''')
 		}
 	}
 
