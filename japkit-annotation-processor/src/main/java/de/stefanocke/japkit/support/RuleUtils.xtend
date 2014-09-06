@@ -21,6 +21,7 @@ import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.support.JavadocUtil.*
+import de.stefanocke.japkit.support.el.ElVariableError
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -144,19 +145,28 @@ class RuleUtils {
 		
 		val vs = ExtensionRegistry.get(ELSupport).valueStack
 		val matcher = expressionInTemplate.matcher(template)
-		val	sb = new StringBuffer();
+		val sb = new StringBuffer();
 		while (matcher.find()) {
 			val expr = matcher.group(1)
-			val value = if(!canBeExpression){
-				//only variable names allowed, no expression
-				if(expr=="srcElementName") currentSrcElement.simpleName.toString 
-					else  vs.get(expr)?.toString ?: {
-						reportRuleError('''Variable «expr» in "«template»"" could not be resolved.''')
-						expr
-					}			
-			} else {
-				eval(expr, lang, String, '''Expression «expr» in "«template»"" could not be resolved.''', expr) 
-			}
+			val value = if (!canBeExpression) {
+
+					//only variable names allowed, no expression
+					if (expr == "srcElementName")
+						currentSrcElement.simpleName.toString
+					else {
+						try{
+							vs.get(expr)?.toString ?: {
+								reportRuleError('''Variable «expr» in "«template»"" could not be resolved.''')
+								expr
+							}						
+						} catch(ElVariableError e){
+							//Do not report the error again here.
+							expr
+						}
+					}
+				} else {
+					eval(expr, lang, String, '''Expression «expr» in "«template»"" could not be resolved.''', expr)
+				}
 			matcher.appendReplacement(sb, value);
 		}
 		matcher.appendTail(sb);
