@@ -51,13 +51,13 @@ class GroovyELProvider implements ELProvider {
 	private static int counter = 1;
 
 	@Override
-	Object eval(ValueStack contextMap, String expr, Class expectedType, String language)throws ELProviderException {
+	Object eval(ValueStack valueStack, String expr, Class expectedType, String language)throws ELProviderException {
 
 		try{
 			switch(language){
-				case "GroovyScript": return evalAsScript(contextMap, expr, expectedType)
-				case "GString": return evalAsGString(contextMap, expr, expectedType)
-				case "GStringTemplateInline": return evalAsGStringTemplate(contextMap, expr, expectedType)
+				case "GroovyScript": return evalAsScript(valueStack, expr, expectedType)
+				case "GString": return evalAsGString(valueStack, expr, expectedType)
+				case "GStringTemplateInline": return evalAsGStringTemplate(valueStack, expr, expectedType)
 				default: throw new ELProviderException("Groovy EL provider does not support language ${language}.")
 			}
 		} catch(GroovyRuntimeException ge) {
@@ -88,17 +88,12 @@ class GroovyELProvider implements ELProvider {
 	static Map<String, Script> scripts = new HashMap(); //TODO: Static? Cache eviction? ...
 
 	private Object evalAsScript(ValueStack contextMap, String expr, Class expectedType)throws ELProviderException {
-		
-		//make mutable copy
-		def mutableContextMap = new HashMap<String, Object>(contextMap);  //TODO: Da funktioniert aber der Zugriff auf den parent des value stack nicht mehr richtig...
-
-		
 
 		//TODO: Caching
 		Script script = scripts.get(expr) ?:  shell.parse(expr, "ELProviderScript" + counter++ + ".groovy");
 		scripts.put(expr, script)
 
-		def scriptObject = InvokerHelper.createScript(script.getClass(), new Binding(mutableContextMap))
+		def scriptObject = InvokerHelper.createScript(script.getClass(), new Binding(contextMap))
 
 
 		def result = scriptObject.run();
@@ -138,10 +133,8 @@ class GroovyELProvider implements ELProvider {
 	static Map<URL, Pair<Long, Script>> templatesStatic = new HashMap()
 
 	@Override
-	public void write(Writer writer, URL templateUrl, ValueStack contextMap, String templateLanguage, Long templateLastModified) {
+	public void write(Writer writer, URL templateUrl, ValueStack valueStack, String templateLanguage, Long templateLastModified) {
 		try{
-			//make mutable copy
-			def mutableContextMap = new HashMap<String, Object>(contextMap);  //TODO: Da funktioniert aber der Zugriff auf den parent des value stack nicht mehr richtig...
 			
 			def template = templates.get(templateUrl)
 			
@@ -171,7 +164,7 @@ class GroovyELProvider implements ELProvider {
 			}
 
 
-			template.make(mutableContextMap).writeTo(writer)
+			template.make(valueStack).writeTo(writer)
 
 		} catch(GroovyRuntimeException ge) {
 			throw new ELProviderException(ge)
