@@ -9,6 +9,7 @@ import java.util.List
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
+import de.stefanocke.japkit.support.el.ElVariableError
 
 @Data
 class ResourceRule extends AbstractRule{
@@ -107,7 +108,11 @@ class ResourceRule extends AbstractRule{
 			} catch (TypeElementNotFoundException tenfe) { 
 				handleTypeElementNotFound(
 					'''Type element not found when processing resource template «templateName».''',	tenfe.fqn)
-			} catch (Exception e) {
+			} catch(ElVariableError e){
+				printDiagnosticMessage[e.message]
+				//no error here, since it was already reported by the EL var rule
+			} 
+			catch (Exception e) {
 				printDiagnosticMessage['''Error when processing resource template «templateName». «e»''']
 				reportRuleError('''Error when processing resource template  «templateName»: «e»''')
 			} 
