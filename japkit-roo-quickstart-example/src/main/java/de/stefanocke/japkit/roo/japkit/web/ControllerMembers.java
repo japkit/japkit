@@ -179,7 +179,6 @@ public abstract class ControllerMembers {
 	 * </code>
 	 * </pre>
 	 */
-	@Method
 	abstract void populateEditForm(Model uiModel, FormBackingObject $modelAttribute$);
 
 }
