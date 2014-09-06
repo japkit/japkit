@@ -164,7 +164,7 @@ class ELSupport {
 		}
 
 		
-		return getElProvider(lang).eval(valueStack as Map<String, Object>, expr, expectedType, lang) as T
+		return getElProvider(lang).eval(valueStack, expr, expectedType, lang) as T
 		
 	}
 	

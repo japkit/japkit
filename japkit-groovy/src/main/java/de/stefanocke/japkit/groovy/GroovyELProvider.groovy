@@ -26,6 +26,7 @@ import de.stefanocke.japkit.support.el.ELProvider;
 import de.stefanocke.japkit.support.el.ELProviderException;
 import de.stefanocke.japkit.support.el.ElExtensionPropertiesAndMethods;
 import de.stefanocke.japkit.support.el.ElExtensions;
+import de.stefanocke.japkit.support.el.ValueStack
 
 class GroovyELProvider implements ELProvider {
 
@@ -50,7 +51,7 @@ class GroovyELProvider implements ELProvider {
 	private static int counter = 1;
 
 	@Override
-	Object eval(Map contextMap, String expr, Class expectedType, String language)throws ELProviderException {
+	Object eval(ValueStack contextMap, String expr, Class expectedType, String language)throws ELProviderException {
 
 		try{
 			switch(language){
@@ -66,7 +67,7 @@ class GroovyELProvider implements ELProvider {
 
 	static Map<String, Template> gstringTemplates = new HashMap(); //TODO: Static? Cache eviction? ...
 
-	private Object evalAsGStringTemplate(Map contextMap, String expr, Class expectedType)throws ELProviderException {
+	private Object evalAsGStringTemplate(ValueStack contextMap, String expr, Class expectedType)throws ELProviderException {
 		if(!expectedType.isAssignableFrom(String)){
 			throw new ELProviderException("GStringTemplate is not allowed as expressions of type ${expectedType}");
 		}
@@ -79,14 +80,14 @@ class GroovyELProvider implements ELProvider {
 		
 	}
 
-	private Object evalAsGString(Map contextMap, String expr, Class expectedType)throws ELProviderException {
+	private Object evalAsGString(ValueStack contextMap, String expr, Class expectedType)throws ELProviderException {
 		return evalAsScript(contextMap, '"'+expr+'"', expectedType) //TODO: More escaping?
 
 	}
 
 	static Map<String, Script> scripts = new HashMap(); //TODO: Static? Cache eviction? ...
 
-	private Object evalAsScript(Map contextMap, String expr, Class expectedType)throws ELProviderException {
+	private Object evalAsScript(ValueStack contextMap, String expr, Class expectedType)throws ELProviderException {
 		
 		//make mutable copy
 		def mutableContextMap = new HashMap<String, Object>(contextMap);  //TODO: Da funktioniert aber der Zugriff auf den parent des value stack nicht mehr richtig...
@@ -137,7 +138,7 @@ class GroovyELProvider implements ELProvider {
 	static Map<URL, Pair<Long, Script>> templatesStatic = new HashMap()
 
 	@Override
-	public void write(Writer writer, URL templateUrl, Map contextMap, String templateLanguage, Long templateLastModified) {
+	public void write(Writer writer, URL templateUrl, ValueStack contextMap, String templateLanguage, Long templateLastModified) {
 		try{
 			//make mutable copy
 			def mutableContextMap = new HashMap<String, Object>(contextMap);  //TODO: Da funktioniert aber der Zugriff auf den parent des value stack nicht mehr richtig...

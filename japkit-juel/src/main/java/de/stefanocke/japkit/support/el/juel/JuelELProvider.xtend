@@ -14,13 +14,14 @@ import java.io.Writer
 import java.net.URL
 import de.stefanocke.japkit.support.el.ElExtensions
 import javax.el.CompositeELResolver
+import de.stefanocke.japkit.support.el.ValueStack
 
 class JuelELProvider implements ELProvider {
 	val ExpressionFactory ef = ExtensionRegistry.get(ExpressionFactory, [|new ExpressionFactoryImpl])
 	
 	
 
-	override eval(Map contextMap, String expr, Class expectedType, String language) {
+	override eval(ValueStack contextMap, String expr, Class<?> expectedType, String language) {
 		try {
 			val context = createElContext(contextMap, ElExtensions.extensions)
 			eval(context, expr, expectedType)
@@ -29,7 +30,7 @@ class JuelELProvider implements ELProvider {
 		}
 	}
 
-	def private createElContext(Map<String, ? extends Object> contextMap, ElExtensionPropertiesAndMethods elExtensions) {
+	def private createElContext(ValueStack contextMap, ElExtensionPropertiesAndMethods elExtensions) {
 		val resolver = new CompositeELResolver();
 		
 		//TODO: Ggf zu einem Resolver zusammenfassen.
@@ -58,7 +59,7 @@ class JuelELProvider implements ELProvider {
 		emptyList
 	}
 	
-	override write(Writer writer, URL templateUrl, Map contextMap, String templateLanguage, Long templateLastModified) {
+	override write(Writer writer, URL templateUrl, ValueStack contextMap, String templateLanguage, Long templateLastModified) {
 		throw new UnsupportedOperationException("Java EL Provider does not support templates.")
 	}
 	
