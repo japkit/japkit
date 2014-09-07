@@ -13,6 +13,7 @@ import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import de.stefanocke.japkit.support.el.ELSupport
+import java.util.List
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -50,10 +51,17 @@ class MessageCollector {
 		
 		val typeElement = element?.nextEnclosingTypeElement
 		val simpleElementName = if (typeElement == element) null else element?.simpleName
+		
+		val rootAnnotation = if (annotation instanceof AnnotationAndParent) annotation?.rootAnnotation else annotation
+		
+		val nestedAnnotationPath =  if (annotation instanceof AnnotationAndParent) annotation?.pathFromRootAnnotation else null
+		
+		
 		val m = new Message(kind, msg, 
 			typeElement?.qualifiedName?.toString,
 			simpleElementName?.toString, 
-			(annotation?.annotationType?.asElement as TypeElement)?.qualifiedName?.toString,
+			(rootAnnotation?.annotationType?.asElement as TypeElement)?.qualifiedName?.toString,
+			nestedAnnotationPath,
 			annotationValueName)  //TODO: AV value !?
 		addMessage(m)
 	}
@@ -79,18 +87,57 @@ class MessageCollector {
 			try{
 				element = getTypeElement(m.typeElementFqn)
 				if(m.elementSimpleName!=null){
+					//TODO: Support inner classes. Use uniqueIdentifier
 					element = element.enclosedElements.findFirst[simpleName.contentEquals(m.elementSimpleName)]
 				} 
-				annotation = element?.annotationMirrors.findFirst[(annotationType.asElement as TypeElement).qualifiedName.contentEquals(m.annotationFqn)]
-				annotationValue = annotation?.elementValues.filter[k, v| k.simpleName.contentEquals(m.annotationValueName)].values.head
+				val rootAnnotation = element?.annotationMirrors.findFirst[(annotationType.asElement as TypeElement).qualifiedName.contentEquals(m.annotationFqn)]
+				
+				annotation = if(supportsNestedAnnotations) getNestedAnnotation(rootAnnotation, m.nestedAnnotationPath) else rootAnnotation
+				
+				annotationValue = annotation.getValue(
+					//If the messager does not support nested annotations, only use the first path segment to determine the AV
+					if(supportsNestedAnnotations) m.avName else m.nestedAnnotationPath?.segments?.get(0)?.name ?: m.avName,
+					null
+				)
+
+
 			} catch(RuntimeException e){
 			}
 			messager.printMessage(m.kind, m.msg, element, annotation, annotationValue)
 			
 			//Make it appear at least in error log...
-			messager.printMessage(m.kind, '''«m.msg» «m.typeElementFqn» «m.annotationFqn» «m.annotationValueName»''')
+			messager.printMessage(m.kind, '''«m.msg» «m.typeElementFqn» «m.annotationFqn» «m.nestedAnnotationPath»''')
 		]
 		messagesPerAnnotatedClass.clear
+	}
+	
+	def boolean supportsNestedAnnotations(){
+		//Eclipse implementation of messager does not support nested annotations
+		!isEclipse()
+	}
+	
+	def boolean isEclipse(){
+		messager.class.package.name.startsWith("org.eclipse")
+	}
+	
+	def getNestedAnnotation(AnnotationMirror rootAnnotation, Path path){
+		val pathSegments = path?.segments
+		var annotation = rootAnnotation
+				
+		if(pathSegments!=null){
+			for(s : pathSegments){
+				var av = annotation.getValue(s.name, s.index)
+				
+				annotation = av.value as AnnotationMirror
+			}				
+		}
+		annotation
+	}
+
+	def getValue(AnnotationMirror am, String avName, Integer index){
+		if(avName.nullOrEmpty) return null
+		val av = am?.elementValues.filter[k, v| k.simpleName.contentEquals(avName)].values.head
+		if(index!=null) (av?.value as List<AnnotationValue>).get(index) else av
 	}
 
 	def removeMessagesForAnnotatedClass(String annotatedClassFqn) {
@@ -109,12 +156,11 @@ class MessageCollector {
 		val metaAnnotation = rule?.metaAnnotation 
 		val metaElement = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotatedElement else rule?.metaElement   //There are rules without any meta annotation. They only have a template element.
 		
-		val rootMetaAnnotation = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotation else metaAnnotation
 		
 		
-		addMessage(Kind.ERROR, msg?.toString, nearestSrcElement ?: currentAnnotatedClass, null, null)
+		addMessage(Kind.ERROR, '''«msg?.toString» MetaElement: «metaElement», MetaAnnotation: «metaAnnotation», Src: «currentSrc»''', currentAnnotatedClass, null, null)
 		
-		addMessage(Kind.ERROR, msg?.toString, metaElement, rootMetaAnnotation, metaAnnotationValueName?.toString)
+		addMessage(Kind.ERROR, msg?.toString, metaElement, metaAnnotation, metaAnnotationValueName?.toString)
 		
 		
 	}

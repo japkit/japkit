@@ -1,5 +1,6 @@
 package de.stefanocke.japkit.support
 
+import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 
@@ -7,11 +8,8 @@ import javax.lang.model.element.Element
 class AnnotationAndParent implements AnnotationWrapper{
 	AnnotationMirror annotation
 	
-	//Name of the annotation value
-	String avName
-	
-	//position of the annotation within the annotation value (in case it is an array)
-	Integer index
+	//the path within the parent annotation. null, if it is a top level annotation.
+	Path.Segment pathSegment
 	
 	//the parent annotation. null, if it is a top level annotation.
 	AnnotationAndParent parentAnnotation
@@ -35,20 +33,20 @@ class AnnotationAndParent implements AnnotationWrapper{
 		parentAnnotation?.rootAnnotation ?: annotation
 	}
 	
-	def String getPathFromRootAnnotation(){
-		pathFromRootAnnotation_.toString
+	def Path getPathFromRootAnnotation(){
+		new Path(getPathFromRootAnnotation_)
 	}
-	def private CharSequence getPathFromRootAnnotation_(){
-		if(parentAnnotation==null) '' 
+	def private List<Path.Segment> getPathFromRootAnnotation_(){
+		if(parentAnnotation==null) newArrayList() 
 		else {
-			 val parentPath = parentAnnotation.pathFromRootAnnotation_
-			 '''«IF parentPath.length>0»«parentPath».«ENDIF»«pathSegment»'''
-			 
+			 val path = parentAnnotation.pathFromRootAnnotation_
+			 path.add(pathSegment)
+			 path
 		}
 	}
 	
-	def private getPathSegment() {
-		'''«avName»«IF index != null»[«index»]«ENDIF»'''
+	override toString() {
+		annotation?.toString
 	}
 	
 }

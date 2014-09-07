@@ -248,7 +248,7 @@ class ElementsExtensions {
 	 */
 	def AnnotationMirror annotationMirror(Element annotatedElement, CharSequence annotationFqn) {
 		val am = annotatedElement.annotationMirrors.findFirst[hasFqn(annotationFqn)]
-		if(am==null) null else new AnnotationAndParent(am, null, null, null, annotatedElement)
+		if(am==null) null else new AnnotationAndParent(am, null, null, annotatedElement)
 	}
 
 	/**
@@ -492,7 +492,7 @@ class ElementsExtensions {
 	}
 	
 	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationAndParent annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
-		new AnnotationAndParent(avAsAnnotation, name.toString, index, annotationMirror, null)
+		new AnnotationAndParent(avAsAnnotation, new Path.Segment(name.toString, index), annotationMirror, null)
 	}
 	
 	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationWithDefaultAnnotation annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
