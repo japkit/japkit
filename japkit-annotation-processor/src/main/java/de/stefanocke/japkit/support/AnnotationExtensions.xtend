@@ -9,6 +9,7 @@ import java.util.ArrayList
 import de.stefanocke.japkit.gen.GenExtensions
 import de.stefanocke.japkit.support.el.ELSupport
 import de.stefanocke.japkit.metaannotations.Clazz
+import javax.lang.model.element.TypeElement
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -96,6 +97,10 @@ class AnnotationExtensions {
 	//TODO: Verallgemeinern. Ggf. @Trigger
 	def isTriggerAnnotation(GenAnnotationMirror am) {
 		am.hasMetaAnnotation(Clazz.name)
+	}
+	
+	def isTriggerAnnotation(TypeElement te) {
+		te.annotationMirror(Clazz.name) != null
 	}
 	
 	/**

@@ -91,7 +91,7 @@ class JapkitProcessor extends AbstractProcessor {
 	}
 
 	override getSupportedAnnotationTypes() {
-		val set = newHashSet('''«Behavior.package.name».*''')
+		val set = newHashSet('''«Behavior.package.name».*''','''«Clazz.package.name».*''')
 		val annotationsOption = processingEnv.options.get("annotations")
 		if (annotationsOption != null) {
 			annotationsOption.split(",").forEach[set.add(it)]
@@ -139,12 +139,18 @@ class JapkitProcessor extends AbstractProcessor {
 		//Search for trigger annotations
 		val annotatedClassesAndTriggerAnnotations = classesToProcess.toInvertedMap[triggerAnnotations].filter[ac, t|
 			!t.empty]
+			
+		//type elements that ARE trigger annotations
+		val triggerAnnotations = classesToProcess.filter[triggerAnnotation].toSet
+		val classesWithTrigger = triggerAnnotations.map[findAllTypeElementsWithTriggerAnnotation(it.qualifiedName.toString, false)].flatten.toSet
 
 		//Register all classes with trigger annotations, including the ones with shadow annotations
 		annotatedClassesAndTriggerAnnotations.forEach[ac, t|typesRegistry.registerAnnotatedClass(ac, t)]
 
+		
+		
 		//Retain all classes with non-shadow trigger annotations
-		classesToProcess.retainAll(annotatedClassesAndTriggerAnnotations.filter[ac, t|t.exists[!value]].keySet)
+		classesToProcess.retainAll(annotatedClassesAndTriggerAnnotations.filter[ac, t|t.exists[!value]].keySet)		
 
 		printDiagnosticMessage(['''Annotated classes in root TypeElements: «classesToProcess»'''])
 
@@ -155,6 +161,11 @@ class JapkitProcessor extends AbstractProcessor {
 		printDiagnosticMessage(
 			['''Annotated classes for uncommited gen classes: «annotatedClassesForUncommitedGenClasses»'''])
 		classesToProcess.addAll(annotatedClassesForUncommitedGenClasses)
+		
+		printDiagnosticMessage(
+			['''Annotated classes for triggers found in root TypeElements: «classesWithTrigger»'''])
+		//For incremental build: If a trigger annotation has changed, add all classes we know to have this trigger
+		classesToProcess.addAll(classesWithTrigger)
 
 		val writtenTypeElementsInCurrentLoop = newHashSet
 		do {

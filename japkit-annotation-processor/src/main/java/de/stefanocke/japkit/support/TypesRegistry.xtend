@@ -673,8 +673,15 @@ class TypesRegistry {
 		
 	}
 
+	//finds type elements with a given trigger annotation known so far. does not register any dependencies
+	def findAllTypeElementsWithTriggerAnnotation(String triggerFqn, boolean shadow){
+		findAllTypeElementsWithTriggerAnnotation(null as String, triggerFqn, shadow)
+	}
+	
+	//finds type elements with a given trigger annotation and registers a depnedency to re-consider the annotated class again
+	//when more such types are discoverd / generated
 	def findAllTypeElementsWithTriggerAnnotation(TypeElement annotatedClass, String triggerFqn, boolean shadow){
-		val acFqn = annotatedClass.qualifiedName.toString
+		val acFqn = annotatedClass?.qualifiedName?.toString
 		findAllTypeElementsWithTriggerAnnotation(acFqn, triggerFqn, shadow)
 	}
 	
@@ -682,19 +689,23 @@ class TypesRegistry {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 		
 		val typeFqns = allAnnotatedClassesByTrigger.get(triggerFqn->shadow)	?: emptySet
-		genericTriggerDependencies.getOrCreateSet(triggerFqn->shadow).add(clienAnnotatedClassFqn)
+		if(clienAnnotatedClassFqn!=null){
+			genericTriggerDependencies.getOrCreateSet(triggerFqn->shadow).add(clienAnnotatedClassFqn)	
+		}
 		
 		ExtensionRegistry.get(MessageCollector).printDiagnosticMessage[
 			'''Found types for trigger «triggerFqn», «shadow»: «typeFqns»'''
 		]
 		
-		//Register dependencies to those types, that cannot be found yet. That is, they are not yet generated since they 
-		//have dependencies to other types.
-		//Note: Types to be generated that are discovered later in the iteration will also wake up the clientAnnotatedClass
-		//but this happens in registerGenTypeElement.
-		typeFqns.filter[findTypeElement(it) == null].forEach[
-			registerTypeDependencyForAnnotatedClassByFqn(clienAnnotatedClassFqn, it, '''Generic dependency on trigger annotation «triggerFqn»''')
-		]
+		if(clienAnnotatedClassFqn!=null){
+			//Register dependencies to those types, that cannot be found yet. That is, they are not yet generated since they 
+			//have dependencies to other types.
+			//Note: Types to be generated that are discovered later in the iteration will also wake up the clientAnnotatedClass
+			//but this happens in registerGenTypeElement.
+			typeFqns.filter[findTypeElement(it) == null].forEach[
+				registerTypeDependencyForAnnotatedClassByFqn(clienAnnotatedClassFqn, it, '''Generic dependency on trigger annotation «triggerFqn»''')
+			]	
+		}
 		
 		
 		//Order?
