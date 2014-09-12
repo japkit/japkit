@@ -48,9 +48,10 @@ class MessageCollector {
 	}
 
 	def void addMessage(Kind kind, String msg, Element element, AnnotationMirror annotation, String annotationValueName) {
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 		
 		val typeElement = element?.nextEnclosingTypeElement
-		val simpleElementName = if (typeElement == element) null else element?.simpleName
+		val String  uniqueElementName = if (typeElement == element) null else element?.uniqueNameWithin(typeElement)
 		
 		val rootAnnotation = if (annotation instanceof AnnotationAndParent) annotation?.rootAnnotation else annotation
 		
@@ -59,7 +60,7 @@ class MessageCollector {
 		
 		val m = new Message(kind, msg, 
 			typeElement?.qualifiedName?.toString,
-			simpleElementName?.toString, 
+			uniqueElementName?.toString, 
 			(rootAnnotation?.annotationType?.asElement as TypeElement)?.qualifiedName?.toString,
 			nestedAnnotationPath,
 			annotationValueName)  //TODO: AV value !?
@@ -78,6 +79,7 @@ class MessageCollector {
 
 	//report all collected errors to the Messager
 	def void printAllMessages() {
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 		printDiagnosticMessage(['''Print Messages: «messagesPerAnnotatedClass»'''])
 		messagesPerAnnotatedClass.values.filter[it != null].flatten.forEach [ m |
 			//Rediscover the element where the message occured...
@@ -85,11 +87,13 @@ class MessageCollector {
 			var AnnotationMirror annotation = null
 			var AnnotationValue annotationValue = null
 			try{
-				element = getTypeElement(m.typeElementFqn)
-				if(m.elementSimpleName!=null){
+				val typeElement = getTypeElement(m.typeElementFqn)
+				if(m.uniqueMemberName!=null){
 					//TODO: Support inner classes. Use uniqueIdentifier
-					element = element.enclosedElements.findFirst[simpleName.contentEquals(m.elementSimpleName)]
-				} 
+					element = typeElement.enclosedElements.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]
+				} else {
+					element = typeElement
+				}
 				val rootAnnotation = element?.annotationMirrors.findFirst[(annotationType.asElement as TypeElement).qualifiedName.contentEquals(m.annotationFqn)]
 				
 				annotation = if(supportsNestedAnnotations) getNestedAnnotation(rootAnnotation, m.nestedAnnotationPath) else rootAnnotation
@@ -113,7 +117,8 @@ class MessageCollector {
 	
 	def boolean supportsNestedAnnotations(){
 		//Eclipse implementation of messager does not support nested annotations
-		!isEclipse()
+		//!isEclipse()
+		true
 	}
 	
 	def boolean isEclipse(){
