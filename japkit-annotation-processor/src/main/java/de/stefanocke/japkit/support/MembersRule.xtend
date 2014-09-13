@@ -4,16 +4,11 @@ import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenTypeElement
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.TypeElement
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 /**supports generating members  from annotation values "fields", "methods", "constructors" and "innerClasses"*/
 @Data
 class MembersRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>> {
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension RuleUtils = ExtensionRegistry.get(RuleUtils)
-	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-
 	
 	List<(GenTypeElement)=>List<? extends GenElement>> memberRules
 
@@ -26,25 +21,8 @@ class MembersRule extends AbstractRule implements Function1<GenTypeElement, List
 		addMemberRules("fields", [new FieldRule(it, null)])
 		addMemberRules("constructors", [new ConstructorRule(it, null)])
 		addMemberRules("methods", [new MethodRule(it, null)])
-		addMemberRules("templates", [createTemplateCallRule(it)])
+		addMemberRules("templates", [new TemplateCallRule(it)])
 		
-
-	}
-	
-	//TODO: separate class and inherit from AbstractRule
-	def private (GenTypeElement)=>List<? extends GenElement> createTemplateCallRule(AnnotationMirror templateCallAnnotation) {
-		val activationRule = createActivationRule(templateCallAnnotation, null)
-		val scopeRule = createScopeRule(templateCallAnnotation, null, null)
-		val templateRule = createTemplateRule(templateCallAnnotation.value("value", TypeElement));
-		[genClass |
-			if (!activationRule.apply) {
-				emptyList
-			} else {
-				scopeRule.apply[
-					templateRule.apply(genClass)		
-				].flatten.toList
-			}]
-
 	}
 
 	def private addMemberRules(String avName,
