@@ -141,8 +141,10 @@ class JapkitProcessor extends AbstractProcessor {
 			!t.empty]
 			
 		//type elements that ARE trigger annotations
-		val triggerAnnotations = classesToProcess.filter[triggerAnnotation].toSet
-		val classesWithTrigger = triggerAnnotations.map[findAllTypeElementsWithTriggerAnnotation(it.qualifiedName.toString, false)].flatten.toSet
+		val triggerAnnotations = new HashSet(classesToProcess.filter[triggerAnnotation].map[it.qualifiedName.toString].toSet)
+		triggerAnnotations.addAll(getTriggerAnnotationsForMetaTypeElements(classesToProcess))
+		
+		val classesWithTrigger = triggerAnnotations.map[findAllTypeElementsWithTriggerAnnotation(it, false)].flatten.toSet
 
 		//Register all classes with trigger annotations, including the ones with shadow annotations
 		annotatedClassesAndTriggerAnnotations.forEach[ac, t|typesRegistry.registerAnnotatedClass(ac, t)]

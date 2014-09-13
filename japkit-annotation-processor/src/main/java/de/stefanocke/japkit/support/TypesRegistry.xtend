@@ -88,10 +88,13 @@ class TypesRegistry {
 	def persist() {
 		persistAnnotatedClasses()
 		persistGenericDependencies()
+		persistMultiMap(metaTypeElementsToTriggerAnnotations, ".japkitMetaDependencies", [k,v | #[k, v]])
 	}
+	
 	def load(){
 		loadAnnotatedClasses()
 		loadGenericDependencies()
+		loadMultiMap(metaTypeElementsToTriggerAnnotations, ".japkitMetaDependencies", [line | line.get(0)->line.get(1)])
 	}
 	
 	def persistAnnotatedClasses() {
@@ -749,8 +752,57 @@ class TypesRegistry {
 		null
 	}
 	
+	//Key is a meta TypeElement (template class, function etc.). Value is the set of trigger annoations that use the meta type element directly or indirectly.
+	val Map<String, Set<String>> metaTypeElementsToTriggerAnnotations = newHashMap();
 	
+	//registers the dependency from the rule's meta type element to the current trigger annotation.
+	//This is necessary to determine the classes to re-generate, when a meta type element.
+	//Note that the meta type element should be always the top level type element, even if the rule uses an inner class.	
+	def registerMetaTypeElement(TypeElement rootMetaTypeElement, TypeElement triggerAnnotation){
+		metaTypeElementsToTriggerAnnotations.getOrCreateSet(rootMetaTypeElement.qualifiedName.toString).add(triggerAnnotation.qualifiedName.toString)
+	}
 	
-	
+	def getTriggerAnnotationsForMetaTypeElements(Iterable<TypeElement> metaTypeElements){
+		metaTypeElements.map[metaTypeElementsToTriggerAnnotations.get(it.qualifiedName.toString) ?: emptySet].flatten.toSet
+	}
 
+	def <K,V> persistMultiMap(Map<K, Set<V>> map, String fileName, (K,V)=>List<String> lineCreator) {
+		val writer = new BufferedWriter(filer.createResource(StandardLocation.SOURCE_OUTPUT, "", fileName).openWriter)
+		try {
+			map.forEach [ k, values |
+				values.forEach[v |
+					writer.append(lineCreator.apply(k, v).join(","))		
+					writer.newLine
+				]			
+			]
+		
+		} finally {
+			writer.close
+		}
+	}
+	
+	
+	
+	def <K,V> loadMultiMap(Map<K, Set<V>> map, String fileName, (List<String>)=>Pair<K,V> lineParser) {
+		var BufferedReader reader = null
+		map.clear
+		
+		try{
+			reader = new BufferedReader(filer.getResource(StandardLocation.SOURCE_OUTPUT, "", fileName).openReader(true))
+			var String[] line = null
+			do{
+				line = reader.readLine?.split(',')
+				if(line!=null){
+					val keyValue = lineParser.apply(line)
+						
+					map.getOrCreateSet(keyValue.key).add(keyValue.value)
+					
+				}
+			} while (line!=null)
+		} catch (Exception e){
+			ExtensionRegistry.get(MessageCollector).printDiagnosticMessage['''Loading «fileName» failed: «e»''']
+		} finally {
+			reader?.close
+		}
+	}
 }
