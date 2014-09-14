@@ -1,5 +1,6 @@
 package de.stefanocke.japkit.support
 
+import de.stefanocke.japkit.annotations.Generated
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenAnnotationValue
 import de.stefanocke.japkit.gen.GenDeclaredType
@@ -11,10 +12,9 @@ import java.util.Collections
 import java.util.List
 import java.util.Map
 import java.util.Set
-import javax.annotation.Generated
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.AnnotationValue
+import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
@@ -27,7 +27,6 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import javax.lang.model.element.Element
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -40,20 +39,17 @@ class TypesRegistry {
 	val MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 
-	val JAPKIT = "japkit"
-
 	new(){
 		load	
 	}
 	
-	def getGenAnnotationType() {
-		getTypeElement(Generated.name).asType as DeclaredType
+	def String getGenAnnotationFqn() {
+		Generated.name
 	}
 
 	def markAsGenerated(GenTypeElement typeElement, TypeElement original) {
-		val genAnno = new GenAnnotationMirror(getGenAnnotationType) => [
-			setValue("value", new GenAnnotationValue(JAPKIT))
-			setValue("comments", new GenAnnotationValue(original.qualifiedName.toString))
+		val genAnno = new GenAnnotationMirror(getTypeElement(getGenAnnotationFqn()).asType as DeclaredType) => [
+			setValue("src", new GenAnnotationValue(original.qualifiedName.toString))
 		]
 		typeElement.addAnnotationMirror(genAnno)
 	}
@@ -63,15 +59,9 @@ class TypesRegistry {
 	}
 
 	def findGenAnnotation(TypeElement typeElement) {
-		val am = typeElement.annotationMirrors.findFirst [
-			annotationType.isSameType(getGenAnnotationType) && it.elementValues.entrySet.exists [
-				key.simpleName.contentEquals('value') && {
-					val list = value.value as List<AnnotationValue>
-					!list.nullOrEmpty && JAPKIT.equals(list.get(0)?.value)
-				}
-			]
-		]
-		am
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+		
+		typeElement.annotationMirror(getGenAnnotationFqn())
 	}
 
 	def getAnnotatedClassForGenClassOnDisk(TypeElement typeElement) {
@@ -80,7 +70,8 @@ class TypesRegistry {
 			return null
 		}
 
-		val fqn = am.elementValues.entrySet.findFirst[key.simpleName.contentEquals('comments')].value.value as String
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+		val fqn = am.value("src", String)
 
 		fqn.getTypeElement
 	}
