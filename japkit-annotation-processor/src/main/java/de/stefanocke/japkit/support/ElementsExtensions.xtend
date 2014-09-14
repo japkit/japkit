@@ -822,8 +822,8 @@ class ElementsExtensions {
 	Map<String, String> commentsFromRuntimeMetadata = newHashMap()
 	Map<String, List<String>> paramNamesFromRuntimeMetadata = newHashMap()
 	
-	//FQNs of types for which RuntimeMetadata has been loaded or  does not exist
-	Set<String> typeElementsForWhichRuntimeMetadataHasBeenLoaded = new HashSet
+	//FQNs RuntimeMetadata. Used to detect if it has been re-generated and thus must be reloaded
+	Map<String, TypeElement> runtimeMetadataByFqn = new HashMap
 	
 	def String getCommentFromRuntimeMetadata(Element element) {
 		loadRuntimeMetadata(element)
@@ -840,24 +840,36 @@ class ElementsExtensions {
 	def loadRuntimeMetadata(Element element) {
 		val topLevelEnclosingTypeElement = element.getTopLevelEnclosingTypeElement
 		val typeElementFqn = topLevelEnclosingTypeElement.qualifiedName.toString
-		if (!typeElementsForWhichRuntimeMetadataHasBeenLoaded.contains(typeElementFqn)) {
-			if (topLevelEnclosingTypeElement.annotationMirror(RuntimeMetadata) != null) {
-				val runtimeMetadataTypeElement = findTypeElement(typeElementFqn + "_RuntimeMetadata") //TODO: Constant
-				if (runtimeMetadataTypeElement != null) {
-					runtimeMetadataTypeElement.annotationMirror(RuntimeMetadata.List)?.value("value",
-						typeof(AnnotationMirror[]))?.forEach [
-						val uniqueName = value("id", String)
-						val comment = value("comment", String)
-						val paramNames = value("paramNames", typeof(String[]))
-						
-						commentsFromRuntimeMetadata.put(uniqueName, comment)
-						paramNamesFromRuntimeMetadata.put(uniqueName, paramNames)
-					]
-				}
-
-			}
-			typeElementsForWhichRuntimeMetadataHasBeenLoaded.add(typeElementFqn)
+		if (topLevelEnclosingTypeElement.annotationMirror(RuntimeMetadata) == null) {
+			//shortcut: If there is no according trigger annoatation there won't be runtime metadata at all
+			//TODO: Exception, since we know at this point that we NEED comments or param names?
+			return
 		}
+		
+		val runtimemetadataFqn = typeElementFqn + "_RuntimeMetadata"
+		var runtimeMetadataTypeElement = findTypeElement(runtimemetadataFqn) //TODO: Constant
+		if (runtimeMetadataTypeElement != null) {
+			if(runtimeMetadataTypeElement != runtimeMetadataByFqn.get(runtimemetadataFqn)){
+				loadCommentsAndParamNames(runtimeMetadataTypeElement)
+				runtimeMetadataByFqn.put(runtimemetadataFqn, runtimeMetadataTypeElement)	
+			}
+			registerTypeDependencyForCurrentAnnotatedClass(runtimeMetadataTypeElement.asType)
+		} else {
+			throw new TypeElementNotFoundException(runtimemetadataFqn, "Access to parameter names or comments required.")
+		}		
+			
+	}
+	
+	def loadCommentsAndParamNames(TypeElement runtimeMetadataTypeElement) {
+		runtimeMetadataTypeElement.annotationMirror(RuntimeMetadata.List)?.value("value",
+			typeof(AnnotationMirror[]))?.forEach [
+			val uniqueName = value("id", String)
+			val comment = value("comment", String)
+			val paramNames = value("paramNames", typeof(String[]))
+			
+			commentsFromRuntimeMetadata.put(uniqueName, comment)
+			paramNamesFromRuntimeMetadata.put(uniqueName, paramNames)
+		]
 	}
 	
 	/////////////////////////////////

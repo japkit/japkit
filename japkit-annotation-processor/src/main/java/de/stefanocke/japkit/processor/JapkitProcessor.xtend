@@ -175,7 +175,7 @@ class JapkitProcessor extends AbstractProcessor {
 
 			//Add all deferred classes without unresolved dependencies
 			val annotatedClassesFromPreviousRoundWithNoDependencies = annotatedClassesToDefer.filter[
-				getTypesOnWhichThatAnnotatedClassDependsOn(qualifiedName).empty]
+				!hasUnresolvedTypeDependencies(it.qualifiedName.toString, emptySet)]
 			printDiagnosticMessage(
 				[
 					'''Annotated classes from previous rounds / iterations with no type dependencies: «annotatedClassesFromPreviousRoundWithNoDependencies»'''])
