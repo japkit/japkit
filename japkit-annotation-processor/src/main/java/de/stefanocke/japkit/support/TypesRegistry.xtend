@@ -492,6 +492,12 @@ class TypesRegistry {
 
 	def dispatch void registerTypeDependencyForAnnotatedClass(TypeElement annotatedClass, TypeMirror type) {
 	}
+	
+	def void registerTypeDependencyForCurrentAnnotatedClass(TypeMirror type) {
+		if(currentAnnotatedClass!=null){
+			registerTypeDependencyForAnnotatedClass(currentAnnotatedClass, type)
+		}
+	}
 
 	def private dispatch TypeMirror erasure(GenDeclaredType type) {
 		type.erasure
