@@ -1,12 +1,13 @@
 package de.stefanocke.japkit.roo.japkit.web;
 
+import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
 
-@Var.List({
+@Trigger(vars={
 		@Var(name = "controllers", triggerAV = "controllers", typeQuery = @TypeQuery(annotation = JapkitWebScaffold.class, shadow = true),
 				setInShadowAnnotation = true),
 		@Var(name = "controllerAnnotations", expr = "#{controllers}", annotation = JapkitWebScaffold.class) })

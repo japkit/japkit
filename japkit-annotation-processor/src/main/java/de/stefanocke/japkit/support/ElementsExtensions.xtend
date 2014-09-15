@@ -1017,6 +1017,7 @@ class ElementsExtensions {
 		typeCandidate
 	}
 	
+	//TODO: Dass sollte alles in die TriggerAnnoationRule und ClassRule
 	def TypeElement generatedTypeElementAccordingToTriggerAnnotation(TypeElement typeElement, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger) {
 		if(triggerAnnotationTypes.nullOrEmpty){
 			return typeElement
@@ -1050,7 +1051,7 @@ class ElementsExtensions {
 		
 			//Only apply the transformation if it is not a generated class 
 				
-			//TODO: Zumindest Teile davon können in die Type Registry
+			
 			val triggerAnnotation = annotations.head
 			val nameRule = new ClassNameRule(triggerAnnotation.metaAnnotation(Clazz))
 			val fqn = nameRule.generateQualifiedName(typeElement)

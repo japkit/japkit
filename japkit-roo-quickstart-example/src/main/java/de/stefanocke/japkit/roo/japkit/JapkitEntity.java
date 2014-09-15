@@ -10,11 +10,13 @@ import de.stefanocke.japkit.metaannotations.Getter;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Setter;
+import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 
+@Trigger(vars=@Var(name = "superclass", expr = "#{annotatedClass.superclass}", requiredTriggerAnnotation = JapkitEntity.class))
 @Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifiers = Modifier.PUBLIC, annotations = { @Annotation(
 		targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class, templates = { @TemplateCall(IdAndVersion.class),
 		@TemplateCall(ToString.class),
@@ -22,7 +24,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
 		fields = @Field(src = "#{src.declaredFields}", getter = @Getter, setter = @Setter, annotations = @Annotation(
 				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 						"org.springframework.format.annotation" })))
-@Var(name = "superclass", expr = "#{annotatedClass.superclass}", requiredTriggerAnnotation = JapkitEntity.class)
+
 public @interface JapkitEntity {
 	// Modifier[] modifier() default {};
 

@@ -7,9 +7,11 @@ import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.Getter;
 import de.stefanocke.japkit.metaannotations.Properties;
+import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.AnnotatedClass;
 
+@Trigger
 @Clazz(nameSuffixToRemove = "ViewModelDef",
 		nameSuffixToAppend = "ViewModel",
 		modifiers = Modifier.ABSTRACT,

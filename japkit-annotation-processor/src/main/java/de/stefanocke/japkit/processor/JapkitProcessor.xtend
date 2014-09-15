@@ -32,6 +32,7 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.metaannotations.Trigger
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -91,7 +92,7 @@ class JapkitProcessor extends AbstractProcessor {
 	}
 
 	override getSupportedAnnotationTypes() {
-		val set = newHashSet('''«Behavior.package.name».*''','''«Clazz.package.name».*''')
+		val set = newHashSet('''«Behavior.package.name».*''','''«Trigger.package.name».*''')
 		val annotationsOption = processingEnv.options.get("annotations")
 		if (annotationsOption != null) {
 			annotationsOption.split(",").forEach[set.add(it)]
@@ -485,7 +486,7 @@ class JapkitProcessor extends AbstractProcessor {
 	
 	//TODO: Some Caching.
 	def List<Pair<AnnotationMirror, Boolean>> getTriggerAnnotations(TypeElement annotatedClass) {
-		annotatedClass.annotationsWithMetaAnnotation(Clazz).map[it -> it.shadowAnnotation].toList
+		annotatedClass.annotationsWithMetaAnnotation(Trigger).map[it -> it.shadowAnnotation].toList
 	}
 
 	val Set<String> writtenTypeElements = newHashSet

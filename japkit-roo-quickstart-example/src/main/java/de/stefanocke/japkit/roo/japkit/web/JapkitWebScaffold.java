@@ -21,13 +21,14 @@ import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
+import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 
-@Var.List({
+@Trigger(vars={
 		@Var(name = "fbo", triggerAV = "formBackingObject"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
 		@Var(name = "entityAnnotation", expr = "#{fboElement}", annotation = JapkitEntity.class),

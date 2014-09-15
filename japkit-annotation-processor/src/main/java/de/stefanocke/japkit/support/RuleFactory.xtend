@@ -5,6 +5,7 @@ import javax.lang.model.element.AnnotationMirror
 import com.google.common.cache.Cache
 import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.metaannotations.Template
+import de.stefanocke.japkit.metaannotations.Trigger
 
 class RuleFactory {
 
@@ -42,7 +43,8 @@ class RuleFactory {
 	val triggerAnnotationCache = CacheBuilder.newBuilder.maximumSize(100).weakKeys.<TypeElement, TriggerAnnotationRule>build
 	
 	def createTriggerAnnotationRule(TypeElement triggerAnnotationClass){
-		getOrCreate(triggerAnnotationCache, triggerAnnotationClass, [new TriggerAnnotationRule(triggerAnnotationClass)])
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+		getOrCreate(triggerAnnotationCache, triggerAnnotationClass, [new TriggerAnnotationRule(triggerAnnotationClass.annotationMirror(Trigger), triggerAnnotationClass)])
 	}
 
 	def static <K, V> V getOrCreate(Cache<K, V> cache, K key, (K)=>V factory) {

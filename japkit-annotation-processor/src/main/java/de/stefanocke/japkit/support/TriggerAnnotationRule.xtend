@@ -13,22 +13,20 @@ import java.util.List
 
 @Data
 class TriggerAnnotationRule extends AbstractRule{
-	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+
 	protected val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	protected val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	protected val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	protected val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	
 	TypeElement triggerAnnotationTypeElement
 	List<ELVariableRule> varRules
 	List<ClassRule> classRules
 	List<ResourceRule> resourceRules
 	
-	new(TypeElement triggerAnnotationTypeElement){
-		super(null, triggerAnnotationTypeElement)
+	new(AnnotationMirror triggerMetaAnnotation, TypeElement triggerAnnotationTypeElement){
+		super(triggerMetaAnnotation, triggerAnnotationTypeElement)
 		_triggerAnnotationTypeElement = triggerAnnotationTypeElement
-		//TODO: Could be an AV in @TriggerAnnotation
-		_varRules=triggerAnnotationTypeElement.annotationMirrors(Var).map[new ELVariableRule(it)].toList
+
+		_varRules=createELVariableRules(metaAnnotation, null)
 		
 		//@Clazz
 		_classRules=triggerAnnotationTypeElement.annotationMirrors(Clazz).map[new ClassRule(it, null ,true)].toList
