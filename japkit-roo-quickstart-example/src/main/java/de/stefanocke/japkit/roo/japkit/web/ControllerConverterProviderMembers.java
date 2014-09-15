@@ -2,8 +2,8 @@ package de.stefanocke.japkit.roo.japkit.web;
 
 import org.springframework.core.convert.converter.ConverterRegistry;
 
+import de.stefanocke.japkit.annotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Method;
-import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.roo.base.web.ConverterProvider;
 import de.stefanocke.japkit.roo.base.web.EntityConverterUtil;

@@ -9,7 +9,7 @@ import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenName
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Clazz
-import de.stefanocke.japkit.metaannotations.ParamNames
+import de.stefanocke.japkit.annotations.ParamNames
 import de.stefanocke.japkit.metaannotations.RequiredTriggerAnnotation
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer

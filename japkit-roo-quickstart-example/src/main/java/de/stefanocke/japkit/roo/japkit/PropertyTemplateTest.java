@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.roo.japkit;
 
+import de.stefanocke.japkit.annotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Method;
-import de.stefanocke.japkit.metaannotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcType;

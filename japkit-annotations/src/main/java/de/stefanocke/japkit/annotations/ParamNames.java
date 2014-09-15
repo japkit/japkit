@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.metaannotations;
+package de.stefanocke.japkit.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
