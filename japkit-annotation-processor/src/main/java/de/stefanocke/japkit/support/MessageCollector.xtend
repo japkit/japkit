@@ -175,6 +175,10 @@ class MessageCollector {
 	def reportError(CharSequence msg, Exception ex, Element element, AnnotationMirror annotation, CharSequence annotationValueName){
 		reportError(new ProcessingException('''«msg» Cause: «ex»: «ex.message»\n at «ex.stackTrace.join("\n at ")»''', element, annotation, annotationValueName, null))  //TODO: Refactor
 	}
+	
+	def reportError(CharSequence msg, Element element, AnnotationMirror annotation, CharSequence annotationValueName){
+		reportError(new ProcessingException(msg?.toString, element, annotation, annotationValueName, null))  //TODO: Refactor
+	}
 
 	def reportError(ProcessingException pe) {
 

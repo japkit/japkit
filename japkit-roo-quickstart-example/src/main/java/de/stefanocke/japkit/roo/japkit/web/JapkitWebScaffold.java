@@ -28,7 +28,7 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 
-@Trigger(vars={
+@Trigger(layer=3, vars={
 		@Var(name = "fbo", triggerAV = "formBackingObject"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
 		@Var(name = "entityAnnotation", expr = "#{fboElement}", annotation = JapkitEntity.class),

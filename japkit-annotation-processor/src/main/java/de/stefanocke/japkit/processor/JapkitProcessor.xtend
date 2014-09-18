@@ -3,7 +3,7 @@ package de.stefanocke.japkit.processor
 import de.stefanocke.japkit.annotations.Behavior
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.gen.JavaEmitter
-import de.stefanocke.japkit.metaannotations.Clazz
+import de.stefanocke.japkit.metaannotations.Trigger
 import de.stefanocke.japkit.support.AnnotationExtensions
 import de.stefanocke.japkit.support.ElementsExtensions
 import de.stefanocke.japkit.support.ExtensionRegistry
@@ -32,7 +32,7 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.metaannotations.Trigger
+import java.util.Collections
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -124,10 +124,7 @@ class JapkitProcessor extends AbstractProcessor {
 			return false
 		}
 
-		//Key the annotated class. Value is Set of  generated type elements for it.
-		val Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound = newHashMap
-
-		val writtenTypeElementsInCurrentRound = newHashSet
+		
 
 		//The annotated classes that have been defered by previous rounds. During the round, some of them will be removed and processed.
 		//But also, new ones might be added
@@ -170,62 +167,24 @@ class JapkitProcessor extends AbstractProcessor {
 		//For incremental build: If a trigger annotation has changed, add all classes we know to have this trigger
 		classesToProcess.addAll(classesWithTrigger)
 
-		val writtenTypeElementsInCurrentLoop = newHashSet
-		do {
-			writtenTypeElementsInCurrentLoop.clear
-
-			//Add all deferred classes without unresolved dependencies
-			val annotatedClassesFromPreviousRoundWithNoDependencies = annotatedClassesToDefer.filter[
-				!hasUnresolvedTypeDependencies(it.qualifiedName.toString, emptySet)]
-			printDiagnosticMessage(
-				[
-					'''Annotated classes from previous rounds / iterations with no type dependencies: «annotatedClassesFromPreviousRoundWithNoDependencies»'''])
-			classesToProcess.addAll(annotatedClassesFromPreviousRoundWithNoDependencies)
-
-			processClassesAndWriteTypeElements(classesToProcess, false, generatedTypeElementsInCurrentRound,
-				annotatedClassesToDefer, writtenTypeElementsInCurrentLoop)
-
-			//Still no progress. Check for cyclic dependencies and try to resolve them
-			processClassesWithCycles(generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
-				writtenTypeElementsInCurrentLoop)
-
-			//We had no progress up to now, since no source file has been written successfully.
-			//Thus, write the classes with permanent type errors now.
-			writeClassesWithPermanentTypeErrors(generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
-				writtenTypeElementsInCurrentLoop, false)
-
-			writtenTypeElementsInCurrentRound.addAll(writtenTypeElementsInCurrentLoop)
-
-			classesToProcess.clear
-
-		} while (!writtenTypeElementsInCurrentLoop.empty)
-
-		//if there is still no progress, consider the classes with dependencies to unknown types again now.
-		if (writtenTypeElementsInCurrentRound.empty) {
-
-			//deferred classes with unknown dependencies 
-			val annotatedClassesWithUnknownDependencies = new HashSet(
-				annotatedClassesToDefer.filter[dependsOnUnknownTypes(qualifiedName)].toSet)
-			printDiagnosticMessage(
-				[
-					'''Consider Annotated classes from previous rounds with unknown type dependencies: «annotatedClassesWithUnknownDependencies»'''])
-
-			processClassesAndWriteTypeElements(annotatedClassesWithUnknownDependencies.toSet, false,
-				generatedTypeElementsInCurrentRound, annotatedClassesToDefer, writtenTypeElementsInCurrentRound)
-
-			processClassesWithCycles(generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
-				writtenTypeElementsInCurrentRound)
-
-			writeClassesWithPermanentTypeErrors(generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
-				writtenTypeElementsInCurrentRound, false)
-
+		var boolean roundDone = false
+		
+		while(!roundDone){
+			val allClasses = new HashSet(annotatedClassesToDefer)
+			allClasses.addAll(classesToProcess)
+			
+			if(!allClasses.empty){
+				val layerCompleted = processLayerAsFarAsPossible(annotatedClassesToDefer, classesToProcess, getMinLayer(allClasses))
+				//The layer could not be completed in this round due to dependencies to unknown types. 
+				//Re-consider the regarding classes in next round
+				roundDone = !layerCompleted
+				classesToProcess.retainAll(annotatedClassesToDefer)			
+			} else {
+				roundDone = true
+			}
 		}
-
-		//if there is still no progress, write the classes with dependencies to unknown types, even if those dependencies are not resolved.
-		if (writtenTypeElementsInCurrentRound.empty) {
-			writeClassesWithPermanentTypeErrors(generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
-				writtenTypeElementsInCurrentRound, true)
-		}
+		//If the lowest layer could not be completed in this round, its remaining classes and
+		//all higher layer classes are deferred to next round
 
 		//defer remaining annotated classes to next round
 		annotatedClassesToDefer.forEach[deferredClasses.put(qualifiedName.toString, null)]
@@ -243,19 +202,140 @@ class JapkitProcessor extends AbstractProcessor {
 
 		false
 	}
+	
+	def getMinLayer(Set<TypeElement> annotatedClasses){
+		val layers = annotatedClasses.map[layer].toSet
+		Collections.min(layers)
+	}
+	
+	def getLayer(TypeElement annotatedClass){
+		val layers = annotatedClass.annotationMirrors.map[metaAnnotation(Trigger)].filter[it!=null].map[value('layer', Integer)].toSet
+		
+		val min = Collections.min(layers)
+		val max = Collections.max(layers)
+		
+		if(min!=max){
+			reportError("Annotated classes with multiple trigger annotations with different layers are not supported", annotatedClass, null, null);
+		}
+		min
+	}
+	
+	def filterLayer(Iterable<TypeElement> elements, int l) {
+		new HashSet(elements.filter[layer == l].toSet)
+	}
+	
+	def boolean processLayerAsFarAsPossible(HashSet<TypeElement> annotatedClassesToDefer, HashSet<TypeElement> classesInCurrentRound, int layer) {
+		printDiagnosticMessage(['''Processing layer «layer»'''])
+		
+		//Key the annotated class. Value is Set of  generated type elements for it.
+		val Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound = newHashMap
+		val writtenTypeElementsInCurrentRound = newHashSet
+		val writtenTypeElementsInCurrentLoop = newHashSet
+		
+		var Set<TypeElement> classesToProcess = classesInCurrentRound.filterLayer(layer)
+		
+		val ctp = classesToProcess
+		printDiagnosticMessage['''Annotated classes to process in layer «layer»: «ctp»''']
+		
+		val higherLayerClassesInCurrentRound = new HashSet(classesInCurrentRound)
+		higherLayerClassesInCurrentRound.removeAll(classesToProcess)
+		
+		annotatedClassesToDefer.addAll(higherLayerClassesInCurrentRound)
+		
+		do {
+			writtenTypeElementsInCurrentLoop.clear
+		
+			//Add all deferred classes without unresolved dependencies
+			val annotatedClassesFromPreviousRoundWithNoDependencies = annotatedClassesToDefer.filter[
+				!hasUnresolvedTypeDependencies(it.qualifiedName.toString, emptySet)].filterLayer(layer)
+			printDiagnosticMessage(
+				[
+					'''Annotated classes from previous rounds / iterations with no type dependencies: «annotatedClassesFromPreviousRoundWithNoDependencies»'''])
+			classesToProcess.addAll(annotatedClassesFromPreviousRoundWithNoDependencies)
+			
+		
+			processClassesAndWriteTypeElements(classesToProcess, false, generatedTypeElementsInCurrentRound,
+				annotatedClassesToDefer, writtenTypeElementsInCurrentLoop)
+		
+			classesToProcess = annotatedClassesToDefer.filterLayer(layer)
+			
+			//Still no progress. Check for cyclic dependencies and try to resolve them
+			processClassesWithCycles(classesToProcess, generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
+				writtenTypeElementsInCurrentLoop)
+		
+			classesToProcess = annotatedClassesToDefer.filterLayer(layer)
+			
+			//We had no progress up to now, since no source file has been written successfully.
+			//Thus, write the classes with permanent type errors now.
+			writeClassesWithPermanentTypeErrors(classesToProcess, generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
+				writtenTypeElementsInCurrentLoop, false)
+		
+			writtenTypeElementsInCurrentRound.addAll(writtenTypeElementsInCurrentLoop)
+		
+			classesToProcess = new HashSet
+		
+		} while (!writtenTypeElementsInCurrentLoop.empty)
+		
+		//if there is still no progress, consider the classes with dependencies to unknown types again now.
+		if (writtenTypeElementsInCurrentRound.empty) {
+		
+			//deferred classes with unknown dependencies 
+			val annotatedClassesWithUnknownDependencies = annotatedClassesToDefer
+				.filterLayer(layer)
+				.filter[dependsOnUnknownTypes(qualifiedName)]
+				.toSet
+			printDiagnosticMessage(
+				[
+					'''Consider Annotated classes from previous rounds /iterations with unknown type dependencies: «annotatedClassesWithUnknownDependencies»'''])
+		
+			processClassesAndWriteTypeElements(annotatedClassesWithUnknownDependencies.toSet, false,
+				generatedTypeElementsInCurrentRound, annotatedClassesToDefer, writtenTypeElementsInCurrentRound)
+		
+			classesToProcess = annotatedClassesToDefer.filterLayer(layer)
+			
+			processClassesWithCycles(classesToProcess, generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
+				writtenTypeElementsInCurrentRound)
+		
+			classesToProcess = annotatedClassesToDefer.filterLayer(layer)
+			writeClassesWithPermanentTypeErrors(classesToProcess, generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
+				writtenTypeElementsInCurrentRound, false)
+		
+		}
+		
+		classesToProcess = annotatedClassesToDefer.filterLayer(layer)
+		
+		//if there is still no progress, write the classes with dependencies to unknown types, even if those dependencies are not resolved.
+		if (writtenTypeElementsInCurrentRound.empty) {	
+			writeClassesWithPermanentTypeErrors(classesToProcess, generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
+				writtenTypeElementsInCurrentRound, true)
+		}
+		
+		val layerDone = annotatedClassesToDefer.filterLayer(layer).isEmpty
+		
+		if(layerDone){
+			printDiagnosticMessage['''Finished processing of layer «layer»''']			
+		} else {
+			printDiagnosticMessage['''Need to defer processing of layer «layer» to next annotation processing round.''']			
+		}
+		
+		layerDone
+	}
+	
+	
 
 	def writeClassesWithPermanentTypeErrors(
+		Set<TypeElement> classesToProcess,
 		Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
 		HashSet<TypeElement> annotatedClassesToDefer,
 		HashSet<GenTypeElement> writtenTypeElementsInCurrentRound,
 		boolean alsoWriteClassesThatDependOnUnknownTypes
 	) {
-		if (writtenTypeElementsInCurrentRound.empty && !annotatedClassesToDefer.empty) {
+		if (writtenTypeElementsInCurrentRound.empty && !classesToProcess.empty) {
 
 			//Those annotated classes have no dependency to other annotated classes. Thus, they have permanent type errors, that cannot be resolved by generating other classes. 
 			//Note: classes from cycles that have been resolved in the previous step are included here, since 
 			//the dependencies to the other annotated classes of the cycle have been removed.
-			val annotatedClassesWithUnresolvableTypeErrors = annotatedClassesToDefer.filter [
+			val annotatedClassesWithUnresolvableTypeErrors = classesToProcess.filter [
 				!dependsOnOtherAnnotatedClasses(qualifiedName.toString) &&
 					(alsoWriteClassesThatDependOnUnknownTypes || !dependsOnUnknownTypes(qualifiedName.toString))
 			].toSet
@@ -295,11 +375,11 @@ class JapkitProcessor extends AbstractProcessor {
 		}
 	}
 
-	def processClassesWithCycles(Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
-		HashSet<TypeElement> annotatedClassesToDefer, HashSet<GenTypeElement> writtenTypeElementsInCurrentRound) {
-		if (writtenTypeElementsInCurrentRound.empty && !annotatedClassesToDefer.empty) {
+	def processClassesWithCycles(Set<TypeElement> classesToProcess, Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
+		Set<TypeElement> annotatedClassesToDefer, HashSet<GenTypeElement> writtenTypeElementsInCurrentRound) {
+		if (writtenTypeElementsInCurrentRound.empty && !classesToProcess.empty) {
 
-			val cyclesToProcess = findCyclesInAnnotatedClasses(annotatedClassesToDefer)
+			val cyclesToProcess = findCyclesInAnnotatedClasses(classesToProcess)
 
 			if (!cyclesToProcess.empty) {
 				printDiagnosticMessage['''Try to resolve cyclic dependencies: «cyclesToProcess»''']

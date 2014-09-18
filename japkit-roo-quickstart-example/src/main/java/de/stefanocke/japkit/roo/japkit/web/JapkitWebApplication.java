@@ -7,7 +7,7 @@ import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
 
-@Trigger(vars={
+@Trigger(layer=4, vars={
 		@Var(name = "controllers", triggerAV = "controllers", typeQuery = @TypeQuery(annotation = JapkitWebScaffold.class, shadow = true),
 				setInShadowAnnotation = true),
 		@Var(name = "controllerAnnotations", expr = "#{controllers}", annotation = JapkitWebScaffold.class) })
