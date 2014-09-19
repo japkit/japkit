@@ -39,7 +39,7 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	}
 	
 	new(String name, String packageName) {
-		this(name, GenPackage.forName(packageName))
+		this(name, GenPackage.packageForName(packageName))
 	}
 	
 	new(String name, Element enclosingElement) {

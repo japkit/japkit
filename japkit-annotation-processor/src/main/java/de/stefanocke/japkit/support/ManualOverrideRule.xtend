@@ -1,13 +1,12 @@
 package de.stefanocke.japkit.support
 
+import de.stefanocke.japkit.gen.GenAnnotationMirror
+import de.stefanocke.japkit.gen.GenElement
+import de.stefanocke.japkit.support.el.ELSupport
+import java.util.List
+import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.element.AnnotationMirror
-import de.stefanocke.japkit.gen.GenElement
-import java.util.List
-import de.stefanocke.japkit.gen.GenAnnotationMirror
-import de.stefanocke.japkit.support.el.ElExtensions
-import de.stefanocke.japkit.support.el.ELSupport
 
 @Data
 class ManualOverrideRule {
@@ -32,7 +31,7 @@ class ManualOverrideRule {
 		val overridesSource = manualOverrides?.resolveType?.asTypeElement
 		if(overridesSource==null) return;
 		
-		val overrideElementsByName = (overridesSource?.enclosedElements?.filter(manualOverridesMatcher) ?: emptyList).toMap[simpleName.toString]
+		val overrideElementsByName = (overridesSource?.enclosedElements?.filter[manualOverridesMatcher.apply(it)] ?: emptyList).toMap[simpleName.toString]
 		
 		val elementsToOverrideNames = elementsToOverride.map[simpleName.toString].toSet
 		

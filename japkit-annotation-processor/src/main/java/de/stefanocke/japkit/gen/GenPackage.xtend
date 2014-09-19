@@ -26,7 +26,7 @@ class GenPackage extends GenElement implements PackageElement{
 		setQualifiedName(new GenName(qualifiedName))
 	}
 	
-	def static forName(CharSequence qualifiedName){
+	def static packageForName(CharSequence qualifiedName){
 		packageForName.getOrCreate(qualifiedName, [new GenPackage(qualifiedName)])
 	}
 	

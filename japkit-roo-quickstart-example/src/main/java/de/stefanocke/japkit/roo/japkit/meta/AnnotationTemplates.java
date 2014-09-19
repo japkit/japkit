@@ -10,7 +10,7 @@ import de.stefanocke.japkit.metaannotations.InnerClass;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Trigger;
 
-@Trigger(layer=-1)
+@Trigger(layer=-2)
 @Clazz(modifiers=Modifier.PUBLIC, innerClasses=
 @InnerClass(src="#{triggerAnnotation.targetAnnotations}", modifiers=Modifier.PUBLIC, kind=ElementKind.ANNOTATION_TYPE, 
 	nameExpr="#{src.asElement().simpleName}_",

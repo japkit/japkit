@@ -237,7 +237,7 @@ class ClassRule extends AbstractRule{
 		
 		val enclosingElAndClassName = if(isTopLevelClass){
 			val names = nameRule.generateClassAndPackageName(currentAnnotatedClass)
-			GenPackage.forName(names.key) -> names.value
+			GenPackage.packageForName(names.key) -> names.value
 		} else {
 			//For inner classes, use provided class name
 			enclosingClass -> name
