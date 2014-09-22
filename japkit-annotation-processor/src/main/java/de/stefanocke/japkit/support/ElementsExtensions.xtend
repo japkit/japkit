@@ -2,6 +2,7 @@ package de.stefanocke.japkit.support
 
 import com.google.common.cache.CacheBuilder
 import de.stefanocke.japkit.annotations.Order
+import de.stefanocke.japkit.annotations.ParamNames
 import de.stefanocke.japkit.annotations.RuntimeMetadata
 import de.stefanocke.japkit.gen.GenAnnotationMirror
 import de.stefanocke.japkit.gen.GenAnnotationValue
@@ -9,7 +10,6 @@ import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenName
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Clazz
-import de.stefanocke.japkit.annotations.ParamNames
 import de.stefanocke.japkit.metaannotations.RequiredTriggerAnnotation
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
@@ -17,10 +17,8 @@ import java.lang.annotation.Annotation
 import java.lang.reflect.Array
 import java.util.Collections
 import java.util.HashMap
-import java.util.HashSet
 import java.util.List
 import java.util.Map
-import java.util.Set
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 import javax.lang.model.element.AnnotationMirror
