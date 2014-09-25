@@ -1015,7 +1015,6 @@ class ElementsExtensions {
 		typeCandidate
 	}
 	
-	//TODO: Dass sollte alles in die TriggerAnnoationRule und ClassRule
 	def TypeElement generatedTypeElementAccordingToTriggerAnnotation(TypeElement typeElement, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger) {
 		if(triggerAnnotationTypes.nullOrEmpty){
 			return typeElement
@@ -1041,18 +1040,16 @@ class ElementsExtensions {
 				 Thus, the generated type to use is not unique.''');
 			null
 		}
-		else if(!typeElement.generated && 
-			//Workaround dafür, dass @Generated Source-Retention hat und somit typeElement.generated im inkrementellen Build falsche Ergebnisse liefert.
-			!ExtensionRegistry.get(AnnotationExtensions).isShadowAnnotation(annotations.head)
-			
-		) {  
+		else if(!typeElement.generated) {  
 		
 			//Only apply the transformation if it is not a generated class 
 				
 			
 			val triggerAnnotation = annotations.head
-			val nameRule = new ClassNameRule(triggerAnnotation.metaAnnotation(Clazz))
-			val fqn = nameRule.generateQualifiedName(typeElement)
+
+			val rule = ExtensionRegistry.get(RuleFactory).createTriggerAnnotationRule(triggerAnnotation.annotationAsTypeElement)
+			val fqn = rule.getGeneratedTypeElementFqn(typeElement)
+			
 			val generatedTypeElement = findTypeElement(fqn)
 			if (generatedTypeElement == null) {
 				throw new TypeElementNotFoundException(fqn, '')  

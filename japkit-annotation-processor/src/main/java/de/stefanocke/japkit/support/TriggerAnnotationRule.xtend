@@ -67,4 +67,13 @@ class TriggerAnnotationRule extends AbstractRule{
 		]
 	}
 	
+	def String getGeneratedTypeElementFqn(TypeElement annotatedClass){
+		if(classRules.size != 1){
+			reportRuleError('''There must be exactly one @Clazz annotation in the trigger annoation declaration to determine the name of the generated class unambgiuously.''')
+			null
+		} else {
+			classRules.head.getGeneratedTypeElementFqn(annotatedClass)
+		}
+	}
+	
 }

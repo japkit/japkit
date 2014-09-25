@@ -260,6 +260,11 @@ class ClassRule extends AbstractRule{
 
 		generatedClass
 	}
+	
+	def String getGeneratedTypeElementFqn(TypeElement annotatedClass){
+		//TODO: Make sure the nameRule is context free. That is, it should only depend on annotatedClass. This is currently not always true, if nameExpr is used.
+		nameRule.generateQualifiedName(annotatedClass)
+	}
 
 
 }
