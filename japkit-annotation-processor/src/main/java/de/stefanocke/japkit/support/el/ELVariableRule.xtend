@@ -25,6 +25,10 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import java.util.Collection
+import java.util.Map
+import java.util.Arrays
+import java.lang.reflect.Array
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
@@ -108,8 +112,24 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		cs.length == 0
 	}
 	
+	def dispatch boolean isEmptyVar(Collection<?> c) {
+		c.empty
+	}
+	
+	def dispatch boolean isEmptyVar(Map<?, ?> m) {
+		m.empty
+	}
+	
+	def dispatch boolean isEmptyVar(Iterable<?> i) {
+		i.empty
+	}
+	
 	def dispatch boolean isEmptyVar(Object object) {
-		false
+		if(object.class.array){
+			Array.getLength(object) == 0
+		} else {
+			false
+		}
 	}
 
 
