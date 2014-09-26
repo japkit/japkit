@@ -1,5 +1,6 @@
 package de.stefanocke.japkit.support.el
 
+import de.stefanocke.japkit.support.AbstractRule
 import de.stefanocke.japkit.support.CodeFragmentRules
 import de.stefanocke.japkit.support.ElementMatcher
 import de.stefanocke.japkit.support.ElementsExtensions
@@ -24,7 +25,6 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.support.AbstractRule
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
@@ -38,6 +38,7 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	val extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 
 	String name
+	boolean ifEmpty
 	boolean isFunction
 	String triggerAv
 	String expr
@@ -57,8 +58,9 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 
 	new(AnnotationMirror elVarAnnotation) {
 		super(elVarAnnotation, null)
-
 		_name = elVarAnnotation.value("name", String);
+		
+		_ifEmpty = elVarAnnotation.value("ifEmpty", Boolean);
 		_isFunction = elVarAnnotation.value("isFunction", Boolean);
 		_triggerAv = elVarAnnotation.value("triggerAV", String);
 		_expr = elVarAnnotation.value("expr", String);
@@ -88,9 +90,26 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 			if (isFunction) {
 				valueStack.put(name, this)
 			} else {
+				val exisitingValue = valueStack.get(name)
+				if(ifEmpty && exisitingValue!==null && !exisitingValue.emptyVar) return
+				
 				val value = eval(currentSrc)
 				valueStack.put(name, value)
 			}
+	}
+	
+	//TODO: What about empty collections and arrays?
+	
+	def dispatch boolean isEmptyVar(String string) {
+		string.empty
+	}
+	
+	def dispatch boolean isEmptyVar(CharSequence cs) {
+		cs.length == 0
+	}
+	
+	def dispatch boolean isEmptyVar(Object object) {
+		false
 	}
 
 

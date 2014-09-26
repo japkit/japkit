@@ -4,6 +4,12 @@ import java.lang.annotation.Annotation;
 
 public @interface Var {
 	String name();
+	
+	/**
+	 * If true, the variable is not set if it already exists and is not null or empty.
+	 * @return
+	 */
+	boolean ifEmpty() default false;
 
 	/**
 	 * If true, the EL-Variable is not evaluated immediately. Instead, it is
