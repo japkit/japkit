@@ -111,5 +111,9 @@ class Property implements VariableElement {
 			case Properties.RuleSource.GETTER: getter
 		}
 	}
+	
+	override String toString(){
+		name.toString
+	}
 
 }

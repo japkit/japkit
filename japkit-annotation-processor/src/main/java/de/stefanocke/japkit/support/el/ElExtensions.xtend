@@ -117,7 +117,7 @@ class ElExtensions {
 		} else {
 			//TODO: Prop Not Found Exception to allow default resolving?
 			//Mit Groovy scheint das zu funktionieren, da die get Methode anscheinden die letzte ist, die aufgerufen wird
-			throw new ELPropertyNotFoundException('''No function with name «functionName» is on values stack and there is also no other property of element «e» with this name.''')
+			throw new ELPropertyNotFoundException('''No function with name «functionName» is on value stack and there is also no other property of element «e.simpleName» with this name.''')
 		}
 	}
 	

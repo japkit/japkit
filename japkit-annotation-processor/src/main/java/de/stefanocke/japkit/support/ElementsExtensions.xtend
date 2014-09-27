@@ -13,6 +13,7 @@ import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.lang.annotation.Annotation
 import java.lang.reflect.Array
+import java.util.Collection
 import java.util.Collections
 import java.util.HashMap
 import java.util.List
@@ -38,7 +39,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
-import java.util.Collection
+import java.util.IdentityHashMap
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -348,12 +349,13 @@ class ElementsExtensions {
 	}
 
 	def clearCaches() {
-		annotationValuesCache.invalidateAll
+		annotationValuesCache.clear
 	}
 
 	//Ist das legal? GGf. auf eine Runde beschränken...
-	static val annotationValuesCache = CacheBuilder.newBuilder.maximumSize(1000).weakKeys.<AnnotationMirror, Map<String, AnnotationValue>>build
+	//static val annotationValuesCache = CacheBuilder.newBuilder.maximumSize(1000).weakKeys.<AnnotationMirror, Map<String, AnnotationValue>>build
 	
+	static val annotationValuesCache = new IdentityHashMap<AnnotationMirror, Map<String, AnnotationValue>>
 
 	def private AnnotationValue value(AnnotationMirror annotationMirror, CharSequence name) {
 		loadAnnotationValues(annotationMirror).get(name.toString)
@@ -365,15 +367,19 @@ class ElementsExtensions {
 
 	//Gets the annotation vlaues from cache and loads them if not yet in cache.
 	def dispatch Map<String, AnnotationValue> loadAnnotationValues(AnnotationMirror annotationMirror) {
-		var valuesMap = annotationValuesCache.getIfPresent(annotationMirror)
+		var valuesMap = annotationValuesCache.get(annotationMirror)
 
 		if (valuesMap == null) {
-			val map = newHashMap
-			annotationMirror.elementValuesWithDefaults.forEach[k, v|map.put(k.simpleName.toString, v)]
-			annotationValuesCache.put(annotationMirror, map)
-			valuesMap = map
+			valuesMap = loadAnnotationValuesCacheMiss(annotationMirror)
 		}
 		valuesMap
+	}
+	
+	def loadAnnotationValuesCacheMiss(AnnotationMirror annotationMirror) {
+		val map = newHashMap
+		annotationMirror.elementValuesWithDefaults.forEach[k, v|map.put(k.simpleName.toString, v)]
+		annotationValuesCache.put(annotationMirror, map)
+		map
 	}
 
 	def handleErrorAnnotationValues(AnnotationValue v, AnnotationMirror annotationMirror, CharSequence name) {

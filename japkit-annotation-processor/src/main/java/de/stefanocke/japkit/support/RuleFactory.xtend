@@ -6,25 +6,27 @@ import com.google.common.cache.Cache
 import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.metaannotations.Template
 import de.stefanocke.japkit.metaannotations.Trigger
+import java.util.IdentityHashMap
+import java.util.Map
 
 class RuleFactory {
 
 	//Ist das legal? GGf. auf eine Runde beschränken...
-	val matcherCache = CacheBuilder.newBuilder.maximumSize(100).weakKeys.<AnnotationMirror, ElementMatcher>build
+	val matcherCache = new IdentityHashMap<AnnotationMirror, ElementMatcher>
 	val matcherFactory = [AnnotationMirror am|new ElementMatcher(am)]
 
 	def createElementMatcher(AnnotationMirror am) {
 		getOrCreate(matcherCache, am, matcherFactory)
 	}
 
-	val annoRuleCache = CacheBuilder.newBuilder.maximumSize(100).weakKeys.<AnnotationMirror, AnnotationMappingRule>build
+	val annoRuleCache = new IdentityHashMap<AnnotationMirror, AnnotationMappingRule>
 	val annoRuleFactory = [AnnotationMirror am|new AnnotationMappingRule(am)]
 
 	def createAnnotationMappingRule(AnnotationMirror am) {
 		getOrCreate(annoRuleCache, am, annoRuleFactory)
 	}
 
-	val templateCache = CacheBuilder.newBuilder.maximumSize(100).weakKeys.<TypeElement, TemplateRule>build
+	val templateCache = new IdentityHashMap<TypeElement, TemplateRule>
 	
 	def templateFactory(AnnotationMirror templateAnnotation) {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
@@ -40,15 +42,15 @@ class RuleFactory {
 		getOrCreate(templateCache, templateClass, templateFactory(templateAnnotation))
 	}
 	
-	val triggerAnnotationCache = CacheBuilder.newBuilder.maximumSize(100).weakKeys.<TypeElement, TriggerAnnotationRule>build
+	val triggerAnnotationCache = new IdentityHashMap<TypeElement, TriggerAnnotationRule>
 	
 	def createTriggerAnnotationRule(TypeElement triggerAnnotationClass){
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
 		getOrCreate(triggerAnnotationCache, triggerAnnotationClass, [new TriggerAnnotationRule(triggerAnnotationClass.annotationMirror(Trigger), triggerAnnotationClass)])
 	}
 
-	def static <K, V> V getOrCreate(Cache<K, V> cache, K key, (K)=>V factory) {
-		cache.getIfPresent(key) ?: {
+	def static <K, V> V getOrCreate(Map<K, V> cache, K key, (K)=>V factory) {
+		cache.get(key) ?: {
 			val v = factory.apply(key)
 			cache.put(key, v)
 			v
