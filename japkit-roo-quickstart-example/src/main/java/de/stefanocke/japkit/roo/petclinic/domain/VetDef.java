@@ -13,7 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 
 @JapkitEntity
-public abstract class VetDef extends AbstractPerson {
+public abstract class VetDef extends AbstractPersonDef {
 
 	/**
      */
