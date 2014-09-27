@@ -127,7 +127,7 @@ class RuleUtils {
 	 */
 	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, boolean defaultValue) {
 
-		val activation = metaAnnotation?.elementMatchers("activation".withPrefix(avPrefix), null)
+		val activation = metaAnnotation?.elementMatchers("activation".withPrefix(avPrefix))
 		if(activation.nullOrEmpty) return [|defaultValue];
 
 		[|activation.exists[matches(currentSrcElement)]]
@@ -201,7 +201,7 @@ class RuleUtils {
 	public def (GenElement)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
 		AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 				
-		val mappings = metaAnnotation?.annotationMappings("annotations".withPrefix(avPrefix), null);
+		val mappings = metaAnnotation?.annotationMappings("annotations".withPrefix(avPrefix));
 		
 		[ genElement|
 			val existingAnnotationsAndTemplateAnnotations = new ArrayList(genElement.annotationMirrors.map[it as GenAnnotationMirror])

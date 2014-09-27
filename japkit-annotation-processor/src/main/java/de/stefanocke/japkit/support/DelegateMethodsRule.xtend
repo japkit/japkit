@@ -13,7 +13,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 	}
 
 	override protected createSrcRule() {
-		val methodFilter = metaAnnotation.elementMatchers("methodFilter", null);
+		val methodFilter = metaAnnotation.elementMatchers("methodFilter");
 		
 		[ |
 			val srcElement = currentSrcElement

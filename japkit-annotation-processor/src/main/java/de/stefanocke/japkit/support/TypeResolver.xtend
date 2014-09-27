@@ -43,14 +43,14 @@ class TypeResolver {
 
 	def TypeMirror resolveType(AnnotationMirror metaAnnotation, String typeAvName) { 
 
-		val selector = currentTriggerAnnotation.valueOrMetaValue(typeAvName, TypeMirror, metaAnnotation)
+		val selector = metaAnnotation.value(typeAvName, TypeMirror)
 		selector.resolveType
 
 	}
 
 	def List<? extends TypeMirror> resolveTypes(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
 
-		val selectors = currentTriggerAnnotation.valueOrMetaValue(typeArgsAvName, typeof(TypeMirror[]), metaAnnotation)
+		val selectors =  metaAnnotation.value(typeArgsAvName, typeof(TypeMirror[]))
 		selectors.map(s|s.resolveType)
 
 	}
@@ -63,7 +63,7 @@ class TypeResolver {
 		}
 	}
 	
-	def TypeMirror resolveType_(TypeMirror selector) {
+	def private TypeMirror resolveType_(TypeMirror selector) {
 
 		
 		try {
@@ -169,10 +169,18 @@ class TypeResolver {
 						
 				}
 
+			
+			
+				val requiredTriggerAnnotation = classSelectorAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
+				
+				if (!requiredTriggerAnnotation.nullOrEmpty && resolvedSelector.type !=null) {
+					resolvedSelector.type = generatedTypeAccordingToTriggerAnnotation(resolvedSelector.type, requiredTriggerAnnotation, true)
+				}
+			
 			}
 
 		}
-
+		
 		resolvedSelector
 	}
 	
@@ -218,21 +226,6 @@ class TypeResolver {
 		avName
 	}
 	
-	
-
-	/**
-	 * If some generated code refers to a type element that is expected to be created by the user, this method can be used.
-	 * It will provide the type element, if it exists. It will always provide an GenClass (TODO: What about interfaces?), that acts as a "proxy" for this type element.
-	 * This proxy can be used by the code generator to state requirements for the type element, for example, which superclasses to extend. 
-	 * 
-	 */
-	@Deprecated
-	def resolveTypeAndCreateProxy(AnnotationMirror metaAnnotation, CharSequence annotationValueName) {
-
-		val selector = currentTriggerAnnotation.valueOrMetaValue(annotationValueName, TypeMirror, metaAnnotation)
-		resolveTypeAndCreateProxy(selector)
-
-	}
 	
 	/**Resolves the class selector and creates a "proxy" for the type element so that it is available even if it does not really exist yet.
 	 * TODO: Braucht man hier wirklich einen separaten Proxy? Ggf spezieller "UnresolvedType" der bei asElement das TypeElement liefert?

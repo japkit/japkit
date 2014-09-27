@@ -9,8 +9,6 @@ import de.stefanocke.japkit.gen.GenAnnotationValue
 import de.stefanocke.japkit.gen.GenElement
 import de.stefanocke.japkit.gen.GenName
 import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.metaannotations.Clazz
-import de.stefanocke.japkit.metaannotations.RequiredTriggerAnnotation
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.lang.annotation.Annotation
@@ -527,30 +525,7 @@ class ElementsExtensions {
 				'''Exception when casting annotation value '«name»' (value : '«value»'): «re.message»''',
 				annotatedElement, annotationMirror, name, av);
 		}
-	}
-
-	def <T> valueOrMetaValue(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name,
-		Class<T> avType, boolean isRequired, AnnotationMirror metaAnnotation) {
-
-		//At first, look at the annotation itself for the value. Prepend the disambiguation prefix from the meta annotation, if provided.
-		val prefixedAvName = getPrefixedAvName(metaAnnotation, name)
-
-		var value = value(annotationMirror, annotatedElement, prefixedAvName, avType, false);
-		
-		//TODO: Das wirkt nicht überall. z.B. nicht in annotationValuesByNameUnwrapped
-		if(value!=null){
-			value = transformTypeToGeneratedType(value, annotationMirror, name) as T	
-		}
-
-		//If the annotation does not provide the value, take it from the meta annotation
-		if (value == null && metaAnnotation != null) {
-			value = value(metaAnnotation, annotationMirror.annotationType.asElement, name, avType,
-				isRequired || avType.primitive)
-		}
-		value
-	}
-
-		
+	}		
 
 	def getPrefixedAvName(AnnotationMirror metaAnnotation, CharSequence name) {
 		if (metaAnnotation == null) {
@@ -569,15 +544,6 @@ class ElementsExtensions {
 		annotationMirror.value(null, name, avType, false)
 	}
 
-	def <T> valueOrMetaValue(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name,
-		Class<T> avType, AnnotationMirror metaAnnotation) {
-		annotationMirror.valueOrMetaValue(annotatedElement, name, avType, false, metaAnnotation)
-	}
-
-	def <T> valueOrMetaValue(AnnotationMirror annotationMirror, CharSequence name, Class<T> avType,
-		AnnotationMirror metaAnnotation) {
-		annotationMirror.valueOrMetaValue(null, name, avType, false, metaAnnotation)
-	}
 
 	def <T> requiredValue(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name,
 		Class<T> avType) {
@@ -965,42 +931,6 @@ class ElementsExtensions {
 		elementUtils.printElements(w, elements)
 	}
 	
-	
-	//TODO: Das ist ziemlich high level für ElementsExtensions. Ggf. als "Plugin" bereitstellen.
-		//Transform annotated types to their generated counterparts, if the annotation value decl. has an according metanannotation
-	
-	private def dispatch transformTypeToGeneratedType(TypeMirror value, AnnotationMirror annotationMirror, CharSequence name) {		
-			val triggerAnnotationTypes = getAVTriggerAnnotationTypes(annotationMirror, name)			
-			generatedTypeAccordingToTriggerAnnotation(value, triggerAnnotationTypes, false)			
-	}
-	
-	private def dispatch transformTypeToGeneratedType(TypeElement value, AnnotationMirror annotationMirror, CharSequence name) {		
-			val triggerAnnotationTypes = getAVTriggerAnnotationTypes(annotationMirror, name)			
-			generatedTypeElementAccordingToTriggerAnnotation(value, triggerAnnotationTypes, false)			
-	}
-	
-	private def dispatch transformTypeToGeneratedType(Iterable<?> value, AnnotationMirror annotationMirror, CharSequence name) {		
-		if(!value.nullOrEmpty && (value.head instanceof TypeMirror)){
-			val triggerAnnotationTypes = getAVTriggerAnnotationTypes(annotationMirror, name)
-			value.map[generatedTypeAccordingToTriggerAnnotation(it as TypeMirror, triggerAnnotationTypes, false)]
-		} else if(!value.nullOrEmpty && value.head instanceof TypeElement){
-			val triggerAnnotationTypes = getAVTriggerAnnotationTypes(annotationMirror, name)
-			value.map[generatedTypeElementAccordingToTriggerAnnotation(it as TypeElement, triggerAnnotationTypes, false)]
-		} else {
-			value
-		}
-	}
-	
-	private def dispatch transformTypeToGeneratedType(Object value, AnnotationMirror annotationMirror, CharSequence name) {
-		value
-	}
-	
-	
-	private def getAVTriggerAnnotationTypes(AnnotationMirror annotationMirror, CharSequence name) {
-		val am = annotationValueDeclaration(annotationMirror, name).annotationMirror(RequiredTriggerAnnotation)
-		am?.value("value", typeof(TypeMirror[]))
-	}
-	
 	/**
 	 * Validates if the type has (at most) one of the given trigger annotations. If so , and it is not a generated type, 
 	 * the according generated type is determined and returned.  
@@ -1023,6 +953,15 @@ class ElementsExtensions {
 		if(triggerAnnotationTypes.nullOrEmpty){
 			return typeElement
 		}
+		
+		val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+		if(typeElement.annotationMirrors.filter[isTriggerAnnotation].empty){
+			//If the type element has no trigger annotations at all we assume it is a "hand-written" class and leave it as it is.
+			//TODO: This could be configurable...
+			return typeElement
+		}
+		
+		
 		val triggerAnnotationTypeFqns = triggerAnnotationTypes.map[qualifiedName].toSet
 		val annotations = typeElement.annotationMirrors.filter[triggerAnnotationTypeFqns.contains(annotationType.qualifiedName)] 
 		

@@ -56,7 +56,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 		val bodyCaseAnnotations = metaAnnotation?.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
 		
 		_bodyCases = bodyCaseAnnotations?.map[
-			elementMatchers('matcher', null) 
+			elementMatchers('matcher') 
 			-> value('expr', String)
 		]?.toList ?: emptyList
 

@@ -9,7 +9,7 @@ class CodeFragmentRule extends CodeRule {
 	
 	new(AnnotationMirror metaAnnotation) {
 		super(metaAnnotation, '')
-		_activation = metaAnnotation.elementMatchers("activation", null)
+		_activation = metaAnnotation.elementMatchers("activation")
 	}
 	
 	override CharSequence code(){

@@ -96,7 +96,7 @@ class AnnotationExtensions {
 	}
 	
 
-	def isTriggerAnnotation(GenAnnotationMirror am) {
+	def isTriggerAnnotation(AnnotationMirror am) {
 		am.hasMetaAnnotation(Trigger.name)
 	}
 	
@@ -107,13 +107,9 @@ class AnnotationExtensions {
 	/**
 	 * Gets a list of element matchers from an annotation.
 	 */
-	 def elementMatchers(AnnotationMirror annotation, CharSequence avName, AnnotationMirror metaAnnotation){
-	 	 val av =(annotation.valueOrMetaValue(avName, typeof(AnnotationMirror[]), metaAnnotation))
+	 def elementMatchers(AnnotationMirror annotation, CharSequence avName){
+	 	 val av =(annotation.value(avName, typeof(AnnotationMirror[])))
 	 	 if(av!=null) av.map[createElementMatcher(it)] else emptyList
-	 }
-	 
-	 def annotationMappings(AnnotationMirror annotation, CharSequence avName, AnnotationMirror metaAnnotation){
-	 	 annotation.valueOrMetaValue(avName, typeof(AnnotationMirror[]), metaAnnotation)?.map[createAnnotationMappingRule(it)] ?: emptyList
 	 }
 	 
 	 def annotationMappings(AnnotationMirror annotation, CharSequence avName){
