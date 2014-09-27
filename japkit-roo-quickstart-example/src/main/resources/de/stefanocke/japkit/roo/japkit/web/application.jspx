@@ -1,7 +1,7 @@
 application_name=Sample Application
 <%controllerAnnotations.each{ 
-	def fqnId = it.fqnId
-	def shortId = it.shortId
+	def fqnId = it.fboFqnId
+	def shortId = it.fboShortId
 	def name = it.fboName
 	def pluralName = it.fboPluralName
 	def propertyNames = it.propertyNames

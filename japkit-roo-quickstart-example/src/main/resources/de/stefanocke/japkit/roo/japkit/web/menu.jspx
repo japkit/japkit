@@ -5,7 +5,7 @@
     <menu:menu id="_menu" z="0">       
         <%controllerAnnotations.each{
         	def path = it.path	
-        	def id = it.shortId
+        	def id = it.fboShortId
         %>
         <menu:category id="c_${id}" z="0">
             <menu:item id="i_${id}_new" messageCode="global_menu_new" url="/${path}?form" z="0"/>

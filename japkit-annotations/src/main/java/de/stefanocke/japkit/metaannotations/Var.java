@@ -29,18 +29,6 @@ public @interface Var {
 	 * @return the trigger annotation value name
 	 */
 	String triggerAV() default "";
-
-	/**
-	 * If this is true and {@link #triggerAV()} is set, the annotation value
-	 * with that name in the shadow annotation will be set to the value of the
-	 * EL Variable. TODO: Is the really a property of the Var? Maybe, we should
-	 * support this only for the case, where the @Var annotation is put directly
-	 * on the annotation value declaration. (This is nicer anyway...). But then
-	 * there is the Eclipse-ordering issue again...
-	 * 
-	 * @return
-	 */
-	boolean setInShadowAnnotation() default false;
 	
 	/**
 	 * If this value is not empty and the variable is a TypeMirror or TypeElement, it validated, that

@@ -171,14 +171,20 @@ class ClassRule extends AbstractRule{
 		try{
 			
 			if(shallCreateShadowAnnotation){
-				val shadowAnnotation = GenExtensions.copy(currentTriggerAnnotation) => [it.setShadowIfAppropriate]
+				val shadowAnnotation = GenExtensions.copy(currentTriggerAnnotation) 
 				
-				valueStack.getVariablesForShadowAnnotation().forEach[name, value |
-					shadowAnnotation.setValue(name, [t| 
-						//TODO: Schicker. In extension o.ä verlagern
-						new GenAnnotationValue(coerceAnnotationValue(value, t))
-					])
+				shadowAnnotation.annotationValueNames.forEach[avName |
+					val valueFromStack = valueStack.get(avName.toString)
+					if(valueFromStack != null && !valueFromStack.isEmptyVar){
+						shadowAnnotation.setValue(avName.toString, [t| 
+							//TODO: Schicker. In extension o.ä verlagern. 
+							new GenAnnotationValue(coerceAnnotationValue(valueFromStack, t))
+						])
+					}
+					
 				]
+				
+				shadowAnnotation.setShadowIfAppropriate
 				
 				generatedClass.addAnnotationMirror(shadowAnnotation)
 				//put on value stack

@@ -38,6 +38,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
+import java.util.Collection
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -384,6 +385,10 @@ class ElementsExtensions {
 			throw new TypeElementNotFoundException(annotationMirror, name);
 		}
 	}
+	
+	def annotationValueNames(AnnotationMirror annotationMirror){
+		annotationMirror.annotationAsTypeElement.declaredMethods.map[simpleName].toSet
+	}
 
 	//	def valueAsTypeElement(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name) {
 	//		annotationMirror.value(annotatedElement, name, TypeElement)
@@ -701,6 +706,10 @@ class ElementsExtensions {
 				throw unsupportedAVType(avType, s)
 		}
 
+	}
+	
+	def dispatch toAnnotationValue(PrimitiveType type, Object o) {
+		o
 	}
 
 	def dispatch toAnnotationValue(TypeMirror type, Object o) {
@@ -1048,5 +1057,37 @@ class ElementsExtensions {
 		list.addAll(e.enclosedElements.map[elementAndAllEnclosedElements].flatten)
 		list
 	}
+	
+	
+	//defines when a value of a variable is considered to be empty.
+	def dispatch boolean isEmptyVar(String string) {
+		string.empty
+	}
+	
+	def dispatch boolean isEmptyVar(CharSequence cs) {
+		cs.length == 0
+	}
+	
+	def dispatch boolean isEmptyVar(Collection<?> c) {
+		c.empty
+	}
+	
+	def dispatch boolean isEmptyVar(Map<?, ?> m) {
+		m.empty
+	}
+	
+	def dispatch boolean isEmptyVar(Iterable<?> i) {
+		i.empty
+	}
+	
+	def dispatch boolean isEmptyVar(Object object) {
+		if(object.class.array){
+			Array.getLength(object) == 0
+		} else {
+			false
+		}
+	}
+
+	
 
 }

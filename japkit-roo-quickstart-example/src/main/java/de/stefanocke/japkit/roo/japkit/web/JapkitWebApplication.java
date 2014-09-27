@@ -8,8 +8,7 @@ import de.stefanocke.japkit.metaannotations.ResourceTemplate;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
 
 @Trigger(layer=4, vars={
-		@Var(name = "controllers", triggerAV = "controllers", typeQuery = @TypeQuery(annotation = JapkitWebScaffold.class, shadow = true),
-				setInShadowAnnotation = true),
+		@Var(name = "controllers", triggerAV = "controllers", typeQuery = @TypeQuery(annotation = JapkitWebScaffold.class, shadow = true)),
 		@Var(name = "controllerAnnotations", expr = "#{controllers}", annotation = JapkitWebScaffold.class) })
 @ResourceTemplate.List({
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "application.jspx", pathExpr = "i18n",

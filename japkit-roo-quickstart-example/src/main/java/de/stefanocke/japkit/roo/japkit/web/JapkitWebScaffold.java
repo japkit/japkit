@@ -29,23 +29,20 @@ import de.stefanocke.japkit.roo.japkit.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 
 @Trigger(layer=3, vars={
-		@Var(name = "fbo", triggerAV = "formBackingObject"),
+		@Var(name = "fbo", expr = "#{formBackingObject}"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
 		@Var(name = "entityAnnotation", expr = "#{fboElement}", annotation = JapkitEntity.class),
-		@Var(name = "fboName", type = String.class, triggerAV = "fboName", expr = "#{fboElement.simpleName.toString()}",
-				setInShadowAnnotation = true),
-		@Var(name = "fboPluralName", type = String.class, triggerAV = "fboPluralName", expr = "#{fboName}s", setInShadowAnnotation = true),
-		@Var(name = "path", type = String.class, triggerAV = "path", expr = "#{fboPluralName.toLowerCase()}", setInShadowAnnotation = true),
-		@Var(name = "modelAttribute", type = String.class, triggerAV = "modelAttribute", expr = "#{fboName.toFirstLower}",
-				setInShadowAnnotation = true),
+		@Var(name = "fboName", type = String.class, triggerAV = "fboName", expr = "#{fboElement.simpleName.toString()}"),
+		@Var(name = "fboPluralName", type = String.class, triggerAV = "fboPluralName", expr = "#{fboName}s"),
+		@Var(name = "path", type = String.class, triggerAV = "path", expr = "#{fboPluralName.toLowerCase()}"),
+		//@Var(name = "path", expr="foo", ifEmpty=true),
+		@Var(name = "modelAttribute", type = String.class, triggerAV = "modelAttribute", expr = "#{fboName.toFirstLower}"),
 		// For making IDs in JSPs unique
-		@Var(name = "fboFqnId", triggerAV = "fqnId", expr = "#{fboElement.qualifiedName.toString().replace('.','_').toLowerCase()}",
-				setInShadowAnnotation = true),
-		@Var(name = "fboShortId", triggerAV = "shortId", expr = "#{fboName.toLowerCase()}", setInShadowAnnotation = true),
+		@Var(name = "fboFqnId", expr = "#{fboElement.qualifiedName.toString().replace('.','_').toLowerCase()}"),
+		@Var(name = "fboShortId", expr = "#{fboName.toLowerCase()}"),
 
 		@Var(name = "viewModel", triggerAV = "viewModel", typeQuery = @TypeQuery(
-				annotation = ViewModel.class, shadow = true, unique = true, filterAV = "formBackingObject", inExpr = "#{fbo}"),
-				setInShadowAnnotation = true),
+				annotation = ViewModel.class, shadow = true, unique = true, filterAV = "formBackingObject", inExpr = "#{fbo}")),
 		
 		// The properties to show
 		@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = ViewModelSelector.class, includeRules = @Matcher(
@@ -76,8 +73,7 @@ import de.stefanocke.japkit.roo.japkit.JapkitEntity;
 		@Var(name = "findRepository", isFunction = true, typeQuery = @TypeQuery(
 				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src.asType()}")),
 				
-		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository", expr="#{fboElement.findRepository}",
-				setInShadowAnnotation = true),
+		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository", expr="#{fboElement.findRepository}"),
 
 })
 @Clazz(
@@ -144,9 +140,9 @@ public @interface JapkitWebScaffold {
 	 * 
 	 * @return the unique id for the fbo class used in JSPs and i18n
 	 */
-	String fqnId() default "";
+	String fboFqnId() default "";
 
-	String shortId() default "";
+	String fboShortId() default "";
 
 	String fboName() default "";
 

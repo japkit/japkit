@@ -48,7 +48,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	String expr
 	String lang
 	Class<?> type
-	boolean setInShadowAnnotation
 	Set<TypeMirror> requiredTriggerAnnotation
 	CodeFragmentRules codeFragments
 
@@ -70,8 +69,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		_expr = elVarAnnotation.value("expr", String);
 		_lang = elVarAnnotation.value("lang", String);
 		_type = Class.forName(elVarAnnotation.value("type", TypeMirror).asElement.qualifiedName.toString);
-
-		_setInShadowAnnotation = elVarAnnotation.value("setInShadowAnnotation", Boolean);
 
 		//TODO: Use Rule factory. But this is not possible, if we use triggerAnnotation. Reconsider...
 		_propertyFilterAnnotations = elVarAnnotation.value("propertyFilter", typeof(AnnotationMirror[]))
@@ -102,37 +99,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 			}
 	}
 	
-	//TODO: What about empty collections and arrays?
-	
-	def dispatch boolean isEmptyVar(String string) {
-		string.empty
-	}
-	
-	def dispatch boolean isEmptyVar(CharSequence cs) {
-		cs.length == 0
-	}
-	
-	def dispatch boolean isEmptyVar(Collection<?> c) {
-		c.empty
-	}
-	
-	def dispatch boolean isEmptyVar(Map<?, ?> m) {
-		m.empty
-	}
-	
-	def dispatch boolean isEmptyVar(Iterable<?> i) {
-		i.empty
-	}
-	
-	def dispatch boolean isEmptyVar(Object object) {
-		if(object.class.array){
-			Array.getLength(object) == 0
-		} else {
-			false
-		}
-	}
-
-
 	
 	def Object filter(Iterable<? extends Element> collection) {
 		collection.filter[
@@ -228,10 +194,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 			]
 			
 			
-			//Das hier funktioniert so nicht, wenn isFunction true ist. Macht aber nichts.
-			if (!(result instanceof ElVariableError) && setInShadowAnnotation && !triggerAv.nullOrEmpty) {
-				valueStack.getVariablesForShadowAnnotation().put(triggerAv, result)
-			}
 			result
 		]
 	}
