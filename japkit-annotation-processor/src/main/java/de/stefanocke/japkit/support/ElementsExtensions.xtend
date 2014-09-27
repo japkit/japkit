@@ -356,7 +356,7 @@ class ElementsExtensions {
 	static val annotationValuesCache = CacheBuilder.newBuilder.maximumSize(1000).weakKeys.<AnnotationMirror, Map<String, AnnotationValue>>build
 	
 
-	def AnnotationValue value(AnnotationMirror annotationMirror, CharSequence name) {
+	def private AnnotationValue value(AnnotationMirror annotationMirror, CharSequence name) {
 		loadAnnotationValues(annotationMirror).get(name.toString)
 	}
 
@@ -595,6 +595,10 @@ class ElementsExtensions {
 		]
 	}
 
+	def annotationValuesByNameUnwrappedAsMap(AnnotationMirror am) {
+		loadAnnotationValues(am).mapValues[unwrapAnnotationValue]
+	}
+	
 	def annotationValuesByNameUnwrapped(AnnotationMirror am) {
 		[CharSequence avName|loadAnnotationValues(am).get(avName.toString)?.unwrapAnnotationValue]
 	}

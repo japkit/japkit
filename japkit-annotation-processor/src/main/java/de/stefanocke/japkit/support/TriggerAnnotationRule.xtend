@@ -47,6 +47,8 @@ class TriggerAnnotationRule extends AbstractRule{
 				try {
 					printDiagnosticMessage['''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
 		
+					valueStack.putAll(currentTriggerAnnotation.annotationValuesByNameUnwrappedAsMap)
+					
 					//EL Variables			
 					varRules.forEach[putELVariable]
 				

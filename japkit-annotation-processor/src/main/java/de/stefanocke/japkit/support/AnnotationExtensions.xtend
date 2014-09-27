@@ -68,7 +68,7 @@ class AnnotationExtensions {
 	public val SHADOW_AV = "shadow"
 
 	def isShadowAnnotation(AnnotationMirror am) {
-		Boolean.TRUE.equals(am?.value(SHADOW_AV)?.value)
+		Boolean.TRUE.equals(am?.value(SHADOW_AV, Boolean))
 	}
 
 	def setShadowIfAppropriate(GenAnnotationMirror am) {
