@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.roo.japkit;
+package de.stefanocke.japkit.roo.japkit.domain;
 
 import java.util.Date;
 

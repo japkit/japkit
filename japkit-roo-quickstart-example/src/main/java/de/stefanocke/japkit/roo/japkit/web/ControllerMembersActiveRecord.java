@@ -17,7 +17,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.stefanocke.japkit.roo.japkit.CrudOperations#remove(java.lang.Long)
+	 * de.stefanocke.japkit.roo.japkit.domain.CrudOperations#remove(java.lang.Long)
 	 */
 	@Override
 	@Method(bodyCode = "#{fbo.code} fbo = #{fbo.name}.find#{fboName}(id);\n" + "fbo.remove();\n")
@@ -28,7 +28,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.stefanocke.japkit.roo.japkit.CrudOperations#merge(de.stefanocke.japkit
+	 * de.stefanocke.japkit.roo.japkit.domain.CrudOperations#merge(de.stefanocke.japkit
 	 * .roo.japkit.FormBackingObject)
 	 */
 	@Override
@@ -40,7 +40,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.stefanocke.japkit.roo.japkit.CrudOperations#persist(de.stefanocke.
+	 * de.stefanocke.japkit.roo.japkit.domain.CrudOperations#persist(de.stefanocke.
 	 * japkit.roo.japkit.FormBackingObject)
 	 */
 	@Override
@@ -51,7 +51,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.stefanocke.japkit.roo.japkit.CrudOperations#find(java.lang.Long)
+	 * @see de.stefanocke.japkit.roo.japkit.domain.CrudOperations#find(java.lang.Long)
 	 */
 	@Override
 	@Method(bodyCode = "return #{fbo.name}.find#{fboName}(id);")
@@ -61,7 +61,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.stefanocke.japkit.roo.japkit.CrudOperations#count()
+	 * @see de.stefanocke.japkit.roo.japkit.domain.CrudOperations#count()
 	 */
 	@Override
 	@Method(bodyCode = "return #{fbo.name}.count#{fboName}s();")
@@ -71,7 +71,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.stefanocke.japkit.roo.japkit.CrudOperations#findAll(java.lang.String,
+	 * de.stefanocke.japkit.roo.japkit.domain.CrudOperations#findAll(java.lang.String,
 	 * java.lang.String)
 	 */
 	@Override
@@ -83,7 +83,7 @@ public abstract class ControllerMembersActiveRecord implements CrudOperations<Fo
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.stefanocke.japkit.roo.japkit.CrudOperations#findEntries(java.lang.
+	 * de.stefanocke.japkit.roo.japkit.domain.CrudOperations#findEntries(java.lang.
 	 * Integer, java.lang.Integer, java.lang.String, java.lang.String)
 	 */
 	@Override

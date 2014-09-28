@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.roo.japkit;
+package de.stefanocke.japkit.roo.japkit.domain;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;

@@ -6,7 +6,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.OneToMany;
 
-import de.stefanocke.japkit.roo.japkit.JapkitEntity;
+import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @JapkitEntity
 public class OwnerDef extends AbstractPersonDef {

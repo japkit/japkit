@@ -6,7 +6,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import de.stefanocke.japkit.roo.japkit.JapkitEntity;
+import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @JapkitEntity(activeRecord=true)
 public class PetDef {

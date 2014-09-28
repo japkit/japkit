@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.roo.japkit;
+package de.stefanocke.japkit.roo.japkit.domain;
 
 import de.stefanocke.japkit.annotations.ParamNames;
 import de.stefanocke.japkit.metaannotations.Method;

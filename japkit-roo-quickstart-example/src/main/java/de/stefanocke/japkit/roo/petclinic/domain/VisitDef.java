@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import de.stefanocke.japkit.roo.japkit.JapkitEntity;
+import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @JapkitEntity
 public class VisitDef {

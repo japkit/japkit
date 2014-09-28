@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.roo.japkit;
+package de.stefanocke.japkit.roo.japkit.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;

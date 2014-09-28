@@ -2,7 +2,7 @@ package de.stefanocke.japkit.roo.petclinic.domain;
 
 import javax.validation.constraints.NotNull;
 
-import de.stefanocke.japkit.roo.japkit.ValueObject;
+import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
 @ValueObject
 public class AddressDef {

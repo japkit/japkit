@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import de.stefanocke.japkit.roo.japkit.JapkitEntity;
+import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @JapkitEntity(// TODO: Das ist etwas hässlich. Ggf. isAbstract AV. o.ä. Oder
 				// modifiers per EL "berechnen"
@@ -32,8 +32,8 @@ public abstract class AbstractPersonDef {
 	/**
      */
 	@NotNull
-	@Size(min = 1, max = 50)
-	private String address;
+	//@Size(min = 1, max = 50)
+	private Address address;
 
 	/**
      */

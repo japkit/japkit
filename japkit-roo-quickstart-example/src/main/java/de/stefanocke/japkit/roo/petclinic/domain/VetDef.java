@@ -10,7 +10,7 @@ import javax.validation.constraints.Past;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import de.stefanocke.japkit.roo.japkit.JapkitEntity;
+import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @JapkitEntity
 public abstract class VetDef extends AbstractPersonDef {

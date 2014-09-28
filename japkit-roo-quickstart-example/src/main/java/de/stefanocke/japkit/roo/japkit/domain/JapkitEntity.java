@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.roo.japkit;
+package de.stefanocke.japkit.roo.japkit.domain;
 
 import javax.lang.model.element.Modifier;
 import javax.persistence.Entity;
@@ -13,7 +13,7 @@ import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
-import de.stefanocke.japkit.roo.japkit.JapkitEntity.SuperclassSelector;
+import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity.SuperclassSelector;
 
 @Trigger
 @Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifiers = Modifier.PUBLIC, annotations = { @Annotation(

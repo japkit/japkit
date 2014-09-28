@@ -25,8 +25,8 @@ import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.metaannotations.Var;
-import de.stefanocke.japkit.roo.japkit.JapJpaRepository;
-import de.stefanocke.japkit.roo.japkit.JapkitEntity;
+import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
+import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @Trigger(layer=3, vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
