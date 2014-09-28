@@ -11,8 +11,9 @@ import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.AnnotatedClass;
+import de.stefanocke.japkit.roo.japkit.Layers;
 
-@Trigger(vars=@Var(name = "properties", propertyFilter = @Properties(sourceClass = AnnotatedClass.class, fromFields = true)))
+@Trigger(layer = Layers.VALUE_OBJECTS, vars=@Var(name = "properties", propertyFilter = @Properties(sourceClass = AnnotatedClass.class, fromFields = true)))
 @Target(ElementType.TYPE)
 @Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifiers = { Modifier.PUBLIC, Modifier.FINAL }, templates = {
 		@TemplateCall(ValueObjectTemplate.class), @TemplateCall(ToString.class) })

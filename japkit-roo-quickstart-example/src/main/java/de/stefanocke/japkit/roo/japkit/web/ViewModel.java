@@ -10,8 +10,9 @@ import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.AnnotatedClass;
+import de.stefanocke.japkit.roo.japkit.Layers;
 
-@Trigger(layer=2)
+@Trigger(layer=Layers.VIEW_MODELS)
 @Clazz(nameSuffixToRemove = "ViewModelDef",
 		nameSuffixToAppend = "ViewModel",
 		modifiers = Modifier.ABSTRACT,
