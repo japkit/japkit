@@ -119,6 +119,11 @@ public @interface InnerClass {
 	 */
 	Modifier[] modifiers() default {};
 
+	/**
+	 * If true, the modifiers from the current src element a copied and merged with the ones given by modifiers AV.
+	 * @return
+	 */
+	boolean modifiersFromSrc() default false;
 
 	/**
 	 * The expression for the class name. 

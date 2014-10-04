@@ -22,6 +22,7 @@ import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.support.JavadocUtil.*
 import de.stefanocke.japkit.support.el.ElVariableError
+import java.util.HashSet
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -220,13 +221,20 @@ class RuleUtils {
 
 		if(metaAnnotation == null) return [|template?.modifiers]
 		val modi = metaAnnotation.value("modifiers".withPrefix(avPrefix), typeof(Modifier[]));
+		val modifiersFromSrc = metaAnnotation.value("modifiersFromSrc".withPrefix(avPrefix), Boolean) ?: false;
 
 		//TODO: Expressions for isPublic , isPrivate etc
-		[|
-			if (!modi.nullOrEmpty) {
-				modi.toSet
-			} else
-				templateModifiers
+		[ |
+			val modifiers = new HashSet(
+				if (!modi.nullOrEmpty) {
+					modi.toSet
+				} else {
+					templateModifiers
+				});
+			if(modifiersFromSrc){
+				modifiers.addAll(currentSrcElement.modifiers)
+			}
+			modifiers
 		]
 	}
 	

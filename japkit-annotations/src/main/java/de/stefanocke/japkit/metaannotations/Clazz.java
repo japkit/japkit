@@ -70,6 +70,12 @@ public @interface Clazz {
 	 * @return the modifiers for the generated class
 	 */
 	Modifier[] modifiers() default {};
+	
+	/**
+	 * If true, the modifiers from the current src element a copied and merged with the ones given by modifiers AV.
+	 * @return
+	 */
+	boolean modifiersFromSrc() default false;
 
 	String nameSuffixToRemove() default "";
 
