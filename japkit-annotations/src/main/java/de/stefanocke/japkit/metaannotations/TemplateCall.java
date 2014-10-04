@@ -27,6 +27,13 @@ public @interface TemplateCall {
 	 * @return
 	 */
 	String src() default "";
+	
+	/**
+	 * A filter expression to be applied to src in case it is a collection. Must be boolean. 
+	 * The variable name for the current collection element to be filtered is "src". 
+	 * @return
+	 */
+	String srcFilter() default "";
 
 	/**
 	 * 

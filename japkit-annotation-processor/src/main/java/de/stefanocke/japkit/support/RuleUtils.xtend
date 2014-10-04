@@ -52,10 +52,11 @@ class RuleUtils {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
 		val srcExpr = metaAnnotation.value("src".withPrefix(avPrefix), String)
-		val srcLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String);
+		val srcLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String)
+		val srcFilter = metaAnnotation.value("srcFilter".withPrefix(avPrefix), String);
 
 		[|
-			val srcElements = if (srcExpr.nullOrEmpty) {
+			var srcElements = if (srcExpr.nullOrEmpty) {
 					Collections.singleton(currentSrc) //Use parent's src. 
 				} else {
 					val elements = eval(srcExpr, srcLang, Object,
@@ -71,6 +72,13 @@ class RuleUtils {
 						Collections.singleton(elements)
 					} 
 				} 
+			if(!srcFilter.nullOrEmpty){
+				srcElements = srcElements.filter[
+					scope(it)[
+						eval(srcFilter, srcLang, Boolean, '''Src filter expression could not be evaluated''' , false) ?: false
+					]
+				]
+			}
 			srcElements
 		]
 	}
@@ -90,7 +98,6 @@ class RuleUtils {
 
 		[(Object)=>T closure |
 			
-			//TODO setCurrentMetaElement(metaElement)
 			val srcElements = srcRule?.apply ?: Collections.singleton(currentSrcElement)		
 
 			(srcElements ?: Collections.singleton(currentSrc)).map [ e |
