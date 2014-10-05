@@ -739,13 +739,22 @@ class TypesRegistry {
 	}
 
 	def TypeElement findGenTypeElementIfAllowed(String typeFqnOrShortname) {
-		if (currentGeneratedClass != null && (typeFqnOrShortname == currentGeneratedClass.qualifiedName.toString ||
-			typeFqnOrShortname == currentGeneratedClass.simpleName.toString)) {
-
-			//Always resolve a self cycle immediately.
-			return currentGeneratedClass
-		}
 		val fqn = typeElementSimpleNameToFqn.get(typeFqnOrShortname) ?: typeFqnOrShortname.toString
+		
+		if (currentGeneratedClass != null){ 
+			val currentGenClassFqn = currentGeneratedClass.qualifiedName.toString
+			if(fqn == currentGenClassFqn || fqn == currentGeneratedClass.simpleName.toString) {	
+				//Always resolve a self cycle immediately.
+				return currentGeneratedClass
+			}
+			if(fqn.startsWith(currentGenClassFqn+".")){
+				//Find an inner class of the currently generated class
+				val innerClassPath = fqn.substring(currentGenClassFqn.length+1).split("\\.")
+				val innerClass = currentGeneratedClass.findNestedElement(innerClassPath)
+				if(innerClass instanceof TypeElement) return innerClass
+			}
+		}
+		
 		if (returnUncommitedGenTypes || isCommitted(fqn)) {
 			val genType = genTypeElementInCurrentRoundByFqn.get(fqn)
 			if (genType != null) {
@@ -753,6 +762,16 @@ class TypesRegistry {
 			}
 		}
 		null
+	}
+	
+	def Element findNestedElement(Element e, String[] path){
+		var result = e
+		for(segment : path){
+			result = result.enclosedElements.findFirst[simpleName.contentEquals(segment)]
+			if(result==null) return null;
+		}
+		result
+		
 	}
 	
 	//Key is a meta TypeElement (template class, function etc.). Value is the set of trigger annoations that use the meta type element directly or indirectly.
