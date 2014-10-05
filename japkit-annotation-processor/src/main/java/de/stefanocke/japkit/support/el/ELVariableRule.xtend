@@ -184,11 +184,8 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 					new ElVariableError(_name)
 				} catch (Exception e) {
 
-					//Idee: Hier auf dem ValueStack speziell markieren, dass es mit der Varaiable einen Fehler gab
-					//Der ValueStack kann dann beim Zugriff auf die Variable eine spezielle Exception werfen, die 
-					//dann dazu genutzt werden kann die Flut an gemeldeten Folgefehlern einzudämmen. 
-					reportRuleError(
-						'''Could not evaluate EL variable «name»: «e.message» ''')
+					reportRuleError('''Could not evaluate EL variable «name»: «e.message»''')
+					
 					new ElVariableError(_name)
 				}
 			]
