@@ -531,9 +531,15 @@ class TypesRegistry {
 			//The annotated class is not part of a cycle currently being resolved.
 			annotatedClassForType != null && !annotatedClassesInSameCycle.contains(annotatedClassForType) &&
 				genTypeElementInCurrentRoundByFqn.containsKey(it) ||
-				//The type is not known to be generated (yet) and it does no exist
-				//TODO: Das ist evtl. etwas ineffizient. Wir wissen i.d.R. schon beim Registrieren der dependency, ob der typ bereits existiert oder nicht.
-				annotatedClassForType == null && elementUtils.getTypeElement(it) == null
+				//The type does not exist and will not be generated as  part of a cycle currently being resolved.
+				
+				(annotatedClassForType == null || !annotatedClassesInSameCycle.contains(annotatedClassForType)) && 
+				{ 
+					//TODO: Das ist evtl. etwas ineffizient. Wir wissen i.d.R. schon beim Registrieren der dependency, ob der typ bereits existiert oder nicht.
+					val te = elementUtils.getTypeElement(it) //Eclipse may return MissingTypeElement here. Therfore the additional check in next line.
+					te == null || te.asType instanceof ErrorType 
+					
+				}
 		]
 	}
 
