@@ -5,6 +5,8 @@ import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.support.el.ELSupport
+import java.util.Collection
 
 @Data
 class PropertyFilter {
@@ -15,9 +17,11 @@ class PropertyFilter {
 	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	val extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
+	val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 	TypeMirror sourceClass
-	String[] includeNames
+	String includeNamesExpr
+	String includeNamesLang
 	List<ElementMatcher> includeRules
 	List<ElementMatcher> excludeRules
 	Properties.RuleSource ruleSource
@@ -47,7 +51,9 @@ class PropertyFilter {
 
 		val properties = propertySource.properties(Object.name, fromFields)
 		
-		//TODO: Should be an expression.
+		val includeNames = if(includeNamesExpr.nullOrEmpty) emptyList 
+			else eval(includeNamesExpr, includeNamesLang, Collection, '''IncludeNamesExpr could not be evaluated: «includeNamesExpr»''', emptyList)
+		
 		includeNames.forEach [
 			if (!properties.exists[p|it.equals(p.name)]) {
 				reportRuleError('''Property with name «it» does not exist in source class.''')
@@ -64,7 +70,8 @@ class PropertyFilter {
 
 		_metaAnnotation = metaAnnotation
 		_sourceClass = metaAnnotation.value("sourceClass", TypeMirror)
-		_includeNames = metaAnnotation.value("includeNames", typeof(String[]))
+		_includeNamesExpr = metaAnnotation.value("includeNamesExpr", String)
+		_includeNamesLang = metaAnnotation.value("includeNamesLang", String)
 		_includeRules = metaAnnotation.value("includeRules", typeof(AnnotationMirror[])).map[
 			createElementMatcher(it)]
 		_excludeRules = metaAnnotation.value("excludeRules", typeof(AnnotationMirror[])).map[

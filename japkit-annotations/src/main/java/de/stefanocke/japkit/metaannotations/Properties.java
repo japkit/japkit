@@ -85,12 +85,14 @@ public @interface Properties {
 
 
 	/**
-	 * Names of properties to be included. They must exist in the source class,
+	 * Expression that yields a collection with the names of properties to be included. They must exist in the source class,
 	 * otherwise an error is reported.
 	 * 
 	 * @return the property names
 	 */
-	String[] includeNames() default {};
+	String includeNamesExpr() default "";
+	
+	String includeNamesLang() default "";
 
 	/**
 	 * Rules for including properties. If at least one of the matcher matches
