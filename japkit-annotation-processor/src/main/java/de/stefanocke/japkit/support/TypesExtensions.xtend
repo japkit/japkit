@@ -247,7 +247,7 @@ class TypesExtensions /**implements Types*/{
 	def dispatch String qualifiedName(ErrorType declType) {
 		if (declType.typeArguments.nullOrEmpty) {
 			return typesRegistry.handleTypeElementNotFound(declType.toString, '''Cannot determine qualified name for error type «declType.toString»''')[
-				typesRegistry.tryToGetFqnForErrorTypeSimpleName(declType.toString)			
+				typesRegistry.tryToGetFqnForErrorType(declType)			
 			]
 			
 		} else {
@@ -273,7 +273,7 @@ class TypesExtensions /**implements Types*/{
 	/** Best guess for error types... */
 	def dispatch String simpleName(ErrorType declType) {
 		if (declType.typeArguments.nullOrEmpty) {
-			declType.toString //TODO: Get last segment
+			declType.simpleNameForErrorType  //TODO: Das ist bei inner classes nicht wirklich der simple name sondern das Symbol wie im Quelltext, also ggf mit umgebender Klasse
 		} else {
 
 			//In Elipse, a genric type seems to be an ErrorType as soon as one of the type args is an ErrorType...

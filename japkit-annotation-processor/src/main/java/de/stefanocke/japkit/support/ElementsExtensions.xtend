@@ -382,14 +382,28 @@ class ElementsExtensions {
 		map
 	}
 
-	def handleErrorAnnotationValues(AnnotationValue v, AnnotationMirror annotationMirror, CharSequence name) {
-
-		//In Eclipse, annotation values with errors are returned as "<error>". F.e. constant values that use not-(yet)-existing types. 
-		//TODO: Same in javac?
-		//TODO: TENFE is a bit misleading here...
-		if (v?.value == "<error>") {
-			throw new TypeElementNotFoundException(annotationMirror, name);
+	def getValueWithErrorHandling(AnnotationValue av){
+		
+		if(av?.class.canonicalName.equals("com.sun.tools.javac.code.Attribute.UnresolvedClass")){
+			//Javac >= 8
+			val errorType = try { 
+				(av.class.getField("classType").get(av) as TypeMirror)
+			} catch (Exception e){
+				//We cannot determine the error type. Maybe it is Java 7 or less (where UnresolvedClass did not exist yet) or the implementation has changed...
+				//Throw a generic TENFE.
+				throw new TypeElementNotFoundException(e);
+			}
+			
+			return errorType
 		}
+		
+		val v = av?.value
+		
+		if (v == "<error>") {
+			throw new TypeElementNotFoundException("Error in annotation value: "+av+". Could not determine the missing type.");
+		}
+		
+		v
 	}
 	
 	def annotationValueNames(AnnotationMirror annotationMirror){
@@ -406,7 +420,7 @@ class ElementsExtensions {
 		boolean isRequired) {
 		val av = annotationMirror.value(name)
 
-		val value = av?.value
+		val value = av?.valueWithErrorHandling
 		
 		if (isNullOrEmptyAV(value)) {
 			if (isRequired) {
@@ -417,7 +431,7 @@ class ElementsExtensions {
 			}
 		}
 
-		av.mapAs(av.value, annotationMirror, annotatedElement, name, null, avType)
+		av.mapAs(av.valueWithErrorHandling, annotationMirror, annotatedElement, name, null, avType)
 	}
 	
 	def isNullOrEmptyAV(Object value) {
@@ -449,7 +463,6 @@ class ElementsExtensions {
 
 	private def <T> T mapAs(AnnotationValue av, Object value, AnnotationMirror annotationMirror,
 		Element annotatedElement, CharSequence name, Integer index, Class<T> avType) {
-		handleErrorAnnotationValues(av, annotationMirror, name)
 		
 		if(value==null) {return null;}
 
@@ -486,7 +499,7 @@ class ElementsExtensions {
 			val arr = Array.newInstance(avType.componentType, (value as List<AnnotationValue>).size)
 			
 			(value as List<AnnotationValue>).forEach[avInList , i|
-				Array.set(arr, i, avInList.mapAs(avInList.value, annotationMirror, annotatedElement, name, i, avType.componentType))
+				Array.set(arr, i, avInList.mapAs(avInList.valueWithErrorHandling, annotationMirror, annotatedElement, name, i, avType.componentType))
 			]
 			arr as T
 		} else if(avType==AnnotationMirror){
@@ -518,7 +531,7 @@ class ElementsExtensions {
 	}
 
 	def singleAV(Iterable<AnnotationValue> values) {		
-		(MoreCollectionExtensions.singleValue(values))?.value
+		(MoreCollectionExtensions.singleValue(values))?.valueWithErrorHandling
 	}
 	
 
@@ -581,11 +594,11 @@ class ElementsExtensions {
 	}
 	
 	def dispatch Object unwrapAnnotationValue(AnnotationValue av) {
-		av?.value.unwrapAnnotationValue
+		av?.valueWithErrorHandling.unwrapAnnotationValue
 	}
 
 	def dispatch Object unwrapAnnotationValue(List<? extends AnnotationValue> values) {
-		values.map[it.value]
+		values.map[it.valueWithErrorHandling]
 	}
 
 	def dispatch Object unwrapAnnotationValue(Object value) {

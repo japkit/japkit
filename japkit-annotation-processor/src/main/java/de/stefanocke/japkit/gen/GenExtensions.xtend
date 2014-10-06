@@ -160,7 +160,8 @@ class GenExtensions {
 	}
 	
 	def static GenAnnotationValue copy(AnnotationValue av,(Object)=>Object valueTransformer ){
-		new GenAnnotationValue(av.value.copyAvValue(valueTransformer))
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)	
+		new GenAnnotationValue(av.valueWithErrorHandling.copyAvValue(valueTransformer))
 	}
 	
 	def static dispatch copyAvValue(List<? extends AnnotationValue> values, (Object)=>Object valueTransformer ){
@@ -174,8 +175,7 @@ class GenExtensions {
 	def static dispatch copyAvValue(Object v, (Object)=>Object valueTransformer ){
 		
 		//In Eclipse, annotation values with errors are returned as "<error>". F.e. constant values that use not-(yet)-existing types. 
-		//TODO: Same in javac?
-		//TODO: TENFE is a bit misleading here...
+		//In Javac this is also the case if the AV is an unknown type itself. (In eclipse we get an error type in that case.) 
 		if(v == "<error>" ){
 			throw new TypeElementNotFoundException();
 		}

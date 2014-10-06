@@ -372,7 +372,22 @@ class TypesRegistry {
 	@org.eclipse.xtend.lib.Property
 	boolean throwTypeElementNotFoundExceptionWhenResolvingSimpleTypeNames = true
 
-	def tryToGetFqnForErrorTypeSimpleName(String simpleName) {
+	def tryToGetFqnForErrorType(TypeMirror errorType) {
+		tryToGetFqnForErrorTypeSimpleName(errorType.simpleNameForErrorType)
+	}
+	
+	def getSimpleNameForErrorType(TypeMirror errorType){
+		val name = errorType.toString
+		
+		if(name.startsWith("<any?>.")){
+			//Javac
+			name.substring(7)
+		} else {
+			name
+		}
+	}
+	
+	def private tryToGetFqnForErrorTypeSimpleName(String simpleName) {
 
 		val fqn = typeElementSimpleNameToFqn.get(simpleName)
 		if (fqn == null) {
@@ -633,11 +648,11 @@ class TypesRegistry {
 
 	def dispatch TypeElement asTypeElement(ErrorType declType) {
 		if (declType.typeArguments.nullOrEmpty) {
-			val e = findGenTypeElementIfAllowed(declType.toString)
+			val e = findGenTypeElementIfAllowed(declType.simpleNameForErrorType)
 			if (e != null) {
 				e
 			} else {
-				throw new TypeElementNotFoundException(declType.toString)
+				throw new TypeElementNotFoundException(declType.simpleNameForErrorType)
 			}
 		} else {
 

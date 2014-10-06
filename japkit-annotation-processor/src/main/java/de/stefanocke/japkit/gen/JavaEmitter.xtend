@@ -288,11 +288,11 @@ class JavaEmitter implements EmitterContext{
 	def dispatch CharSequence typeRef(DeclaredType type){
 		val rawType = if(type.erasure instanceof ErrorType){
 			//The type itself is an error type
-			val simpleName = type.erasure.toString   //TODO: Ist das wirklich immer ein simple name? Was ist mit inner classes? Zunächst ein assert...
-			if(simpleName.contains('.')){
-				throw new IllegalArgumentException('''Error type name «simpleName» is unexpectedly qualified.''');
-			}
-			val fqn =  typesRegistry.tryToGetFqnForErrorTypeSimpleName(type.erasure.toString)
+			val simpleName =  type.erasure.simpleNameForErrorType   
+//			if(simpleName.contains('.')){
+//				throw new IllegalArgumentException('''Error type name «simpleName» is unexpectedly qualified.''');
+//			}
+			val fqn =  typesRegistry.tryToGetFqnForErrorType(type.erasure)
 			importIfPossibleAndGetNameForCode(simpleName, fqn)
 		} else {
 			//One of the type args is an error type

@@ -97,7 +97,7 @@ class AnnotationValueMappingRule extends AbstractRule{
 			}
 			
 			if (mode == AVMode.JOIN_LIST && existingValue != null) {
-				val joined = new ArrayList(existingValue.value as List<Object>)
+				val joined = new ArrayList(existingValue.valueWithErrorHandling as List<Object>)
 				joined.addAll(v as List<Object>)
 				new GenAnnotationValue(joined)
 			} else {
