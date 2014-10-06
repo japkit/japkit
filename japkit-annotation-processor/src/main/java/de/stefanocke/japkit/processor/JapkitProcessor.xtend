@@ -168,13 +168,14 @@ class JapkitProcessor extends AbstractProcessor {
 		classesToProcess.addAll(classesWithTrigger)
 
 		var boolean roundDone = false
+		val writtenTypeElementsInCurrentRound = newHashSet
 		
 		while(!roundDone){
 			val allClasses = new HashSet(annotatedClassesToDefer)
 			allClasses.addAll(classesToProcess)
 			
 			if(!allClasses.empty){
-				val layerCompleted = processLayerAsFarAsPossible(annotatedClassesToDefer, classesToProcess, getMinLayer(allClasses))
+				val layerCompleted = processLayerAsFarAsPossible(annotatedClassesToDefer, classesToProcess, getMinLayer(allClasses), writtenTypeElementsInCurrentRound)
 				//The layer could not be completed in this round due to dependencies to unknown types. 
 				//Re-consider the regarding classes in next round
 				roundDone = !layerCompleted
@@ -224,12 +225,12 @@ class JapkitProcessor extends AbstractProcessor {
 		new HashSet(elements.filter[layer == l].toSet)
 	}
 	
-	def boolean processLayerAsFarAsPossible(HashSet<TypeElement> annotatedClassesToDefer, HashSet<TypeElement> classesInCurrentRound, int layer) {
+	def boolean processLayerAsFarAsPossible(HashSet<TypeElement> annotatedClassesToDefer, HashSet<TypeElement> classesInCurrentRound, int layer, HashSet<GenTypeElement> writtenTypeElementsInCurrentRound) {
 		printDiagnosticMessage(['''Processing layer «layer»'''])
 		
 		//Key the annotated class. Value is Set of  generated type elements for it.
 		val Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound = newHashMap
-		val writtenTypeElementsInCurrentRound = newHashSet
+		
 		val writtenTypeElementsInCurrentLoop = newHashSet
 		
 		var Set<TypeElement> classesToProcess = classesInCurrentRound.filterLayer(layer)
