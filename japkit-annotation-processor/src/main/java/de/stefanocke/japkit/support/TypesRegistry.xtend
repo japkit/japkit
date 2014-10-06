@@ -412,7 +412,7 @@ class TypesRegistry {
 	 * The dependencies, where this type is target, are also removed from the registry, since they are resolved
 	 *  (as soon as the next round starts and the type element is available). 
 	 */
-	def commitGeneratedTypeElement(GenTypeElement genTypeElement) {
+	def void commitGeneratedTypeElement(GenTypeElement genTypeElement) {
 		val typeFqn = genTypeElement.qualifiedName.toString
 
 		//genTypeElementInCurrentRoundByFqn.remove(typeFqn)
@@ -424,6 +424,9 @@ class TypesRegistry {
 		]
 
 		commitedGenTypeElements.add(typeFqn)
+		
+		//Recursively commit all inner classes
+		genTypeElement.enclosedElements.filterInstanceOf(GenTypeElement).forEach[commitGeneratedTypeElement]
 
 	}
 
