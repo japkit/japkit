@@ -31,6 +31,14 @@ class GenerateClassContext {
 	def void setCurrentGeneratedClass(GenTypeElement currentGeneratedClass){
 		valueStack.put("genClass" , currentGeneratedClass)
 	}
+	
+	def void setCurrentPrimaryGenClass(GenTypeElement primaryGenClass){
+		valueStack.put("primaryGenClass", primaryGenClass)
+	}
+	
+	def GenTypeElement getCurrentPrimaryGenClass(){
+		valueStack.get("primaryGenClass") as GenTypeElement
+	}
 
 	
 	def AnnotationMirror getCurrentTriggerAnnotation(){

@@ -53,10 +53,16 @@ class ClassRule extends AbstractRule{
 	
 	boolean shallCreateShadowAnnotation
 	
+	//is it a top level calls that is generated as a "by-product" of the main top level class?
+	boolean isAuxClass
+	
 	List<ELVariableRule> varRules
 		
-	
 	new(AnnotationMirror metaAnnotation, TypeElement templateClass, boolean isTopLevelClass){
+		this(metaAnnotation, templateClass, isTopLevelClass, false)
+	}	
+	
+	new(AnnotationMirror metaAnnotation, TypeElement templateClass, boolean isTopLevelClass, boolean isAuxClass){
 		super(metaAnnotation, templateClass)
 		_templateRule= templateClass?.createTemplateRule
 		_membersRule = new MembersRule(metaAnnotation)
@@ -70,6 +76,7 @@ class ClassRule extends AbstractRule{
 		
 		_shallCreateShadowAnnotation = metaAnnotation.value("createShadowAnnotation", Boolean) ?: false
 		_isTopLevelClass = isTopLevelClass
+		_isAuxClass = isAuxClass
 		_nameRule = if(isTopLevelClass) new ClassNameRule(metaAnnotation) else null
 		_behaviorRule = new BehaviorDelegationRule(metaAnnotation)
 		_superclassRule = createTypeRule(metaAnnotation, null, "superclass", null, null)
@@ -89,24 +96,37 @@ class ClassRule extends AbstractRule{
 	def GenTypeElement generateClass(String name, Set<GenTypeElement> generatedTopLevelClasses
 	) {
 		inRule[
-			val enclosingClass = currentGeneratedClass
-			
-			if(isTopLevelClass != (enclosingClass==null)){
-				throw new IllegalArgumentException("currentGeneratedClass must be available when it is a rule for an inner class.")
+			val enclosingClass = if (!isTopLevelClass) {
+					if (currentGeneratedClass == null) {
+						throw new IllegalArgumentException(
+							"currentGeneratedClass must be available when it is a rule for an inner class.")
+					}
+					currentGeneratedClass
+				} else
+					null
+			if (!isTopLevelClass && (enclosingClass == null)) {
+				throw new IllegalArgumentException(
+					"currentGeneratedClass must be available when it is a rule for an inner class.")
 			}
 			
 			
 			scope[
-				
+				if(isAuxClass){
+					if (currentGeneratedClass == null) {
+						throw new IllegalArgumentException(
+							"currentGeneratedClass must be available when it is a rule for an aux class.")
+					}
+			 		currentPrimaryGenClass = currentGeneratedClass
+			 	}
 				varRules?.forEach[it.putELVariable]
 				//superclass with type args
 				val generatedClass = createClass(enclosingClass, name)
 				
 				
 				//Register generated class as early as possible to allow error type resolution in other classes
-				registerGeneratedTypeElement(generatedClass, currentAnnotatedClass, if(isTopLevelClass) currentTriggerAnnotation else null)	
+				registerGeneratedTypeElement(generatedClass, currentAnnotatedClass, if(isTopLevelClass && !isAuxClass) currentTriggerAnnotation else null)	
 		
-			 
+			 	
 				setCurrentGeneratedClass(generatedClass)
 				
 				generatedClass.modifiers = modifiersRule.apply
@@ -121,7 +141,7 @@ class ClassRule extends AbstractRule{
 					generatedClass.addInterface(it)
 				]
 				
-				if(isTopLevelClass){
+				if(isTopLevelClass && !isAuxClass){
 					createShadowAnnotation(generatedClass)	
 				}
 				
@@ -137,7 +157,7 @@ class ClassRule extends AbstractRule{
 								
 				behaviorRule.createBehaviorDelegation(generatedClass)
 				
-				if(isTopLevelClass){
+				if(isTopLevelClass && !isAuxClass){
 					val Set<GenTypeElement> generatedClasses = newHashSet
 					generatedClasses.add(generatedClass)	
 					addAllAuxTopLevelClasses(generatedClasses, generatedClass)

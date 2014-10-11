@@ -14,6 +14,7 @@ import javax.lang.model.element.TypeElement
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
+import de.stefanocke.japkit.metaannotations.Clazz
 
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
@@ -32,6 +33,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	AnnotationMirror fieldDefaults
 	AnnotationMirror methodDefaults
 	AnnotationMirror constructorDefaults
+	List<ClassRule> auxClassRules
 
 	
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
@@ -82,6 +84,10 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 				allMethodsAreTemplates || value != null].map [
 				new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, methodDefaults), key)
 			])
+			
+		_auxClassRules =	templateClass.declaredTypes.map[it -> annotationMirror(Clazz)].filter[value != null].map [
+				new ClassRule(value, key, true, true)
+			].toList
 
 		_annotationsRule = ru.createAnnotationMappingRules(metaAnnotation, templateClass, null)
 		_scopeRule = ru.createScopeRule(metaAnnotation, _templateClass, null)
@@ -98,7 +104,10 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 			scopeRule.apply [
 				generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
 				addInterfaces(generatedClass)				
-				memberRules.map[it.apply(generatedClass)].flatten.toList	
+				val members = memberRules.map[it.apply(generatedClass)].flatten.toList	
+							
+				auxClassRules.forEach[generatedClass.auxTopLevelClasses.add(it.generateClass(null, null))]
+				members
 			].flatten.toList
 		
 		]

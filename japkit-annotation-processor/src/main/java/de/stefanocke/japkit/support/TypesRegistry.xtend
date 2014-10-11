@@ -759,18 +759,11 @@ class TypesRegistry {
 	def TypeElement findGenTypeElementIfAllowed(String typeFqnOrShortname) {
 		val fqn = typeElementSimpleNameToFqn.get(typeFqnOrShortname) ?: typeFqnOrShortname.toString
 		
+		//Always resolve a self cycle and dependency to aux classes immediately.
 		if (currentGeneratedClass != null){ 
-			val currentGenClassFqn = currentGeneratedClass.qualifiedName.toString
-			if(fqn == currentGenClassFqn || fqn == currentGeneratedClass.simpleName.toString) {	
-				//Always resolve a self cycle immediately.
-				return currentGeneratedClass
-			}
-			if(fqn.startsWith(currentGenClassFqn+".")){
-				//Find an inner class of the currently generated class
-				val innerClassPath = fqn.substring(currentGenClassFqn.length+1).split("\\.")
-				val innerClass = currentGeneratedClass.findNestedElement(innerClassPath)
-				if(innerClass instanceof TypeElement) return innerClass
-			}
+			val foundType = findTypeInGeneratedClass(currentGeneratedClass, fqn) 
+				?: (currentPrimaryGenClass ?: currentGeneratedClass).auxTopLevelClasses?.map[findTypeInGeneratedClass(fqn)]?.findFirst[it!=null]
+			if(foundType!=null) return foundType
 		}
 		
 		if (returnUncommitedGenTypes || isCommitted(fqn)) {
@@ -780,6 +773,19 @@ class TypesRegistry {
 			}
 		}
 		null
+	}
+	
+	def private TypeElement findTypeInGeneratedClass(GenTypeElement genClass, String typeFqnOrShortname){
+		val genClassFqn = genClass.qualifiedName.toString
+		if(typeFqnOrShortname == genClassFqn || typeFqnOrShortname == currentGeneratedClass.simpleName.toString) {			
+			return genClass
+		}
+		if(typeFqnOrShortname.startsWith(genClassFqn+".")){
+			//Find an inner class of the currently generated class
+			val innerClassPath = typeFqnOrShortname.substring(genClassFqn.length+1).split("\\.")
+			val innerClass = genClass.findNestedElement(innerClassPath)
+			if(innerClass instanceof TypeElement) return innerClass
+		}
 	}
 	
 	def Element findNestedElement(Element e, String[] path){
