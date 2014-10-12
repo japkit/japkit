@@ -111,6 +111,8 @@ class ClassRule extends AbstractRule{
 			
 			
 			scope[
+				
+				
 				if(isAuxClass){
 					if (currentGeneratedClass == null) {
 						throw new IllegalArgumentException(
@@ -122,58 +124,63 @@ class ClassRule extends AbstractRule{
 				//superclass with type args
 				val generatedClass = createClass(enclosingClass, name)
 				
+				try{
 				
-				//Register generated class as early as possible to allow error type resolution in other classes
-				registerGeneratedTypeElement(generatedClass, currentAnnotatedClass, if(isTopLevelClass && !isAuxClass) currentTriggerAnnotation else null)	
+					//Register generated class as early as possible to allow error type resolution in other classes
+					registerGeneratedTypeElement(generatedClass, currentAnnotatedClass, if(isTopLevelClass && !isAuxClass) currentTriggerAnnotation else null)	
+			
+				 	
+					setCurrentGeneratedClass(generatedClass)
+					
+					generatedClass.modifiers = modifiersRule.apply
+					
+					//TODO: Move to modifiers rule ?
+					if(templateRule != null){
+						generatedClass.removeModifier(Modifier.ABSTRACT) //Templates are usually abstract
+					}				
+					
+					generatedClass.setSuperclass(superclassRule.apply)
+					interfaceRules.map[apply].filter[it!=null].forEach[
+						generatedClass.addInterface(it)
+					]
+					
+					if(isTopLevelClass && !isAuxClass){
+						createShadowAnnotation(generatedClass)	
+					}
+					
+					
+					generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
+					
+					
+					membersRule.apply(generatedClass)
+					
+					
+					//For @InnerClass, the annotated inner class is the template
+					templateRule?.apply(generatedClass)
+									
+					behaviorRule.createBehaviorDelegation(generatedClass)
+					generatedClass
+				
+				} finally{
+					if(isTopLevelClass && !isAuxClass && generatedClass!=null){
+						val Set<GenTypeElement> generatedClasses = newHashSet
+						generatedClasses.add(generatedClass)	
+						addAllAuxTopLevelClasses(generatedClasses, generatedClass)
 		
-			 	
-				setCurrentGeneratedClass(generatedClass)
-				
-				generatedClass.modifiers = modifiersRule.apply
-				
-				//TODO: Move to modifiers rule ?
-				if(templateRule != null){
-					generatedClass.removeModifier(Modifier.ABSTRACT) //Templates are usually abstract
-				}
-				
-				generatedClass.setSuperclass(superclassRule.apply)
-				interfaceRules.map[apply].filter[it!=null].forEach[
-					generatedClass.addInterface(it)
-				]
-				
-				if(isTopLevelClass && !isAuxClass){
-					createShadowAnnotation(generatedClass)	
-				}
-				
-				
-				generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
-				
-				
-				membersRule.apply(generatedClass)
-				
-				
-				//For @InnerClass, the annotated inner class is the template
-				templateRule?.apply(generatedClass)
-								
-				behaviorRule.createBehaviorDelegation(generatedClass)
-				
-				if(isTopLevelClass && !isAuxClass){
-					val Set<GenTypeElement> generatedClasses = newHashSet
-					generatedClasses.add(generatedClass)	
-					addAllAuxTopLevelClasses(generatedClasses, generatedClass)
-	
-					generatedClasses.forEach[markAsGenerated(it, currentAnnotatedClass)]
-					generatedClasses.forEach[addOrderAnnotations]				
-					generatedClasses.forEach[addParamNamesAnnotations]		
-				
-				
-					if(generatedTopLevelClasses!=null){
-						generatedTopLevelClasses.addAll(generatedClasses)			
+						generatedClasses.forEach[markAsGenerated(it, currentAnnotatedClass)]
+						generatedClasses.forEach[addOrderAnnotations]				
+						generatedClasses.forEach[addParamNamesAnnotations]		
+					
+					
+						if(generatedTopLevelClasses!=null){
+							generatedTopLevelClasses.addAll(generatedClasses)			
+						}
+					
 					}
 				
 				}
 			
-				generatedClass
+				
 			
 			]
 		
@@ -213,7 +220,7 @@ class ClassRule extends AbstractRule{
 		
 		} 
 		catch (TypeElementNotFoundException tenfe) {
-			throw tenfe
+			handleTypeElementNotFound('''Missing type when creating shadow annotation:''', tenfe.fqn)
 		}
 		catch (RuntimeException re){
 			reportRuleError('''Error when creating shadow annotation: «re»''')
