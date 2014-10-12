@@ -344,7 +344,7 @@ class JapkitProcessor extends AbstractProcessor {
 			if (!annotatedClassesWithUnresolvableTypeErrors.empty) {
 				messageCollector.printDiagnosticMessage[
 					'''
-						Write classes with permanent type errors: 
+						Consider classes with permanent type errors: 
 						«annotatedClassesWithUnresolvableTypeErrors.map[
 							'''«it» depends on: «unresolvableTypesOnWhichThatAnnotatedClassDependsOn(qualifiedName.toString, true)»'''].
 							join('\n')»
@@ -413,6 +413,9 @@ class JapkitProcessor extends AbstractProcessor {
 	) {
 
 		try {
+			
+			printDiagnosticMessage(['''Classes to process: «classesToProcess». Is cycle: «isCycle»'''])
+			
 			if (isCycle) {
 				typesRegistry.startUsingUncomittedGenTypes
 			}
@@ -500,6 +503,8 @@ class JapkitProcessor extends AbstractProcessor {
 
 		} finally {
 			typesRegistry.stopUsingUncommitedGenTypes
+			
+			printDiagnosticMessage(['''AnnotatedClassesToDefer: «annotatedClassesToDefer». GeneratedTypeElementsInCurrentRound: «generatedTypeElementsInCurrentRound»'''])
 		}
 	}
 
@@ -553,8 +558,6 @@ class JapkitProcessor extends AbstractProcessor {
 
 	def private Set<GenTypeElement> processTriggerAnnotations(TypeElement annotatedClass) {
 		
-		//TODO: Maybe we could make Trigger annotations more explicit by some meta annotation @Trigger
-		//At least, it should not be necessary to always have @GenerateClass ...
 		val triggerAnnotations = getTriggerAnnotations(annotatedClass)
 
 		triggerAnnotations.filter[!value].map [ 
