@@ -545,12 +545,17 @@ class TypesRegistry {
 
 		dependsOn.exists [
 			val annotatedClassForType = annotatedClassForGenTypeElement.get(it)
-			//The type is known to be generated from an annotated class and has just been generated in current round. 
-			//The annotated class is not part of a cycle currently being resolved.
-			annotatedClassForType != null && !annotatedClassesInSameCycle.contains(annotatedClassForType) &&
+			
+			//Self-cycles of an annotated class (or between multiple classes generated from same annotated class) are (currently) not considered.
+			annotatedClassForType != annotatedClassFqn &&
+			
+			{
+				//The type is known to be generated from an annotated class and has just been generated in current round. 
+				//The annotated class is not part of a cycle currently being resolved.	
+				annotatedClassForType != null && !annotatedClassesInSameCycle.contains(annotatedClassForType) &&
 				genTypeElementInCurrentRoundByFqn.containsKey(it) ||
-				//The type does not exist and will not be generated as  part of a cycle currently being resolved.
 				
+				//The type does not exist and will not be generated as  part of a cycle currently being resolved.		
 				(annotatedClassForType == null || !annotatedClassesInSameCycle.contains(annotatedClassForType)) && 
 				{ 
 					//TODO: Das ist evtl. etwas ineffizient. Wir wissen i.d.R. schon beim Registrieren der dependency, ob der typ bereits existiert oder nicht.
@@ -558,6 +563,8 @@ class TypesRegistry {
 					te == null || te.asType instanceof ErrorType 
 					
 				}
+				
+			}
 		]
 	}
 
