@@ -400,7 +400,7 @@ class ElementsExtensions {
 		val v = av?.value
 		
 		if (v == "<error>") {
-			throw new TypeElementNotFoundException("Error in annotation value: "+av+". Could not determine the missing type.");
+			throw new TypeElementNotFoundException(TypeElementNotFoundException.UNKNOWN_TYPE, "Error in annotation value: "+av+". Could not determine the missing type.");
 		}
 		
 		v
