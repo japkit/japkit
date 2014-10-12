@@ -190,8 +190,9 @@ class TypesRegistry {
 	//the key is the name of the type. For a type, that does not yet exist, it is usually only the simple name.
 	val Map<String, Set<String>> annotatedClassesThatDependOnThatType = newHashMap
 
-	//reverse mapping: Key is FQN of anntotated class. Key is set of fqns / simple names of types the annotated class depends on
-	val Map<String, Set<String>> typesOnWhichThatAnnotatedClassDependsOn = newHashMap
+	//reverse mapping: Key is FQN of anntotated class. 
+	//Value is set of pairs where key is generated class fqn and value is the fqn of the type on which it depends
+	val Map<String, Set<Pair<String, String>>> typesOnWhichThatAnnotatedClassDependsOn = newHashMap
 
 	//key is fqn of generated type element. value is fqn of annotated class from which the type element is generated
 	val Map<String, String> annotatedClassForGenTypeElement = newHashMap
@@ -292,11 +293,22 @@ class TypesRegistry {
 	 * Does the annotated class have type dependencies where javac has only returned the String "error" instead of an ErrorType
 	 * with the short name of the missing type? 
 	 */
-	def dependsOnUnknownTypes(CharSequence annotatedClassFqn) {
+	def boolean dependsOnUnknownTypes(CharSequence annotatedClassFqn) {
 		annotatedClassFqn.getTypesOnWhichThatAnnotatedClassDependsOn.contains(TypeElementNotFoundException.UNKNOWN_TYPE)
 	}
+	
+	def boolean dependsOnUnknownTypes(CharSequence annotatedClassFqn, CharSequence genClassFqn) {
+		(typesOnWhichThatAnnotatedClassDependsOn.get(annotatedClassFqn) ?: emptySet).exists[
+			value == TypeElementNotFoundException.UNKNOWN_TYPE &&
+			(
+				key.nullOrEmpty ||  //the dependency was not for a specific gen class but for the annotatated class in general. Example: @Var in Trigger annotation		
+				key == genClassFqn ||
+				key.startsWith(genClassFqn+".") //innerclass of the generated class
+			)  
+		]
+	}
 
-	def dependOnUnknownTypes(Set<String> annotatedClassesFqn) {
+	def boolean dependOnUnknownTypes(Set<String> annotatedClassesFqn) {
 		annotatedClassesFqn.exists[dependsOnUnknownTypes]
 	}
 
@@ -411,11 +423,13 @@ class TypesRegistry {
 		if (!annotatedClasses.empty) {
 			annotatedClassesThatDependOnThatType.put(genTypeFqn, annotatedClasses)
 			annotatedClasses.forEach [
-				val dependentTypes = getTypesOnWhichThatAnnotatedClassDependsOn
-				if (dependentTypes != null) {
-					dependentTypes.remove(genTypeSimpleName)
-					dependentTypes.add(genTypeFqn)
+				val dependentTypes = typesOnWhichThatAnnotatedClassDependsOn.get(it)
+				if(dependentTypes!=null){
+					val simpleTypeNameDependencies = dependentTypes.filter[value==genTypeSimpleName].toSet  
+					dependentTypes.addAll(simpleTypeNameDependencies.map[key -> genTypeFqn])
+					dependentTypes.removeAll(simpleTypeNameDependencies)
 				}
+					
 			]
 		}
 
@@ -433,9 +447,9 @@ class TypesRegistry {
 		//genTypeElementInCurrentRoundByFqn.remove(typeFqn)
 		val annotatedClasses = annotatedClassesThatDependOnThatType.remove(typeFqn) ?: emptySet
 
-		annotatedClasses.map[getTypesOnWhichThatAnnotatedClassDependsOn].forEach [
-			remove(typeFqn)
-			remove(genTypeElement.simpleName) //just in case not all dependencies are rectified for some reason...
+		annotatedClasses.map[typesOnWhichThatAnnotatedClassDependsOn.get(it)]?.forEach [
+			val dependenciesOnType = it.filter[value == typeFqn || value == genTypeElement.simpleName].toSet
+			it.removeAll(dependenciesOnType)
 		]
 
 		commitedGenTypeElements.add(typeFqn)
@@ -446,7 +460,7 @@ class TypesRegistry {
 	}
 
 	def removeDependenciesForAnnotatedClass(String annotatedClassFqn) {
-		val types = typesOnWhichThatAnnotatedClassDependsOn.remove(annotatedClassFqn)
+		val types = typesOnWhichThatAnnotatedClassDependsOn.remove(annotatedClassFqn)?.map[value]?.toSet
 		types?.forEach [
 			val ac = annotatedClassesThatDependOnThatType.get(it)
 			if (ac != null) {
@@ -485,6 +499,8 @@ class TypesRegistry {
 			val annotatedClassFqn = annotatedClass.qualifiedName.toString
 			if (typeFqn.startsWith("java") || typeFqn.equals(annotatedClassFqn) || !typeElement.generated ||
 				typeElement == currentGeneratedClass || typeElement.committed) {
+				//TODO: Die self-cycles zu generierten inner classes werden bsiher noch hier registriert und erst in 	
+				//hasUnresolvedTypeDependencies aussortiert. Das kann man noch etwas schöner machen.	
 
 				//Es werden hier nur Abhängigkeiten zu anderen generierten Klassen existiert, denn nur diese können
 				//sich im Rahmen des inkrementellen Builds ändern.
@@ -525,11 +541,17 @@ class TypesRegistry {
 		val typeFqn = typeElementSimpleNameToFqn.get(typeFqnOrSimpleName) ?: typeFqnOrSimpleName
 
 		annotatedClassesThatDependOnThatType.getOrCreateSet(typeFqn).add(annotatedClassFqn)
-		val isNewDependency = typesOnWhichThatAnnotatedClassDependsOn.getOrCreateSet(annotatedClassFqn).add(typeFqn)
+		
+		//TODO: Das is eigentlich nur korrekt, wenn der annotatedClassFqn auch immer die currentAnnotatedClass ist. Das wäre zu prüfen und zu bereinigen...
+		val genClassFqn = currentGeneratedClass?.qualifiedName?.toString
+		
+		val isNewDependency = typesOnWhichThatAnnotatedClassDependsOn
+			.getOrCreateSet(annotatedClassFqn)
+			.add(genClassFqn -> typeFqn)
 
 		if (isNewDependency) {
 			messageCollector.printDiagnosticMessage[
-				'''Registered dependency from «annotatedClassFqn» to «typeFqn». Details: «causeMsg»''']
+				'''Registered dependency from «annotatedClassFqn» to «typeFqn». Generated class: «genClassFqn». Details: «causeMsg»''']
 		}
 	}
 
@@ -568,9 +590,14 @@ class TypesRegistry {
 		]
 	}
 
-	def getTypesOnWhichThatAnnotatedClassDependsOn(CharSequence annotatedClassFqn) {
-		typesOnWhichThatAnnotatedClassDependsOn.get(annotatedClassFqn.toString) ?: emptySet
+	def Set<String> getTypesOnWhichThatAnnotatedClassDependsOn(CharSequence annotatedClassFqn) {
+		annotatedClassFqn.getTypesByGenClassOnWhichThatAnnotatedClassDependsOn.map[value].toSet
 	}
+	
+	def Set<Pair<String, String>> getTypesByGenClassOnWhichThatAnnotatedClassDependsOn(CharSequence annotatedClassFqn) {
+		(typesOnWhichThatAnnotatedClassDependsOn.get(annotatedClassFqn.toString) ?: emptySet)
+	}
+	
 
 	def void handleTypeElementNotFound(CharSequence msg, TypeElement annotatedClass, (Object)=>void closure) {
 		try {

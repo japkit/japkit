@@ -196,7 +196,7 @@ class JapkitProcessor extends AbstractProcessor {
 			'''
 				Deferred classes: «deferredClasses.keySet.join(", ")»
 				Dependencies: 
-				«deferredClasses.keySet.map['''«it» depends on «getTypesOnWhichThatAnnotatedClassDependsOn»'''].join('\n')»
+				«deferredClasses.keySet.map['''«it» depends on «getTypesByGenClassOnWhichThatAnnotatedClassDependsOn»'''].join('\n')»
 			''']
 
 		printDiagnosticMessage['''Round Time (ms): «System.currentTimeMillis - startTime»''']
@@ -337,16 +337,15 @@ class JapkitProcessor extends AbstractProcessor {
 			//Note: classes from cycles that have been resolved in the previous step are included here, since 
 			//the dependencies to the other annotated classes of the cycle have been removed.
 			val annotatedClassesWithUnresolvableTypeErrors = classesToProcess.filter [
-				!dependsOnOtherAnnotatedClasses(qualifiedName.toString) &&
-					(alsoWriteClassesThatDependOnUnknownTypes || !dependsOnUnknownTypes(qualifiedName.toString))
+				!dependsOnOtherAnnotatedClasses(qualifiedName.toString) 
 			].toSet
 
 			if (!annotatedClassesWithUnresolvableTypeErrors.empty) {
 				messageCollector.printDiagnosticMessage[
 					'''
-						Consider classes with permanent type errors: 
+						Consider classes with unresolvable type errors (alsoWriteClassesThatDependOnUnknownTypes = «alsoWriteClassesThatDependOnUnknownTypes»): 
 						«annotatedClassesWithUnresolvableTypeErrors.map[
-							'''«it» depends on: «unresolvableTypesOnWhichThatAnnotatedClassDependsOn(qualifiedName.toString, true)»'''].
+							'''«it» depends on: «unresolvableTypesOnWhichThatAnnotatedClassDependsOn(qualifiedName.toString, false)»'''].
 							join('\n')»
 					''']
 
@@ -363,10 +362,21 @@ class JapkitProcessor extends AbstractProcessor {
 
 				generatedTypeElementsInCurrentRound.filter[annotatedClass, genTypeElements|
 					annotatedClassesWithUnresolvableTypeErrors.contains(annotatedClass)].forEach [ annotatedClass, genTypeElements |
+					
+					val genClassesNotWritten = newHashSet()
 					genTypeElements.forEach [
-						writeSourceFileAndCommitTypeElement(it, annotatedClass, writtenTypeElementsInCurrentRound)
-						annotatedClassesToDefer.remove(annotatedClass)
+						//If alsoWriteClassesThatDependOnUnknownTypes is false, we try to write as much of the generated classes as possible
+						//since there is still the chance that those classes will resolve the uknown dependency.
+						//For example, an AV might refer to an auxiliary class and the primary class uses this AV.
+						if(alsoWriteClassesThatDependOnUnknownTypes || !dependsOnUnknownTypes(annotatedClass.qualifiedName.toString, it.qualifiedName.toString)){
+							writeSourceFileAndCommitTypeElement(it, annotatedClass, writtenTypeElementsInCurrentRound)					
+						} else {
+							genClassesNotWritten.add(it)
+						}				
 					]
+					if(genClassesNotWritten.empty) {	
+				 		annotatedClassesToDefer.remove(annotatedClass)
+					}
 				]
 
 				typesRegistry.throwTypeElementNotFoundExceptionWhenResolvingSimpleTypeNames = true
@@ -592,7 +602,8 @@ class JapkitProcessor extends AbstractProcessor {
 
 		} else {
 
-			//TODO: This probably should be a "real" warning with the hint to do a clean build.
+			//This happens if only some of the generated classes of an annotated class have been written
+			//and later the remaining ones
 			printDiagnosticMessage['''Source file «typeElement.qualifiedName» already exists.''']
 		}
 
