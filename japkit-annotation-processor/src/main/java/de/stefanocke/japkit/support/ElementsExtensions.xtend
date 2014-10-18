@@ -406,11 +406,11 @@ class ElementsExtensions {
 		
 		if(v instanceof DeclaredType && !(v instanceof ErrorType) && v.class.canonicalName.startsWith("org.eclipse.jdt")){
 			try{
-				//TODO: Make static?
+				//In Eclipse: zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): 
+				//Arrays mit UnresolvedTypeBindings werden nicht resolved.		
 				if(eclipseGetBindingMethod !=null && eclipseGetBindingMethod.invoke(v).class.canonicalName.contains("Unresolved")){
 					val te =  (v as DeclaredType).asTypeElement			
-					//zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): Arrays mit UnresolvedTypeBindings werden nicht resolved.	
-					val char dollar = '$'
+					val char dollar = '$'  //UnresolvedTypeBindings for inner classes have $ in their FQNs.
 					val teFqn = te.qualifiedName.toString.replace(dollar ,'.')
 					val teResolved = getTypeElement(teFqn)
 					return teResolved.asType		
