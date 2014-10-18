@@ -40,6 +40,7 @@ import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
 import java.util.IdentityHashMap
+import java.lang.reflect.Method
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -403,7 +404,35 @@ class ElementsExtensions {
 			throw new TypeElementNotFoundException(TypeElementNotFoundException.UNKNOWN_TYPE, "Error in annotation value: "+av+". Could not determine the missing type.");
 		}
 		
+		if(v instanceof DeclaredType && !(v instanceof ErrorType) && v.class.canonicalName.startsWith("org.eclipse.jdt")){
+			try{
+				//TODO: Make static?
+				if(eclipseGetBindingMethod !=null && eclipseGetBindingMethod.invoke(v).class.canonicalName.contains("Unresolved")){
+					val te =  (v as DeclaredType).asTypeElement			
+					//zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): Arrays mit UnresolvedTypeBindings werden nicht resolved.	
+					val char dollar = '$'
+					val teFqn = te.qualifiedName.toString.replace(dollar ,'.')
+					val teResolved = getTypeElement(teFqn)
+					return teResolved.asType		
+				}			
+			
+			} catch (Exception e){
+				//Ignore reflection exceptions. 
+				//TODO: Logging
+			}
+		}
+		
 		v
+	}
+	
+	static val Method eclipseGetBindingMethod = {
+		try{
+			val m = ElementsExtensions.classLoader.loadClass("org.eclipse.jdt.internal.compiler.apt.model.TypeMirrorImpl")?.getDeclaredMethod("binding")
+			m.accessible = true
+			m
+		} catch (Exception e){
+			null
+		}
 	}
 	
 	def annotationValueNames(AnnotationMirror annotationMirror){
@@ -598,7 +627,9 @@ class ElementsExtensions {
 	}
 
 	def dispatch Object unwrapAnnotationValue(List<? extends AnnotationValue> values) {
-		values.map[it.valueWithErrorHandling]
+		values.map[
+			it.valueWithErrorHandling
+		]
 	}
 
 	def dispatch Object unwrapAnnotationValue(Object value) {
