@@ -9,6 +9,9 @@ import javax.lang.model.element.Name
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
+import de.stefanocke.japkit.support.ExtensionRegistry
+import de.stefanocke.japkit.support.TypesExtensions
+import javax.lang.model.type.TypeKind
 
 @FieldsFromInterface
 abstract class GenExecutableElement extends GenParameterizable implements ExecutableElement {
@@ -16,7 +19,7 @@ abstract class GenExecutableElement extends GenParameterizable implements Execut
 	CodeBody body
 	AnnotationValue defaultValue
 	List<VariableElement> parameters = newArrayList
-	TypeMirror returnType = GenNoType.INSTANCE
+	TypeMirror returnType = { ExtensionRegistry.get(TypesExtensions).getNoType(TypeKind.VOID) }
 	List<TypeMirror> thrownTypes = newArrayList
 	boolean varArgs
 	
@@ -73,7 +76,7 @@ abstract class GenExecutableElement extends GenParameterizable implements Execut
 	}
 	
 	def void setReturnType(TypeMirror returnType){
-		this.returnType = returnType ?:  GenNoType.INSTANCE
+		this.returnType = returnType ?:  { ExtensionRegistry.get(TypesExtensions).getNoType(TypeKind.VOID) }
 	}
  	
 }
