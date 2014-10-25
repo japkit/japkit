@@ -37,7 +37,7 @@ public @interface JapkitEntity {
 
 	boolean customBehavior() default false;
 
-	@ClassSelector(kind = ClassSelectorKind.EXPR, expr = "#{annotatedClass.superclass}", requiredTriggerAnnotation=JapkitEntity.class)
+	@ClassSelector(expr = "#{annotatedClass.superclass}", requiredTriggerAnnotation=JapkitEntity.class)
 	static class SuperclassSelector {
 	};
 	

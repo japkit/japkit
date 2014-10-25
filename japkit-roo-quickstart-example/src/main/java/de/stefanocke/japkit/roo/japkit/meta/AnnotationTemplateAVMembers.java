@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.roo.japkit.meta;
 
-import static de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind.EXPR;
 import static de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind.INNER_CLASS_NAME;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
@@ -31,7 +30,7 @@ public @interface AnnotationTemplateAVMembers {
 	@ClassSelector(kind=INNER_CLASS_NAME, expr="#{src.singleValueType.asElement.simpleName}_", enclosing=GenClassEnclosingClass.class)
 	@interface AnnotationTemplateType{}
 	
-	@ClassSelector(kind=EXPR, expr="#{genClass.enclosingElement.asType()}")
+	@ClassSelector(expr="#{genClass.enclosingElement.asType()}")
 	@interface GenClassEnclosingClass{}
 
 	@Method

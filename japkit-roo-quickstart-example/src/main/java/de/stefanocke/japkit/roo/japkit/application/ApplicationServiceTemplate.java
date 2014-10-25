@@ -35,10 +35,10 @@ import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 public class ApplicationServiceTemplate {
 	
 
-	@ClassSelector(kind=ClassSelectorKind.EXPR, expr="repository")
+	@ClassSelector
 	public static class Repository{}
 	
-	@ClassSelector(kind=ClassSelectorKind.EXPR, expr="aggregate")
+	@ClassSelector
 	public static class Aggregate{}
 	
 	

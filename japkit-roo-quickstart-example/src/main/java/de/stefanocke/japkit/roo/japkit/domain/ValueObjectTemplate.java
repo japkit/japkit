@@ -46,7 +46,7 @@ public abstract class ValueObjectTemplate {
 	@ClassSelector(kind = ClassSelectorKind.INNER_CLASS_NAME, enclosing = GeneratedClass.class)
 	public static abstract class Builder {
 
-		@ClassSelector(kind = ClassSelectorKind.EXPR, expr = "#{genClass.enclosingElement.asType()}")
+		@ClassSelector(expr = "#{genClass.enclosingElement.asType()}")
 		abstract static class EnclosingClass {
 		}
 

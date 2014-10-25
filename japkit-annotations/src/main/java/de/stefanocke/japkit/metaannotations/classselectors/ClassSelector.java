@@ -10,7 +10,7 @@ public @interface ClassSelector {
 	 * 
 	 * @return the kind of the class selector.
 	 */
-	ClassSelectorKind kind() default ClassSelectorKind.TYPE_MIRROR;
+	ClassSelectorKind kind() default ClassSelectorKind.EXPR;
 
 	/**
 	 * 

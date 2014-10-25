@@ -1,9 +1,6 @@
 package de.stefanocke.japkit.metaannotations.classselectors;
 
 public enum ClassSelectorKind{
-
-	/**The class is given by an annotation value of type Class.*/
-	TYPE_MIRROR,
 	
 	/**The class is an inner class of the given enclosing class. The result of the expression is the name of the inner class. 
 	 * If no expression is set, the name of the class is used, where this annotation is located at.*/
@@ -36,7 +33,8 @@ public enum ClassSelectorKind{
 	SRC_SINGLE_VALUE_TYPE,
 	
 	/**
-	 * An EL expression is used to determine the type.
+	 * An EL expression is used to determine the type. If no expression is given the name of the annotated class is used to
+	 * search for an accordingly named variable on value stack (with first letter to lower case).
 	 */
 	EXPR
 }

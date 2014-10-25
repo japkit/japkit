@@ -122,12 +122,12 @@ class TypeResolver {
 		resolvedSelector.type = type
 
 		if (type instanceof DeclaredType && !(type instanceof ErrorType)) {
-			var TypeElement te = null
+			val TypeElement te = 
 			try {
 				//zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): Arrays mit UnresolvedTypeBindings werden nicht resolved.
-				te = getTypeElement(type.asTypeElement.qualifiedName)
+				getTypeElement(type.asTypeElement.qualifiedName)
 			} catch (TypeElementNotFoundException tenfe) {
-				//No selector.
+				null
 			}
 			
 
@@ -147,20 +147,20 @@ class TypeResolver {
 						resolvedSelector.type = currentSrc.srcType
 					case ClassSelectorKind.SRC_SINGLE_VALUE_TYPE:
 						resolvedSelector.type = currentSrc.srcType?.singleValueType
-					case ClassSelectorKind.TYPE_MIRROR: {
-						resolvedSelector.type = currentTriggerAnnotation.value(classSelectorAnnotation.getClassSelectorAvName(te),
-							TypeMirror)
-						if(resolvedSelector.type == null){
-							resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, TypeMirror)
-						}	
-					}
+//					case ClassSelectorKind.TYPE_MIRROR: {
+//						resolvedSelector.type = currentTriggerAnnotation.value(classSelectorAnnotation.getClassSelectorAvName(te),
+//							TypeMirror)
+//						if(resolvedSelector.type == null){
+//							resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, TypeMirror)
+//						}	
+//					}
 					case ClassSelectorKind.INNER_CLASS_NAME:
 					{	
 						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te, throwTypeElementNotFound)	
 					}
 					
 					case ClassSelectorKind.EXPR : {
-						resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, TypeMirror)
+						resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, [|te.simpleName.toString.toFirstLower], TypeMirror)
 					}
 					default: {
 						resolvedSelector.type = null
@@ -196,7 +196,7 @@ class TypeResolver {
 			messageCollector.reportRuleError('''Could not determine enclosing type element for inner class.''')
 			return
 		}
-		resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, String)
+		resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, null, String)
 		
 		//simple name of the type template as fallback
 		if(resolvedSelector.innerClassName==null){
@@ -207,24 +207,26 @@ class TypeResolver {
 		resolvedSelector.type = resolvedSelector.typeElement?.asType
 	}
 	
-	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, Class<T> targetType) {
-		val expr = classSelectorAnnotation.value("expr", String);
+	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, ()=>String defaultExpr, Class<T> targetType) {
+		val exprFromAV = classSelectorAnnotation.value("expr", String);
+		val expr = if(exprFromAV.nullOrEmpty) defaultExpr?.apply else exprFromAV
 		if(expr.nullOrEmpty) return null
 		val lang = classSelectorAnnotation.value("lang", String);
 		ExtensionRegistry.get(ELSupport).eval(expr, lang, targetType,
 			'''Error when evaluating class selector expression '«expr»'  ''', null			
-		)
+		)	
+		
 	}
 	
 	
 	
-	def private getClassSelectorAvName(AnnotationMirror classSelectorAnnotation, TypeElement te) {
-		var avName = classSelectorAnnotation.value("avName", String);
-		if(avName.nullOrEmpty){
-			avName = te.simpleName.toString.toFirstLower
-		}
-		avName
-	}
+//	def private getClassSelectorAvName(AnnotationMirror classSelectorAnnotation, TypeElement te) {
+//		var avName = classSelectorAnnotation.value("avName", String);
+//		if(avName.nullOrEmpty){
+//			avName = te.simpleName.toString.toFirstLower
+//		}
+//		avName
+//	}
 	
 	
 	/**Resolves the class selector and creates a "proxy" for the type element so that it is available even if it does not really exist yet.
@@ -240,7 +242,7 @@ class TypeResolver {
 			var tm = resolved.type
 			var selectorKind = resolved.kind
 
-			if (selectorKind == null || selectorKind == ClassSelectorKind.TYPE_MIRROR) {
+			if (selectorKind == null || selectorKind == ClassSelectorKind.EXPR) {
 				var TypeElement te
 
 				try {
