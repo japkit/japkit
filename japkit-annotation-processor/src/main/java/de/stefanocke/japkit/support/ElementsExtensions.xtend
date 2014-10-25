@@ -380,7 +380,12 @@ class ElementsExtensions {
 		val map = newHashMap
 		annotationMirror.elementValuesWithDefaults.forEach[k, v|
 			val v2 = if((v.value instanceof List<?>) && k.annotationMirror(SingleValue)!=null){
-				MoreCollectionExtensions.singleValue(v.value as List<AnnotationValue>)
+				val list = (v.value as List<AnnotationValue>)
+//Does not work, since currentAnnotatedClass is not always available.
+//				if(list.size>1){
+//					ExtensionRegistry.get(MessageCollector).reportError("At most one value is allowed here.", null, annotationMirror, k.simpleName)
+//				}
+				list.head
 			} else {
 				v
 			}

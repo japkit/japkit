@@ -62,6 +62,8 @@ class TriggerAnnotationRule extends AbstractRule{
 				} catch (TypeElementNotFoundException tenfe) {
 					handleTypeElementNotFound(tenfe, annotatedClass)
 					
+				} catch(Exception re) {
+					reportRuleError('''Error in trigger annotation rule: «re»''')				
 				}
 				generatedClasses
 			]
