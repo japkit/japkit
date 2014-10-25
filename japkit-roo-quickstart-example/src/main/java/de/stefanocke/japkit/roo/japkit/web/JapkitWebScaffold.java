@@ -17,6 +17,7 @@ import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.AnnotationMode;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Matcher;
+import de.stefanocke.japkit.metaannotations.SingleValue;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
@@ -74,7 +75,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 		@Var(name = "findRepository", isFunction = true, typeQuery = @TypeQuery(
 				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src.asType()}")),
 				
-		@Var(name = "repository", type = TypeMirror.class, triggerAV = "repository", expr="#{fboElement.findRepository}"),
+		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fboElement.findRepository}"),
 
 })
 @Clazz(
@@ -135,6 +136,7 @@ public @interface JapkitWebScaffold {
 	String modelAttribute() default "";
 
 	@SuppressWarnings("rawtypes")
+	@SingleValue
 	Class<? extends JpaRepository>[] repository() default {};
 
 	/**

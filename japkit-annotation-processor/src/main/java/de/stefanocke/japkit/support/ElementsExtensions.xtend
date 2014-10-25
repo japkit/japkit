@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.support
 
-import com.google.common.cache.CacheBuilder
 import de.stefanocke.japkit.annotations.Order
 import de.stefanocke.japkit.annotations.ParamNames
 import de.stefanocke.japkit.annotations.RuntimeMetadata
@@ -13,9 +12,11 @@ import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.lang.annotation.Annotation
 import java.lang.reflect.Array
+import java.lang.reflect.Method
 import java.util.Collection
 import java.util.Collections
 import java.util.HashMap
+import java.util.IdentityHashMap
 import java.util.List
 import java.util.Map
 import java.util.regex.Pattern
@@ -39,8 +40,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
-import java.util.IdentityHashMap
-import java.lang.reflect.Method
+import de.stefanocke.japkit.metaannotations.SingleValue
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -362,12 +362,12 @@ class ElementsExtensions {
 		loadAnnotationValues(annotationMirror).get(name.toString)
 	}
 
-	def dispatch Map<String, AnnotationValue> loadAnnotationValues(AnnotationWrapper wrapper) {
+	def private dispatch Map<String, AnnotationValue> loadAnnotationValues(AnnotationWrapper wrapper) {
 		loadAnnotationValues(wrapper.annotation)
 	}
 
 	//Gets the annotation vlaues from cache and loads them if not yet in cache.
-	def dispatch Map<String, AnnotationValue> loadAnnotationValues(AnnotationMirror annotationMirror) {
+	def private dispatch Map<String, AnnotationValue> loadAnnotationValues(AnnotationMirror annotationMirror) {
 		var valuesMap = annotationValuesCache.get(annotationMirror)
 
 		if (valuesMap == null) {
@@ -376,9 +376,16 @@ class ElementsExtensions {
 		valuesMap
 	}
 	
-	def loadAnnotationValuesCacheMiss(AnnotationMirror annotationMirror) {
+	def private Map<String, AnnotationValue>loadAnnotationValuesCacheMiss(AnnotationMirror annotationMirror) {
 		val map = newHashMap
-		annotationMirror.elementValuesWithDefaults.forEach[k, v|map.put(k.simpleName.toString, v)]
+		annotationMirror.elementValuesWithDefaults.forEach[k, v|
+			val v2 = if((v.value instanceof List<?>) && k.annotationMirror(SingleValue)!=null){
+				MoreCollectionExtensions.singleValue(v.value as List<AnnotationValue>)
+			} else {
+				v
+			}
+			map.put(k.simpleName.toString, v2)
+		]
 		annotationValuesCache.put(annotationMirror, map)
 		map
 	}
@@ -559,7 +566,7 @@ class ElementsExtensions {
 		annotationMirror.annotationAsTypeElement.declaredMethods.findFirst[simpleName.contentEquals(name)]
 	}
 
-	def singleAV(Iterable<AnnotationValue> values) {		
+	def private singleAV(Iterable<AnnotationValue> values) {		
 		(MoreCollectionExtensions.singleValue(values))?.valueWithErrorHandling
 	}
 	
@@ -622,18 +629,22 @@ class ElementsExtensions {
 		[CharSequence avName|loadAnnotationValues(am).get(avName.toString)?.unwrapAnnotationValue]
 	}
 	
-	def dispatch Object unwrapAnnotationValue(AnnotationValue av) {
+	def private dispatch Object unwrapAnnotationValue(AnnotationValue av) {
 		av?.valueWithErrorHandling.unwrapAnnotationValue
 	}
 
-	def dispatch Object unwrapAnnotationValue(List<? extends AnnotationValue> values) {
+	def private dispatch Object unwrapAnnotationValue(List<? extends AnnotationValue> values) {
 		values.map[
 			it.valueWithErrorHandling
 		]
 	}
 
-	def dispatch Object unwrapAnnotationValue(Object value) {
+	def private dispatch Object unwrapAnnotationValue(Object value) {
 		value
+	}
+	
+	def private dispatch Object unwrapAnnotationValue(Void value) {
+		null
 	}
 
 	//Maps from annotation value type mirror to the expected class of the value
