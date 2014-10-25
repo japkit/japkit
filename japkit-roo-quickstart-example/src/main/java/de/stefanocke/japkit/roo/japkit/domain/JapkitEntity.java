@@ -17,13 +17,16 @@ import de.stefanocke.japkit.roo.japkit.Layers;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity.SuperclassSelector;
 
 @Trigger(layer=Layers.ENTITIES)
-@Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifiers = Modifier.PUBLIC, annotations = { @Annotation(
+@Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifiers = Modifier.PUBLIC, modifiersFromSrc=true, annotations = { @Annotation(
 		targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class, templates = { @TemplateCall(IdAndVersion.class),
+		@TemplateCall(PropertyRefsTemplate.class),
 		@TemplateCall(ToString.class),
-		@TemplateCall(activation = @Matcher(condition = "#{triggerAnnotation.activeRecord}"), value = ActiveRecordMembers.class) },
-		fields = @Field(src = "#{src.declaredFields}", getter = @Getter, setter = @Setter, annotations = @Annotation(
+		@TemplateCall(activation = @Matcher(condition = "#{triggerAnnotation.activeRecord}"), value = ActiveRecordMembers.class),
+		@TemplateCall(EntityBehaviorMethods.class)},
+		fields = {@Field(src = "#{src.declaredFields}", getter = @Getter, setter = @Setter(modifiers=Modifier.PROTECTED), annotations = @Annotation(
 				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
-						"org.springframework.format.annotation" })))
+						"org.springframework.format.annotation" } ))	
+				})
 
 public @interface JapkitEntity {
 	// Modifier[] modifier() default {};
@@ -37,5 +40,9 @@ public @interface JapkitEntity {
 	@ClassSelector(kind = ClassSelectorKind.EXPR, expr = "#{annotatedClass.superclass}", requiredTriggerAnnotation=JapkitEntity.class)
 	static class SuperclassSelector {
 	};
+	
+	Class<?>[] createCommandProperties() default {};
+	
+	Class<?>[] updateCommandProperties() default {};
 
 }

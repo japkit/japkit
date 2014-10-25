@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
-@JapkitEntity(activeRecord=true)
+@JapkitEntity()
 public class PetDef {
 
 	/**

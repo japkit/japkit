@@ -12,9 +12,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
-@JapkitEntity
-public abstract class VetDef extends AbstractPersonDef {
-
+//@PropertyRefs
+@JapkitEntity(createCommandProperties={VetProperties.Specialty_.class /*, VetProperties.FirstName_.class, VetProperties.LastName_.class*/})
+public class VetDef extends AbstractPersonDef {	
+	
 	/**
      */
 	@NotNull
@@ -27,4 +28,6 @@ public abstract class VetDef extends AbstractPersonDef {
      */
 	@Enumerated
 	private Specialty specialty;
+	
+	
 }

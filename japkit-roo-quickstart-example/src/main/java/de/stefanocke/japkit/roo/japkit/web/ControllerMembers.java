@@ -26,6 +26,7 @@ import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 @Template()
 public abstract class ControllerMembers {
 	
+	
 	/**
 	 * @japkit.bodyCode <pre>
 	 * <code>

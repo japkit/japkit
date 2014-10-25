@@ -19,7 +19,7 @@ import de.stefanocke.japkit.metaannotations.Var;
 		fieldDefaults = @Field(activation = @Matcher(src = "template",
 				nameNotIn = "inheritedProperties"),
 				getter = @Getter,
-				setter = @Setter))
+				setter = @Setter(modifiers={})))
 public class IdAndVersion {
 
 	@Field
