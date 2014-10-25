@@ -87,12 +87,22 @@ public @interface Properties {
 	/**
 	 * Expression that yields a collection with the names of properties to be included. They must exist in the source class,
 	 * otherwise an error is reported.
+	 * <p>
+	 * This expression might also yield a list of classes. In this case, the simple names of these classes are used. This allows
+	 * to refer to properties in a compile-time safe and code completion friendly way. However, there is no standard annotation provides
+	 * for generating those "property reference classes" but that can easily be done with something like @InnerClass(src="properties").
 	 * 
 	 * @return the property names
 	 */
 	String includeNamesExpr() default "";
 	
 	String includeNamesLang() default "";
+	
+	/**The includeNames given by includeNamesExpr must all start with this prefix and this prefix is removed to get the property name.*/
+	String includeNamesPrefix() default ""; 
+	
+	/**The includeNames given by includeNamesExpr must all end with this suffix and this suffix is removed to get the property name.*/
+	String includeNamesSuffix() default "_";
 
 	/**
 	 * Rules for including properties. If at least one of the matcher matches
