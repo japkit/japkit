@@ -4,14 +4,14 @@
     <jsp:output omit-xml-declaration="yes"/>
     <page:show id="ps_de_stefanocke_japkit_roo_petclinic_domain_owner" object="${owner}" path="/owners" z="0">
     <field:display field="pets" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_pets" object="${owner}"  z="0"/>
-    <field:display field="address" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_address" object="${owner}"  z="0"/>
-    <field:display field="birthDay" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_birthDay" object="${owner}" dateTimePattern="${owner_birthday_date_format}" date="true" z="0"/>
-    <field:display field="city" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_city" object="${owner}"  z="0"/>
-    <field:display field="email" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_email" object="${owner}"  z="0"/>
     <field:display field="firstName" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_firstName" object="${owner}"  z="0"/>
-    <field:display field="homePage" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_homePage" object="${owner}"  z="0"/>
     <field:display field="lastName" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_lastName" object="${owner}"  z="0"/>
+    <field:display field="address" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_address" object="${owner}"  z="0"/>
+    <field:display field="city" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_city" object="${owner}"  z="0"/>
     <field:display field="telephone" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_telephone" object="${owner}"  z="0"/>
+    <field:display field="homePage" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_homePage" object="${owner}"  z="0"/>
+    <field:display field="email" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_email" object="${owner}"  z="0"/>
+    <field:display field="birthDay" id="s_de_stefanocke_japkit_roo_petclinic_domain_owner_birthDay" object="${owner}" dateTimePattern="${owner_birthday_date_format}" date="true" z="0"/>
             
     </page:show>
 </div>

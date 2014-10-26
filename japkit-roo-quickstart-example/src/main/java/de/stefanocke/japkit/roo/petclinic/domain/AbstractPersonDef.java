@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import de.stefanocke.japkit.annotations.Order;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @JapkitEntity(// TODO: Das ist etwas hässlich. Ggf. isAbstract AV. o.ä. Oder
@@ -20,44 +21,52 @@ public abstract class AbstractPersonDef {
 
 	/**
      */
+	@Order(0)
 	@Size(min = 3, max = 30)
 	private String firstName;
 
 	/**
      */
+	@Order(1)
 	@NotNull
 	@Size(min = 3, max = 30)
 	private String lastName;
 
 	/**
      */
+	@Order(2)
 	@NotNull
 	//@Size(min = 1, max = 50)
 	private Address address;
 
 	/**
      */
+	@Order(3)
 	@NotNull
 	@Size(max = 30)
 	private String city;
 
 	/**
      */
+	@Order(4)
 	@NotNull
 	private String telephone;
 
 	/**
      */
+	@Order(5)
 	@Size(max = 30)
 	private String homePage;
 
 	/**
      */
+	@Order(6)
 	@Size(min = 6, max = 30)
 	private String email;
 
 	/**
      */
+	@Order(7)
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(style = "M-")

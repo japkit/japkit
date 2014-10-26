@@ -10,9 +10,9 @@ import javax.validation.constraints.Past;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import de.stefanocke.japkit.annotations.Order;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
-//@PropertyRefs
 @JapkitEntity(createCommandProperties={VetProperties.Specialty_.class /*, VetProperties.FirstName_.class, VetProperties.LastName_.class*/})
 public class VetDef extends AbstractPersonDef {	
 	
@@ -22,11 +22,13 @@ public class VetDef extends AbstractPersonDef {
 	@Past
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(style = "M-")
+	@Order(0)
 	private Calendar employedSince;
 
 	/**
      */
 	@Enumerated
+	@Order(1)
 	private Specialty specialty;
 	
 	
