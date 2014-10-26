@@ -27,6 +27,7 @@ import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
+import de.stefanocke.japkit.roo.japkit.application.ApplicationService;
 import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
@@ -76,6 +77,9 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src.asType()}")),
 				
 		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fboElement.findRepository}"),
+		
+		@Var(name = "applicationService", ifEmpty = true, typeQuery = @TypeQuery(
+				annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots", inExpr = "#{fbo}")),
 
 })
 @Clazz(
@@ -139,6 +143,8 @@ public @interface JapkitWebScaffold {
 	@SingleValue
 	Class<? extends JpaRepository>[] repository() default {};
 
+	@SingleValue
+	Class<?>[] applicationService() default {};
 	/**
 	 * 
 	 * @return the unique id for the fbo class used in JSPs and i18n
