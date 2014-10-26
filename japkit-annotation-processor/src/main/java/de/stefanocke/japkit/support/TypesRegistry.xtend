@@ -674,26 +674,29 @@ class TypesRegistry {
 	def dispatch TypeElement asTypeElement(TypeMirror declType) {
 
 		val e = declType.asElement
-		if (e == null || !(e instanceof TypeElement)) {
+		if (e instanceof TypeElement) {
+			//Even if we find the type element, we prefer the generated one, since it is newer.
+			//This is relevant during incremental build.
+			findGenTypeElementIfAllowed(e.qualifiedName.toString) ?: e
+		} else {
+			//should not happen
 			throw new TypeElementNotFoundException(declType.erasure.toString)
 		}
-		e as TypeElement
+		
+		
 	}
 
 	def dispatch TypeElement asTypeElement(ErrorType declType) {
-		if (declType.typeArguments.nullOrEmpty) {
-			val e = findGenTypeElementIfAllowed(declType.simpleNameForErrorType)
-			if (e != null) {
-				e
-			} else {
-				throw new TypeElementNotFoundException(declType.simpleNameForErrorType)
-			}
-		} else {
-
-			//In Eclipse, a generic type seem to be an ErrorType as soon as one of the type args is an ErrorType...
-			//-> Try erasure instead.
-			declType.erasure.asTypeElement
+		if (!declType.typeArguments.nullOrEmpty) {
+			return declType.erasure.asTypeElement
 		}
+		val e = findGenTypeElementIfAllowed(declType.simpleNameForErrorType)
+		if (e != null) {
+			e
+		} else {
+			throw new TypeElementNotFoundException(declType.simpleNameForErrorType)
+		}
+		
 	}
 
 	//Key is FQN of trigger annotation and shadow flag. 
