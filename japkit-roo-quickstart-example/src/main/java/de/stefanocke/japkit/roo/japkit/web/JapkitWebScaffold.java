@@ -34,16 +34,16 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
 		@Var(name = "entityAnnotation", expr = "#{fboElement}", annotation = JapkitEntity.class),
-		@Var(name = "fboName", type = String.class, triggerAV = "fboName", expr = "#{fboElement.simpleName.toString()}"),
-		@Var(name = "fboPluralName", type = String.class, triggerAV = "fboPluralName", expr = "#{fboName}s"),
-		@Var(name = "path", type = String.class, triggerAV = "path", expr = "#{fboPluralName.toLowerCase()}"),
+		@Var(name = "fboName", type = String.class, ifEmpty=true, expr = "#{fboElement.simpleName.toString()}"),
+		@Var(name = "fboPluralName", type = String.class, ifEmpty=true, expr = "#{fboName}s"),
+		@Var(name = "path", type = String.class, ifEmpty=true, expr = "#{fboPluralName.toLowerCase()}"),
 		//@Var(name = "path", expr="foo", ifEmpty=true),
-		@Var(name = "modelAttribute", type = String.class, triggerAV = "modelAttribute", expr = "#{fboName.toFirstLower}"),
+		@Var(name = "modelAttribute", type = String.class, ifEmpty=true, expr = "#{fboName.toFirstLower}"),
 		// For making IDs in JSPs unique
 		@Var(name = "fboFqnId", expr = "#{fboElement.qualifiedName.toString().replace('.','_').toLowerCase()}"),
 		@Var(name = "fboShortId", expr = "#{fboName.toLowerCase()}"),
 
-		@Var(name = "viewModel", triggerAV = "viewModel", typeQuery = @TypeQuery(
+		@Var(name = "viewModel", ifEmpty=true, typeQuery = @TypeQuery(
 				annotation = ViewModel.class, shadow = true, unique = true, filterAV = "formBackingObject", inExpr = "#{fbo}")),
 		
 		// The properties to show

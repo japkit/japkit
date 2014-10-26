@@ -44,7 +44,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	String name
 	boolean ifEmpty
 	boolean isFunction
-	String triggerAv
 	String expr
 	String lang
 	Class<?> type
@@ -65,7 +64,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		
 		_ifEmpty = elVarAnnotation.value("ifEmpty", Boolean);
 		_isFunction = elVarAnnotation.value("isFunction", Boolean);
-		_triggerAv = elVarAnnotation.value("triggerAV", String);
 		_expr = elVarAnnotation.value("expr", String);
 		_lang = elVarAnnotation.value("lang", String);
 		_type = Class.forName(elVarAnnotation.value("type", TypeMirror).asElement.qualifiedName.toString);
@@ -117,19 +115,10 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 			val result = scope(src) [
 				try {
 
-					var Object av
-
-					//Be default, the value is the current src. This is useful for matcher and retrieveAV
+					//Be default, the value is the current src. This is useful for matcher 
 					var Object value = currentSrc
 
-					value = if (!triggerAv.nullOrEmpty && {
-						av = currentTriggerAnnotation.value(triggerAv, type);
-						!av.nullOrEmptyAV
-					}) {
-
-						av
-
-					} else if (!expr.nullOrEmpty) {
+					value = if (!expr.nullOrEmpty) {
 						eval(expr, lang, type);
 					} else if (!propertyFilterAnnotations.nullOrEmpty) {
 

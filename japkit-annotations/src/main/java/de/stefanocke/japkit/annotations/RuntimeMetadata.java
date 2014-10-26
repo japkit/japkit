@@ -13,7 +13,7 @@ import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.Var;
 
-@Trigger(layer=-1, vars=@Var(name="srcClass", triggerAV="srcClass", expr="#{annotatedClass.asType()}"))
+@Trigger(layer=-1, vars=@Var(name="srcClass", ifEmpty=true, expr="#{annotatedClass.asType()}"))
 @Clazz(nameSuffixToAppend=RuntimeMetadata.CLASS_SUFFIX, annotations={
 	@Annotation(id="elementMetadata", targetAnnotation=Element.class, 
 			values={

@@ -21,14 +21,6 @@ public @interface Var {
 	 */
 	boolean isFunction() default false;
 
-	/**
-	 * If this is set, the current trigger annotation value with this name is
-	 * retrieved. If it is set (TODO: What does this exactly mean?), it is used
-	 * as value for the variable and the expression, property filter or type query won't be evaluated.
-	 * 
-	 * @return the trigger annotation value name
-	 */
-	String triggerAV() default "";
 	
 	/**
 	 * If this value is not empty and the variable is a TypeMirror or TypeElement, it validated, that
