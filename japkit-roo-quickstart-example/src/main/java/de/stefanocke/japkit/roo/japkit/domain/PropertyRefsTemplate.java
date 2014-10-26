@@ -9,7 +9,6 @@ import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
-import de.stefanocke.japkit.metaannotations.classselectors.AnnotatedClass;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 
 @Template(vars=@Var(name="properties", propertyFilter=@Properties(sourceClass=GeneratedClass.class)))

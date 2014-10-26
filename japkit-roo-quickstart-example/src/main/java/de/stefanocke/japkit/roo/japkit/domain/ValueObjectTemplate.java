@@ -3,6 +3,7 @@ package de.stefanocke.japkit.roo.japkit.domain;
 import java.util.Date;
 
 import javax.lang.model.element.Modifier;
+import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 
 import de.stefanocke.japkit.annotations.ParamNames;
@@ -37,6 +38,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 // "} finally {\n" +
 // "}\n"))
 		})
+@Embeddable
 public abstract class ValueObjectTemplate {
 
 	@InnerClass(fields = @Field(src = "#{properties}", modifiers = Modifier.PRIVATE,

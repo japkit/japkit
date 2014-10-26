@@ -23,13 +23,13 @@ public class VetDef extends AbstractPersonDef {
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(style = "M-")
 	@Order(0)
-	private Calendar employedSince;
+	Calendar employedSince;
 
 	/**
      */
 	@Enumerated
 	@Order(1)
-	private Specialty specialty;
+	Specialty specialty;
 	
 	
 }

@@ -9,7 +9,6 @@
      	<field:input field="firstName" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_firstName" required="false"  z="0"/>
     <field:input field="lastName" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_lastName" required="true"  z="0"/>
     <field:input field="address" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_address" required="true"  z="0"/>
-    <field:input field="city" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_city" required="true"  z="0"/>
     <field:input field="telephone" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_telephone" required="true"  z="0"/>
     <field:input field="homePage" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_homePage" required="false"  z="0"/>
     <field:input field="email" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_email" required="false"  z="0"/>

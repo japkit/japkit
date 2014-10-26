@@ -2,7 +2,6 @@ package de.stefanocke.japkit.roo.petclinic.domain;
 
 import java.util.Date;
 
-import javax.lang.model.element.Modifier;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
@@ -23,46 +22,39 @@ public abstract class AbstractPersonDef {
      */
 	@Order(0)
 	@Size(min = 3, max = 30)
-	private String firstName;
+	String firstName;
 
 	/**
      */
 	@Order(1)
 	@NotNull
 	@Size(min = 3, max = 30)
-	private String lastName;
+	String lastName;
 
 	/**
      */
 	@Order(2)
 	@NotNull
 	//@Size(min = 1, max = 50)
-	private Address address;
-
-	/**
-     */
-	@Order(3)
-	@NotNull
-	@Size(max = 30)
-	private String city;
+	Address address;
 
 	/**
      */
 	@Order(4)
 	@NotNull
-	private String telephone;
+	String telephone;
 
 	/**
      */
 	@Order(5)
 	@Size(max = 30)
-	private String homePage;
+	String homePage;
 
 	/**
      */
 	@Order(6)
 	@Size(min = 6, max = 30)
-	private String email;
+	String email;
 
 	/**
      */
@@ -70,5 +62,5 @@ public abstract class AbstractPersonDef {
 	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(style = "M-")
-	private Date birthDay;
+	Date birthDay;
 }

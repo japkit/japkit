@@ -4,10 +4,10 @@
     <jsp:output omit-xml-declaration="yes"/>
     <page:list id="pl_de_stefanocke_japkit_roo_petclinic_domain_visit" items="${visits}" z="0">
         <table:table data="${visits}" id="l_de_stefanocke_japkit_roo_petclinic_domain_visit" path="/visits" z="0">
+           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_visitDate" property="visitDate" dateTimePattern="${visit_visitdate_date_format}" date="true" z="0"/> 
            <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_description" property="description"  z="0"/> 
            <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_pet" property="pet"  z="0"/> 
            <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_vet" property="vet"  z="0"/> 
-           <table:column id="c_de_stefanocke_japkit_roo_petclinic_domain_visit_visitDate" property="visitDate" dateTimePattern="${visit_visitdate_date_format}" date="true" z="0"/> 
          
         </table:table>
     </page:list>

@@ -6,6 +6,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import de.stefanocke.japkit.annotations.Order;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @JapkitEntity()
@@ -13,28 +14,36 @@ public class PetDef {
 
 	/**
      */
-	private boolean sendReminders;
-
-	/**
-     */
 	@NotNull
 	@Size(min = 1)
-	private String name;
-
-	/**
-     */
-	@NotNull
-	@Min(0L)
-	private Float weight;
-
-	/**
-     */
-	@ManyToOne
-	private Owner owner;
+	@Order(0)
+	String name;
 
 	/**
      */
 	@NotNull
 	@Enumerated
-	private PetType type;
+	@Order(1)
+	PetType type;
+	
+	/**
+     */
+	@NotNull
+	@Min(0L)
+	@Order(2)
+	Float weight;
+
+	/**
+     */
+	@Order(3)
+	boolean sendReminders;
+	
+	/**
+     */
+	@ManyToOne
+	@Order(4)
+	Owner owner;
+
+	
+	
 }

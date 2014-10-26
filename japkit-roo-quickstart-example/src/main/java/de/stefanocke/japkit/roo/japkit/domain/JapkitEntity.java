@@ -12,7 +12,6 @@ import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
-import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.roo.japkit.Layers;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity.SuperclassSelector;
 
@@ -23,7 +22,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity.SuperclassSelector;
 		@TemplateCall(ToString.class),
 		@TemplateCall(activation = @Matcher(condition = "#{triggerAnnotation.activeRecord}"), value = ActiveRecordMembers.class),
 		@TemplateCall(EntityBehaviorMethods.class)},
-		fields = {@Field(src = "#{src.declaredFields}", getter = @Getter, setter = @Setter(modifiers=Modifier.PROTECTED), annotations = @Annotation(
+		fields = {@Field(src = "#{src.declaredFields}", modifiers=Modifier.PRIVATE, getter = @Getter, setter = @Setter(modifiers=Modifier.PROTECTED), annotations = @Annotation(
 				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 						"org.springframework.format.annotation" } ))	
 				})

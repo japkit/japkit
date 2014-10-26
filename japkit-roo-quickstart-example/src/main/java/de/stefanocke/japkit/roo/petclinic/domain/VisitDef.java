@@ -11,6 +11,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import de.stefanocke.japkit.annotations.Order;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @JapkitEntity
@@ -18,25 +19,29 @@ public class VisitDef {
 
 	/**
      */
-	@Size(max = 255)
-	private String description;
-
-	/**
-     */
 	@NotNull
 	@Past
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(style = "M-")
-	private Date visitDate;
+	@Order(0)
+	Date visitDate;
+	
+	/**
+     */
+	@Size(max = 255)
+	@Order(1)
+	String description;
 
 	/**
      */
 	@NotNull
 	@ManyToOne
-	private Pet pet;
+	@Order(2)
+	Pet pet;
 
 	/**
      */
 	@ManyToOne
-	private Vet vet;
+	@Order(3)
+	Vet vet;
 }
