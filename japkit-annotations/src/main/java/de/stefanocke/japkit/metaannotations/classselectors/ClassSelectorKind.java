@@ -36,5 +36,10 @@ public enum ClassSelectorKind{
 	 * An EL expression is used to determine the type. If no expression is given the name of the annotated class is used to
 	 * search for an accordingly named variable on value stack (with first letter to lower case).
 	 */
-	EXPR
+	EXPR,
+	
+	/**
+	 * The expr is the FQN of the type.
+	 */
+	FQN
 }

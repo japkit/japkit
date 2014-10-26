@@ -147,13 +147,6 @@ class TypeResolver {
 						resolvedSelector.type = currentSrc.srcType
 					case ClassSelectorKind.SRC_SINGLE_VALUE_TYPE:
 						resolvedSelector.type = currentSrc.srcType?.singleValueType
-//					case ClassSelectorKind.TYPE_MIRROR: {
-//						resolvedSelector.type = currentTriggerAnnotation.value(classSelectorAnnotation.getClassSelectorAvName(te),
-//							TypeMirror)
-//						if(resolvedSelector.type == null){
-//							resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, TypeMirror)
-//						}	
-//					}
 					case ClassSelectorKind.INNER_CLASS_NAME:
 					{	
 						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te, throwTypeElementNotFound)	
@@ -161,6 +154,13 @@ class TypeResolver {
 					
 					case ClassSelectorKind.EXPR : {
 						resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, [|te.simpleName.toString.toFirstLower], TypeMirror)
+					}
+					case ClassSelectorKind.FQN : {
+						val fqn = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, null, String)
+						resolvedSelector.type = findTypeElement(fqn).asType
+						if(resolvedSelector.type == null){
+							throw new TypeElementNotFoundException(fqn)
+						}
 					}
 					default: {
 						resolvedSelector.type = null

@@ -93,6 +93,12 @@ public @interface Clazz {
 
 	String packageNameExReplace() default "";
 	
+	/**
+	 * The expression for the class name. 
+	 */
+	String nameExpr() default "";
+
+	String nameLang() default "";
 	
 	/**
 	 * If true, a shadow annotation is created by copying the trigger annotation to the generated 
