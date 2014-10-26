@@ -190,6 +190,10 @@ class TypesExtensions /**implements Types*/{
 		if((t1 === null) || (t2 === null)){
 			return false
 		}
+		
+		if(t1.isVoid) {
+			return t2.isVoid
+		}
 
 		//if(t1.containsErrorType || t1.containsErrorType){
 		//There are several issues with error types that we try to workaround here:
