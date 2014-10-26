@@ -211,14 +211,9 @@ class JapkitProcessor extends AbstractProcessor {
 	
 	def getLayer(TypeElement annotatedClass){
 		val layers = annotatedClass.annotationMirrors.map[metaAnnotation(Trigger)].filter[it!=null].map[value('layer', Integer)].toSet
+				
+		Collections.max(layers)
 		
-		val min = Collections.min(layers)
-		val max = Collections.max(layers)
-		
-		if(min!=max){
-			reportError("Annotated classes with multiple trigger annotations with different layers are not supported", annotatedClass, null, null);
-		}
-		min
 	}
 	
 	def filterLayer(Iterable<TypeElement> elements, int l) {
