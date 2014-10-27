@@ -2,6 +2,7 @@ package de.stefanocke.japkit.roo.japkit.web;
 
 import java.util.Arrays;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -17,34 +18,75 @@ import org.springframework.web.bind.annotation.RequestParam;
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Template;
+import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Var;
+import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 
 @Controller
 @RequestMapping("/$path$")
 @RuntimeMetadata
-@Template()
+@Template(templates=@TemplateCall(ControllerMembers.Create.class))
 public abstract class ControllerMembers {
-	
+	@ClassSelector
+	class ApplicationService{}
 	
 	/**
-	 * @japkit.bodyCode <pre>
-	 * <code>
-	 * if (bindingResult.hasErrors()) {
-	 * 	populateEditForm(uiModel, fbo);
-	 * 	return "#{path}/create";
-	 * }
-	 * uiModel.asMap().clear();
-	 * crudOperations().persist(fbo);
-	 * return "redirect:/#{path}/" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);
-	 * </code>
-	 * </pre>
+	 * #{createCommands.toString()}
 	 */
-	@Method(imports = ControllerUtil.class)
-	@RequestMapping(method = RequestMethod.POST, produces = "text/html")
-	public abstract String create(@Valid FormBackingObject fbo, BindingResult bindingResult, Model uiModel,
-			HttpServletRequest httpServletRequest);
-
+	@Resource
+	private ApplicationService applicationService;
+	
+	@Template(src="#{createCommands.get(0)}", srcVar="cmdMethod", 
+			vars=@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"))
+	abstract class Create{
+		/**
+		 * @japkit.bodyCode <pre>
+		 * <code>
+		 * if (bindingResult.hasErrors()) {
+		 * 	populateCreateForm(uiModel, command);
+		 * 	return "#{path}/create";
+		 * }
+		 * uiModel.asMap().clear();
+		 * #{fbo.code} fbo =  applicationService.#{cmdMethod.simpleName}(command);
+		 * return "redirect:/#{path}/" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);
+		 * </code>
+		 * </pre>
+		 */
+		@Method(imports = ControllerUtil.class)
+		@RequestMapping(method = RequestMethod.POST, produces = "text/html")
+		public abstract String create(@Valid Command command, BindingResult bindingResult, Model uiModel,
+				HttpServletRequest httpServletRequest);
+	
+		@ClassSelector
+		class Command{}
+		
+		/**
+		 * @japkit.bodyCode <pre>
+		 * <code>
+		 * populateCreateForm(uiModel, new #{command.code}()); 
+		 * return "#{path}/create";
+		 * </code>
+		 * </pre>
+		 */
+		@Method()
+		@RequestMapping(params = "form", produces = "text/html")
+		public abstract String createForm(Model uiModel);
+		
+		/**
+		 * @japkit.bodyCode <pre>
+		 * <code>	
+		 * uiModel.addAttribute("#{modelAttribute}", command);
+		 * addDateTimeFormatPatterns(uiModel);
+		 * addEnumChoices(uiModel);
+		 * addEntityChoices(uiModel);
+		 * </code>
+		 * </pre>
+		 */
+		abstract void populateCreateForm(Model uiModel, Command command);
+	
+	}
+	
 	/**
 	 * @japkit.bodyCode 
 	 * <code>uiModel.addAttribute("#{src.dtfModelAttr}", ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));</code>
@@ -72,18 +114,6 @@ public abstract class ControllerMembers {
 	 */
 	@Method(bodyIterator="entityProperties")
 	abstract void addEntityChoices(Model uiModel);
-
-	/**
-	 * @japkit.bodyCode <pre>
-	 * <code>
-	 * populateEditForm(uiModel, new ${fbo.code}()); 
-	 * return "${path}/create";
-	 * </code>
-	 * </pre>
-	 */
-	@Method(bodyLang = "GStringTemplateInline")
-	@RequestMapping(params = "form", produces = "text/html")
-	public abstract String createForm(Model uiModel);
 
 	/**
 	 * @japkit.bodyCode <pre>

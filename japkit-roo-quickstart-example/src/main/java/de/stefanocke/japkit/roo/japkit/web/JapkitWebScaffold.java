@@ -28,8 +28,10 @@ import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
 import de.stefanocke.japkit.roo.japkit.application.ApplicationService;
+import de.stefanocke.japkit.roo.japkit.application.CommandMethod;
 import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
+import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 
 @Trigger(layer=Layers.CONTROLLERS, vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
@@ -80,6 +82,8 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 		
 		@Var(name = "applicationService", ifEmpty = true, typeQuery = @TypeQuery(
 				annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots", inExpr = "#{fbo}")),
+		@Var(name="createCommands", expr="#{applicationService.asElement.declaredMethods}", 
+				matcher=@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo)}"))
 
 })
 @Clazz(
@@ -95,13 +99,18 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 		customBehaviorActivation=@Matcher(condition="#{triggerAnnotation.customBehavior}"),
 		templates = {
 				@TemplateCall(ControllerMembers.class),
-				@TemplateCall(activation = @Matcher(condition = "#{entityAnnotation.activeRecord}"), value = ControllerMembersActiveRecord.class),
 				@TemplateCall(ControllerMembersJpaRepository.class) ,
 				@TemplateCall(ControllerConverterProviderMembers.class)
 				})
 @ResourceTemplate.List({
-		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
-				nameExpr = "create.jspx", location = ResourceLocation.WEBINF, vars = @Var(name = "update", expr = "#{false}")),
+		@ResourceTemplate(src="#{createCommands.get(0)}", srcVar="cmdMethod", 
+				templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
+				nameExpr = "create.jspx", location = ResourceLocation.WEBINF, 
+				vars ={ @Var(name = "update", expr = "#{false}"), 
+					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+					@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = Command.class, includeRules = @Matcher(
+							annotationsNot = { Id.class, Version.class }))),
+				}),
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
 				nameExpr = "update.jspx", location = ResourceLocation.WEBINF, vars = @Var(name = "update", expr = "#{true}")),
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "show.jspx", location = ResourceLocation.WEBINF,

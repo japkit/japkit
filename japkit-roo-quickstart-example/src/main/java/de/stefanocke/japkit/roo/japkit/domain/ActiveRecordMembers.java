@@ -15,6 +15,7 @@ import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 
+@Deprecated
 @RuntimeMetadata
 @Template(vars = @Var(expr = "#{genClass.simpleName}", name = "entityName", type = String.class))
 @Configurable

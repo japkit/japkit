@@ -7,7 +7,6 @@ import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.Getter;
-import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Trigger;
@@ -20,7 +19,6 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity.SuperclassSelector;
 		targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class, templates = { @TemplateCall(IdAndVersion.class),
 		@TemplateCall(PropertyRefsTemplate.class),
 		@TemplateCall(ToString.class),
-		@TemplateCall(activation = @Matcher(condition = "#{triggerAnnotation.activeRecord}"), value = ActiveRecordMembers.class),
 		@TemplateCall(EntityBehaviorMethods.class)},
 		fields = {@Field(src = "#{src.declaredFields}", modifiers=Modifier.PRIVATE, getter = @Getter, setter = @Setter(modifiers=Modifier.PROTECTED), annotations = @Annotation(
 				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
@@ -31,8 +29,6 @@ public @interface JapkitEntity {
 	// Modifier[] modifier() default {};
 
 	boolean shadow() default false;
-
-	boolean activeRecord() default false;
 
 	boolean customBehavior() default false;
 

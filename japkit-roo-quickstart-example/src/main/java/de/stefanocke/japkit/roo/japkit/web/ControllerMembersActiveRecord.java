@@ -7,6 +7,7 @@ import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.roo.base.web.CrudOperations;
 
+@Deprecated
 @Template
 public abstract class ControllerMembersActiveRecord implements CrudOperations<FormBackingObject> {
 

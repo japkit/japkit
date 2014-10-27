@@ -8,7 +8,7 @@
     <field:datetime field="employedSince" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_employedSince" dateTimePattern="${vet_employedsince_date_format}" past="true" required="true" z="0"/>
         <field:select field="specialty" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_specialty" items="${specialtys}" path="specialtys" required="false" z="0"/>
      	<field:input field="firstName" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_firstName" required="false"  z="0"/>
-    <field:input field="lastName" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_lastName" required="true" validationRegex="[a-zA-Z]+" z="0"/>
+    <field:input field="lastName" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_lastName" required="true"  z="0"/>
     <field:input field="address" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_address" required="true"  z="0"/>
     <field:input field="telephone" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_telephone" required="true"  z="0"/>
     <field:input field="homePage" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_homePage" required="false"  z="0"/>

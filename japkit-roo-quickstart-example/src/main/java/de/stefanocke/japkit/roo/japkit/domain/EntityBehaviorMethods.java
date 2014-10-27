@@ -4,6 +4,7 @@ import javax.lang.model.element.Modifier;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
+import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Constructor;
 import de.stefanocke.japkit.metaannotations.Matcher;
@@ -56,18 +57,25 @@ public abstract class EntityBehaviorMethods {
 					bodyCode="assignments"
 	
 	)
-	public EntityBehaviorMethods(@Param(src = "propertiesToAssign") SrcType $srcElementName$) {
+	public EntityBehaviorMethods(
+		@Param(src = "propertiesToAssign", 
+			annotations = @Annotation(copyAnnotationsFromPackages={"javax.validation.constraints", "org.springframework.format.annotation"})) 
+		SrcType $srcElementName$) {
 
 	}
 
 	@Method(activation =  @Matcher(src = "#{genClass}", modifiersNot = Modifier.ABSTRACT), 
+			
 			vars = @Var(name = "propertiesToAssign",
 			propertyFilter = @Properties(sourceClass = GeneratedClass.class, 
 			includeNamesExpr = "updateCommandProperties",
 			includeRules = @Matcher(condition="#{updateCommandProperties.isEmpty()}"),
 			excludeRules={@Matcher(annotations=Id.class), @Matcher(annotations=Version.class)} )),
 			bodyCode="assignments")
-	public void update$entityName$(@Param(src = "propertiesToAssign") SrcType $srcElementName$){}
+	public void update$entityName$(
+			@Param(src = "propertiesToAssign", 
+				annotations = @Annotation(copyAnnotationsFromPackages={"javax.validation.constraints", "org.springframework.format.annotation"})) 
+			SrcType $srcElementName$){}
 	
 
 }
