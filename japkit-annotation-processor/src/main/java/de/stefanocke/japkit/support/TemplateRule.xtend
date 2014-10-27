@@ -106,7 +106,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 				addInterfaces(generatedClass)				
 				val members = memberRules.map[it.apply(generatedClass)].flatten.toList	
 							
-				auxClassRules.forEach[generatedClass.auxTopLevelClasses.add(it.generateClass(null, null))]
+				auxClassRules.forEach[generatedClass.auxTopLevelClasses.addAll(it.generateClass(null, null))]
 				members
 			].flatten.toList
 		

@@ -23,7 +23,7 @@ class InnerClassRule extends MemberRuleSupport<TypeElement, GenTypeElement> {
 			
 		
 		
-		val clazz = classRule.generateClass(name, null)
+		val clazz = classRule.generateClass(name, null).head 
 			
 		clazz.comment = commentRule.apply
 		

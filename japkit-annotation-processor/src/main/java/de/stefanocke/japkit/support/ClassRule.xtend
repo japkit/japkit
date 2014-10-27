@@ -50,6 +50,7 @@ class ClassRule extends AbstractRule{
 	
 	()=>TypeMirror superclassRule
 	List<()=>TypeMirror> interfaceRules
+	((Object)=>GenTypeElement)=>Iterable<? extends GenTypeElement> scopeRule
 	
 	boolean shallCreateShadowAnnotation
 	
@@ -86,6 +87,7 @@ class ClassRule extends AbstractRule{
 		//Note: src expression is currently not supported in the annotation, since generating multiple classes is not supported
 		//and would for instance be in conflict with ElementExtensions.generatedTypeElementAccordingToTriggerAnnotation 
 		_varRules = if(isTopLevelClass) createELVariableRules(metaAnnotation, null) else null;
+		_scopeRule = if(isTopLevelClass) createScopeRule(metaAnnotation, templateClass, null) else scopeWithCurrentSrc
 	}
 	
 	/**
@@ -93,7 +95,7 @@ class ClassRule extends AbstractRule{
 	 * 
 	 * @return the set of generated top level classes. 
 	 */
-	def GenTypeElement generateClass(String name, Set<GenTypeElement> generatedTopLevelClasses
+	def List<? extends GenTypeElement> generateClass(String name, Set<GenTypeElement> generatedTopLevelClasses
 	) {
 		inRule[
 			val enclosingClass = if (!isTopLevelClass) {
@@ -110,7 +112,7 @@ class ClassRule extends AbstractRule{
 			}
 			
 			
-			scope[
+			scopeRule.apply[
 				
 				
 				if(isAuxClass){
@@ -182,7 +184,7 @@ class ClassRule extends AbstractRule{
 			
 				
 			
-			]
+			].toList
 		
 		]
 	}
