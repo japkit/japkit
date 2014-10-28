@@ -108,6 +108,7 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 				nameExpr = "create.jspx", location = ResourceLocation.WEBINF, 
 				vars ={ @Var(name = "update", expr = "#{false}"), 
 					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+					@Var(name="modelAttribute", expr="#{command.asElement().simpleName.toFirstLower}"),
 					@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = Command.class, includeRules = @Matcher(
 							annotationsNot = { Id.class, Version.class }))),
 				}),

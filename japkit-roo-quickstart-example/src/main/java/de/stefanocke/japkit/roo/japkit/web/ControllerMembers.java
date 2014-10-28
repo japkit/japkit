@@ -38,24 +38,25 @@ public abstract class ControllerMembers {
 	private ApplicationService applicationService;
 	
 	@Template(src="#{createCommands.get(0)}", srcVar="cmdMethod", 
-			vars=@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"))
+			vars={@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+			@Var(name="cmdName", expr="#{command.asElement().simpleName.toFirstLower}")})
 	abstract class Create{
 		/**
 		 * @japkit.bodyCode <pre>
 		 * <code>
 		 * if (bindingResult.hasErrors()) {
-		 * 	populateCreateForm(uiModel, command);
+		 * 	populateCreateForm(uiModel, #{cmdName});
 		 * 	return "#{path}/create";
 		 * }
 		 * uiModel.asMap().clear();
-		 * #{fbo.code} fbo =  applicationService.#{cmdMethod.simpleName}(command);
+		 * #{fbo.code} fbo =  applicationService.#{cmdMethod.simpleName}(#{cmdName});
 		 * return "redirect:/#{path}/" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);
 		 * </code>
 		 * </pre>
 		 */
 		@Method(imports = ControllerUtil.class)
 		@RequestMapping(method = RequestMethod.POST, produces = "text/html")
-		public abstract String create(@Valid Command command, BindingResult bindingResult, Model uiModel,
+		public abstract String create(@Valid Command $cmdName$, BindingResult bindingResult, Model uiModel,
 				HttpServletRequest httpServletRequest);
 	
 		@ClassSelector
@@ -76,7 +77,7 @@ public abstract class ControllerMembers {
 		/**
 		 * @japkit.bodyCode <pre>
 		 * <code>	
-		 * uiModel.addAttribute("#{modelAttribute}", command);
+		 * uiModel.addAttribute("#{cmdName}", command);
 		 * addDateTimeFormatPatterns(uiModel);
 		 * addEnumChoices(uiModel);
 		 * addEntityChoices(uiModel);
