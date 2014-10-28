@@ -36,8 +36,9 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	List<ClassRule> auxClassRules
 
 	
-	new(TypeElement templateClass, AnnotationMirror templateAnnotation) {
+	new(TypeElement templateClass, AnnotationMirror templateAnnotation, (TemplateRule)=>void registrationCallback) {
 		super(templateAnnotation, templateClass)
+		registrationCallback.apply(this) //Allows self cycles of template rules!
 		_templateClass = templateClass
 		
 		_methodDefaults = metaAnnotation?.value("methodDefaults", typeof(AnnotationMirror[]))?.singleValue
