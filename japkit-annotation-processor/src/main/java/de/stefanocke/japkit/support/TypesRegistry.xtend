@@ -671,9 +671,10 @@ class TypesRegistry {
 	}
 
 	//val generatedTypesByFqn
-	def dispatch TypeElement asTypeElement(TypeMirror declType) {
+	def dispatch TypeElement asTypeElement(DeclaredType declType) {
 
 		val e = declType.asElement
+		
 		if (e instanceof TypeElement) {
 			//Even if we find the type element, we prefer the generated one, since it is newer.
 			//This is relevant during incremental build.
@@ -697,6 +698,10 @@ class TypesRegistry {
 			throw new TypeElementNotFoundException(declType.simpleNameForErrorType)
 		}
 		
+	}
+	
+	def dispatch TypeElement asTypeElement(TypeMirror declType) {
+		declType.asElement as TypeElement
 	}
 
 	//Key is FQN of trigger annotation and shadow flag. 
