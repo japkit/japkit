@@ -108,6 +108,8 @@ class JapkitProcessor extends AbstractProcessor {
 
 	override process(Set<? extends TypeElement> annotations, extension RoundEnvironment roundEnv) {
 		elementsExtensions.clearCaches
+		//The rules cannot be reused in later rounds since they contain references to elements that are no longer valid.
+		ruleFactory.clearCaches
 
 		val startTime = System.currentTimeMillis
 
