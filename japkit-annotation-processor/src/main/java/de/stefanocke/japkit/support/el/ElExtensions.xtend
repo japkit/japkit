@@ -192,11 +192,17 @@ class ElExtensions {
 		s.toString.toFirstLower
 	}
 	
+	def static Element findByName(Iterable<?> elements, CharSequence name){
+		MoreCollectionExtensions.filterInstanceOf(elements, Element).findFirst[simpleName.contentEquals(name)]
+	}
+	
+	
 	//Provide the extensions as Collections of closures...
 	public static val ElExtensionPropertiesAndMethods extensions  = new ElExtensionPropertiesAndMethods() => [
 		registerExtensionProperties
 		registerExtensionMethods
 	]
+	
 
 	//TODO: Das kann man bestimmt auch fein generieren... :)
 	def static registerExtensionProperties(ElExtensionPropertiesAndMethods elExtensions) {
@@ -241,6 +247,8 @@ class ElExtensions {
 		elExtensions.registerMethod(TypeMirror, "isSame", [context, type, paramTypes, params|type.isSame(params.get(0) as TypeMirror)])
 		
 		elExtensions.registerMethod(Element, "hasType", [context, e, paramTypes, params|e.hasType(params.get(0) as CharSequence)])
+		
+		elExtensions.registerMethod(Iterable, "findByName", [context, elements, paramTypes, params|elements.findByName(params.get(0) as CharSequence)])
 		
 //		elExtensions.registerMethod(String, "findAllTypeElementsWithTrigger", [context, triggerFqn, paramTypes, params|
 //			findAllTypeElementsWithTrigger(triggerFqn, (params as Object[]).get(0) as Boolean, context)
