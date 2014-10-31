@@ -61,6 +61,9 @@ class GenerateClassContext {
 	}
 	
 	def void pushCurrentRule(Rule rule){
+		if(currentRules.size > 30 && currentRules.filter[it===rule].size>20){
+			throw new ProcessingException("Potential infinite recursion.", rule.metaElement, rule.metaAnnotation, null, null)
+		}
 		currentRules.push(rule)
 	}
 	
