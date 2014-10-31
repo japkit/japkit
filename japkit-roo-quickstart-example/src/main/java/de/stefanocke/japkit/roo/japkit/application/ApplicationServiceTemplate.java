@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Annotation;
+import de.stefanocke.japkit.metaannotations.Case;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Field;
@@ -19,6 +20,7 @@ import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
+import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
@@ -26,6 +28,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
+import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
 @RuntimeMetadata
 @Service
@@ -40,8 +43,15 @@ public class ApplicationServiceTemplate {
 			@Var(name="aggregateCreateMethods", expr="#{src.asElement.declaredConstructors}", matcher=@Matcher(modifiers=Modifier.PUBLIC, condition="#{!src.parameters.isEmpty()}") ),
 			@Var(name = "repository", typeQuery = @TypeQuery(
 					annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src}")),
-					@Var(name="repositoryName", expr="#{aggregateNameLower}Repository"),
-					@Var(name="nameList", isFunction=true, expr="src.collect{it.simpleName}.join(',')", lang="GroovyScript")
+			@Var(name="repositoryName", expr="#{aggregateNameLower}Repository"),
+			@Var(name="nameList", isFunction=true, expr="src.collect{it.simpleName}.join(',')", lang="GroovyScript"),
+			@Var(name = "findGetter", isFunction=true, expr="#{cmdProperties.findByName(src.simpleName).getter}"),
+			@Var(name = "paramsFromCommand", 
+				code = @CodeFragment( 
+					iterator="#{src.parameters}" , 
+					separator = ", ", linebreak=true,  
+					cases=@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
+					code="command.#{src.findGetter.simpleName}()"))
 		})
 	public static class ApplicationServiceMethodsForAggregate {
 		
@@ -62,25 +72,40 @@ public class ApplicationServiceTemplate {
 		
 		@Clazz(src="aggregateUpdateMethods", srcVar="method", nameExpr="#{method.simpleName.toFirstUpper}Command")
 		@ClassSelector(kind=ClassSelectorKind.FQN, expr="#{genClass.enclosingElement.qualifiedName}.#{src.simpleName.toFirstUpper}Command")
-		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), allFieldsAreTemplates=true)
+		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), allFieldsAreTemplates=true,
+		 templates = @TemplateCall(value=CommandFieldTemplate.class, src="#{src.parameters}"))
 		public class Command{
 			long id; //TODO: GUID instead of DB ID !
 			
-			long version;
-			
-			@Field(src="#{src.parameters}", annotations = @Annotation(copyAnnotationsFromPackages={"javax.validation.constraints", "org.springframework.format.annotation"}))
-			private SrcType $srcElementName$;
+			long version;		
 		};
 		
 
 		@Clazz(src="aggregateCreateMethods", nameExpr="Create#{aggregateName}Command")
 		@ClassSelector(kind=ClassSelectorKind.FQN, expr="#{genClass.enclosingElement.qualifiedName}.Create#{aggregateName}Command")
-		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), allFieldsAreTemplates=true)
+		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), 
+				 templates = @TemplateCall(value=CommandFieldTemplate.class, src="#{src.parameters}"))
 		public class CreateCommand{
-			
-			@Field(src="#{src.parameters}", annotations = @Annotation(copyAnnotationsFromPackages={"javax.validation.constraints", "org.springframework.format.annotation"}))
-			private SrcType $srcElementName$;
 		};
+		
+		
+		@Template(
+				vars=@Var(name="valueObject", isFunction=true, annotation=ValueObject.class),
+				templates=@TemplateCall( activation=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
+				value=CommandFieldTemplate.class , src="#{src.asType().asElement.properties}")
+		)
+		private static class CommandFieldTemplate{
+			/**
+			 * #{src.asType().asElement.properties.toString()}
+			 *
+			 */			
+			@Field( activation=@Matcher(condition="#{src.asType().asElement.valueObject == null}"), 
+						/*, typeCategory={TypeCategory.PRIMITIVE, TypeCategory.STRING, TypeCategory.ENUM, TypeCategory.TEMPORAL, TypeCategory.MATH}*/
+					
+					annotations = @Annotation(copyAnnotationsFromPackages={"javax.validation.constraints", "org.springframework.format.annotation"}), 
+					getter=@Getter, setter=@Setter )
+			private SrcType $srcElementName$;
+		}
 		
 		
 		/**
@@ -88,16 +113,12 @@ public class ApplicationServiceTemplate {
 		 *  @japkit.bodyCode <pre>
 		 * <code>
 		 * #{aggregate.code} #{aggregateNameLower} = find#{aggregateName}(command.getId(), command.getVersion());
-		 * #{callAggregateMethod.code()} 
+		 * #{aggregateNameLower}.#{src.simpleName}(#{paramsFromCommand.code()}); 
 		 * </code>
 		 * </pre>
 		 * @param command
 		 */
-		@Method(src="aggregateUpdateMethods", vars={ @Var(name="cmdProperties", propertyFilter=@Properties(sourceClass=Command.class)),
-				@Var(name = "matchingProperty", isFunction = true, lang = "GroovyScript", expr="cmdProperties.find{src.simpleName.contentEquals(it.name)}"),
-				@Var(name = "callAggregateMethod", code = @CodeFragment(emptyIteratorCode="#{aggregateNameLower}.#{src.simpleName}();",
-						beforeIteratorCode="#{aggregateNameLower}.#{src.simpleName}(", afterIteratorCode=");", iterator="#{src.parameters}" , 
-						separator = ", ", linebreak=true,  code="\tcommand.#{src.matchingProperty.getter.simpleName}()"))})
+		@Method(src="aggregateUpdateMethods", vars={ @Var(name="cmdProperties", propertyFilter=@Properties(sourceClass=Command.class))})
 		//Das ist etwas wacklig, da für das Auflösen des ClassSelectors die passende src bereitstehen muss.
 		//Alternativ könnte man auch alles, was mit dem Command zu tun hat, als dependent rules formulieren, die dann die Command-Klasse als Gen-Element bekommen.
 		@Transactional
@@ -108,18 +129,14 @@ public class ApplicationServiceTemplate {
 		 * 
 		 *  @japkit.bodyCode <pre>
 		 * <code>
-		 * #{callAggregateConstructor.code()}
+		 * #{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(#{paramsFromCommand.code()});
 		 * #{repositoryName}.save(#{aggregateNameLower});
 		 * return #{aggregateNameLower};
 		 * </code>
 		 * </pre>
 		 * @param command
 		 */
-		@Method(src="aggregateCreateMethods", vars={ @Var(name="cmdProperties", propertyFilter=@Properties(sourceClass=CreateCommand.class)),
-				@Var(name = "matchingProperty", isFunction = true, lang = "GroovyScript", expr="cmdProperties.find{src.simpleName.contentEquals(it.name)}"),
-				@Var(name = "callAggregateConstructor", code = @CodeFragment(
-						beforeIteratorCode="#{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(", afterIteratorCode=");", iterator="#{src.parameters}" , 
-						separator = ", ", linebreak=true,  code="\tcommand.#{src.matchingProperty.getter.simpleName}()"))})
+		@Method(src="aggregateCreateMethods", vars={ @Var(name="cmdProperties", propertyFilter=@Properties(sourceClass=CreateCommand.class))})
 		//Das ist etwas wacklig, da für das Auflösen des ClassSelectors die passende src bereitstehen muss.
 		//Alternativ könnte man auch alles, was mit dem Command zu tun hat, als dependent rules formulieren, die dann die Command-Klasse als Gen-Element bekommen.
 		@Transactional

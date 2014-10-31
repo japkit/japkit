@@ -43,8 +43,8 @@ public abstract class ValueObjectTemplate {
 
 	@InnerClass(fields = @Field(src = "#{properties}", modifiers = Modifier.PRIVATE,
 			annotations = @Annotation(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
-					"org.springframework.format.annotation" }), getter = @Getter(fluent = true), setter = @Setter(fluent = true,
-					chain = true), commentFromSrc = true))
+					"org.springframework.format.annotation" }), getter = @Getter(/*fluent = true*/), setter = @Setter(/*fluent = true,
+					chain = true*/), commentFromSrc = true))
 	@ClassSelector(kind = ClassSelectorKind.INNER_CLASS_NAME, enclosing = GeneratedClass.class)
 	public static abstract class Builder {
 
@@ -58,7 +58,7 @@ public abstract class ValueObjectTemplate {
 
 	@Field(src = "#{properties}", annotations = @Annotation(copyAnnotationsFromPackages = { "javax.persistence",
 			"javax.validation.constraints", "org.springframework.format.annotation" }), commentFromSrc = true, getter = @Getter(
-			fluent = true, surroundReturnExprFragments = "defensiveCopyFragment",
+			/*fluent = true,*/ surroundReturnExprFragments = "defensiveCopyFragment",
 			commentExpr = "Getter for #{src.simpleName}. \n@returns #{src.simpleName}\n"))
 	private SrcType $srcElementName$;
 
