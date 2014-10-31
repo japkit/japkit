@@ -1,5 +1,9 @@
 package de.stefanocke.japkit.roo.japkit.domain;
 
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.JPA;
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.JSR303;
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.SPRING_FORMAT;
+
 import javax.lang.model.element.Modifier;
 import javax.persistence.Entity;
 
@@ -21,8 +25,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity.SuperclassSelector;
 		@TemplateCall(ToString.class),
 		@TemplateCall(EntityBehaviorMethods.class)},
 		fields = {@Field(src = "#{src.declaredFields}", modifiers=Modifier.PRIVATE, getter = @Getter, setter = @Setter(modifiers=Modifier.PROTECTED), annotations = @Annotation(
-				copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
-						"org.springframework.format.annotation" } ))	
+				copyAnnotationsFromPackages = { JPA, JSR303, SPRING_FORMAT } ))	
 				})
 
 public @interface JapkitEntity {

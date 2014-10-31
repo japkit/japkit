@@ -1,5 +1,8 @@
 package de.stefanocke.japkit.roo.japkit.application;
 
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.JSR303;
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.SPRING_FORMAT;
+
 import javax.annotation.Resource;
 import javax.lang.model.element.Modifier;
 
@@ -13,19 +16,16 @@ import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.Getter;
-import de.stefanocke.japkit.metaannotations.InnerClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
-import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
-import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
@@ -84,7 +84,8 @@ public class ApplicationServiceTemplate {
 		@Clazz(src="aggregateCreateMethods", nameExpr="Create#{aggregateName}Command")
 		@ClassSelector(kind=ClassSelectorKind.FQN, expr="#{genClass.enclosingElement.qualifiedName}.Create#{aggregateName}Command")
 		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), 
-				 templates = @TemplateCall(value=CommandFieldTemplate.class, src="#{src.parameters}"))
+				 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{src.parameters}"),
+			})
 		public class CreateCommand{
 		};
 		
@@ -102,7 +103,7 @@ public class ApplicationServiceTemplate {
 			@Field( activation=@Matcher(condition="#{src.asType().asElement.valueObject == null}"), 
 						/*, typeCategory={TypeCategory.PRIMITIVE, TypeCategory.STRING, TypeCategory.ENUM, TypeCategory.TEMPORAL, TypeCategory.MATH}*/
 					
-					annotations = @Annotation(copyAnnotationsFromPackages={"javax.validation.constraints", "org.springframework.format.annotation"}), 
+					annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 					getter=@Getter, setter=@Setter )
 			private SrcType $srcElementName$;
 		}

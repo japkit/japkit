@@ -1,5 +1,8 @@
 package de.stefanocke.japkit.roo.japkit.domain;
 
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.JSR303;
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.SPRING_FORMAT;
+
 import javax.lang.model.element.Modifier;
 import javax.persistence.Id;
 import javax.persistence.Version;
@@ -59,7 +62,7 @@ public abstract class EntityBehaviorMethods {
 	)
 	public EntityBehaviorMethods(
 		@Param(src = "propertiesToAssign", 
-			annotations = @Annotation(copyAnnotationsFromPackages={"javax.validation.constraints", "org.springframework.format.annotation"})) 
+			annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT})) 
 		SrcType $srcElementName$) {
 
 	}
@@ -74,7 +77,7 @@ public abstract class EntityBehaviorMethods {
 			bodyCode="assignments")
 	public void update$entityName$(
 			@Param(src = "propertiesToAssign", 
-				annotations = @Annotation(copyAnnotationsFromPackages={"javax.validation.constraints", "org.springframework.format.annotation"})) 
+				annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT})) 
 			SrcType $srcElementName$){}
 	
 
