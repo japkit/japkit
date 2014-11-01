@@ -157,7 +157,7 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 					val valueForVariable = if (annotationToRetrieve == null) {
 							value
 						} else {
-							value.retrieveAnnotationMirrors(annotationToRetrieve.qualifiedName)
+							value?.retrieveAnnotationMirrors(annotationToRetrieve.qualifiedName)
 						}
 
 					valueForVariable
