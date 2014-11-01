@@ -157,7 +157,7 @@ class TypeResolver {
 					}
 					case ClassSelectorKind.FQN : {
 						val fqn = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, null, String)
-						resolvedSelector.type = findTypeElement(fqn).asType
+						resolvedSelector.type = findTypeElement(fqn)?.asType
 						if(resolvedSelector.type == null){
 							throw new TypeElementNotFoundException(fqn)
 						}
