@@ -192,6 +192,7 @@ class ClassRule extends AbstractRule{
 	def void addAllAuxTopLevelClasses(Set<GenTypeElement> result, GenTypeElement typeElement) {
 		result.addAll(typeElement.auxTopLevelClasses)
 		typeElement.declaredTypes.forEach[addAllAuxTopLevelClasses(result, it as GenTypeElement)]
+		typeElement.auxTopLevelClasses.forEach[addAllAuxTopLevelClasses(result, it as GenTypeElement)]
 	}
 	
 	
