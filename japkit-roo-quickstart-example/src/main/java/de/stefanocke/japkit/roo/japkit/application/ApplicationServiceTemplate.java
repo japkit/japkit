@@ -27,6 +27,7 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
+import de.stefanocke.japkit.roo.japkit.application.ApplicationServiceTemplate.ApplicationServiceMethodsForAggregate.DTOforVO.DTOClass;
 import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
@@ -91,23 +92,41 @@ public class ApplicationServiceTemplate {
 		
 		
 		@Template(
-				vars=@Var(name="valueObject", isFunction=true, annotation=ValueObject.class),
-				templates=@TemplateCall( activation=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
-				value=CommandFieldTemplate.class , src="#{src.asType().asElement.properties}")
+				vars=@Var(name="valueObject", isFunction=true, expr="#{src.asType().asElement}",  annotation=ValueObject.class),
+				templates=@TemplateCall( 
+						activation=@Matcher(condition="#{src.valueObject != null}"), 
+						value=DTOforVO.class , src="#{src.asType()}"),
+						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
+								getter=@Getter, setter=@Setter)
 		)
-		private static class CommandFieldTemplate{
+		public static class CommandFieldTemplate{
+			
+			
 			/**
-			 * #{src.asType().asElement.properties.toString()}
+			 * #{src.asType().asElement.valueObject.toString()}
 			 *
 			 */			
-			@Field( activation=@Matcher(condition="#{src.asType().asElement.valueObject == null}"), 
-						/*, typeCategory={TypeCategory.PRIMITIVE, TypeCategory.STRING, TypeCategory.ENUM, TypeCategory.TEMPORAL, TypeCategory.MATH}*/
-					
-					annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
-					getter=@Getter, setter=@Setter )
+			@Field( activation=@Matcher(condition="#{src.valueObject == null}"))
 			private SrcType $srcElementName$;
+			
+			/**
+			@Field( activation=@Matcher(condition="#{src.valueObject != null}"), nameExpr="#{src.simpleName}")
+			private DTOClass dtoForVO;
+			*/
+			
 		}
 		
+		
+		@Template
+		public static class DTOforVO{
+			@Clazz(src="#{src}", srcVar="vo", nameExpr="#{vo.asElement.simpleName}DTO",
+					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.asElement.properties}")})
+			@ClassSelector(kind=ClassSelectorKind.FQN,  expr="#{genClass.enclosingElement.qualifiedName}.#{src.asType().asElement.simpleName}DTO")
+			@DTO
+			public class DTOClass{
+				
+			}
+		}
 		
 		/**
 		 * 
