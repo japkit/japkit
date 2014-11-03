@@ -23,6 +23,7 @@ import javax.lang.model.type.TypeMirror
 import static extension de.stefanocke.japkit.support.JavadocUtil.*
 import de.stefanocke.japkit.support.el.ElVariableError
 import java.util.HashSet
+import javax.lang.model.type.TypeKind
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -253,12 +254,11 @@ class RuleUtils {
 		String avPrefix, ()=>TypeMirror defaultValue) {
 
 		[  |
-			val typeFromTemplate = template?.resolveType
 			val type = metaAnnotation?.resolveType(avName.withPrefix(avPrefix), '''«avName»Args'''.withPrefix(avPrefix))
 			if (!type.isVoid) {
 				type
 			} else {
-				typeFromTemplate ?: defaultValue?.apply 
+				if(template != null){ template.resolveType ?: getNoType(TypeKind.VOID)} else defaultValue?.apply 
 			}
 		]
 	}

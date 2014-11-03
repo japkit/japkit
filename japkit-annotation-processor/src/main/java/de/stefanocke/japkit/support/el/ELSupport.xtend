@@ -154,7 +154,7 @@ class ELSupport {
 	
 	//If the expression language is not set, look on value stack at first
 	//TODO: only for legal Java identifiers?
-	def <T> T evalFromValueStack(String expr, String lang) {
+	def private <T> T evalFromValueStack(String expr, String lang) {
 		if(lang.nullOrEmpty){
 			val v = valueStack.get(expr)
 			if(v instanceof Function0<?>){
