@@ -91,6 +91,18 @@ class ElementsExtensions {
 	def declaredTypes(TypeElement type) {
 		typesIn(type.enclosedElements).sortBy[ordinalNumber]
 	}
+	
+	/**
+	 * If there is any element with an Order annotation, sort by order annotations. Otherwise use "natural" order.
+	 */
+	def enclosedElementsOrdered(TypeElement type) {
+		val elements = type.enclosedElements
+		if(elements.exists[annotationMirror(ORDER_ANNOTATION_NAME)!=null]){
+			elements.sortBy[ordinalNumber]
+		} else {
+			elements
+		}
+	}
 
 	public val ORDER_ANNOTATION_NAME = Order.name
 	

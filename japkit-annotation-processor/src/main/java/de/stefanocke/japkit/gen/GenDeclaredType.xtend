@@ -24,7 +24,15 @@ class GenDeclaredType extends GenTypeMirror implements DeclaredType {
 	}
 	
 	override toString(){
-		'''«element.qualifiedName»«FOR a : typeArguments BEFORE '<' SEPARATOR ','  AFTER '>'»«a»«ENDFOR»'''
+		'''«qualifiedName»«FOR a : typeArguments BEFORE '<' SEPARATOR ','  AFTER '>'»«a»«ENDFOR»'''
+	}
+	
+	def qualifiedName(){
+		element.qualifiedName.toString
+	}
+	
+	def simpleName(){
+		element.simpleName.toString
 	}
 	
 	new(TypeElement element){

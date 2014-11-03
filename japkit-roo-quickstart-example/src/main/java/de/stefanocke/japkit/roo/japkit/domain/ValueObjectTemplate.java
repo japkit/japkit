@@ -6,6 +6,7 @@ import javax.lang.model.element.Modifier;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 
+import de.stefanocke.japkit.annotations.Order;
 import de.stefanocke.japkit.annotations.ParamNames;
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Annotation;
@@ -41,6 +42,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 @Embeddable
 public abstract class ValueObjectTemplate {
 
+	@Order(1)
 	@InnerClass(fields = @Field(src = "#{properties}", modifiers = Modifier.PRIVATE,
 			annotations = @Annotation(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
 					"org.springframework.format.annotation" }), getter = @Getter(/*fluent = true*/), setter = @Setter(/*fluent = true,
@@ -56,6 +58,7 @@ public abstract class ValueObjectTemplate {
 		public abstract EnclosingClass build();
 	}
 
+	@Order(2)
 	@Field(src = "#{properties}", annotations = @Annotation(copyAnnotationsFromPackages = { "javax.persistence",
 			"javax.validation.constraints", "org.springframework.format.annotation" }), commentFromSrc = true, getter = @Getter(
 			/*fluent = true,*/ surroundReturnExprFragments = "defensiveCopyFragment",
@@ -66,6 +69,7 @@ public abstract class ValueObjectTemplate {
 	private ValueObjectTemplate() {
 	};
 
+	@Order(3)
 	@Constructor(vars = {
 			@Var(name = "rhs", code = @CodeFragment(code = "builder.#{src.simpleName}", surroundingFragments = "defensiveCopyFragment",
 					linebreak = false)),

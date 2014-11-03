@@ -27,6 +27,7 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.gen.GenUnresolvedType
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -666,6 +667,10 @@ class TypesRegistry {
 		genTypeElementInCurrentRoundByFqn.clear
 	}
 
+	def dispatch TypeElement asTypeElement(GenUnresolvedType genDeclType) {
+		throw new TypeElementNotFoundException(genDeclType.qualifiedName)
+	}
+	
 	def dispatch TypeElement asTypeElement(GenDeclaredType genDeclType) {
 		genDeclType.asElement as TypeElement
 	}

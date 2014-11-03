@@ -243,6 +243,10 @@ class TypesExtensions /**implements Types*/{
 			enclosingTopLevelType
 	}
 
+	def dispatch String qualifiedName(GenDeclaredType declType) {
+		declType.qualifiedName
+	}
+	
 	def dispatch String qualifiedName(DeclaredType declType) {
 		declType.asTypeElement.qualifiedName.toString
 	}
@@ -270,6 +274,10 @@ class TypesExtensions /**implements Types*/{
 		type.toString
 	}
 
+	def dispatch String simpleName(GenDeclaredType declType) {
+		declType.simpleName
+	}
+	
 	def dispatch String simpleName(DeclaredType declType) {
 		declType.asTypeElement.simpleName.toString
 	}

@@ -9,6 +9,7 @@ import javax.lang.model.element.Modifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.stefanocke.japkit.annotations.Order;
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.Case;
@@ -67,10 +68,12 @@ public class ApplicationServiceTemplate {
 		/**
 		 * #{aggregateCreateMethods.toString()}
 		 */
+		@Order(1)
 		@Field
 		@Resource
 		private Repository $repositoryName$;
 		
+		@Order(2)
 		@Clazz(src="aggregateUpdateMethods", srcVar="method", nameExpr="#{method.simpleName.toFirstUpper}Command")
 		@ClassSelector(kind=ClassSelectorKind.FQN, expr="#{genClass.enclosingElement.qualifiedName}.#{src.simpleName.toFirstUpper}Command")
 		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), allFieldsAreTemplates=true,
@@ -82,6 +85,7 @@ public class ApplicationServiceTemplate {
 		};
 		
 
+		@Order(3)
 		@Clazz(src="aggregateCreateMethods", nameExpr="Create#{aggregateName}Command")
 		@ClassSelector(kind=ClassSelectorKind.FQN, expr="#{genClass.enclosingElement.qualifiedName}.Create#{aggregateName}Command")
 		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), 
@@ -138,6 +142,7 @@ public class ApplicationServiceTemplate {
 		 * </pre>
 		 * @param command
 		 */
+		@Order(4)
 		@Method(src="aggregateUpdateMethods", vars={ @Var(name="cmdProperties", propertyFilter=@Properties(sourceClass=Command.class))})
 		//Das ist etwas wacklig, da für das Auflösen des ClassSelectors die passende src bereitstehen muss.
 		//Alternativ könnte man auch alles, was mit dem Command zu tun hat, als dependent rules formulieren, die dann die Command-Klasse als Gen-Element bekommen.
@@ -156,6 +161,7 @@ public class ApplicationServiceTemplate {
 		 * </pre>
 		 * @param command
 		 */
+		@Order(5)
 		@Method(src="aggregateCreateMethods", vars={ @Var(name="cmdProperties", propertyFilter=@Properties(sourceClass=CreateCommand.class))})
 		//Das ist etwas wacklig, da für das Auflösen des ClassSelectors die passende src bereitstehen muss.
 		//Alternativ könnte man auch alles, was mit dem Command zu tun hat, als dependent rules formulieren, die dann die Command-Klasse als Gen-Element bekommen.

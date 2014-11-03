@@ -12,6 +12,7 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.gen.GenUnresolvedType
 
 /**Resolves type references / class selectors from templates and annotations.*/
 class TypeResolver {
@@ -67,7 +68,7 @@ class TypeResolver {
 
 		
 		try {
-			var resolved =  resolveClassSelector(selector, true)
+			var resolved =  resolveClassSelector(selector)
 			
 			var type = resolved.type
 			
@@ -116,7 +117,7 @@ class TypeResolver {
 	/**
 	 * If the type element is annotated with @ClassSelector, the selector is resolved.
 	 */
-	def private ResolvedClassSelector resolveClassSelector(TypeMirror type, boolean throwTypeElementNotFound) {
+	def private ResolvedClassSelector resolveClassSelector(TypeMirror type) {
 
 		val resolvedSelector = new ResolvedClassSelector
 		resolvedSelector.type = type
@@ -149,7 +150,7 @@ class TypeResolver {
 						resolvedSelector.type = currentSrc.srcType?.singleValueType
 					case ClassSelectorKind.INNER_CLASS_NAME:
 					{	
-						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te, throwTypeElementNotFound)	
+						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te)	
 					}
 					
 					case ClassSelectorKind.EXPR : {
@@ -159,7 +160,8 @@ class TypeResolver {
 						val fqn = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, null, String)
 						resolvedSelector.type = findTypeElement(fqn)?.asType
 						if(resolvedSelector.type == null){
-							throw new TypeElementNotFoundException(fqn)
+							//Do not throw a TENFE here but allow the type to be resolved later.
+							resolvedSelector.type = new GenUnresolvedType(fqn)
 						}
 					}
 					default: {
@@ -190,7 +192,7 @@ class TypeResolver {
 		enclosing
 	}
 	
-	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector, AnnotationMirror classSelectorAnnotation, TypeElement te, boolean throwTypeElementNotFound) {
+	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector, AnnotationMirror classSelectorAnnotation, TypeElement te) {
 		resolvedSelector.enclosingTypeElement = getEnclosingTypeElement(classSelectorAnnotation)
 		if(resolvedSelector.enclosingTypeElement==null){
 			messageCollector.reportRuleError('''Could not determine enclosing type element for inner class.''')
@@ -203,8 +205,10 @@ class TypeResolver {
 			resolvedSelector.innerClassName=te.simpleName.toString
 		}
 		
-		resolvedSelector.typeElement = findInnerClass(resolvedSelector.enclosingTypeElement , resolvedSelector.innerClassName, throwTypeElementNotFound)
-		resolvedSelector.type = resolvedSelector.typeElement?.asType
+		resolvedSelector.typeElement = resolvedSelector.enclosingTypeElement.declaredTypes.findFirst[simpleName.contentEquals(resolvedSelector.innerClassName)]
+		resolvedSelector.type = if(resolvedSelector.typeElement != null)
+			resolvedSelector.typeElement.asType
+			else new GenUnresolvedType('''«resolvedSelector.enclosingTypeElement.qualifiedName».«resolvedSelector.innerClassName»''')
 	}
 	
 	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, ()=>String defaultExpr, Class<T> targetType) {
@@ -237,7 +241,7 @@ class TypeResolver {
 	def public resolveTypeAndCreateProxy(TypeMirror selector) {
 		try {
 
-			var resolved = resolveClassSelector(selector, false)
+			var resolved = resolveClassSelector(selector)
 
 			var tm = resolved.type
 			var selectorKind = resolved.kind
@@ -291,13 +295,4 @@ class TypeResolver {
 
 	}
 
-	def findInnerClass(TypeElement enclosingClass, String innerClassName, boolean mustExist) {
-		
-		val e = enclosingClass.declaredTypes.findFirst[simpleName.contentEquals(innerClassName)]
-
-		if (mustExist && e == null) {
-			throw new TypeElementNotFoundException('''«enclosingClass».«innerClassName»''');
-		}
-		e
-	}
 }

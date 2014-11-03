@@ -15,6 +15,8 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
 import de.stefanocke.japkit.metaannotations.Clazz
+import javax.lang.model.element.VariableElement
+import javax.lang.model.element.ElementKind
 
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
@@ -33,8 +35,10 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	AnnotationMirror fieldDefaults
 	AnnotationMirror methodDefaults
 	AnnotationMirror constructorDefaults
-	List<ClassRule> auxClassRules
-
+	
+	boolean allFieldsAreTemplates
+	boolean allMethodsAreTemplates
+	boolean allConstructorsAreTemplates
 	
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation, (TemplateRule)=>void registrationCallback) {
 		super(templateAnnotation, templateClass)
@@ -45,9 +49,9 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		_fieldDefaults = metaAnnotation?.value("fieldDefaults", typeof(AnnotationMirror[]))?.singleValue
 		_constructorDefaults = metaAnnotation?.value("constructorDefaults", typeof(AnnotationMirror[]))?.singleValue
 		
-		val allFieldsAreTemplates = metaAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
-		val allMethodsAreTemplates = metaAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
-		val allConstructorsAreTemplates = metaAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
+		_allFieldsAreTemplates = metaAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
+		_allMethodsAreTemplates = metaAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
+		_allConstructorsAreTemplates = metaAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
 		
 		_memberRules=newArrayList()	
 		
@@ -56,43 +60,51 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 			memberRules.add(new MembersRule(metaAnnotation))
 		}
 		
-		memberRules.addAll(
-			templateClass.declaredTypes.map[it -> annotationMirror(InnerClass)].filter[value != null].map [
-				new InnerClassRule(value, key)
-			])
-
-		memberRules.addAll(
-			templateClass.declaredFields.map[it -> annotationMirror(Field)].filter[
-				allFieldsAreTemplates || value != null].map [
-				new FieldRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, fieldDefaults), key)
-			])
-
-		//		memberRules.addAll(templateClass.declaredFields.map[it -> annotationMirror(Getter)].filter[value != null].map [
-		//			gs.createGetterRule(value, key, null)
-		//		])
-		//		
-		//		memberRules.addAll(templateClass.declaredFields.map[it -> annotationMirror(Setter)].filter[value != null].map [
-		//			gs.createSetterRule(value, key, null)
-		//		])
-		memberRules.addAll(
-			templateClass.declaredConstructors.map[it -> annotationMirror(Constructor)].filter[
-				(allConstructorsAreTemplates && !key.isDefaultConstructor) || value != null].map [
-				new ConstructorRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, constructorDefaults), key)
-			])
-
-		memberRules.addAll(
-			templateClass.declaredMethods.map[it -> annotationMirror(Method)].filter[
-				allMethodsAreTemplates || value != null].map [
-				new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(value, methodDefaults), key)
-			])
-			
-		_auxClassRules =	templateClass.declaredTypes.map[it -> annotationMirror(Clazz)].filter[value != null].map [
-				new ClassRule(value, key, true, true)
-			].toList
+		memberRules.addAll(templateClass.enclosedElementsOrdered
+			.map[createRuleForMember]
+			.filter[it!=null].toList
+		)	
 
 		_annotationsRule = ru.createAnnotationMappingRules(metaAnnotation, templateClass, null)
 		_scopeRule = ru.createScopeRule(metaAnnotation, _templateClass, null)
 
+	}
+	
+	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(TypeElement member){
+		val innerClassAnnotation = member.annotationMirror(InnerClass)
+		if(innerClassAnnotation!=null){
+			 return new InnerClassRule(innerClassAnnotation, member) 	 
+		}
+		val clazzAnnotation = member.annotationMirror(Clazz)
+		if(clazzAnnotation!=null){
+			val cr = new ClassRule(clazzAnnotation, member, true, true);
+			return	[GenTypeElement generatedClass |
+					generatedClass.auxTopLevelClasses.addAll(cr.generateClass(null, null))
+					emptyList
+				]
+		}
+		return null
+	}
+	
+	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(VariableElement member){
+		val annotation =  member.annotationMirror(Field)
+		if(annotation != null || allFieldsAreTemplates)
+			new FieldRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotation, fieldDefaults), member)
+		else null
+	}
+	
+	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(ExecutableElement member){
+		if(member.kind == ElementKind.METHOD){
+			val annotation =  member.annotationMirror(Method)
+			if(annotation != null || allMethodsAreTemplates)
+				return new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotation, methodDefaults), member)
+			
+		} else (member.kind == ElementKind.CONSTRUCTOR ){
+			val annotation =  member.annotationMirror(Constructor)
+			if(annotation != null || (allConstructorsAreTemplates && !member.isDefaultConstructor))
+				return new ConstructorRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotation, constructorDefaults), member)
+		} 
+		return null
 	}
 	
 	def private boolean isDefaultConstructor(ExecutableElement ctor){
@@ -107,7 +119,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 				addInterfaces(generatedClass)				
 				val members = memberRules.map[it.apply(generatedClass)].flatten.toList	
 							
-				auxClassRules.forEach[generatedClass.auxTopLevelClasses.addAll(it.generateClass(null, null))]
+				
 				members
 			].flatten.toList
 		
