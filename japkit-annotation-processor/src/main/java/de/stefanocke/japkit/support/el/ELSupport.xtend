@@ -121,6 +121,10 @@ class ELSupport {
 		valueStack.getRequired("src")
 	}
 	
+	def Object getCurrentSrcOptional(){
+		valueStack.get("src")
+	}	
+	
 	def Element getNearestSrcElement(){
 		valueStack.nearestSrcElement
 	}

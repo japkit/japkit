@@ -98,6 +98,7 @@ class ClassRule extends AbstractRule{
 	def List<? extends GenTypeElement> generateClass(String name, Set<GenTypeElement> generatedTopLevelClasses
 	) {
 		inRule[
+			
 			val enclosingClass = if (!isTopLevelClass) {
 					if (currentGeneratedClass == null) {
 						throw new IllegalArgumentException(
@@ -125,6 +126,7 @@ class ClassRule extends AbstractRule{
 				varRules?.forEach[it.putELVariable]
 				//superclass with type args
 				val generatedClass = createClass(enclosingClass, name)
+				
 				
 				try{
 				
@@ -161,9 +163,18 @@ class ClassRule extends AbstractRule{
 					templateRule?.apply(generatedClass)
 									
 					behaviorRule.createBehaviorDelegation(generatedClass)
-					generatedClass
+					
 				
-				} finally{
+				} catch (ProcessingException pe) {
+					reportError(pe)
+					
+				} catch (TypeElementNotFoundException tenfe) {
+					handleTypeElementNotFound(tenfe, currentAnnotatedClass)
+					
+				} catch(Exception re) {
+					reportRuleError('''Error in trigger annotation rule: «re»''')				
+				}
+				finally{
 					if(isTopLevelClass && !isAuxClass && generatedClass!=null){
 						val Set<GenTypeElement> generatedClasses = newHashSet
 						generatedClasses.add(generatedClass)	
@@ -181,6 +192,7 @@ class ClassRule extends AbstractRule{
 					}
 				
 				}
+				generatedClass
 			
 				
 			

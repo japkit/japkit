@@ -148,20 +148,22 @@ class MessageCollector {
 	}
 	
 	def reportRuleError(CharSequence msg){
-		reportRuleError(msg, null)
+		reportRuleError(currentRule, msg, null)
 	}
 	
 	def reportRuleError(CharSequence msg, CharSequence metaAnnotationValueName){
+		reportRuleError(currentRule, msg, metaAnnotationValueName)
+	}
+	
+	def reportRuleError(Rule rule, CharSequence msg, CharSequence metaAnnotationValueName){
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
-		
-		val rule = currentRule
 		
 		val metaAnnotation = rule?.metaAnnotation 
 		val metaElement = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotatedElement else rule?.metaElement   //There are rules without any meta annotation. They only have a template element.
 		
 		
 		
-		addMessage(Kind.ERROR, '''«msg?.toString» MetaElement: «metaElement», MetaAnnotation: «metaAnnotation», Src: «currentSrc»''', currentAnnotatedClass, null, null)
+		addMessage(Kind.ERROR, '''«msg?.toString» MetaElement: «metaElement», MetaAnnotation: «metaAnnotation», Src: «currentSrcOptional»''', currentAnnotatedClass, null, null)
 		
 		addMessage(Kind.ERROR, msg?.toString, metaElement, metaAnnotation, metaAnnotationValueName?.toString)
 		
