@@ -385,11 +385,20 @@ class TypesRegistry {
 	@org.eclipse.xtend.lib.Property
 	boolean throwTypeElementNotFoundExceptionWhenResolvingSimpleTypeNames = true
 
-	def tryToGetFqnForErrorType(TypeMirror errorType) {
+	def dispatch tryToGetFqnForErrorType(GenDeclaredType errorType) {
+		errorType.qualifiedName
+	}
+	
+	def dispatch tryToGetFqnForErrorType(TypeMirror errorType) {
 		tryToGetFqnForErrorTypeSimpleName(errorType.simpleNameForErrorType)
 	}
 	
-	def getSimpleNameForErrorType(TypeMirror errorType){
+	def dispatch getSimpleNameForErrorType(GenDeclaredType errorType){
+		errorType.simpleName
+	}
+	
+	def dispatch getSimpleNameForErrorType(TypeMirror errorType){
+		
 		val name = errorType.toString
 		
 		if(name.startsWith("<any?>.")){
@@ -809,7 +818,7 @@ class TypesRegistry {
 		//Always resolve a self cycle and dependency to aux classes immediately.
 		if (currentGeneratedClass != null){ 
 			val foundType = findTypeInGeneratedClass(currentGeneratedClass, fqn) 
-				?: (currentPrimaryGenClass ?: currentGeneratedClass).auxTopLevelClasses?.map[findTypeInGeneratedClass(fqn)]?.findFirst[it!=null]
+				?: (currentPrimaryGenClass ?: currentGeneratedClass).allAuxTopLevelClasses?.map[findTypeInGeneratedClass(fqn)]?.findFirst[it!=null]
 			if(foundType!=null) return foundType
 		}
 		
@@ -821,6 +830,8 @@ class TypesRegistry {
 		}
 		null
 	}
+	
+	
 	
 	def private TypeElement findTypeInGeneratedClass(GenTypeElement genClass, String typeFqnOrShortname){
 		val genClassFqn = genClass.qualifiedName.toString

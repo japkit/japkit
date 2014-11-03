@@ -121,11 +121,17 @@ class ClassRule extends AbstractRule{
 						throw new IllegalArgumentException(
 							"currentGeneratedClass must be available when it is a rule for an aux class.")
 					}
-			 		currentPrimaryGenClass = currentGeneratedClass
+					if(currentPrimaryGenClass == null){
+			 			currentPrimaryGenClass = currentGeneratedClass		 		
+			 		}
 			 	}
 				varRules?.forEach[it.putELVariable]
 				//superclass with type args
 				val generatedClass = createClass(enclosingClass, name)
+				if(isIsAuxClass){
+					//early registration of aux classes to allow other aux classes to find them.
+					currentPrimaryGenClass.auxTopLevelClasses.add(generatedClass)
+				}
 				
 				
 				try{

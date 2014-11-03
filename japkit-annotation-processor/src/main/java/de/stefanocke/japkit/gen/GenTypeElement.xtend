@@ -21,6 +21,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
 import java.util.Set
+import java.util.HashSet
 
 @FieldsFromInterface
 abstract class GenTypeElement extends GenParameterizable implements TypeElement {
@@ -31,7 +32,12 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	//auxiliary top level classes that have been generated for this GenTypeElement
 	@Property
 	Set<GenTypeElement> auxTopLevelClasses = newHashSet
-		
+
+	def Set<GenTypeElement> allAuxTopLevelClasses(){
+		val result = new HashSet(auxTopLevelClasses)
+		auxTopLevelClasses.forEach[result.addAll(it.allAuxTopLevelClasses)]
+		result
+	}	
 
 	@Derived
 	override getQualifiedName(){
