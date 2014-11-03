@@ -519,9 +519,11 @@ class TypesRegistry {
 				return;
 			}
 			registerTypeDependencyForAnnotatedClassByFqn(annotatedClassFqn, typeFqn,
-				'''The type «type» already existes but might be re-generated during incremental build.''')
+				'''The type element for «type» already existes but might be re-generated during incremental build.''')
 		} catch (TypeElementNotFoundException e) {
-			handleTypeElementNotFound('''Type «type» not found.''', rawType.toString, annotatedClass)
+			//handleTypeElementNotFound('''Type «type» not found.''', rawType.toString, annotatedClass)
+			registerTypeDependencyForAnnotatedClassByFqn(annotatedClass.qualifiedName.toString, e.fqn, 
+				'''TypeElement for «type» not found. Using «e.fqn» as short name or fqn for dependency registration.''')
 		}
 	}
 
