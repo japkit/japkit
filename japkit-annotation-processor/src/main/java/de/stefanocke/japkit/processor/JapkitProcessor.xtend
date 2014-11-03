@@ -529,19 +529,23 @@ class JapkitProcessor extends AbstractProcessor {
 	def writeSourceFileAndCommitTypeElement(GenTypeElement genTypeElement, TypeElement original,
 		Set<GenTypeElement> writtenTypeElementsInCurrentRound) {
 
-		try {
-			if (writeSourceFile(genTypeElement, original)) {
-				writtenTypeElementsInCurrentRound.add(genTypeElement)
+		scope[
+			currentAnnotatedClass = original  //required for error reporting
+			try {
+				if (writeSourceFile(genTypeElement, original)) {
+					writtenTypeElementsInCurrentRound.add(genTypeElement)
+				}
+				commitGeneratedTypeElement(genTypeElement)
+	
+			} catch (TypeElementNotFoundException e) {
+				handleTypeElementNotFound(
+					'''Type «e.fqn» not found when writing source file for «genTypeElement.qualifiedName»''', e.fqn,
+					original)
+	
+				throw e
 			}
-			commitGeneratedTypeElement(genTypeElement)
-
-		} catch (TypeElementNotFoundException e) {
-			handleTypeElementNotFound(
-				'''Type «e.fqn» not found when writing source file for «genTypeElement.qualifiedName»''', e.fqn,
-				original)
-
-			throw e
-		}
+			null
+		]
 	}
 
 	def Map<GenTypeElement, TypeElement> processAnnotatedClass(TypeElement annotatedClass) {
