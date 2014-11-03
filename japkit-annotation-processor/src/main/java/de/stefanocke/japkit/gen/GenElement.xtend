@@ -33,7 +33,7 @@ abstract class GenElement implements Element{
 	}
 	
 	override asType() {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+		throw new UnsupportedOperationException("asType() is not supported for "+this)
 	}
 	
 	override <A extends Annotation> A getAnnotation(Class<A> annotationType){
