@@ -677,6 +677,9 @@ class TypesRegistry {
 	}
 
 	def dispatch TypeElement asTypeElement(GenUnresolvedType genDeclType) {
+		//May be it exists now. Try to find it.
+		val te = findTypeElement(genDeclType.qualifiedName) 
+		if(te!=null) return te
 		throw new TypeElementNotFoundException(genDeclType.qualifiedName)
 	}
 	
