@@ -17,6 +17,9 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singl
 import de.stefanocke.japkit.metaannotations.Clazz
 import javax.lang.model.element.VariableElement
 import javax.lang.model.element.ElementKind
+import java.util.Map
+import de.stefanocke.japkit.metaannotations.CodeFragment
+import javax.lang.model.element.Element
 
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
@@ -39,6 +42,8 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	boolean allFieldsAreTemplates
 	boolean allMethodsAreTemplates
 	boolean allConstructorsAreTemplates
+	
+	Map<String,?> functions
 	
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation, (TemplateRule)=>void registrationCallback) {
 		super(templateAnnotation, templateClass)
@@ -68,6 +73,23 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		_annotationsRule = ru.createAnnotationMappingRules(metaAnnotation, templateClass, null)
 		_scopeRule = ru.createScopeRule(metaAnnotation, _templateClass, null)
 
+		_functions = newHashMap( 		
+			templateClass.enclosedElementsOrdered
+				.map[createFunctionForMember]
+				.filter[it!=null])
+		
+	}
+	
+	def private dispatch createFunctionForMember(TypeElement member){
+		val codeFragmentAnnotation = member.annotationMirror(CodeFragment)
+		if(codeFragmentAnnotation!=null){
+			return member.simpleName.toString.toFirstLower -> new CodeFragmentRule(codeFragmentAnnotation)
+		}
+		null
+	}
+	
+	def private dispatch createFunctionForMember(Element member){
+		null
 	}
 	
 	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(TypeElement member){
@@ -106,6 +128,9 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		} 
 		return null
 	}
+	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(Element member){
+		null
+	}
 	
 	def private boolean isDefaultConstructor(ExecutableElement ctor){
 		ctor.parameters.nullOrEmpty
@@ -115,12 +140,10 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		inRule[
 			
 			scopeRule.apply [
+				valueStack.putAll(functions)
 				generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
 				addInterfaces(generatedClass)				
-				val members = memberRules.map[it.apply(generatedClass)].flatten.toList	
-							
-				
-				members
+				memberRules.map[it.apply(generatedClass)].flatten.toList	
 			].flatten.toList
 		
 		]
