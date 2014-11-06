@@ -8,18 +8,18 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import static extension de.stefanocke.japkit.support.RuleUtils.*
 
 @Data
-class CodeFragmentRules implements Function0<CharSequence>{
+class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
 	val List<CodeFragmentRule> rules
 	
 	new(Iterable<AnnotationMirror> metaAnnotations){
 		_rules = metaAnnotations.map[new CodeFragmentRule(it)].toList
 	} 
 
-	def code(){
+	override code(){
 		rules.map[it.code()].join
 	}
 	
-	def CharSequence surround(CharSequence surrounded){
+	override CharSequence surround(CharSequence surrounded){
 		var result = surrounded
 		for(r : rules) {
 			result = r.surround(result)
@@ -34,7 +34,7 @@ class CodeFragmentRules implements Function0<CharSequence>{
 		
 		var result = surrounded
 		for(n : fragmentNames) {
-			val fragments = valueStack.getRequired(n) as  CodeFragmentRules
+			val fragments = valueStack.getRequired(n) as  ICodeFragmentRule
 			result = fragments.surround(surrounded)		
 		}
 		result
@@ -45,7 +45,7 @@ class CodeFragmentRules implements Function0<CharSequence>{
 		if(fragmentNames==null) return ''
 		val extension ElSupport = ExtensionRegistry.get(ELSupport)
 		
-		fragmentNames.map[valueStack.getRequired(it) as  CodeFragmentRules].map[it.code].join
+		fragmentNames.map[valueStack.getRequired(it) as ICodeFragmentRule].map[it.code].join
 			
 	}
 	

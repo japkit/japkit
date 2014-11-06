@@ -81,7 +81,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	
 	private def stringFromAnnotationOrMap(AnnotationMirror metaAnnotation, Map<String, String> map, String name){
 		 val av = metaAnnotation?.value(name, String)
-		 if(av.nullOrEmpty) map?.get(name) else av
+		 (if(av.nullOrEmpty) map?.get(name) else av) ?: ""
 	}
 	
 	private static def withPrefix(String name, String prefix){
@@ -192,7 +192,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 		]?.value ?: bodyExpr
 		
 		
-		eval(bodyExprToUse, lang, String, '''Error in code body expression.''',	errorResult).withLinebreakIfRequested
+		eval(bodyExprToUse, lang, CharSequence, "Error in code body expression.",	errorResult).withLinebreakIfRequested
 	}
 	
 	private def CharSequence withLinebreakIfRequested(CharSequence cs){

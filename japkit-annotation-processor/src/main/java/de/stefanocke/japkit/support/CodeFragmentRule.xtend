@@ -3,7 +3,7 @@ package de.stefanocke.japkit.support
 import javax.lang.model.element.AnnotationMirror
 
 @Data
-class CodeFragmentRule extends CodeRule {
+class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 	
 	ElementMatcher[] activation
 	
@@ -19,7 +19,7 @@ class CodeFragmentRule extends CodeRule {
 	}
 	
 	
-	def CharSequence surround(CharSequence surrounded){
+	override CharSequence surround(CharSequence surrounded){
 		try{
 			valueStack.put("surrounded", surrounded)
 			val result = code()
