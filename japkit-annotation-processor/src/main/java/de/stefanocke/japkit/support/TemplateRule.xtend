@@ -83,7 +83,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	def private dispatch createFunctionForMember(TypeElement member){
 		val codeFragmentAnnotation = member.annotationMirror(CodeFragment)
 		if(codeFragmentAnnotation!=null){
-			return member.simpleName.toString.toFirstLower -> new CodeFragmentRule(codeFragmentAnnotation)
+			return member.simpleName.toString.toFirstLower -> new CodeFragmentRule(codeFragmentAnnotation, member)
 		}
 		null
 	}

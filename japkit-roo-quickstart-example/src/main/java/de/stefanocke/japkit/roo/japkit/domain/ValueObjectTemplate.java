@@ -1,5 +1,9 @@
 package de.stefanocke.japkit.roo.japkit.domain;
 
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.JPA;
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.JSR303;
+import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.SPRING_FORMAT;
+
 import java.util.Date;
 
 import javax.lang.model.element.Modifier;
@@ -20,33 +24,40 @@ import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
-import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 
 @RuntimeMetadata
-@Template(vars = {
-		@Var(name = "validationFragment", code = @CodeFragment(activation = @Matcher(annotations = NotNull.class),
-				code = "if(#{src.simpleName}==null){\n"
-						+ "  throw new IllegalArgumentException(\"#{src.simpleName} must not be null.\");\n" + "}")),
-		@Var(name = "defensiveCopyFragment", code = @CodeFragment(imports = Date.class, cases = { @Case(matcher = @Matcher(
-				type = Date.class), expr = "new Date(#{surrounded}.getTime())") }, linebreak = false))
-// ,
-// @Var(name = "tryFinallyTest", code = @CodeFragment(expr="try {\n" +
-// "#{surrounded}" +
-// "} finally {\n" +
-// "}\n"))
-		})
+@Template()
 @Embeddable
 public abstract class ValueObjectTemplate {
+	/**
+	 * @japkit.code <pre>
+	 * <code>
+	 * if(#{src.simpleName}==null){
+	 * 	throw new IllegalArgumentException("#{src.simpleName} must not be null.");
+	 * }
+	 * 
+	 * </code>
+	 * </pre>
+	 */
+	@CodeFragment(activation = @Matcher(annotations = NotNull.class))
+	static class ValidationFragment{}
+	
+	@CodeFragment(imports = Date.class,
+			cases = { @Case(matcher = @Matcher(type = Date.class),
+					expr = "new Date(#{surrounded}.getTime())") },
+			linebreak = false)
+	static class DefensiveCopyFragment {
+	}
 
 	@Order(1)
 	@InnerClass(fields = @Field(src = "#{properties}", modifiers = Modifier.PRIVATE,
-			annotations = @Annotation(copyAnnotationsFromPackages = { "javax.persistence", "javax.validation.constraints",
-					"org.springframework.format.annotation" }), getter = @Getter(/*fluent = true*/), setter = @Setter(/*fluent = true,
-					chain = true*/), commentFromSrc = true))
+			annotations = @Annotation(copyAnnotationsFromPackages = { JPA, JSR303, SPRING_FORMAT }), 
+				getter = @Getter(/*fluent = true*/), setter = @Setter(/*fluent = true,*/
+					chain = true), commentFromSrc = true))
 	@ClassSelector(kind = ClassSelectorKind.INNER_CLASS_NAME, enclosing = GeneratedClass.class)
 	public static abstract class Builder {
 
@@ -59,8 +70,8 @@ public abstract class ValueObjectTemplate {
 	}
 
 	@Order(2)
-	@Field(src = "#{properties}", annotations = @Annotation(copyAnnotationsFromPackages = { "javax.persistence",
-			"javax.validation.constraints", "org.springframework.format.annotation" }), commentFromSrc = true, getter = @Getter(
+	@Field(src = "#{properties}", annotations = @Annotation(copyAnnotationsFromPackages = { JPA, JSR303, SPRING_FORMAT }), 
+		commentFromSrc = true, getter = @Getter(
 			/*fluent = true,*/ surroundReturnExprFragments = "defensiveCopyFragment",
 			commentExpr = "Getter for #{src.simpleName}. \n@returns #{src.simpleName}\n"))
 	private SrcType $srcElementName$;
@@ -68,13 +79,19 @@ public abstract class ValueObjectTemplate {
 	@Constructor(bodyCode = "//Some ctor code")
 	private ValueObjectTemplate() {
 	};
+	
+	
+
+	@CodeFragment(code = "builder.#{src.simpleName}", surroundingFragments = "defensiveCopyFragment",
+			linebreak = false)
+	static class Rhs{}
+	
+	@CodeFragment(code = "this.#{src.simpleName} = #{rhs.code()};",
+			beforeFragments = "validationFragment")
+	static class Assignment{}
 
 	@Order(3)
-	@Constructor(vars = {
-			@Var(name = "rhs", code = @CodeFragment(code = "builder.#{src.simpleName}", surroundingFragments = "defensiveCopyFragment",
-					linebreak = false)),
-			@Var(name = "assignment", code = @CodeFragment(code = "this.#{src.simpleName} = #{rhs.code()};",
-					beforeFragments = "validationFragment")) }, bodyIterator = "properties", bodyCode = "assignment")
+	@Constructor(bodyIterator = "properties", bodyCode = "assignment")
 	@ParamNames("builder")
 	private ValueObjectTemplate(Builder builder) {
 	}

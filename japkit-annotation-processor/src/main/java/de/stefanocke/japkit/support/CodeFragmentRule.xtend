@@ -1,14 +1,15 @@
 package de.stefanocke.japkit.support
 
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Element
 
 @Data
 class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 	
 	ElementMatcher[] activation
 	
-	new(AnnotationMirror metaAnnotation) {
-		super(metaAnnotation, '')
+	new(AnnotationMirror metaAnnotation, Element metaElement) {
+		super(metaAnnotation, metaElement, '')
 		_activation = metaAnnotation.elementMatchers("activation")
 	}
 	

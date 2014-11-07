@@ -32,12 +32,12 @@ public abstract class ToString {
 			)
 	public abstract String toString();
 	
-	//idea: Fragments could be written as classes:
-	
-	/**
-	 * @japkit.expr <code>append("#{src.simpleName}", #{src.getter.simpleName}(), false).</code>
-	 */
-	@CodeFragment(activation=@Matcher(typeCategory=TypeCategory.COLLECTION))
-	class AppendCollection{}
+//	//idea: Fragments could be written as classes:
+//	
+//	/**
+//	 * @japkit.expr <code>append("#{src.simpleName}", #{src.getter.simpleName}(), false).</code>
+//	 */
+//	@CodeFragment(activation=@Matcher(typeCategory=TypeCategory.COLLECTION))
+//	class AppendCollection{}
 	
 }

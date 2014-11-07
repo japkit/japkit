@@ -12,7 +12,7 @@ class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
 	val List<CodeFragmentRule> rules
 	
 	new(Iterable<AnnotationMirror> metaAnnotations){
-		_rules = metaAnnotations.map[new CodeFragmentRule(it)].toList
+		_rules = metaAnnotations.map[new CodeFragmentRule(it, null)].toList
 	} 
 
 	override code(){

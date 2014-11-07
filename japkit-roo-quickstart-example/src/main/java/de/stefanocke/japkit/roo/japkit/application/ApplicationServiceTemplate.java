@@ -47,13 +47,11 @@ public class ApplicationServiceTemplate {
 					annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src}")),
 			@Var(name="repositoryName", expr="#{aggregateNameLower}Repository"),
 			@Var(name="nameList", isFunction=true, expr="src.collect{it.simpleName}.join(',')", lang="GroovyScript"),
+			@Var(name="valueObject", isFunction=true, annotation=ValueObject.class),
 			@Var(name = "findGetter", isFunction=true, expr="#{cmdProperties.findByName(src.simpleName).getter}"),
-			@Var(name = "paramsFromCommand", 
-				code = @CodeFragment( 
-					iterator="#{src.parameters}" , 
-					separator = ", ", linebreak=true,  
-					cases=@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
-					code="command.#{src.findGetter.simpleName}()"))
+					
+			
+			
 		})
 	public static class ApplicationServiceMethodsForAggregate {
 		
@@ -68,12 +66,12 @@ public class ApplicationServiceTemplate {
 		/**
 		 * #{aggregateCreateMethods.toString()}
 		 */
-		@Order(1)
+		@Order(0)
 		@Field
 		@Resource
 		private Repository $repositoryName$;
 		
-		@Order(2)
+		@Order(1)
 		@Clazz(src="aggregateUpdateMethods", srcVar="method", nameExpr="#{method.simpleName.toFirstUpper}Command")
 		@ClassSelector(kind=ClassSelectorKind.FQN, expr="#{genClass.enclosingElement.qualifiedName}.#{src.simpleName.toFirstUpper}Command")
 		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), allFieldsAreTemplates=true,
@@ -83,7 +81,6 @@ public class ApplicationServiceTemplate {
 			
 			long version;		
 		};
-		
 
 		@Order(3)
 		@Clazz(src="aggregateCreateMethods", nameExpr="Create#{aggregateName}Command")
@@ -95,10 +92,8 @@ public class ApplicationServiceTemplate {
 		};
 		
 		
-		@Template(
-				vars=@Var(name="valueObject", isFunction=true, expr="#{src.asType().asElement}",  annotation=ValueObject.class),
-				templates=@TemplateCall( 
-						activation=@Matcher(condition="#{src.valueObject != null}"), 
+		@Template(templates=@TemplateCall( 
+						activation=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
 						value=DTOforVO.class , src="#{src.asType()}"),
 						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 								getter=@Getter, setter=@Setter)
@@ -110,27 +105,49 @@ public class ApplicationServiceTemplate {
 			 * #{src.asType().asElement.valueObject.toString()}
 			 *
 			 */			
-			@Field( activation=@Matcher(condition="#{src.valueObject == null}"))
+			@Field( activation=@Matcher(condition="#{src.asType().asElement.valueObject == null}"))
 			private SrcType $srcElementName$;
 			
-			/**
-			@Field( activation=@Matcher(condition="#{src.valueObject != null}"), nameExpr="#{src.simpleName}")
+			
+			@Field( activation=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), nameExpr="#{src.simpleName}")
 			private DTOClass dtoForVO;
-			*/
+			
 			
 		}
 		
 		
-		@Template
+		@Template(src="#{src.asElement}", srcVar="vo")
 		public static class DTOforVO{
-			@Clazz(src="#{src}", srcVar="vo", nameExpr="#{vo.asElement.simpleName}DTO",
-					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.asElement.properties}")})
+			@Clazz( nameExpr="#{vo.simpleName}DTO",
+					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
 			@ClassSelector(kind=ClassSelectorKind.FQN,  expr="#{genClass.enclosingElement.qualifiedName}.#{src.asType().asElement.simpleName}DTO")
 			@DTO
 			public class DTOClass{
 				
 			}
+			
+//			@ClassSelector(expr="#{vo.asType()}") 
+//			class VO{}
+//			
+//			@SuppressWarnings("unused")
+//			private VO $srcElementName$FromDTO(){return null;}
 		}
+		
+		@CodeFragment( 
+					iterator="#{src.parameters}" , 
+					separator = ", ", linebreak=true,  
+					cases={
+							@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
+							@Case(matcher=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
+								expr="new #{src.asType().code}.Builder().build()" )
+					},
+					code="command.#{src.findGetter.simpleName}()")
+		static class ParamsFromCommand{}
+		
+		//Hier braucht man 2 params (src und target). Und tschüss...
+		@CodeFragment()
+		static class FluentVOSettersFromDTO{}
+		
 		
 		/**
 		 * 
