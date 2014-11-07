@@ -45,7 +45,7 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	String lang
 	Class<?> type
 	Set<TypeMirror> requiredTriggerAnnotation
-	CodeFragmentRules codeFragments
+
 
 	//TODO: Das könnten auch direkt PropertyFilter sein, aber im Moment ist die Trigger Anntoation Teil ihres State...
 	AnnotationMirror[] propertyFilterAnnotations
@@ -76,9 +76,7 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		
 		_requiredTriggerAnnotation = elVarAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
 
-		val codeFragmentAnnotations = elVarAnnotation.value("code", typeof(AnnotationMirror[]))
 		
-		_codeFragments = if(codeFragmentAnnotations.empty) null else new CodeFragmentRules(codeFragmentAnnotations)
 	}
 
 	def void putELVariable() {
@@ -125,8 +123,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 
 					} else if (typeQuery != null) {
 						evalTypeQuery(typeQuery)
-					} else if (codeFragments != null) {
-						codeFragments
 					} else {
 						value
 					}

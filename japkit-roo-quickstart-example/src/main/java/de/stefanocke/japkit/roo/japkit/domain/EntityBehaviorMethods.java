@@ -21,9 +21,11 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 
 @Template(vars = {@Var(name = "superconstructors",
 		expr = "#{genClass.superclass.asElement.declaredConstructors}"),
-		@Var(name="entityName", expr="#{genClass.simpleName}"),
-		@Var(name = "assignments", code = @CodeFragment(iterator = "propertiesToAssign", code = "#{src.setter.simpleName}(#{src.simpleName});")) })
+		@Var(name="entityName", expr="#{genClass.simpleName}")})
 public abstract class EntityBehaviorMethods {
+	
+	@CodeFragment(iterator = "propertiesToAssign", code = "#{src.setter.simpleName}(#{src.simpleName});")
+	static class assignments{}
 	/**
 	 * Default constructor for JPA. //TODO: Make protected as soon as contollers support that.
 	 */

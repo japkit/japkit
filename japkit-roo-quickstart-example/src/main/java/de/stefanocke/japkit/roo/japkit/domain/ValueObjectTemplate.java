@@ -39,7 +39,6 @@ public abstract class ValueObjectTemplate {
 	 * if(#{src.simpleName}==null){
 	 * 	throw new IllegalArgumentException("#{src.simpleName} must not be null.");
 	 * }
-	 * 
 	 * </code>
 	 * </pre>
 	 */
@@ -76,21 +75,18 @@ public abstract class ValueObjectTemplate {
 			commentExpr = "Getter for #{src.simpleName}. \n@returns #{src.simpleName}\n"))
 	private SrcType $srcElementName$;
 
+	@Order(3)
 	@Constructor(bodyCode = "//Some ctor code")
 	private ValueObjectTemplate() {
 	};
 	
-	
-
-	@CodeFragment(code = "builder.#{src.simpleName}", surroundingFragments = "defensiveCopyFragment",
-			linebreak = false)
+	@CodeFragment(code = "builder.#{src.simpleName}", surroundingFragments = "defensiveCopyFragment", linebreak = false)
 	static class Rhs{}
 	
-	@CodeFragment(code = "this.#{src.simpleName} = #{rhs.code()};",
-			beforeFragments = "validationFragment")
+	@CodeFragment(code = "this.#{src.simpleName} = #{rhs.code()};",	beforeFragments = "validationFragment")
 	static class Assignment{}
 
-	@Order(3)
+	@Order(4)
 	@Constructor(bodyIterator = "properties", bodyCode = "assignment")
 	@ParamNames("builder")
 	private ValueObjectTemplate(Builder builder) {

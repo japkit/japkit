@@ -1,9 +1,5 @@
 package de.stefanocke.japkit.metaannotations;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.Modifier;
-
-import de.stefanocke.japkit.metaannotations.classselectors.None;
 
 /**
  * 
@@ -24,7 +20,12 @@ public @interface CodeFragment {
 	 */
 	Matcher[] activation() default {};
 
-	
+	/**
+	 * EL Variables within the scope of the code fragment.
+	 * 
+	 * @return
+	 */
+	Var[] vars() default {};
 
 	/**
 	 * Classes to imported for the code. Allows to use short class names

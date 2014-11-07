@@ -139,13 +139,18 @@ public class ApplicationServiceTemplate {
 					cases={
 							@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
 							@Case(matcher=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
-								expr="new #{src.asType().code}.Builder().build()" )
+								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO.code()}.build()" )
 					},
 					code="command.#{src.findGetter.simpleName}()")
 		static class ParamsFromCommand{}
 		
 		//Hier braucht man 2 params (src und target). Und tschüss...
-		@CodeFragment()
+		@CodeFragment(vars={
+				@Var(name="dtoGetter", expr="#{src.findGetter}"),
+				@Var(name="dto", expr="#{dtoGetter.returnType.asElement}"),
+				}, 
+				iterator="#{dto.properties}" ,
+				code=".#{src.setter.simpleName}(command.#{dtoGetter.simpleName}().#{src.getter.simpleName}())") //Quick&Dirty
 		static class FluentVOSettersFromDTO{}
 		
 		

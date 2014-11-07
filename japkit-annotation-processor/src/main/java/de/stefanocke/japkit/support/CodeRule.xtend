@@ -22,6 +22,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	val protected extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	val protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	val protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val protected extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	
 
 	Element template

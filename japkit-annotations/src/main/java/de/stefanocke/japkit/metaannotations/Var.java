@@ -76,11 +76,6 @@ public @interface Var {
 	 */
 	Class<? extends Annotation>[] annotation() default {};
 
-	/**
-	 * Puts a code fragment on the value stack. It can then  be used in code bodies by calling its code() method.
-	 * @return
-	 */
-	CodeFragment[] code() default {}; 
 	
 	@interface List {
 		Var[] value();

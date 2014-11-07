@@ -63,7 +63,7 @@ class TriggerAnnotationRule extends AbstractRule{
 					handleTypeElementNotFound(tenfe, annotatedClass)
 					
 				} catch(Throwable re) {
-					reportRuleError('''Error in trigger annotation rule: «re»''')				
+					reportRuleError('''Error in trigger annotation rule: «re» '''+ re.stackTrace.join("\n"))				
 				} 
 				generatedClasses
 			]
