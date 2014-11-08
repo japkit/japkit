@@ -4,7 +4,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import de.stefanocke.japkit.metaannotations.Case;
-import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Properties;
@@ -28,8 +27,8 @@ public abstract class ToString {
 			},
 			bodyCode = "append(\"#{src.simpleName}\", #{src.getter.simpleName}()).",
 			bodyAfterIteratorCode = "toString();",
-			bodyEmptyIteratorCode = "return super.toString();" , bodyLinebreak=true
-			
+			bodyEmptyIteratorCode = "return super.toString();",
+			bodyIndentAfterLinebreak=true
 			)
 	public abstract String toString();
 	

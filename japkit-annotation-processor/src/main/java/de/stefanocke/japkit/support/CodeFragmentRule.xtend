@@ -17,23 +17,14 @@ class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 		_scopeRule = createScopeRule(metaAnnotation, metaElement, null)
 	}
 	
-	override CharSequence code(){
-		code(false)
-	}
 	
-	def CharSequence code(boolean indent){
+	override CharSequence code(){
 		//val indentation = (valueStack.get("indentation") as CharSequence ?: '') + '\t'
 		scopeRule.apply[
 			if(activation.nullOrEmpty || activation.exists[matches(currentSrcElement)]){	
-					
-				//valueStack.put("indentation", indentation)
 				
-				val code = super.code()
-				if(indent){
-					val sc = new StringConcatenation()
-					sc.append(code, '\t')	
-					sc				
-				} else code
+				super.code()
+				
 			} else ''		
 		].head    //TODO: use scope for iteration instead of "bodyIterator" ? 
 	}

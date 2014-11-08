@@ -152,6 +152,7 @@ public @interface Constructor {
 	 */
 	boolean bodyLinebreak() default true;
 
+	boolean bodyIndentAfterLinebreak() default false;
 	/**
 	 * 
 	 * @return an expression for the code to be generated before the repetitive

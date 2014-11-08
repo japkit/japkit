@@ -1,5 +1,7 @@
 package de.stefanocke.japkit.roo.petclinic.domain;
 
+import java.util.Date;
+
 import javax.validation.constraints.NotNull;
 
 import de.stefanocke.japkit.annotations.Order;
@@ -33,6 +35,9 @@ public class AddressDef {
 	 */
 	@Order(3)
 	String state;
+	
+	@Order(4)
+	Date someDate;
 	
 	
 }

@@ -89,6 +89,8 @@ public @interface CodeFragment {
 	 * @return
 	 */
 	boolean linebreak() default true;
+	
+	boolean indentAfterLinebreak() default true;
 
 	/**
 	 * 

@@ -47,8 +47,7 @@ public abstract class ValueObjectTemplate {
 	
 	@CodeFragment(imports = Date.class,
 			cases = { @Case(matcher = @Matcher(type = Date.class),
-					expr = "new Date(#{surrounded}.getTime())") },
-			linebreak = false)
+					expr = "new Date(#{surrounded}.getTime())") })
 	static class DefensiveCopyFragment {
 	}
 
@@ -79,13 +78,13 @@ public abstract class ValueObjectTemplate {
 	private ValueObjectTemplate() {
 	};
 	
-	@CodeFragment(code = "builder.#{src.simpleName}", surroundingFragments = "defensiveCopyFragment", linebreak = false)
+	@CodeFragment(code = "builder.#{src.simpleName}", surroundingFragments = "defensiveCopyFragment")
 	static class Rhs{}
 	
 	@CodeFragment(code = "/**after*/")
 	static class After{};
 	
-	@CodeFragment(code = "this.#{src.simpleName} = #{rhs.code()};",	beforeFragments = "validationFragment", afterFragments="after")
+	@CodeFragment(code = "this.#{src.simpleName} = #{rhs.code()};",	beforeFragments = "validationFragment")
 	static class Assignment{}
 
 	@Order(4)

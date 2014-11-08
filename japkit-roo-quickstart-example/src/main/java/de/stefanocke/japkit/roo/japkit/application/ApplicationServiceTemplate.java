@@ -129,11 +129,11 @@ public class ApplicationServiceTemplate {
 		
 		@CodeFragment( 
 					iterator="#{src.parameters}" , 
-					separator = ",", linebreak=true,  
+					separator = ",",  
 					cases={
 							@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
 							@Case(matcher=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
-								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO.code(true)}.build()" )
+								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO.code()}.build()" )
 					},
 					code="command.#{src.findGetter.simpleName}()")
 		static class ParamsFromCommand{}
@@ -152,7 +152,7 @@ public class ApplicationServiceTemplate {
 		 *  @japkit.bodyCode <pre>
 		 * <code>
 		 * #{aggregate.code} #{aggregateNameLower} = find#{aggregateName}(command.getId(), command.getVersion());
-		 * #{aggregateNameLower}.#{src.simpleName}(#{paramsFromCommand.code(true)}); 
+		 * #{aggregateNameLower}.#{src.simpleName}(#{paramsFromCommand.code()}); 
 		 * </code>
 		 * </pre>
 		 * @param command
@@ -169,7 +169,7 @@ public class ApplicationServiceTemplate {
 		 * 
 		 *  @japkit.bodyCode <pre>
 		 * <code>
-		 * #{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(#{paramsFromCommand.code(true)});
+		 * #{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(#{paramsFromCommand.code()});
 		 * #{repositoryName}.save(#{aggregateNameLower});
 		 * return #{aggregateNameLower};
 		 * </code>

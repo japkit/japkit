@@ -183,6 +183,8 @@ public @interface Method {
 	 * @return
 	 */
 	boolean bodyLinebreak() default true;
+	
+	boolean bodyIndentAfterLinebreak() default false;
 
 	/**
 	 * 

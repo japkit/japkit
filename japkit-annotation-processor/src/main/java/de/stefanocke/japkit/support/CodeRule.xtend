@@ -39,6 +39,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	String emptyExpr
 	(CharSequence)=>CharSequence defaultFragmentsRule
 	boolean linebreak
+	boolean indentAfterLinebreak
 	
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
@@ -77,6 +78,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 		
 		
 		_linebreak = metaAnnotation?.value("linebreak".withPrefix(avPrefix), boolean) ?: false
+		_indentAfterLinebreak = metaAnnotation?.value("indentAfterLinebreak".withPrefix(avPrefix), boolean) ?: false
 		
 		_defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
 	}
@@ -149,6 +151,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	}
 	
 	private def CharSequence code(EmitterContext ec) {
+		
 		inRule[
 			if(bodyExpr.nullOrEmpty && bodyCases.empty) return null //Really?
 	
@@ -164,17 +167,16 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 						val bodyIterator = eval(iteratorExpr, iteratorLang, Iterable,
 							'''Error in code body iterator expression.''', emptyList)
 						if (!bodyIterator.nullOrEmpty) {
-							val before = eval(beforeExpr, lang, String,
+							val before = eval(beforeExpr, lang, CharSequence,
 								'''Error in code body before expression.''', '').withLinebreak(linebreak)
-							val after = eval(afterExpr, lang, String,
+							val after = eval(afterExpr, lang, CharSequence,
 								'''Error in code body after expression.''', '').withLinebreak(linebreak)
-							'''
-								«FOR e : bodyIterator 
+							'''«FOR e : bodyIterator 
 									BEFORE before 
 									SEPARATOR separator + if(linebreak) StringConcatenation.DEFAULT_LINE_DELIMITER else ''
-									AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''
+									AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''.indent
 						} else {
-							eval(emptyExpr, lang, String, '''Error in code body empty expression.''',
+							eval(emptyExpr, lang, CharSequence, '''Error in code body empty expression.''',
 								'throw new UnsupportedOperationException();')
 						}
 					}
@@ -183,7 +185,13 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 				
 			]
 		
-		] //.withLinebreakIfRequested(true)
+		] 
+	}
+	
+	def private StringConcatenation indent(CharSequence sequence){
+		val sc = new StringConcatenation
+		sc.append(sequence, if(indentAfterLinebreak) '\t' else '')
+		sc
 	}
 	
 	
