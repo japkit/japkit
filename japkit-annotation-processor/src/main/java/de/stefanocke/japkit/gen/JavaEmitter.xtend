@@ -25,6 +25,7 @@ import javax.lang.model.type.WildcardType
 import org.apache.commons.lang3.StringEscapeUtils
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import org.eclipse.xtend2.lib.StringConcatenation
 
 class JavaEmitter implements EmitterContext{
 
@@ -185,7 +186,7 @@ class JavaEmitter implements EmitterContext{
 		val type = asType
 		val constantExpr = field.constantExpressionCode
 		'''
-		«field.docCommentCode»	
+		«field.docCommentCode»
 		«field.annotationsCode»
 		«field.modifiersCode»«type.typeRef» «simpleName»«IF constantExpr!=null» = «constantExpr»«ENDIF»;
 		'''
@@ -270,7 +271,7 @@ class JavaEmitter implements EmitterContext{
 	}
 	
 	def codeForParameters(ExecutableElement ee){
-		codeListInlineOrWithLinebreaks(ee.parameters.map[codeForParameter].toList, '(', ', ',')')
+		codeListInlineOrWithLinebreaks(ee.parameters.map[codeForParameter].toList, '(', ',',')')
 	}
 	
 	def codeForParameter(extension VariableElement p){
@@ -391,25 +392,27 @@ class JavaEmitter implements EmitterContext{
 			'''(«values.head.value.annotationValueCode»)'''
 		} else {
 			val avCode = values.map[av | '''«av.key.simpleName» = «av.value.annotationValueCode»'''].toList
-			codeListInlineOrWithLinebreaks(avCode, '(', ', ', ')')
+			codeListInlineOrWithLinebreaks(avCode, '(', ',', ')')
 		}
 		
 		'''@«typeName»«elementValuePairs»'''
 	}
 	
 	def codeListInlineOrWithLinebreaks(Iterable<? extends CharSequence> codeList, String before, String separator, String after) {
+		'''«before»«codeListInlineOrWithLinebreaks(codeList, separator)»«after»'''
+	}
+	
+	def codeListInlineOrWithLinebreaks(Iterable<? extends CharSequence> codeList, String separator) {
 		val codeLength = codeList.map[length].reduce[l1, l2| l1 + l2] ?: 0
 		
-		if(codeLength<150){
-			'''«before»«FOR c : codeList SEPARATOR separator»«c»«ENDFOR»«after»'''			
+		val sc = new StringConcatenation()
+		
+		sc.append(if(codeLength<150){
+			'''«FOR c : codeList SEPARATOR separator+' '»«c»«ENDFOR»'''			
 		} else {
-			'''
-			«before»
-				«FOR c : codeList SEPARATOR separator»
-				«c»
-				«ENDFOR»
-			«after»'''
-		}
+			'''«FOR c : codeList SEPARATOR separator+StringConcatenation.DEFAULT_LINE_DELIMITER»«c»«ENDFOR»'''
+		}, "\t\t")
+		sc
 	}
 	
 	def dispatch CharSequence annotationValueCode(AnnotationValue value) {
@@ -446,7 +449,7 @@ class JavaEmitter implements EmitterContext{
 			values.head.annotationValueCode
 		} else {
 			val avCode = values.map[annotationValueCode].toList
-			codeListInlineOrWithLinebreaks(avCode, '{',', ','}')
+			codeListInlineOrWithLinebreaks(avCode, '{',',','}')
 					
 		}
 	}

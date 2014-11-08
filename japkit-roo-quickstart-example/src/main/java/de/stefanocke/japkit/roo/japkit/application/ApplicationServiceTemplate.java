@@ -119,8 +119,7 @@ public class ApplicationServiceTemplate {
 			@ClassSelector(kind=ClassSelectorKind.FQN,  expr="#{genClass.enclosingElement.qualifiedName}.#{src.asType().asElement.simpleName}DTO")
 			@DTO
 			public class DTOClass{				
-			}
-			
+			}			
 //			@ClassSelector(expr="#{vo.asType()}") 
 //			class VO{}
 //			

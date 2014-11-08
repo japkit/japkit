@@ -12,6 +12,7 @@ import javax.lang.model.type.DeclaredType
 import org.eclipse.xtext.xbase.lib.Pair
 import java.util.Map
 import org.eclipse.xtext.xbase.lib.Functions.Function0
+import org.eclipse.xtend2.lib.StringConcatenation
 
 @Data
 class CodeRule extends AbstractRule implements Function0<CharSequence> {
@@ -70,14 +71,14 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 		_iteratorExpr = metaAnnotation?.value("iterator".withPrefix(avPrefix), String)
 		_iteratorLang = metaAnnotation?.value("iteratorLang".withPrefix(avPrefix), String)
 
-		_separator = metaAnnotation?.value("separator".withPrefix(avPrefix), String)
+		_separator = metaAnnotation?.value("separator".withPrefix(avPrefix), String) ?: ''
 
 		_imports = metaAnnotation?.value("imports", typeof(DeclaredType[]))?.toList ?: emptyList
 		
- 
-		_defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
 		
 		_linebreak = metaAnnotation?.value("linebreak".withPrefix(avPrefix), boolean) ?: false
+		
+		_defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
 	}
 	
 	private def stringFromAnnotationOrMap(AnnotationMirror metaAnnotation, Map<String, String> map, String name){
@@ -147,7 +148,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 		code(valueStack.getRequired("ec") as EmitterContext)
 	}
 	
-	public def CharSequence code(EmitterContext ec) {
+	private def CharSequence code(EmitterContext ec) {
 		inRule[
 			if(bodyExpr.nullOrEmpty && bodyCases.empty) return null //Really?
 	
@@ -164,14 +165,14 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 							'''Error in code body iterator expression.''', emptyList)
 						if (!bodyIterator.nullOrEmpty) {
 							val before = eval(beforeExpr, lang, String,
-								'''Error in code body before expression.''', '').withLinebreakIfRequested
+								'''Error in code body before expression.''', '').withLinebreak(linebreak)
 							val after = eval(afterExpr, lang, String,
-								'''Error in code body after expression.''', '').withLinebreakIfRequested
+								'''Error in code body after expression.''', '').withLinebreak(linebreak)
 							'''
-								«FOR e : bodyIterator BEFORE before SEPARATOR separator AFTER after»«scope(e as Element) [
-									code(bodyCases, bodyExpr, lang, '')
-								]»«ENDFOR»
-							'''
+								«FOR e : bodyIterator 
+									BEFORE before 
+									SEPARATOR separator + if(linebreak) StringConcatenation.DEFAULT_LINE_DELIMITER else ''
+									AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''
 						} else {
 							eval(emptyExpr, lang, String, '''Error in code body empty expression.''',
 								'throw new UnsupportedOperationException();')
@@ -182,7 +183,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 				
 			]
 		
-		]
+		] //.withLinebreakIfRequested(true)
 	}
 	
 	
@@ -193,10 +194,14 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 		]?.value ?: bodyExpr
 		
 		
-		eval(bodyExprToUse, lang, CharSequence, "Error in code body expression.",	errorResult).withLinebreakIfRequested
+		eval(bodyExprToUse, lang, CharSequence, "Error in code body expression.",	errorResult)
 	}
 	
-	private def CharSequence withLinebreakIfRequested(CharSequence cs){
+	public static def CharSequence withLinebreak(CharSequence cs){
+		withLinebreak(cs, true)
+	}
+	
+	public static def CharSequence withLinebreak(CharSequence cs, boolean linebreak){
 		if(linebreak && cs !=null && cs.length>0) 
 		'''«cs»
 		'''

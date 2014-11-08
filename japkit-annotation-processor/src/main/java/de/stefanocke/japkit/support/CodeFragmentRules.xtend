@@ -6,6 +6,7 @@ import javax.lang.model.element.AnnotationMirror
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 import static extension de.stefanocke.japkit.support.RuleUtils.*
+import static extension de.stefanocke.japkit.support.CodeRule.withLinebreak
 
 @Data
 class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
@@ -59,9 +60,13 @@ class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
 			val after = CodeFragmentRules.code(afterFragments)
 			CodeFragmentRules.surround(
 				surroundingFragments,
-				'''«before»«code»«after»'''
+				'''«before.withLinebreak»«code.withLinebreak(!after.nullOrEmpty)»«after»'''
 			)
 		]
+	}
+	
+	def static nullOrEmpty(CharSequence cs){
+		cs==null || cs.length ==0
 	}
 	
 	override apply() {

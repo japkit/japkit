@@ -71,8 +71,7 @@ public abstract class ValueObjectTemplate {
 	@Order(2)
 	@Field(src = "#{properties}", annotations = @Annotation(copyAnnotationsFromPackages = { JPA, JSR303, SPRING_FORMAT }), 
 		commentFromSrc = true, getter = @Getter(
-			/*fluent = true,*/ surroundReturnExprFragments = "defensiveCopyFragment",
-			commentExpr = "Getter for #{src.simpleName}. \n@returns #{src.simpleName}\n"))
+			/*fluent = true,*/ surroundReturnExprFragments = "defensiveCopyFragment"))
 	private SrcType $srcElementName$;
 
 	@Order(3)
@@ -83,7 +82,10 @@ public abstract class ValueObjectTemplate {
 	@CodeFragment(code = "builder.#{src.simpleName}", surroundingFragments = "defensiveCopyFragment", linebreak = false)
 	static class Rhs{}
 	
-	@CodeFragment(code = "this.#{src.simpleName} = #{rhs.code()};",	beforeFragments = "validationFragment")
+	@CodeFragment(code = "/**after*/")
+	static class After{};
+	
+	@CodeFragment(code = "this.#{src.simpleName} = #{rhs.code()};",	beforeFragments = "validationFragment", afterFragments="after")
 	static class Assignment{}
 
 	@Order(4)
