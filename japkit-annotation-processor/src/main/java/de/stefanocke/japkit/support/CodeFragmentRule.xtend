@@ -3,6 +3,7 @@ package de.stefanocke.japkit.support
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import java.util.List
+import org.eclipse.xtend2.lib.StringConcatenation
 
 @Data
 class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
@@ -17,9 +18,22 @@ class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 	}
 	
 	override CharSequence code(){
+		code(false)
+	}
+	
+	def CharSequence code(boolean indent){
+		//val indentation = (valueStack.get("indentation") as CharSequence ?: '') + '\t'
 		scopeRule.apply[
-			if(activation.nullOrEmpty || activation.exists[matches(currentSrcElement)]){		
-				super.code()	
+			if(activation.nullOrEmpty || activation.exists[matches(currentSrcElement)]){	
+					
+				//valueStack.put("indentation", indentation)
+				
+				val code = super.code()
+				if(indent){
+					val sc = new StringConcatenation()
+					sc.append(code, '\t')	
+					sc				
+				} else code
 			} else ''		
 		].head    //TODO: use scope for iteration instead of "bodyIterator" ? 
 	}

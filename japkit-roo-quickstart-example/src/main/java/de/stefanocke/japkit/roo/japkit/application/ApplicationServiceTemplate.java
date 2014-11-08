@@ -62,10 +62,6 @@ public class ApplicationServiceTemplate {
 		@ClassSelector
 		public static class Aggregate{}
 		
-		
-		/**
-		 * #{aggregateCreateMethods.toString()}
-		 */
 		@Order(0)
 		@Field
 		@Resource
@@ -122,8 +118,7 @@ public class ApplicationServiceTemplate {
 					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
 			@ClassSelector(kind=ClassSelectorKind.FQN,  expr="#{genClass.enclosingElement.qualifiedName}.#{src.asType().asElement.simpleName}DTO")
 			@DTO
-			public class DTOClass{
-				
+			public class DTOClass{				
 			}
 			
 //			@ClassSelector(expr="#{vo.asType()}") 
@@ -135,16 +130,15 @@ public class ApplicationServiceTemplate {
 		
 		@CodeFragment( 
 					iterator="#{src.parameters}" , 
-					separator = ", ", linebreak=true,  
+					separator = ",", linebreak=true,  
 					cases={
 							@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
 							@Case(matcher=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
-								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO.code()}.build()" )
+								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO.code(true)}.build()" )
 					},
 					code="command.#{src.findGetter.simpleName}()")
 		static class ParamsFromCommand{}
 		
-		//Hier braucht man 2 params (src und target). Und tschüss...
 		@CodeFragment(vars={
 				@Var(name="dtoGetter", expr="#{src.findGetter}"),
 				@Var(name="dto", expr="#{dtoGetter.returnType.asElement}"),
@@ -159,7 +153,7 @@ public class ApplicationServiceTemplate {
 		 *  @japkit.bodyCode <pre>
 		 * <code>
 		 * #{aggregate.code} #{aggregateNameLower} = find#{aggregateName}(command.getId(), command.getVersion());
-		 * #{aggregateNameLower}.#{src.simpleName}(#{paramsFromCommand.code()}); 
+		 * #{aggregateNameLower}.#{src.simpleName}(#{paramsFromCommand.code(true)}); 
 		 * </code>
 		 * </pre>
 		 * @param command
@@ -176,7 +170,7 @@ public class ApplicationServiceTemplate {
 		 * 
 		 *  @japkit.bodyCode <pre>
 		 * <code>
-		 * #{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(#{paramsFromCommand.code()});
+		 * #{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(#{paramsFromCommand.code(true)});
 		 * #{repositoryName}.save(#{aggregateNameLower});
 		 * return #{aggregateNameLower};
 		 * </code>
