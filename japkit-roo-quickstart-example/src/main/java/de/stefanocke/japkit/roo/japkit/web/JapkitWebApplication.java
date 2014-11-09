@@ -9,6 +9,7 @@ import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.roo.japkit.Layers;
 
 @Trigger(layer=Layers.WEB_APP, vars={
+		@Var(name = "toHtmlId", isFunction=true, expr="#{src.toString().replace('.','_').toLowerCase()}" ),
 		@Var(name = "controllers", ifEmpty=true, typeQuery = @TypeQuery(annotation = JapkitWebScaffold.class, shadow = true)),
 		@Var(name = "controllerAnnotations", expr = "#{controllers}", annotation = JapkitWebScaffold.class) })
 @ResourceTemplate.List({

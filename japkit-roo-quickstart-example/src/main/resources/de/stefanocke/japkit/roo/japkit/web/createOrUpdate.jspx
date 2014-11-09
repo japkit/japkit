@@ -9,27 +9,33 @@
   	<%} else {
   	%><form:create id="fc_${fboFqnId}" modelAttribute="${modelAttribute}" path="/${path}" render="\${empty dependencies}" z="0">
     <%}
-    viewProperties.each {   	
+    def fieldsForProperties
+    fieldsForProperties = {properties, prefix -> properties.each {   	
     	def required = it.isRequired	
     	def attrMap = [:]
     	attrMap.validationRegex = it.regexp
     	def attr = attrMap.findAll{it.value!=null}.collect{"$it.key=\"$it.value\""}.join(' ')
+    	def field = prefix ? "${prefix}.${it.name}" : it.name
+    	def id =  "c_${fboFqnId}_${toHtmlId.eval(field)}" 
     			
     	//TODO: At first, generate some intermediate annotation based model of the view ?
     	if(it.isBoolean){
-    	%><field:checkbox field="${it.name}" id="c_${fboFqnId}_${it.name}"  z="0"/>
+    	%><field:checkbox field="${field}" id="${id}"  z="0"/>
     	<%} else if(it.isDatetime){
         def past = it.isPast
         def dtf = "${it.dtfModelAttr}"
-        %><field:datetime field="${it.name}" id="c_${fboFqnId}_${it.name}" dateTimePattern="\${$dtf}" past="${past}" required="${required}" z="0"/>
+        %><field:datetime field="${field}" id="${id}" dateTimePattern="\${$dtf}" past="${past}" required="${required}" z="0"/>
         <%} else if(it.isEnum){
-     	%><field:select field="${it.name}" id="c_${fboFqnId}_${it.name}" items="\${${it.name}s}" path="${it.name}s" required="${required}" z="0"/>
+     	%><field:select field="${field}" id="${id}" items="\${${it.name}s}" path="${it.name}s" required="${required}" z="0"/>
      	<%} else if(it.isEntity){
-     	%><field:select field="${it.name}" id="c_${fboFqnId}_${it.name}" itemValue="id" items="\${${it.name}Choices}" path="${it.name}s" required="${required}" z="0"/>
-     	<%} else {
-    	%><field:input field="${it.name}" id="c_${fboFqnId}_${it.name}" required="${required}" <%=attr%> z="0"/>
+     	%><field:select field="${field}" id="${id}" itemValue="id" items="\${${it.name}Choices}" path="${it.name}s" required="${required}" z="0"/>
+     	<%} else if(it.isDTO){
+     		fieldsForProperties(it.asType().asElement.properties, field)
+     	} else {
+    	%><field:input field="${field}" id="${id}" required="${required}" <%=attr%> z="0"/>
     <%	}
-    }
+    }}
+    fieldsForProperties(viewProperties, null)
     if(!update){%>
     </form:create>
     <form:dependency dependencies="\${dependencies}" id="d_${fboFqnId}" render="\${not empty dependencies}" z="0"/>

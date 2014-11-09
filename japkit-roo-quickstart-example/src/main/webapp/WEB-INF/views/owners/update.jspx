@@ -6,13 +6,13 @@
     <jsp:output omit-xml-declaration="yes"/>
     <form:update id="fu_de_stefanocke_japkit_roo_petclinic_domain_owner" modelAttribute="owner" path="/owners" versionField="Version" z="0">
   	<field:select field="pets" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_pets" itemValue="id" items="${petsChoices}" path="petss" required="false" z="0"/>
-     	<field:input field="firstName" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_firstName" required="false"  z="0"/>
-    <field:input field="lastName" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_lastName" required="true"  z="0"/>
+     	<field:input field="firstName" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_firstname" required="false"  z="0"/>
+    <field:input field="lastName" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_lastname" required="true"  z="0"/>
     <field:input field="address" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_address" required="true"  z="0"/>
     <field:input field="telephone" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_telephone" required="true"  z="0"/>
-    <field:input field="homePage" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_homePage" required="false"  z="0"/>
+    <field:input field="homePage" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_homepage" required="false"  z="0"/>
     <field:input field="email" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_email" required="false"  z="0"/>
-    <field:datetime field="birthDay" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_birthDay" dateTimePattern="${owner_birthday_date_format}" past="false" required="true" z="0"/>
+    <field:datetime field="birthDay" id="c_de_stefanocke_japkit_roo_petclinic_domain_owner_birthday" dateTimePattern="${owner_birthday_date_format}" past="false" required="true" z="0"/>
         </form:update>
     
 </div>

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -35,6 +36,7 @@ public abstract class AbstractPersonDef {
      */
 	@Order(2)
 	@NotNull
+	@Valid
 	//@Size(min = 1, max = 50)
 	Address address;
 

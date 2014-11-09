@@ -24,6 +24,7 @@ import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
+import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
@@ -36,8 +37,8 @@ public abstract class ValueObjectTemplate {
 	/**
 	 * @japkit.code <pre>
 	 * <code>
-	 * if(#{src.simpleName}==null){
-	 * 	throw new IllegalArgumentException("#{src.simpleName} must not be null.");
+	 * if(#{param}==null){
+	 * 	throw new IllegalArgumentException("#{param} must not be null.");
 	 * }
 	 * </code>
 	 * </pre>
@@ -78,13 +79,15 @@ public abstract class ValueObjectTemplate {
 	private ValueObjectTemplate() {
 	};
 	
-	@CodeFragment(code = "builder.#{src.simpleName}", surroundingFragments = "defensiveCopyFragment")
+	@CodeFragment(code = "#{param}", surroundingFragments = "defensiveCopyFragment")
 	static class Rhs{}
 	
 	@CodeFragment(code = "/**after*/")
 	static class After{};
 	
-	@CodeFragment(code = "this.#{src.simpleName} = #{rhs.code()};",	beforeFragments = "validationFragment")
+	@CodeFragment(vars = @Var(name="param", expr ="builder.#{src.simpleName}"),
+			code = "this.#{src.simpleName} = #{rhs.code()};",	beforeFragments = "validationFragment"
+	)
 	static class Assignment{}
 
 	@Order(4)

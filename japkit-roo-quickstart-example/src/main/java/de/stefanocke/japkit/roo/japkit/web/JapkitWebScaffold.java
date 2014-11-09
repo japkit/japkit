@@ -29,8 +29,10 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
 import de.stefanocke.japkit.roo.japkit.application.ApplicationService;
 import de.stefanocke.japkit.roo.japkit.application.CommandMethod;
+import de.stefanocke.japkit.roo.japkit.application.DTO;
 import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
+import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 
 @Trigger(layer=Layers.CONTROLLERS, vars={
@@ -42,8 +44,9 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		@Var(name = "path", type = String.class, ifEmpty=true, expr = "#{fboPluralName.toLowerCase()}"),
 		//@Var(name = "path", expr="foo", ifEmpty=true),
 		@Var(name = "modelAttribute", type = String.class, ifEmpty=true, expr = "#{fboName.toFirstLower}"),
+		@Var(name = "toHtmlId", isFunction=true, expr="#{src.toString().replace('.','_').toLowerCase()}" ),
 		// For making IDs in JSPs unique
-		@Var(name = "fboFqnId", expr = "#{fboElement.qualifiedName.toString().replace('.','_').toLowerCase()}"),
+		@Var(name = "fboFqnId", expr = "#{toHtmlId.eval(fboElement.qualifiedName)}"),
 		@Var(name = "fboShortId", expr = "#{fboName.toLowerCase()}"),
 
 		@Var(name = "viewModel", ifEmpty=true, typeQuery = @TypeQuery(
@@ -71,6 +74,8 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		@Var(name = "dtfModelAttr", isFunction = true, expr = "#{fboShortId}_#{src.name.toLowerCase()}_date_format"),
 		
 		@Var(name = "isEntity", isFunction = true,  matcher = @Matcher(singleValueTypeAnnotations = JapkitEntity.class)),
+		@Var(name = "isDTO", isFunction = true,  matcher = @Matcher(singleValueTypeAnnotations = DTO.class)),
+		@Var(name = "isVO", isFunction = true,  matcher = @Matcher(singleValueTypeAnnotations = ValueObject.class)),
 		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
 		@Var(name = "relatedEntities", expr = "entityProperties.collect{it.singleValueType.asElement()}", lang="GroovyScript"),
 		
@@ -83,7 +88,9 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		@Var(name = "applicationService", ifEmpty = true, typeQuery = @TypeQuery(
 				annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots", inExpr = "#{fbo}")),
 		@Var(name="createCommands", expr="#{applicationService.asElement.declaredMethods}", 
-				matcher=@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo)}"))
+				matcher=@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo)}")),
+				
+				
 
 })
 @Clazz(
@@ -95,7 +102,16 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		annotations = {
 				@Annotation(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMode.MERGE,
 						values = { @AV(name = "propertyNames", mode = AVMode.IGNORE,
-								expr = "viewProperties.collect{it.name}", lang = "GroovyScript"), })},
+								expr = "def pNames;  "
+										+ "pNames={p, prfx -> "
+										+ " p.collect{ "
+										+ "  def name = prfx ? prfx+'.'+it.name : it.name;"
+										+ "  def names = [name];"
+										+ "  if(it.isVO)  names.addAll(pNames(it.asType().asElement.properties, name));"
+										+ "  names"
+										+ " }.flatten()}; "
+										+ "pNames(viewProperties, null)", 
+								lang = "GroovyScript"), })},
 		customBehaviorActivation=@Matcher(condition="#{triggerAnnotation.customBehavior}"),
 		templates = {
 				@TemplateCall(ControllerMembers.class),

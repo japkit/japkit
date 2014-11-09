@@ -8,7 +8,7 @@ application_name=Sample Application
 %>
 label_${fqnId}=${name}
 label_${fqnId}_plural=${pluralName}
-<%propertyNames.each{ %>label_${fqnId}_${it.toLowerCase()}=${it.toFirstUpper}
+<%propertyNames.each{ %>label_${fqnId}_${toHtmlId.eval(it)}=${it.toFirstUpper}
 <%}%>
 menu_category_${shortId}_label=${name}
 menu_item_${shortId}_list_label=${pluralName}
