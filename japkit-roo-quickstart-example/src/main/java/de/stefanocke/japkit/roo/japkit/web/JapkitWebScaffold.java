@@ -93,17 +93,18 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		@Var(name="updateCommands", expr="#{applicationService.asElement.declaredMethods}", 
 				matcher=@Matcher(annotations=CommandMethod.class, type=void.class , condition="#{src.CommandMethod.aggregateRoot.isSame(fbo)}")),
 				
-		@Var(name = "propertyNames", ifEmpty = true,
+		@Var(name = "allPropertyNames", isFunction=true,
 				expr = "def pNames;  "
 						+ "pNames={p, prfx -> "
 						+ " p.collect{ "
 						+ "  def name = prfx ? prfx+'.'+it.name : it.name;"
 						+ "  def names = [name];"
-						+ "  if(it.isVO)  names.addAll(pNames(it.asType().asElement.properties, name));"
+						+ "  if(it.isVO || it.isDTO)  names.addAll(pNames(it.asType().asElement.properties, name));"
 						+ "  names"
 						+ " }.flatten()}; "
-						+ "pNames(viewProperties, null)", 
-				lang = "GroovyScript")		
+						+ "pNames(src, null)", 
+				lang = "GroovyScript"),
+		@Var(name = "propertyNames", ifEmpty=true, expr="#{allPropertyNames.eval(viewProperties)}")		
 
 })
 @Clazz(
@@ -127,6 +128,14 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 					@Var(name="modelAttribute", expr="#{command.asElement().simpleName.toFirstLower}"),
 					@Var(name = "viewProperties", expr="#{command.asElement().properties}"),
 				}),
+		@ResourceTemplate(src="#{createCommands}", srcVar="cmdMethod",
+				templateLang = "GStringTemplate", templateName = "command_i18n.jspx", pathExpr = "i18n/#{path}",
+				nameExpr = "#{cmdMethod.simpleName}.properties", location = ResourceLocation.WEBINF, 
+				vars = {
+					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+					@Var(name="cmdName", expr="#{cmdMethod.simpleName}"),
+					@Var(name = "cmdPropertyNames", expr="#{allPropertyNames.eval(command.asElement().properties)}"),
+				}),
 		@ResourceTemplate(src="#{updateCommands}", srcVar="cmdMethod",
 				templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
 				nameExpr = "#{cmdMethod.simpleName.toFirstLower}.jspx", location = ResourceLocation.WEBINF, 
@@ -135,6 +144,14 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
 					@Var(name="modelAttribute", expr="#{command.asElement().simpleName.toFirstLower}"),
 					@Var(name = "viewProperties", expr="#{command.asElement().properties}"),
+				}),
+		@ResourceTemplate(src="#{updateCommands}", srcVar="cmdMethod",
+				templateLang = "GStringTemplate", templateName = "command_i18n.jspx", pathExpr = "i18n/#{path}",
+				nameExpr = "#{cmdMethod.simpleName}.properties", location = ResourceLocation.WEBINF, 
+				vars = {
+					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+					@Var(name="cmdName", expr="#{cmdMethod.simpleName}"),
+					@Var(name = "cmdPropertyNames", expr="#{allPropertyNames.eval(command.asElement().properties)}"),
 				}),
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "show.jspx", location = ResourceLocation.WEBINF,
 				pathExpr = "views/#{path}"),

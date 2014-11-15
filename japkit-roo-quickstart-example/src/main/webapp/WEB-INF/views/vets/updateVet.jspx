@@ -6,32 +6,32 @@
 	 version="2.0">
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
-    <form:update id="fu_de_stefanocke_japkit_roo_petclinic_domain_vet" modelAttribute="updateVetCommand" path="/vets/updateVet" versionField="Version" z="0">
-  	<field:datetime field="employedSince" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_employedsince" dateTimePattern="${vet_employedsince_date_format}" past="true" required="true" z="0"/>
-        <field:select field="specialty" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_specialty" items="${specialtys}" path="specialtys" required="false" z="0"/>
+    <form:update id="form_updatevet" modelAttribute="updateVetCommand" path="/vets/updateVet" versionField="Version" z="0">
+  	<field:datetime field="employedSince" id="field_updatevet_employedsince" dateTimePattern="${vet_employedsince_date_format}" past="true" required="true" z="0"/>
+        <field:select field="specialty" id="field_updatevet_specialty" items="${specialtys}" path="specialtys" required="false" z="0"/>
      	
-    	<field:input field="firstName" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_firstname" required="false"  z="0"/>
+    	<field:input field="firstName" id="field_updatevet_firstname" required="false"  z="0"/>
     
-    	<field:input field="lastName" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_lastname" required="true"  z="0"/>
+    	<field:input field="lastName" id="field_updatevet_lastname" required="true"  z="0"/>
     
-     	<util:panel id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_address" title="address" openPane="true">
+     	<util:panel id="field_updatevet_address" title="address" openPane="true">
      	
-    	<field:input field="address.street" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_address_street" required="true"  z="0"/>
+    	<field:input field="address.street" id="field_updatevet_address_street" required="true"  z="0"/>
     
-    	<field:input field="address.city" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_address_city" required="true"  z="0"/>
+    	<field:input field="address.city" id="field_updatevet_address_city" required="true"  z="0"/>
     
-    	<field:input field="address.zip" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_address_zip" required="true"  z="0"/>
+    	<field:input field="address.zip" id="field_updatevet_address_zip" required="true"  z="0"/>
     
-    	<field:input field="address.state" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_address_state" required="false"  z="0"/>
+    	<field:input field="address.state" id="field_updatevet_address_state" required="false"  z="0"/>
     
      	</util:panel><br/>	
      	
-    	<field:input field="telephone" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_telephone" required="true"  z="0"/>
+    	<field:input field="telephone" id="field_updatevet_telephone" required="true"  z="0"/>
     
-    	<field:input field="homePage" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_homepage" required="false"  z="0"/>
+    	<field:input field="homePage" id="field_updatevet_homepage" required="false"  z="0"/>
     
-    	<field:input field="email" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_email" required="false"  z="0"/>
-    <field:datetime field="birthDay" id="c_de_stefanocke_japkit_roo_petclinic_domain_vet_birthday" dateTimePattern="${vet_birthday_date_format}" past="false" required="true" z="0"/>
+    	<field:input field="email" id="field_updatevet_email" required="false"  z="0"/>
+    <field:datetime field="birthDay" id="field_updatevet_birthday" dateTimePattern="${vet_birthday_date_format}" past="false" required="true" z="0"/>
         </form:update>
     
 </div>

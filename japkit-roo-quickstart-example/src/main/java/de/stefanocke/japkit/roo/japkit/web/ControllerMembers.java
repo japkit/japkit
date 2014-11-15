@@ -23,12 +23,13 @@ import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.roo.base.web.ControllerUtil;
+import de.stefanocke.japkit.roo.base.web.ResourceBundleNameProvider;
 
 @Controller
 @RequestMapping("/$path$")
 @RuntimeMetadata
 @Template(templates={@TemplateCall(ControllerMembers.Create.class), @TemplateCall(ControllerMembers.Update.class)})
-public abstract class ControllerMembers {
+public abstract class ControllerMembers implements ResourceBundleNameProvider{
 	@ClassSelector
 	class ApplicationService{}
 	
@@ -98,11 +99,22 @@ public abstract class ControllerMembers {
 	 */
 	public static void populateUpdateCommands(Model uiModel){};
 	
+	
 	/**
 	 * @japkit.initCode <code>'{'+updateCommands.collect{'"'+it.simpleName+'"'}.join(', ')+'}'</code>
 	 */
 	@Field(initLang="GroovyScript")  //TODO: Modus, der wie bei AVs funktioniert, damit man den Wert auch direkt setzen kann
 	public static String[] UPDATE_COMMANDS;
+	
+	/**
+	 * @japkit.bodyCode <pre>
+	 * <code>	
+	 * return new String[]{<%= (updateCommands.toSet() + createCommands.toSet()).collect{'"'+path+'/'+it.simpleName+'"'}.join(', ') %>};
+	 * </code>
+	 * </pre>
+	 */
+	@Method(bodyLang="GStringTemplateInline")
+	public abstract String[] getResourceBundleBaseNames();
 	
 	@Template(src="#{updateCommands}", srcVar="cmdMethod", 
 			vars={@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),

@@ -6,16 +6,15 @@
 	 version="2.0">
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
-    <form:create id="fc_de_stefanocke_japkit_roo_petclinic_domain_pet" modelAttribute="createPetCommand" path="/pets" render="${empty dependencies}" z="0">
+    <form:create id="form_createpet" modelAttribute="createPetCommand" path="/pets" render="${empty dependencies}" z="0">
     
-    	<field:input field="name" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_name" required="true"  z="0"/>
-    <field:select field="type" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_type" items="${types}" path="types" required="true" z="0"/>
+    	<field:input field="name" id="field_createpet_name" required="true"  z="0"/>
+    <field:select field="type" id="field_createpet_type" items="${types}" path="types" required="true" z="0"/>
      	
-    	<field:input field="weight" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_weight" required="true"  z="0"/>
-    <field:checkbox field="sendReminders" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_sendreminders"  z="0"/>
-    	<field:select field="owner" id="c_de_stefanocke_japkit_roo_petclinic_domain_pet_owner" itemValue="id" items="${ownerChoices}" path="owners" required="false" z="0"/>
+    	<field:input field="weight" id="field_createpet_weight" required="true"  z="0"/>
+    <field:checkbox field="sendReminders" id="field_createpet_sendreminders"  z="0"/>
+    	<field:select field="owner" id="field_createpet_owner" itemValue="id" items="${ownerChoices}" path="owners" required="false" z="0"/>
      	
     </form:create>
-    <form:dependency dependencies="${dependencies}" id="d_de_stefanocke_japkit_roo_petclinic_domain_pet" render="${not empty dependencies}" z="0"/>
     
 </div>

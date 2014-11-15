@@ -6,10 +6,13 @@
 	 version="2.0">
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
-    <% if(update){ 
-    %><form:update id="fu_${fboFqnId}" modelAttribute="${modelAttribute}" path="/${path}/${cmdMethod.simpleName}" versionField="Version" z="0">
+    <% 
+    def cmdName = cmdMethod.simpleName.toString()
+    def formId = toHtmlId.eval(cmdName)
+    if(update){ 
+    %><form:update id="form_${formId}" modelAttribute="${modelAttribute}" path="/${path}/${cmdName}" versionField="Version" z="0">
   	<%} else {
-  	%><form:create id="fc_${fboFqnId}" modelAttribute="${modelAttribute}" path="/${path}" render="\${empty dependencies}" z="0">
+  	%><form:create id="form_${formId}" modelAttribute="${modelAttribute}" path="/${path}" render="\${empty dependencies}" z="0">
     <%}
     def fieldsForProperties
     fieldsForProperties = {properties, prefix -> properties.each {   	
@@ -18,7 +21,7 @@
     	attrMap.validationRegex = it.regexp
     	def attr = attrMap.findAll{it.value!=null}.collect{"$it.key=\"$it.value\""}.join(' ')
     	def field = prefix ? "${prefix}.${it.name}" : it.name
-    	def id =  "c_${fboFqnId}_${toHtmlId.eval(field)}" 
+    	def id =  "field_${formId}_${toHtmlId.eval(field)}" 
     			
   		if(it.name=="version" || it.name=="id"){
   		//do nothing. the hidden fields for id and version are in update.tagx
@@ -43,7 +46,6 @@
     fieldsForProperties(viewProperties, null)
     if(!update){%>
     </form:create>
-    <form:dependency dependencies="\${dependencies}" id="d_${fboFqnId}" render="\${not empty dependencies}" z="0"/>
     <%} else {
     %></form:update>
     <%}%>
