@@ -92,8 +92,10 @@
           </c:forTokens>
           <th></th>
           <c:if test="${update}">
-            <th></th>
-            <spring:eval var="colCounter" expression="colCounter  + 1" />
+          	<c:forEach items="${updateCommands}" var="updateCommand">
+	            <th></th>
+	            <spring:eval var="colCounter" expression="colCounter  + 1" />
+            </c:forEach>
           </c:if>
           <c:if test="${delete}">
             <th></th>
@@ -141,16 +143,16 @@
             </a>
           </td>
           <c:if test="${update}">
-            <td class="utilbox">
-              <spring:url value="${path}/${itemId}" var="update_form_url">
-                <spring:param name="form" />
-              </spring:url>
-              <spring:url value="/resources/images/update.png" var="update_image_url" />
-              <spring:message arguments="${typeName}" code="entity_update" var="update_label" htmlEscape="false" />
-              <a href="${update_form_url}" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}">
-                <img alt="${fn:escapeXml(update_label)}" class="image" src="${update_image_url}" title="${fn:escapeXml(update_label)}" />
-              </a>
-            </td>
+          	<c:forEach items="${updateCommands}" var="updateCommand">
+	            <td class="utilbox">
+	              <spring:url value="${path}/${itemId}/${updateCommand}" var="update_form_url"/>
+	              <spring:url value="/resources/images/update.png" var="update_image_url" />
+	              <spring:message arguments="${typeName}" code="entity_update" var="update_label" htmlEscape="false" />
+	              <a href="${update_form_url}" alt="${updateCommand}" title="${updateCommand}">
+	                <img alt="${updateCommand}" class="image" src="${update_image_url}" title="${updateCommand}" />
+	              </a>
+	            </td>
+            </c:forEach>
           </c:if>
           <c:if test="${delete}">
             <td class="utilbox">

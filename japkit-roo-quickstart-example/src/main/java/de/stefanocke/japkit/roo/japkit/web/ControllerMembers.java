@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
+import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
@@ -26,7 +27,7 @@ import de.stefanocke.japkit.roo.base.web.ControllerUtil;
 @Controller
 @RequestMapping("/$path$")
 @RuntimeMetadata
-@Template(templates=@TemplateCall(ControllerMembers.Create.class))
+@Template(templates={@TemplateCall(ControllerMembers.Create.class), @TemplateCall(ControllerMembers.Update.class)})
 public abstract class ControllerMembers {
 	@ClassSelector
 	class ApplicationService{}
@@ -89,6 +90,74 @@ public abstract class ControllerMembers {
 	}
 	
 	/**
+	 * @japkit.bodyCode <pre>
+	 * <code>	
+	 * uiModel.addAttribute("updateCommands", UPDATE_COMMANDS);
+	 * </code>
+	 * </pre>
+	 */
+	public static void populateUpdateCommands(Model uiModel){};
+	
+	/**
+	 * @japkit.initCode <code>'{'+updateCommands.collect{'"'+it.simpleName+'"'}.join(', ')+'}'</code>
+	 */
+	@Field(initLang="GroovyScript")  //TODO: Modus, der wie bei AVs funktioniert, damit man den Wert auch direkt setzen kann
+	public static String[] UPDATE_COMMANDS;
+	
+	@Template(src="#{updateCommands}", srcVar="cmdMethod", 
+			vars={@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+			@Var(name="cmdNameU", expr="#{command.asElement().simpleName}"),
+			@Var(name="cmdName", expr="#{cmdNameU.toFirstLower}"),
+			@Var(name="cmdMethodName", expr="#{cmdMethod.simpleName.toString()}" )})
+	abstract class Update{
+		/**
+		 * @japkit.bodyCode <pre>
+		 * <code>
+		 * if (bindingResult.hasErrors()) {
+		 * 	populate#{cmdNameU}Form(uiModel, #{cmdName});
+		 * 	return "#{path}/#{cmdMethodName}";
+		 * }
+		 * uiModel.asMap().clear();
+		 * applicationService.#{cmdMethodName}(#{cmdName});
+		 * return "redirect:/#{path}/" + ControllerUtil.encodeUrlPathSegment(#{cmdName}.getId().toString(), httpServletRequest);
+		 * </code>
+		 * </pre>
+		 */
+		@Method(imports = ControllerUtil.class)
+		@RequestMapping(value = "/$cmdMethodName$", method = RequestMethod.POST, produces = "text/html")
+		public abstract String $cmdName$(@Valid Command $cmdName$, BindingResult bindingResult, Model uiModel,
+				HttpServletRequest httpServletRequest);
+	
+		@ClassSelector
+		class Command{}
+		
+		/**
+		 * @japkit.bodyCode <pre>
+		 * <code>
+		 * populate#{cmdNameU}Form(uiModel, applicationService.find#{fboName}(id, null)); 
+		 * return "#{path}/#{cmdMethodName}";
+		 * </code>
+		 * </pre>
+		 */
+		@Method()
+		@RequestMapping(value = "/{id}/$cmdMethodName$",  produces = "text/html")
+		public abstract String $cmdName$Form(@PathVariable("id") Long id, Model uiModel);
+		
+		/**
+		 * @japkit.bodyCode <pre>
+		 * <code>	
+		 * uiModel.addAttribute("#{cmdName}", command);
+		 * addDateTimeFormatPatterns(uiModel);
+		 * addEnumChoices(uiModel);
+		 * addEntityChoices(uiModel);
+		 * </code>
+		 * </pre>
+		 */
+		abstract void populate$cmdNameU$Form(Model uiModel, Object command); //TODO: Instead of relying on UI Binding here, the AppService could provide factory methods for commands
+	
+	}
+	
+	/**
 	 * @japkit.bodyCode 
 	 * <code>uiModel.addAttribute("#{src.dtfModelAttr}", ControllerUtil.patternForStyle(getDateTimeFormat#{src.name.toFirstUpper}()));</code>
 	 */
@@ -122,6 +191,7 @@ public abstract class ControllerMembers {
 	 * uiModel.addAttribute("#{modelAttribute}", crudOperations().find(id));
 	 * uiModel.addAttribute("itemId", id);
 	 * addDateTimeFormatPatterns(uiModel);
+	 * populateUpdateCommands(uiModel);
 	 * return "#{path}/show";
 	 * </code>
 	 * </pre>
@@ -144,6 +214,7 @@ public abstract class ControllerMembers {
 	 * 	uiModel.addAttribute("#{modelAttribute}s", crudOperations().findAll(sortFieldName, sortOrder));
 	 * }
 	 * addDateTimeFormatPatterns(uiModel);
+	 * populateUpdateCommands(uiModel);
 	 * return "#{path}/list";
 	 * </code>
 	 * </pre>

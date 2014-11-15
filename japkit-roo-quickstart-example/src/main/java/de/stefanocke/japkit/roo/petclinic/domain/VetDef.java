@@ -12,10 +12,23 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import de.stefanocke.japkit.annotations.Order;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
+import de.stefanocke.japkit.roo.petclinic.domain.Vet.AbstractBehavior;
 
-@JapkitEntity(/*createCommandProperties={VetProperties.Specialty_.class , VetProperties.FirstName_.class, VetProperties.LastName_.class}*/)
+@JapkitEntity(customBehavior=true/*createCommandProperties={VetProperties.Specialty_.class , VetProperties.FirstName_.class, VetProperties.LastName_.class}*/)
 public class VetDef extends AbstractPersonDef {	
 	
+	public static class Behavior extends AbstractBehavior {
+
+		protected Behavior(VetInternal internal) {
+			super(internal);
+		}
+		
+		public void rateVet(int rating){
+			
+		}
+
+	}
+
 	/**
      */
 	@NotNull

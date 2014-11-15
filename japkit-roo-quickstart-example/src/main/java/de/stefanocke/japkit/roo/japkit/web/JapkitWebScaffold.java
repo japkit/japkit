@@ -87,10 +87,23 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		
 		@Var(name = "applicationService", ifEmpty = true, typeQuery = @TypeQuery(
 				annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots", inExpr = "#{fbo}")),
+		@Var(name="CommandMethod", isFunction=true, annotation=CommandMethod.class),
 		@Var(name="createCommands", expr="#{applicationService.asElement.declaredMethods}", 
-				matcher=@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo)}")),
+				matcher=@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo) && src.CommandMethod.aggregateRoot.isSame(fbo)}")),
+		@Var(name="updateCommands", expr="#{applicationService.asElement.declaredMethods}", 
+				matcher=@Matcher(annotations=CommandMethod.class, type=void.class , condition="#{src.CommandMethod.aggregateRoot.isSame(fbo)}")),
 				
-				
+		@Var(name = "propertyNames", ifEmpty = true,
+				expr = "def pNames;  "
+						+ "pNames={p, prfx -> "
+						+ " p.collect{ "
+						+ "  def name = prfx ? prfx+'.'+it.name : it.name;"
+						+ "  def names = [name];"
+						+ "  if(it.isVO)  names.addAll(pNames(it.asType().asElement.properties, name));"
+						+ "  names"
+						+ " }.flatten()}; "
+						+ "pNames(viewProperties, null)", 
+				lang = "GroovyScript")		
 
 })
 @Clazz(
@@ -99,19 +112,6 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		//superclassTypeArgs=FormBackingObject.class,
 		
 		modifiers = Modifier.PUBLIC,
-		annotations = {
-				@Annotation(targetAnnotation = JapkitWebScaffold.class, mode = AnnotationMode.MERGE,
-						values = { @AV(name = "propertyNames", mode = AVMode.IGNORE,
-								expr = "def pNames;  "
-										+ "pNames={p, prfx -> "
-										+ " p.collect{ "
-										+ "  def name = prfx ? prfx+'.'+it.name : it.name;"
-										+ "  def names = [name];"
-										+ "  if(it.isVO)  names.addAll(pNames(it.asType().asElement.properties, name));"
-										+ "  names"
-										+ " }.flatten()}; "
-										+ "pNames(viewProperties, null)", 
-								lang = "GroovyScript"), })},
 		customBehaviorActivation=@Matcher(condition="#{triggerAnnotation.customBehavior}"),
 		templates = {
 				@TemplateCall(ControllerMembers.class),
@@ -125,11 +125,17 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 				vars ={ @Var(name = "update", expr = "#{false}"), 
 					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
 					@Var(name="modelAttribute", expr="#{command.asElement().simpleName.toFirstLower}"),
-					@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = Command.class, includeRules = @Matcher(
-							annotationsNot = { Id.class, Version.class }))),
+					@Var(name = "viewProperties", expr="#{command.asElement().properties}"),
 				}),
-		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
-				nameExpr = "update.jspx", location = ResourceLocation.WEBINF, vars = @Var(name = "update", expr = "#{true}")),
+		@ResourceTemplate(src="#{updateCommands}", srcVar="cmdMethod",
+				templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
+				nameExpr = "#{cmdMethod.simpleName.toFirstLower}.jspx", location = ResourceLocation.WEBINF, 
+				vars = {
+					@Var(name = "update", expr = "#{true}"),
+					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+					@Var(name="modelAttribute", expr="#{command.asElement().simpleName.toFirstLower}"),
+					@Var(name = "viewProperties", expr="#{command.asElement().properties}"),
+				}),
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "show.jspx", location = ResourceLocation.WEBINF,
 				pathExpr = "views/#{path}"),
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "list.jspx", location = ResourceLocation.WEBINF,
@@ -185,4 +191,5 @@ public @interface JapkitWebScaffold {
 
 	// For i18n. TODO: Reconsider
 	String[] propertyNames() default {};
+	
 }

@@ -16,17 +16,8 @@
 		<put-attribute name="footer" value="/WEB-INF/views/footer.jspx" />
 	</definition>
 
-	<definition extends="default" name="*/list">
-		<put-attribute name="body" value="/WEB-INF/views/{1}/list.jspx" />
-	</definition>
-	<definition extends="default" name="*/show">
-		<put-attribute name="body" value="/WEB-INF/views/{1}/show.jspx" />
-	</definition>
-	<definition extends="default" name="*/create">
-		<put-attribute name="body" value="/WEB-INF/views/{1}/create.jspx" />
-	</definition>
-	<definition extends="default" name="*/update">
-		<put-attribute name="body" value="/WEB-INF/views/{1}/update.jspx" />
+	<definition extends="default" name="*/*">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jspx" />
 	</definition>
 
 </tiles-definitions>

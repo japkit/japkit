@@ -31,6 +31,6 @@ public class IdAndVersion {
 	@Field
 	@Version
 	@Column(name = "version")
-	private Integer version;
+	private Long version;
 
 }

@@ -73,9 +73,9 @@ public class ApplicationServiceTemplate {
 		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), allFieldsAreTemplates=true,
 		 templates = @TemplateCall(value=CommandFieldTemplate.class, src="#{src.parameters}"))
 		public class Command{
-			long id; //TODO: GUID instead of DB ID !
+			Long id; //TODO: GUID instead of DB ID !
 			
-			long version;		
+			Long version;		
 		};
 
 		@Order(3)

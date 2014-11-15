@@ -30,6 +30,14 @@ public class ApplicationConversionServiceFactoryBean extends FormattingConversio
 		for (ConverterProvider provider : converterProviders) {
 			provider.registerConverters(registry);	
 		}
+		//Q&D: toString() as fallback 
+		registry.addConverter(new Converter<Object, String>() {
+
+			@Override
+			public String convert(Object source) {
+				return source.toString();
+			}
+		});
 	}
 
 	public void afterPropertiesSet() {
