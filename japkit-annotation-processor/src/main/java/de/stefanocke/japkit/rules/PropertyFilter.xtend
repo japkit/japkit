@@ -12,14 +12,14 @@ import org.eclipse.xtend.lib.Data
 
 @Data
 class PropertyFilter {
-	val extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
-	val extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	val extension JavaBeansExtensions javaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
-	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
-	val extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
-	val extension ELSupport = ExtensionRegistry.get(ELSupport)
+	val transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	val transient extension JavaBeansExtensions javaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
+	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
+	val transient extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
+	val transient extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 	TypeMirror sourceClass
 	String includeNamesExpr

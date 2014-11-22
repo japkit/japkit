@@ -19,14 +19,14 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
-	val extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
 
 	extension TypesExtensions types = ExtensionRegistry.get(TypesExtensions)
-	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	extension ELSupport = ExtensionRegistry.get(ELSupport)
-	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	val extension TypeResolver = ExtensionRegistry.get(TypeResolver)
+	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	val transient extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 
 	String name
 	boolean ifEmpty

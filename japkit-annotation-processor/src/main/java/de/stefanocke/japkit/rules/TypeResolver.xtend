@@ -16,12 +16,12 @@ import javax.lang.model.type.TypeMirror
 
 /**Resolves type references / class selectors from templates and annotations.*/
 class TypeResolver {
-	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
-	extension ELSupport =  ExtensionRegistry.get(ELSupport)
-	MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val transient extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
+	val transient extension ELSupport =  ExtensionRegistry.get(ELSupport)
+	val MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	
 	def TypeMirror resolveType(
 		AnnotationMirror metaAnnotation,

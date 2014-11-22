@@ -9,10 +9,10 @@ import static extension de.stefanocke.japkit.rules.RuleUtils.*
 
 class GetterSetterRules {
 	
-	val extension JavaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
-	val extension ElementsExtensions  = ExtensionRegistry.get(ElementsExtensions)
-	val extension RuleUtils = ExtensionRegistry.get(RuleUtils)
-	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	val transient extension JavaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
+	val transient extension ElementsExtensions  = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension RuleUtils = ExtensionRegistry.get(RuleUtils)
+	val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	
 	def MethodRule createGetterRuleFromGetterAV(AnnotationMirror metaAnnotation, VariableElement template) {
 		metaAnnotation?.value("getter", AnnotationMirror)?.createGetterRule(template, null)

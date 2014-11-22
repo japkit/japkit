@@ -29,14 +29,14 @@ import static extension de.stefanocke.japkit.rules.JavadocUtil.*
  * annotation values, for example "nameExpr" for the AV the contains an expression to determine the name of the element to be generated.
  */
 class RuleUtils {
-	val protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val protected extension ELSupport = ExtensionRegistry.get(ELSupport)
-	val protected extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	val protected extension AnnotationExtensions  = ExtensionRegistry.get(AnnotationExtensions)
-	val protected extension GenExtensions = ExtensionRegistry.get(GenExtensions)
-	val protected extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
-	val protected extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	val protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val protected transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val protected transient extension ELSupport = ExtensionRegistry.get(ELSupport)
+	val protected transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	val protected transient extension AnnotationExtensions  = ExtensionRegistry.get(AnnotationExtensions)
+	val protected transient extension GenExtensions = ExtensionRegistry.get(GenExtensions)
+	val protected transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
+	val protected transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	val protected transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	
 	
 	public static def withPrefix(CharSequence name, String prefix){

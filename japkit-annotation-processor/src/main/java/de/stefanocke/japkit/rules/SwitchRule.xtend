@@ -7,8 +7,8 @@ import org.eclipse.xtend.lib.Data
 
 @Data
 class SwitchRule extends AbstractRule{
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	
 	
 	List<Pair<ElementMatcher, String>> cases

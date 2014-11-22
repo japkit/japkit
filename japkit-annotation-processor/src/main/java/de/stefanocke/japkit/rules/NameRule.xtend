@@ -13,8 +13,8 @@ class NameRule extends AbstractRule{
 	String expr
 	String lang
 
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension ELSupport = ExtensionRegistry.get(ELSupport)
+	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ELSupport = ExtensionRegistry.get(ELSupport)
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
 		super(metaAnnotation, null)

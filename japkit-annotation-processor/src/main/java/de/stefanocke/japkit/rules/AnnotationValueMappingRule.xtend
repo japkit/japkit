@@ -15,10 +15,10 @@ import org.eclipse.xtend.lib.Data
 
 @Data
 class AnnotationValueMappingRule extends AbstractRule{
-	val extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
-	val extension ProcessingEnvironment procEnv = ExtensionRegistry.get(ProcessingEnvironment)
-	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val extension RuleUtils =  ExtensionRegistry.get(RuleUtils)
+	val transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ProcessingEnvironment procEnv = ExtensionRegistry.get(ProcessingEnvironment)
+	val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	val transient extension RuleUtils =  ExtensionRegistry.get(RuleUtils)
 
 	()=>boolean activationRule
 	String name

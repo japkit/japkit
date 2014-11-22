@@ -15,14 +15,14 @@ import org.eclipse.xtend.lib.Data
 @Data
 class ResourceRule extends AbstractRule{
 	
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
-	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	val extension RuleUtils ru = ExtensionRegistry.get(RuleUtils)
+	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
+	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	val transient extension RuleUtils ru = ExtensionRegistry.get(RuleUtils)
 	val ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val extension FileExtensions = ExtensionRegistry.get(FileExtensions)
+	val transient extension FileExtensions = ExtensionRegistry.get(FileExtensions)
 	
 	String templateName
 	String templateLang

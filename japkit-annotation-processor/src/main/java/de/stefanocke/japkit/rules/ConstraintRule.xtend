@@ -8,10 +8,10 @@ import org.eclipse.xtend.lib.Data
 
 @Data
 class ConstraintRule extends AbstractRule{
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension ELSupport = ExtensionRegistry.get(ELSupport)
-	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ELSupport = ExtensionRegistry.get(ELSupport)
+	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	
 	String expr
 	String msg

@@ -26,17 +26,17 @@ import org.eclipse.xtend.lib.Data
 
 @Data
 class ClassRule extends AbstractRule{
-	protected val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	protected val extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
-	protected val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	protected val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	protected val extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	protected val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	protected val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	protected val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	protected val extension TypeResolver = ExtensionRegistry.get(TypeResolver)
-	protected val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-	protected val extension RuleUtils = ExtensionRegistry.get(RuleUtils)
+	protected val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	protected val transient extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
+	protected val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	protected val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	protected val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	protected val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	protected val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	protected val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	protected val transient extension TypeResolver = ExtensionRegistry.get(TypeResolver)
+	protected val transient extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+	protected val transient extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	
 
 	TemplateRule templateRule

@@ -17,10 +17,10 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import static de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 class ELSupport {
-	val extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
 
 	extension TypesExtensions types = ExtensionRegistry.get(TypesExtensions)
-	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 
 	val Map<String, ELProvider> elProviders = newHashMap
 

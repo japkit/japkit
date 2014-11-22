@@ -48,10 +48,10 @@ import javax.lang.model.util.Elements
 import static javax.lang.model.util.ElementFilter.*
 
 class ElementsExtensions {
-	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	MessageCollector mc = ExtensionRegistry.get(MessageCollector)
-	Elements elementUtils = ExtensionRegistry.get(Elements)
+	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val MessageCollector mc = ExtensionRegistry.get(MessageCollector)
+	val Elements elementUtils = ExtensionRegistry.get(Elements)
 
 	def hasType(Element e, TypeMirror type) {
 		e.asType == type;

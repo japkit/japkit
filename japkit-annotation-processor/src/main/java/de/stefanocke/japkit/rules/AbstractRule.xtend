@@ -3,15 +3,15 @@ package de.stefanocke.japkit.rules
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class AbstractRule implements Rule {
-	val protected extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	val protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val protected extension RuleUtils = ExtensionRegistry.get(RuleUtils)
-	val protected extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	val transient protected extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	val transient protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val transient protected extension RuleUtils = ExtensionRegistry.get(RuleUtils)
+	val transient protected extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	
 	AnnotationMirror metaAnnotation
 	Element metaElement

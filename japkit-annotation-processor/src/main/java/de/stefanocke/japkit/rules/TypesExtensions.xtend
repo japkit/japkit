@@ -27,9 +27,9 @@ import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
 class TypesExtensions /**implements Types*/{
-	Types typeUtils = ExtensionRegistry.get(Types)
-	extension Elements elementUtils = ExtensionRegistry.get(Elements)
-	extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val Types typeUtils = ExtensionRegistry.get(Types)
+	val transient extension Elements elementUtils = ExtensionRegistry.get(Elements)
+	val transient extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
 	
 	public def TypeMirror getJavaLangObject(){
 		findTypeElement(Object.name).asType

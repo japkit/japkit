@@ -17,12 +17,12 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
 class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Function1<Element, Boolean>{
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	val extension TypesExtensions typesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val extension RuleUtils ruleUtils = ExtensionRegistry.get(RuleUtils)
+	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension TypesExtensions typesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val transient extension RuleUtils ruleUtils = ExtensionRegistry.get(RuleUtils)
 
 	String srcExpr
 	String srcLang

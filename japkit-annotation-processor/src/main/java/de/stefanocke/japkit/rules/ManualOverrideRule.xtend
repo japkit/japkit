@@ -11,13 +11,13 @@ import org.eclipse.xtend.lib.Data
 
 @Data
 class ManualOverrideRule {
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension TypeResolver = ExtensionRegistry.get(TypeResolver)
-	val extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	val extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	val extension ELSupport =  ExtensionRegistry.get(ELSupport)
-	val protected extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension TypeResolver = ExtensionRegistry.get(TypeResolver)
+	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension ELSupport =  ExtensionRegistry.get(ELSupport)
+	val protected transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 
 	//The class selector for manual overrides
 	TypeMirror manualOverrides	

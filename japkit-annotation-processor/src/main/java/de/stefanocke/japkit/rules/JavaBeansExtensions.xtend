@@ -8,7 +8,7 @@ import javax.lang.model.type.TypeMirror
 
 class JavaBeansExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 
 	def getterName(CharSequence propertyName, boolean isBoolean) {
 		(if(isBoolean) "is" else "get") + propertyName.toString.toFirstUpper

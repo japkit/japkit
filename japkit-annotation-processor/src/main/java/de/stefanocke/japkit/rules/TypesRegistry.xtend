@@ -35,11 +35,11 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
  */
 class TypesRegistry {
 
-	extension Types = ExtensionRegistry.get(Types)
-	extension Elements = ExtensionRegistry.get(Elements)
-	extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
+	val transient extension Types = ExtensionRegistry.get(Types)
+	val transient extension Elements = ExtensionRegistry.get(Elements)
+	val transient extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
 	val MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 
 	new(){
 		load	

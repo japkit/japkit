@@ -14,7 +14,7 @@ class ClassNameRule extends AbstractRule{
 	NameRule classNameRule
 	NameRule packageNameRule
 	
-	val extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 	
 	
 	

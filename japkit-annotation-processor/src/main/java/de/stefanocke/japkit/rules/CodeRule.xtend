@@ -16,14 +16,14 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 @Data
 class CodeRule extends AbstractRule implements Function0<CharSequence> {
-	val protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val protected extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val protected extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	val protected extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-	val protected extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	val protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val protected extension RuleUtils = ExtensionRegistry.get(RuleUtils)
+	val protected transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val protected transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	val protected transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
+	val protected transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+	val protected transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	val protected transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val protected transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
+	val protected transient extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	
 
 	Element template

@@ -18,15 +18,15 @@ import static de.stefanocke.japkit.metaannotations.AnnotationMode.*
 
 @Data
 class AnnotationMappingRule extends AbstractRule{
-	val extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
-	val extension ProcessingEnvironment procEnv = ExtensionRegistry.get(ProcessingEnvironment)
-	//val extension RoundEnvironment roundEnv = ExtensionRegistry.get(RoundEnvironment)
-	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	val extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-	val extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
-	val extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val extension RuleUtils =  ExtensionRegistry.get(RuleUtils)
+	val transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ProcessingEnvironment procEnv = ExtensionRegistry.get(ProcessingEnvironment)
+	//val transient extension RoundEnvironment roundEnv = ExtensionRegistry.get(RoundEnvironment)
+	val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+	val transient extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
+	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val transient extension RuleUtils =  ExtensionRegistry.get(RuleUtils)
 
 	String id
 	()=>boolean activationRule

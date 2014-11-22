@@ -26,10 +26,10 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singl
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
 
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
-	val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
+	val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val RuleUtils ru = ExtensionRegistry.get(RuleUtils)
 	val GetterSetterRules gs = ExtensionRegistry.get(GetterSetterRules)
 

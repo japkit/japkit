@@ -13,8 +13,8 @@ import org.eclipse.xtend.lib.Data
 @Data
 class TriggerAnnotationRule extends AbstractRule{
 
-	protected val extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	protected val extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	protected val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
+	protected val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	
 	TypeElement triggerAnnotationTypeElement
 	List<ELVariableRule> varRules

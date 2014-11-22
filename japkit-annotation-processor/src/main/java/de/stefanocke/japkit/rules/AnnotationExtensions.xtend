@@ -13,10 +13,10 @@ import javax.lang.model.element.TypeElement
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	val extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
-	val extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val extension ELSupport = ExtensionRegistry.get(ELSupport)
+	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
+	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val transient extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 	/**
 	 * Maps annotations from a source element.

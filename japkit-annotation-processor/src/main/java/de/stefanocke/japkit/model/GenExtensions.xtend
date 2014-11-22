@@ -21,7 +21,7 @@ import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 
 class GenExtensions {
-	val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	
 	def createOverride(ExecutableElement m, CodeBody b) {
 		//TODO: Check, if method can be overridden?
