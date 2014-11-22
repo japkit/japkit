@@ -191,8 +191,8 @@ class TypesExtensions /**implements Types*/{
 			return false
 		}
 		
-		if(t1.isVoid) {
-			return t2.isVoid
+		if(t1.isVoid || t2.isVoid) {
+			return t2.isVoid && t1.isVoid
 		}
 
 		//if(t1.containsErrorType || t1.containsErrorType){
@@ -394,7 +394,23 @@ class TypesExtensions /**implements Types*/{
 		typeUtils.isSubsignature(m1, m2)
 	}
 	
-	def isSubtype(TypeMirror t1, TypeMirror t2) {
+	def dispatch boolean isSubtype(GenDeclaredType t1, TypeMirror t2) {
+		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtype(t2)  //TODO: What about type args here?
+	}
+	
+	def dispatch boolean isSubtype(DeclaredType t1, GenTypeMirror t2) {
+		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtype(t2)  //TODO: What about type args here?
+	}
+	
+	def dispatch boolean isSubtype(GenTypeMirror t1, TypeMirror t2) {
+		t1.isSameType(t2)
+	}
+	
+	def dispatch boolean isSubtype(TypeMirror t1, GenTypeMirror t2) {
+		t1.isSameType(t2)
+	}
+	
+	def dispatch boolean isSubtype(TypeMirror t1, TypeMirror t2) {
 		typeUtils.isSubtype(t1, t2)
 	}
 	

@@ -1,18 +1,7 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.rules.AbstractRule
-import de.stefanocke.japkit.rules.CodeFragmentRules
-import de.stefanocke.japkit.rules.ElementMatcher
-import de.stefanocke.japkit.rules.ElementsExtensions
-import de.stefanocke.japkit.rules.ExtensionRegistry
-import de.stefanocke.japkit.rules.GenerateClassContext
-import de.stefanocke.japkit.rules.MessageCollector
-import de.stefanocke.japkit.rules.PropertyFilter
-import de.stefanocke.japkit.rules.RuleFactory
-import de.stefanocke.japkit.rules.TypeElementNotFoundException
-import de.stefanocke.japkit.rules.TypeResolver
-import de.stefanocke.japkit.rules.TypesExtensions
-import de.stefanocke.japkit.rules.TypesRegistry
+import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.el.ElVariableError
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.util.ArrayList
 import java.util.Collections
@@ -26,8 +15,6 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.el.ELSupport
-import de.stefanocke.japkit.el.ElVariableError
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
