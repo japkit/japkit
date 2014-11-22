@@ -42,7 +42,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 		
 		val getDelegateMethod = if(delegate instanceof ExecutableElement){
 			delegate
-		} else if(delegate instanceof Property){
+		} else if(delegate instanceof de.stefanocke.japkit.model.Property){
 			delegate.getter
 		} else {
 			null

@@ -30,7 +30,7 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	NestingKind nestingKind
 	TypeMirror superclass
 	//auxiliary top level classes that have been generated for this GenTypeElement
-	@Property
+	@org.eclipse.xtend.lib.Property
 	Set<GenTypeElement> auxTopLevelClasses = newHashSet
 
 	def Set<GenTypeElement> allAuxTopLevelClasses(){

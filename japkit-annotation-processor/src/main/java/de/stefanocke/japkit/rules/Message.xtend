@@ -1,6 +1,7 @@
 package de.stefanocke.japkit.rules
 
 import javax.tools.Diagnostic.Kind
+import de.stefanocke.japkit.model.Path
 
 @Data
 public class Message {

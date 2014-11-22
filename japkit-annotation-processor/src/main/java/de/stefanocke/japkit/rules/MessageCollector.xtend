@@ -13,6 +13,8 @@ import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.model.AnnotationAndParent
+import de.stefanocke.japkit.model.Path
 
 /** Collects error messages for annotated classes.
  * <p>

@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.rules
+package de.stefanocke.japkit.model
 
 import java.lang.annotation.Annotation
 import javax.lang.model.element.Element

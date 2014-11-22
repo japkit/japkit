@@ -41,6 +41,10 @@ import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
 import de.stefanocke.japkit.metaannotations.SingleValue
+import de.stefanocke.japkit.model.AnnotationAndParent
+import de.stefanocke.japkit.model.AnnotationWrapper
+import de.stefanocke.japkit.model.AnnotationWithDefaultAnnotation
+import de.stefanocke.japkit.model.Path
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -853,7 +857,7 @@ class ElementsExtensions {
 		e.comment?.toString?.trim
 	}
 	
-	def private dispatch String docComment(Property p, boolean useRuntimeMetadata) {
+	def private dispatch String docComment(de.stefanocke.japkit.model.Property p, boolean useRuntimeMetadata) {
 		p.fieldOrGetter?.docComment(useRuntimeMetadata)  //TODO: If getter, extract @return comment here?
 	}
 

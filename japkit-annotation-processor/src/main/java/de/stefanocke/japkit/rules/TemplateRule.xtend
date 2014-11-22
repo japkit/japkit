@@ -20,6 +20,7 @@ import javax.lang.model.element.ElementKind
 import java.util.Map
 import de.stefanocke.japkit.metaannotations.CodeFragment
 import javax.lang.model.element.Element
+import de.stefanocke.japkit.model.AnnotationWithDefaultAnnotation
 
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{

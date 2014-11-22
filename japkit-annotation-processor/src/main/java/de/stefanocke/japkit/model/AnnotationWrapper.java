@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.rules;
+package de.stefanocke.japkit.model;
 
 import javax.lang.model.element.AnnotationMirror;
 
