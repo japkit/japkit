@@ -1,17 +1,17 @@
 package de.stefanocke.japkit.model
 
 import de.stefanocke.japkit.activeannotations.FieldsFromInterface
+import de.stefanocke.japkit.rules.ExtensionRegistry
+import de.stefanocke.japkit.rules.TypesExtensions
 import java.util.List
 import javax.lang.model.element.AnnotationValue
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.Name
 import javax.lang.model.element.VariableElement
+import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
-import de.stefanocke.japkit.rules.ExtensionRegistry
-import de.stefanocke.japkit.rules.TypesExtensions
-import javax.lang.model.type.TypeKind
 
 @FieldsFromInterface
 abstract class GenExecutableElement extends GenParameterizable implements ExecutableElement {

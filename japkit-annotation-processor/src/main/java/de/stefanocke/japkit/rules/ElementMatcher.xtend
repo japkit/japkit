@@ -1,16 +1,17 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.metaannotations.TypeCategory
 import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.metaannotations.TypeCategory
+import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
+import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.element.ElementKind
-import java.util.Set
-import javax.lang.model.element.TypeElement
+import org.eclipse.xtend.lib.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 

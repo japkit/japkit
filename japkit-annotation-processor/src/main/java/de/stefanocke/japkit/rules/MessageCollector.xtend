@@ -1,6 +1,8 @@
 package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.model.AnnotationAndParent
+import de.stefanocke.japkit.model.Path
 import java.util.List
 import java.util.Map
 import java.util.Set
@@ -11,10 +13,9 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic.Kind
+import org.eclipse.xtend.lib.Property
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.model.AnnotationAndParent
-import de.stefanocke.japkit.model.Path
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -31,7 +32,7 @@ class MessageCollector {
 	extension ProcessingEnvironment processingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
 	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	
-	@org.eclipse.xtend.lib.Property
+	@Property
 	boolean diagnosticLogging = false
 
 

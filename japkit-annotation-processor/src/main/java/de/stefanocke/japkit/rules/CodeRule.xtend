@@ -1,18 +1,18 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.el.ValueStack
 import de.stefanocke.japkit.model.CodeBody
 import de.stefanocke.japkit.model.EmitterContext
 import de.stefanocke.japkit.model.GenElement
-import de.stefanocke.japkit.el.ELSupport
-import de.stefanocke.japkit.el.ValueStack
 import java.util.List
+import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
-import org.eclipse.xtext.xbase.lib.Pair
-import java.util.Map
-import org.eclipse.xtext.xbase.lib.Functions.Function0
+import org.eclipse.xtend.lib.Data
 import org.eclipse.xtend2.lib.StringConcatenation
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 @Data
 class CodeRule extends AbstractRule implements Function0<CharSequence> {

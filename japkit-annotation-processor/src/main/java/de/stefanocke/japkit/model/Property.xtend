@@ -1,13 +1,13 @@
 package de.stefanocke.japkit.model
 
+import de.stefanocke.japkit.metaannotations.Properties
 import java.lang.annotation.Annotation
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementVisitor
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.model.GenName
-import de.stefanocke.japkit.metaannotations.Properties
+import org.eclipse.xtend.lib.Data
 
 @Data
 class Property implements VariableElement {

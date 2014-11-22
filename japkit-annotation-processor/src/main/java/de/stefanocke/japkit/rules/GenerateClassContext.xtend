@@ -1,11 +1,11 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.el.ValueStack
+import de.stefanocke.japkit.model.GenTypeElement
+import java.util.Stack
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import java.util.Stack
 
 /**
  * Provides access currently generated class and annotated class.

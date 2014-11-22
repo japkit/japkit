@@ -23,9 +23,9 @@ import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.WildcardType
 import org.apache.commons.lang3.StringEscapeUtils
+import org.eclipse.xtend2.lib.StringConcatenation
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import org.eclipse.xtend2.lib.StringConcatenation
 
 class JavaEmitter implements EmitterContext{
 

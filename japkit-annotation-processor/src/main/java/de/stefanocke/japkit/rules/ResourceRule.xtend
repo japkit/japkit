@@ -1,7 +1,8 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.metaannotations.ResourceLocation
 import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.el.ElVariableError
+import de.stefanocke.japkit.metaannotations.ResourceLocation
 import java.io.File
 import java.io.FileWriter
 import java.net.URL
@@ -9,7 +10,7 @@ import java.util.List
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
-import de.stefanocke.japkit.el.ElVariableError
+import org.eclipse.xtend.lib.Data
 
 @Data
 class ResourceRule extends AbstractRule{

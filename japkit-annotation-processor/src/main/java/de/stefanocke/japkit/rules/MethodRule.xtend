@@ -1,18 +1,19 @@
 package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.model.GenExtensions
 import de.stefanocke.japkit.model.GenMethod
 import de.stefanocke.japkit.model.GenParameter
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.AnnotationValue
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.element.AnnotationValue
+import org.eclipse.xtend.lib.Data
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
-import de.stefanocke.japkit.model.GenExtensions
 
 @Data
 class MethodRule extends ExecutableElementRule<GenMethod> {

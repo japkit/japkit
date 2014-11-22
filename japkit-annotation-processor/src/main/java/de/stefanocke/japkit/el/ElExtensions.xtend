@@ -2,6 +2,8 @@ package de.stefanocke.japkit.el
 
 import de.stefanocke.japkit.model.EmitterContext
 import de.stefanocke.japkit.rules.ElementsExtensions
+import de.stefanocke.japkit.rules.ExtensionRegistry
+import de.stefanocke.japkit.rules.GenerateClassContext
 import de.stefanocke.japkit.rules.JavaBeansExtensions
 import de.stefanocke.japkit.rules.TypesExtensions
 import de.stefanocke.japkit.rules.TypesRegistry
@@ -14,9 +16,6 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.stefanocke.japkit.rules.ExtensionRegistry.*
-import de.stefanocke.japkit.rules.ExtensionRegistry
-import de.stefanocke.japkit.rules.GenerateClassContext
-import de.stefanocke.japkit.rules.Rule
 
 class ElExtensions {
 

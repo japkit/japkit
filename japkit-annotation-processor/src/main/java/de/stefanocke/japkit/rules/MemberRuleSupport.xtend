@@ -1,14 +1,15 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenExtensions
 import de.stefanocke.japkit.model.GenTypeElement
-import de.stefanocke.japkit.el.ELSupport
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
+import org.eclipse.xtend.lib.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data

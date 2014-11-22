@@ -1,13 +1,14 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.ResourceTemplate
-import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.model.GenTypeElement
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import org.eclipse.xtend.lib.Data
 
 @Data
 class TriggerAnnotationRule extends AbstractRule{

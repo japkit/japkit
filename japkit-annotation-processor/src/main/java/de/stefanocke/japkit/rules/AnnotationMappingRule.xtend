@@ -1,10 +1,10 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.model.GenAnnotationMirror
-import de.stefanocke.japkit.model.GenExtensions
+import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.AnnotationMode
 import de.stefanocke.japkit.metaannotations.DefaultAnnotation
-import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.model.GenAnnotationMirror
+import de.stefanocke.japkit.model.GenExtensions
 import java.util.List
 import java.util.Map
 import java.util.Set
@@ -12,6 +12,7 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
+import org.eclipse.xtend.lib.Data
 
 import static de.stefanocke.japkit.metaannotations.AnnotationMode.*
 

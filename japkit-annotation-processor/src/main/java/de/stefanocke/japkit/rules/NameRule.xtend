@@ -1,9 +1,10 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELSupport
 import java.util.regex.Pattern
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import de.stefanocke.japkit.el.ELSupport
+import org.eclipse.xtend.lib.Data
 
 @Data
 class NameRule extends AbstractRule{

@@ -3,6 +3,7 @@ package de.stefanocke.japkit.rules
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import org.eclipse.xtend.lib.Data
 
 @Data
 class SwitchRule extends AbstractRule{

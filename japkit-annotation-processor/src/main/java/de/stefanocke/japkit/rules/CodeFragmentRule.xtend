@@ -1,9 +1,9 @@
 package de.stefanocke.japkit.rules
 
+import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import java.util.List
-import org.eclipse.xtend2.lib.StringConcatenation
+import org.eclipse.xtend.lib.Data
 
 @Data
 class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {

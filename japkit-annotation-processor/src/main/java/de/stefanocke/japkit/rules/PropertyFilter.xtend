@@ -2,12 +2,13 @@ package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.Properties
+import de.stefanocke.japkit.model.Property
 import java.util.Collection
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Property
+import org.eclipse.xtend.lib.Data
 
 @Data
 class PropertyFilter {
@@ -36,7 +37,7 @@ class PropertyFilter {
 	/**
 	 * Property source is determined by AV "sourceClass"
 	 */
-	def List<de.stefanocke.japkit.model.Property> getFilteredProperties() {
+	def List<Property> getFilteredProperties() {
 		val propertySource = handleTypeElementNotFound(null,
 			'''Could not find property source. No properties will be generated.''', currentAnnotatedClass ) [
 			sourceClass.resolveType.asTypeElement
@@ -50,7 +51,7 @@ class PropertyFilter {
 			emptyList
 	}
 
-	def List<de.stefanocke.japkit.model.Property> getFilteredProperties(TypeElement propertySource) {
+	def List<Property> getFilteredProperties(TypeElement propertySource) {
 
 		val properties = propertySource.properties(Object.name, fromFields)
 		

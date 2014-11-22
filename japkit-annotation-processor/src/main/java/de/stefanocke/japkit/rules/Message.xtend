@@ -1,7 +1,8 @@
 package de.stefanocke.japkit.rules
 
-import javax.tools.Diagnostic.Kind
 import de.stefanocke.japkit.model.Path
+import javax.tools.Diagnostic.Kind
+import org.eclipse.xtend.lib.Data
 
 @Data
 public class Message {

@@ -46,7 +46,7 @@ class ELResolver extends SimpleResolver {
 		super.getValue(context, base, property)
 	}
 
-	override invoke(ELContext context, Object base, Object method, Class[] paramTypes, Object[] params) {
+	override invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
 
 		val rootProperties = contextMap
 		

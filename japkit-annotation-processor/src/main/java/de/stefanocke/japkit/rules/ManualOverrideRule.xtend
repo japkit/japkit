@@ -1,12 +1,13 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenElement
-import de.stefanocke.japkit.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
+import org.eclipse.xtend.lib.Data
 
 @Data
 class ManualOverrideRule {

@@ -3,11 +3,17 @@ package de.stefanocke.japkit.rules
 import de.stefanocke.japkit.annotations.Order
 import de.stefanocke.japkit.annotations.ParamNames
 import de.stefanocke.japkit.annotations.RuntimeMetadata
+import de.stefanocke.japkit.metaannotations.SingleValue
+import de.stefanocke.japkit.model.AnnotationAndParent
+import de.stefanocke.japkit.model.AnnotationWithDefaultAnnotation
+import de.stefanocke.japkit.model.AnnotationWrapper
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenAnnotationValue
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenName
 import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.model.Path
+import de.stefanocke.japkit.model.Property
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.lang.annotation.Annotation
@@ -40,11 +46,6 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
-import de.stefanocke.japkit.metaannotations.SingleValue
-import de.stefanocke.japkit.model.AnnotationAndParent
-import de.stefanocke.japkit.model.AnnotationWrapper
-import de.stefanocke.japkit.model.AnnotationWithDefaultAnnotation
-import de.stefanocke.japkit.model.Path
 
 class ElementsExtensions {
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -857,7 +858,7 @@ class ElementsExtensions {
 		e.comment?.toString?.trim
 	}
 	
-	def private dispatch String docComment(de.stefanocke.japkit.model.Property p, boolean useRuntimeMetadata) {
+	def private dispatch String docComment(Property p, boolean useRuntimeMetadata) {
 		p.fieldOrGetter?.docComment(useRuntimeMetadata)  //TODO: If getter, extract @return comment here?
 	}
 

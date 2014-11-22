@@ -1,9 +1,10 @@
 package de.stefanocke.japkit.processor
 
 import de.stefanocke.japkit.annotations.Behavior
+import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.metaannotations.Trigger
 import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.model.JavaEmitter
-import de.stefanocke.japkit.metaannotations.Trigger
 import de.stefanocke.japkit.rules.AnnotationExtensions
 import de.stefanocke.japkit.rules.ElementsExtensions
 import de.stefanocke.japkit.rules.ExtensionRegistry
@@ -14,7 +15,7 @@ import de.stefanocke.japkit.rules.TypeElementNotFoundException
 import de.stefanocke.japkit.rules.TypeResolver
 import de.stefanocke.japkit.rules.TypesExtensions
 import de.stefanocke.japkit.rules.TypesRegistry
-import de.stefanocke.japkit.el.ELSupport
+import java.util.Collections
 import java.util.HashMap
 import java.util.HashSet
 import java.util.List
@@ -32,7 +33,6 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import java.util.Collections
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**

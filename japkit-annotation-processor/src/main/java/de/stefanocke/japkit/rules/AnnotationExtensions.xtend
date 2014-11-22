@@ -1,16 +1,15 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.metaannotations.Trigger
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenAnnotationValue
+import de.stefanocke.japkit.model.GenExtensions
+import java.util.ArrayList
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import java.util.ArrayList
-import de.stefanocke.japkit.model.GenExtensions
-import de.stefanocke.japkit.el.ELSupport
-import de.stefanocke.japkit.metaannotations.Clazz
 import javax.lang.model.element.TypeElement
-import de.stefanocke.japkit.metaannotations.Trigger
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)

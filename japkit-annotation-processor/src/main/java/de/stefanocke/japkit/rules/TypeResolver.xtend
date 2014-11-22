@@ -1,10 +1,11 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.model.GenArrayType
-import de.stefanocke.japkit.model.GenClass
+import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind
-import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.model.GenArrayType
+import de.stefanocke.japkit.model.GenClass
+import de.stefanocke.japkit.model.GenUnresolvedType
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
@@ -12,7 +13,6 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.model.GenUnresolvedType
 
 /**Resolves type references / class selectors from templates and annotations.*/
 class TypeResolver {

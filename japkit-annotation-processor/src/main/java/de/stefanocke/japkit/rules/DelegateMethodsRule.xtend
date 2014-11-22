@@ -1,10 +1,11 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.model.GenMethod
+import de.stefanocke.japkit.model.Property
 import java.util.ArrayList
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
-import de.stefanocke.japkit.model.GenMethod
 
 class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod> {
 
@@ -42,7 +43,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 		
 		val getDelegateMethod = if(delegate instanceof ExecutableElement){
 			delegate
-		} else if(delegate instanceof de.stefanocke.japkit.model.Property){
+		} else if(delegate instanceof Property){
 			delegate.getter
 		} else {
 			null

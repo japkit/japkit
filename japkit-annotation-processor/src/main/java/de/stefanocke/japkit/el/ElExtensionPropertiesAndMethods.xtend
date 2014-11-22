@@ -1,6 +1,7 @@
 package de.stefanocke.japkit.el
 
 import java.util.Map
+import org.eclipse.xtend.lib.Property
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
@@ -16,7 +17,7 @@ class ElExtensionPropertiesAndMethods {
 	
 	// baseClass -> ( methodName -> ((rootProperties, base, params)=>resultValue) ) 
 	@Property
-	val Map<Class<?>, Map<String, (Map<String, Object>, Object, Class[], Object[])=>Object>> methodNameToClosureByClass = newHashMap
+	val Map<Class<?>, Map<String, (Map<String, Object>, Object, Class<?>[], Object[])=>Object>> methodNameToClosureByClass = newHashMap
 	
 	def <T> void  registerProperty(Class<T> baseClass, String propertyName, (Map<String, Object>, T)=>Object getterClosure){
 		propertyNameToGetterClosureByClass.getOrCreateMap(baseClass).put(propertyName, getterClosure as (Map<String, Object>, Object)=>Object)
@@ -26,8 +27,8 @@ class ElExtensionPropertiesAndMethods {
 		getPropertyClosureByClass.put(baseClass, getPropertyClosure as (Map<String, Object>, Object, String)=>Object)
 	}
 	
-	def <T>  void registerMethod(Class<T> baseClass, String methodName, (Map<String, Object>, T, Class[], Object[])=>Object closure){
-		methodNameToClosureByClass.getOrCreateMap(baseClass).put(methodName, closure as (Map<String, Object>, Object, Class[], Object[])=>Object)
+	def <T>  void registerMethod(Class<T> baseClass, String methodName, (Map<String, Object>, T, Class<?>[], Object[])=>Object closure){
+		methodNameToClosureByClass.getOrCreateMap(baseClass).put(methodName, closure as (Map<String, Object>, Object, Class<?>[], Object[])=>Object)
 	}
 	
 	def findMethodClosure(Object base, String methodName){

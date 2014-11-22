@@ -4,6 +4,7 @@ import de.stefanocke.japkit.el.ELSupport
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.tools.Diagnostic.Kind
+import org.eclipse.xtend.lib.Data
 
 @Data
 class ConstraintRule extends AbstractRule{

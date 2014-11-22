@@ -1,14 +1,12 @@
 package de.stefanocke.japkit.rules
 
-import com.google.common.cache.CacheBuilder
-import javax.lang.model.element.AnnotationMirror
-import com.google.common.cache.Cache
-import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.metaannotations.Template
 import de.stefanocke.japkit.metaannotations.Trigger
+import java.util.HashMap
 import java.util.IdentityHashMap
 import java.util.Map
-import java.util.HashMap
+import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.TypeElement
 
 class RuleFactory {
 	

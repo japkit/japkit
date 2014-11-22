@@ -3,6 +3,7 @@ package de.stefanocke.japkit.rules
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement
+import org.eclipse.xtend.lib.Data
 
 @Data
 class ClassNameRule extends AbstractRule{

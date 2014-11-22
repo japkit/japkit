@@ -1,26 +1,27 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.model.GenElement
-import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.metaannotations.Clazz
+import de.stefanocke.japkit.metaannotations.CodeFragment
 import de.stefanocke.japkit.metaannotations.Constructor
 import de.stefanocke.japkit.metaannotations.Field
 import de.stefanocke.japkit.metaannotations.InnerClass
 import de.stefanocke.japkit.metaannotations.Method
-import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.model.AnnotationWithDefaultAnnotation
+import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.model.GenTypeElement
 import java.util.List
+import java.util.Map
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
+import javax.lang.model.element.VariableElement
+import org.eclipse.xtend.lib.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
-import de.stefanocke.japkit.metaannotations.Clazz
-import javax.lang.model.element.VariableElement
-import javax.lang.model.element.ElementKind
-import java.util.Map
-import de.stefanocke.japkit.metaannotations.CodeFragment
-import javax.lang.model.element.Element
-import de.stefanocke.japkit.model.AnnotationWithDefaultAnnotation
 
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{

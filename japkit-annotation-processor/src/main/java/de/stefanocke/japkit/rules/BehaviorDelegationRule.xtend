@@ -15,6 +15,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
+import org.eclipse.xtend.lib.Data
 
 @Data
 class BehaviorDelegationRule extends AbstractRule {

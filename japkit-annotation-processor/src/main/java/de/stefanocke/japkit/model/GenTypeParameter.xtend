@@ -1,11 +1,11 @@
 package de.stefanocke.japkit.model
 
-import javax.lang.model.element.TypeParameterElement
 import de.stefanocke.japkit.activeannotations.FieldsFromInterface
+import java.util.List
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
+import javax.lang.model.element.TypeParameterElement
 import javax.lang.model.type.TypeMirror
-import java.util.List
 
 @FieldsFromInterface
 class GenTypeParameter extends GenElement implements TypeParameterElement {

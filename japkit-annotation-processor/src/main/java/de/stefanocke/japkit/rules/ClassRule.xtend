@@ -1,5 +1,6 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenAnnotationType
 import de.stefanocke.japkit.model.GenAnnotationValue
@@ -11,7 +12,6 @@ import de.stefanocke.japkit.model.GenExtensions
 import de.stefanocke.japkit.model.GenInterface
 import de.stefanocke.japkit.model.GenPackage
 import de.stefanocke.japkit.model.GenTypeElement
-import de.stefanocke.japkit.el.ELSupport
 import java.util.List
 import java.util.Set
 import javax.annotation.processing.ProcessingEnvironment
@@ -22,6 +22,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
+import org.eclipse.xtend.lib.Data
 
 @Data
 class ClassRule extends AbstractRule{

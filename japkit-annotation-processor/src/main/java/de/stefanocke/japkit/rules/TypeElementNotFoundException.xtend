@@ -1,6 +1,7 @@
 package de.stefanocke.japkit.rules
 
 import javax.lang.model.element.AnnotationMirror
+import org.eclipse.xtend.lib.Data
 
 /**
  * This exception is thrown if the type element for a given type mirror could not be found.

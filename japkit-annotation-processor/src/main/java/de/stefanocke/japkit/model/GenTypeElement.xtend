@@ -6,8 +6,10 @@ import de.stefanocke.japkit.rules.ElementsExtensions
 import de.stefanocke.japkit.rules.ExtensionRegistry
 import de.stefanocke.japkit.rules.TypesExtensions
 import java.util.Comparator
+import java.util.HashSet
 import java.util.List
 import java.util.Map
+import java.util.Set
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
@@ -20,8 +22,6 @@ import javax.lang.model.element.TypeParameterElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
-import java.util.Set
-import java.util.HashSet
 
 @FieldsFromInterface
 abstract class GenTypeElement extends GenParameterizable implements TypeElement {

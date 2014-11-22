@@ -1,6 +1,7 @@
 package de.stefanocke.japkit.model
 
 import javax.lang.model.element.Name
+import org.eclipse.xtend.lib.Data
 
 @Data
 class GenName implements Name {

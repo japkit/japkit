@@ -7,6 +7,7 @@ import javax.lang.model.element.Name
 import javax.lang.model.element.PackageElement
 
 import static javax.lang.model.element.ElementKind.*
+
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 @FieldsFromInterface

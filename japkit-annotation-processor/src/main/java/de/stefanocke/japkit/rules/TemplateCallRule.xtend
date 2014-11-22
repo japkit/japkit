@@ -4,8 +4,9 @@ import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenTypeElement
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
-import org.eclipse.xtext.xbase.lib.Functions.Function1
 import javax.lang.model.element.TypeElement
+import org.eclipse.xtend.lib.Data
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
 class TemplateCallRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>> {

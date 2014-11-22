@@ -3,6 +3,7 @@ package de.stefanocke.japkit.rules
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.AnnotationValue
 import javax.lang.model.element.Element
+import org.eclipse.xtend.lib.Data
 
 /**
  * An exception that prevents further processing of an annotation. Should be catched by the processor and reported as error

@@ -1,9 +1,9 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.rules.Rule
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import org.eclipse.xtend.lib.Data
 
 @Data
 class AbstractRule implements Rule {

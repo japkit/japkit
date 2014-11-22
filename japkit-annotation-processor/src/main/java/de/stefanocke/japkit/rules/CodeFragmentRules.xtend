@@ -3,10 +3,11 @@ package de.stefanocke.japkit.rules
 import de.stefanocke.japkit.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
+import org.eclipse.xtend.lib.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 
-import static extension de.stefanocke.japkit.rules.RuleUtils.*
 import static extension de.stefanocke.japkit.rules.CodeRule.withLinebreak
+import static extension de.stefanocke.japkit.rules.RuleUtils.*
 
 @Data
 class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{

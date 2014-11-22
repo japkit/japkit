@@ -1,8 +1,9 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.metaannotations.AVMode
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenAnnotationValue
-import de.stefanocke.japkit.el.ELSupport
 import java.util.ArrayList
 import java.util.List
 import java.util.Map
@@ -10,7 +11,7 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.metaannotations.AVMode
+import org.eclipse.xtend.lib.Data
 
 @Data
 class AnnotationValueMappingRule extends AbstractRule{

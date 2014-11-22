@@ -1,7 +1,8 @@
 package de.stefanocke.japkit.model
 
-import java.util.List
 import java.util.ArrayList
+import java.util.List
+import org.eclipse.xtend.lib.Data
 
 /** Path for nested annotations / annotation values or for bean properties. */
 @Data

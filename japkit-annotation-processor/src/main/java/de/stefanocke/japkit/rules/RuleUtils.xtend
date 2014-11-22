@@ -1,14 +1,16 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.el.ElVariableError
+import de.stefanocke.japkit.metaannotations.Param
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenExtensions
 import de.stefanocke.japkit.model.GenParameter
-import de.stefanocke.japkit.metaannotations.Param
-import de.stefanocke.japkit.el.ELSupport
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections
+import java.util.HashSet
 import java.util.List
 import java.util.Set
 import java.util.regex.Pattern
@@ -17,12 +19,10 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.VariableElement
+import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
-import de.stefanocke.japkit.el.ElVariableError
-import java.util.HashSet
-import javax.lang.model.type.TypeKind
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
