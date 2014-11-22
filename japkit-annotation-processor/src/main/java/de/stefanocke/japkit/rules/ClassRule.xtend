@@ -12,7 +12,6 @@ import de.stefanocke.japkit.gen.GenInterface
 import de.stefanocke.japkit.gen.GenPackage
 import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.el.ELSupport
-import de.stefanocke.japkit.el.ELVariableRule
 import java.util.List
 import java.util.Set
 import javax.annotation.processing.ProcessingEnvironment
@@ -210,7 +209,7 @@ class ClassRule extends AbstractRule{
 	def void addAllAuxTopLevelClasses(Set<GenTypeElement> result, GenTypeElement typeElement) {
 		result.addAll(typeElement.auxTopLevelClasses)
 		typeElement.declaredTypes.forEach[addAllAuxTopLevelClasses(result, it as GenTypeElement)]
-		typeElement.auxTopLevelClasses.forEach[addAllAuxTopLevelClasses(result, it as GenTypeElement)]
+		typeElement.auxTopLevelClasses.forEach[addAllAuxTopLevelClasses(result, it)]
 	}
 	
 	

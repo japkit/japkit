@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.el
+package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.rules.AbstractRule
 import de.stefanocke.japkit.rules.CodeFragmentRules
@@ -26,6 +26,8 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.el.ElVariableError
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {

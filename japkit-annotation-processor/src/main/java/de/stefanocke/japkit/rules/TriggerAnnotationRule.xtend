@@ -4,7 +4,6 @@ import de.stefanocke.japkit.gen.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.ResourceTemplate
 import de.stefanocke.japkit.el.ELSupport
-import de.stefanocke.japkit.el.ELVariableRule
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror

@@ -6,7 +6,6 @@ import de.stefanocke.japkit.gen.GenExtensions
 import de.stefanocke.japkit.gen.GenParameter
 import de.stefanocke.japkit.metaannotations.Param
 import de.stefanocke.japkit.el.ELSupport
-import de.stefanocke.japkit.el.ELVariableRule
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections
