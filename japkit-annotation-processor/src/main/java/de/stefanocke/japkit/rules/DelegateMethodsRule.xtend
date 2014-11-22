@@ -4,7 +4,7 @@ import java.util.ArrayList
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
-import de.stefanocke.japkit.gen.GenMethod
+import de.stefanocke.japkit.model.GenMethod
 
 class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod> {
 

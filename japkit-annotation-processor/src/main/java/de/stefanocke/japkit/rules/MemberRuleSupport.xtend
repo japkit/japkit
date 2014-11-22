@@ -1,8 +1,8 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenElement
-import de.stefanocke.japkit.gen.GenExtensions
-import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.model.GenExtensions
+import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.el.ELSupport
 import java.util.List
 import java.util.Set

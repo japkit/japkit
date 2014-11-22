@@ -1,6 +1,6 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.model.GenTypeElement
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 

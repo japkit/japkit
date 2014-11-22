@@ -1,8 +1,8 @@
 package de.stefanocke.japkit.processor
 
 import de.stefanocke.japkit.annotations.Behavior
-import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.gen.JavaEmitter
+import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.model.JavaEmitter
 import de.stefanocke.japkit.metaannotations.Trigger
 import de.stefanocke.japkit.rules.AnnotationExtensions
 import de.stefanocke.japkit.rules.ElementsExtensions

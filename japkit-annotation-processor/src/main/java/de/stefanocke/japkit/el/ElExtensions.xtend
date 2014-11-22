@@ -1,6 +1,6 @@
 package de.stefanocke.japkit.el
 
-import de.stefanocke.japkit.gen.EmitterContext
+import de.stefanocke.japkit.model.EmitterContext
 import de.stefanocke.japkit.rules.ElementsExtensions
 import de.stefanocke.japkit.rules.JavaBeansExtensions
 import de.stefanocke.japkit.rules.TypesExtensions

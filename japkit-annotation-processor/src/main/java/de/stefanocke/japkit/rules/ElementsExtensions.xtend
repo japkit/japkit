@@ -3,11 +3,11 @@ package de.stefanocke.japkit.rules
 import de.stefanocke.japkit.annotations.Order
 import de.stefanocke.japkit.annotations.ParamNames
 import de.stefanocke.japkit.annotations.RuntimeMetadata
-import de.stefanocke.japkit.gen.GenAnnotationMirror
-import de.stefanocke.japkit.gen.GenAnnotationValue
-import de.stefanocke.japkit.gen.GenElement
-import de.stefanocke.japkit.gen.GenName
-import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.model.GenAnnotationMirror
+import de.stefanocke.japkit.model.GenAnnotationValue
+import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.model.GenName
+import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.lang.annotation.Annotation

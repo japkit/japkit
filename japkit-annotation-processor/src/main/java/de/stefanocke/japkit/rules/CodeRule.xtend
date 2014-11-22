@@ -1,8 +1,8 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.CodeBody
-import de.stefanocke.japkit.gen.EmitterContext
-import de.stefanocke.japkit.gen.GenElement
+import de.stefanocke.japkit.model.CodeBody
+import de.stefanocke.japkit.model.EmitterContext
+import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.el.ValueStack
 import java.util.List

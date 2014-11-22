@@ -1,13 +1,13 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenClass
-import de.stefanocke.japkit.gen.GenConstructor
-import de.stefanocke.japkit.gen.GenExtensions
-import de.stefanocke.japkit.gen.GenField
-import de.stefanocke.japkit.gen.GenInterface
-import de.stefanocke.japkit.gen.GenMethod
-import de.stefanocke.japkit.gen.GenParameter
-import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.model.GenClass
+import de.stefanocke.japkit.model.GenConstructor
+import de.stefanocke.japkit.model.GenExtensions
+import de.stefanocke.japkit.model.GenField
+import de.stefanocke.japkit.model.GenInterface
+import de.stefanocke.japkit.model.GenMethod
+import de.stefanocke.japkit.model.GenParameter
+import de.stefanocke.japkit.model.GenTypeElement
 import java.util.ArrayList
 import java.util.IdentityHashMap
 import java.util.Map

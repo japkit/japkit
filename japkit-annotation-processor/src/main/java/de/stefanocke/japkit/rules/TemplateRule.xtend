@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenElement
-import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Constructor
 import de.stefanocke.japkit.metaannotations.Field
 import de.stefanocke.japkit.metaannotations.InnerClass

@@ -1,9 +1,9 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.CodeBody
-import de.stefanocke.japkit.gen.GenElement
-import de.stefanocke.japkit.gen.GenExecutableElement
-import de.stefanocke.japkit.gen.GenParameter
+import de.stefanocke.japkit.model.CodeBody
+import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.model.GenExecutableElement
+import de.stefanocke.japkit.model.GenParameter
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror

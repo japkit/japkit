@@ -6,7 +6,7 @@ import javax.lang.model.element.ElementVisitor
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.gen.GenName
+import de.stefanocke.japkit.model.GenName
 import de.stefanocke.japkit.metaannotations.Properties
 
 @Data

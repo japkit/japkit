@@ -1,16 +1,16 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenAnnotationMirror
-import de.stefanocke.japkit.gen.GenAnnotationType
-import de.stefanocke.japkit.gen.GenAnnotationValue
-import de.stefanocke.japkit.gen.GenClass
-import de.stefanocke.japkit.gen.GenElement
-import de.stefanocke.japkit.gen.GenEnum
-import de.stefanocke.japkit.gen.GenExecutableElement
-import de.stefanocke.japkit.gen.GenExtensions
-import de.stefanocke.japkit.gen.GenInterface
-import de.stefanocke.japkit.gen.GenPackage
-import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.model.GenAnnotationMirror
+import de.stefanocke.japkit.model.GenAnnotationType
+import de.stefanocke.japkit.model.GenAnnotationValue
+import de.stefanocke.japkit.model.GenClass
+import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.model.GenEnum
+import de.stefanocke.japkit.model.GenExecutableElement
+import de.stefanocke.japkit.model.GenExtensions
+import de.stefanocke.japkit.model.GenInterface
+import de.stefanocke.japkit.model.GenPackage
+import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.el.ELSupport
 import java.util.List
 import java.util.Set

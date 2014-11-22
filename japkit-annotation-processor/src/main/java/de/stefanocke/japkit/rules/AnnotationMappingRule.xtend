@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenAnnotationMirror
-import de.stefanocke.japkit.gen.GenExtensions
+import de.stefanocke.japkit.model.GenAnnotationMirror
+import de.stefanocke.japkit.model.GenExtensions
 import de.stefanocke.japkit.metaannotations.AnnotationMode
 import de.stefanocke.japkit.metaannotations.DefaultAnnotation
 import de.stefanocke.japkit.el.ELSupport

@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenAnnotationMirror
-import de.stefanocke.japkit.gen.GenElement
+import de.stefanocke.japkit.model.GenAnnotationMirror
+import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror

@@ -1,11 +1,11 @@
 package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.annotations.Generated
-import de.stefanocke.japkit.gen.GenAnnotationMirror
-import de.stefanocke.japkit.gen.GenAnnotationValue
-import de.stefanocke.japkit.gen.GenDeclaredType
-import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.gen.GenTypeMirror
+import de.stefanocke.japkit.model.GenAnnotationMirror
+import de.stefanocke.japkit.model.GenAnnotationValue
+import de.stefanocke.japkit.model.GenDeclaredType
+import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.model.GenTypeMirror
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.util.Collections
@@ -27,7 +27,7 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import de.stefanocke.japkit.gen.GenUnresolvedType
+import de.stefanocke.japkit.model.GenUnresolvedType
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.

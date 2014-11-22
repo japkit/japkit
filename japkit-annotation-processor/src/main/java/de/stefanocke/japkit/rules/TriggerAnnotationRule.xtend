@@ -1,6 +1,6 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.ResourceTemplate
 import de.stefanocke.japkit.el.ELSupport

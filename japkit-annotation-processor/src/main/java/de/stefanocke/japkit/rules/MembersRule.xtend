@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenElement
-import de.stefanocke.japkit.gen.GenTypeElement
+import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.model.GenTypeElement
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import org.eclipse.xtext.xbase.lib.Functions.Function1

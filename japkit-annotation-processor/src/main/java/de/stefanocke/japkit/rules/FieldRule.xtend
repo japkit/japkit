@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.CodeBody
-import de.stefanocke.japkit.gen.GenField
+import de.stefanocke.japkit.model.CodeBody
+import de.stefanocke.japkit.model.GenField
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror

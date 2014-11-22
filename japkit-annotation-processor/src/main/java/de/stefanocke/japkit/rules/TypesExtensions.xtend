@@ -1,8 +1,8 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.gen.GenDeclaredType
-import de.stefanocke.japkit.gen.GenTypeElement
-import de.stefanocke.japkit.gen.GenTypeMirror
+import de.stefanocke.japkit.model.GenDeclaredType
+import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.model.GenTypeMirror
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Calendar
