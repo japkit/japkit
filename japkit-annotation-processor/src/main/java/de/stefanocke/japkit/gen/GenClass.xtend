@@ -1,8 +1,8 @@
 package de.stefanocke.japkit.gen
 
 import de.stefanocke.japkit.activeannotations.FieldsFromInterface
-import de.stefanocke.japkit.support.ExtensionRegistry
-import de.stefanocke.japkit.support.TypesExtensions
+import de.stefanocke.japkit.rules.ExtensionRegistry
+import de.stefanocke.japkit.rules.TypesExtensions
 import javax.lang.model.element.TypeElement
 
 import static javax.lang.model.element.ElementKind.*

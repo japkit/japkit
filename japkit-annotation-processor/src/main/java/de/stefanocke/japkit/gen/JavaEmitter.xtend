@@ -1,9 +1,9 @@
 package de.stefanocke.japkit.gen
 
-import de.stefanocke.japkit.support.ElementsExtensions
-import de.stefanocke.japkit.support.ExtensionRegistry
-import de.stefanocke.japkit.support.TypesExtensions
-import de.stefanocke.japkit.support.TypesRegistry
+import de.stefanocke.japkit.rules.ElementsExtensions
+import de.stefanocke.japkit.rules.ExtensionRegistry
+import de.stefanocke.japkit.rules.TypesExtensions
+import de.stefanocke.japkit.rules.TypesRegistry
 import java.util.Collection
 import java.util.List
 import java.util.Map

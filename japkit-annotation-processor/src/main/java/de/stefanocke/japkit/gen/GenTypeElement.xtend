@@ -2,9 +2,9 @@ package de.stefanocke.japkit.gen
 
 import de.stefanocke.japkit.activeannotations.Derived
 import de.stefanocke.japkit.activeannotations.FieldsFromInterface
-import de.stefanocke.japkit.support.ElementsExtensions
-import de.stefanocke.japkit.support.ExtensionRegistry
-import de.stefanocke.japkit.support.TypesExtensions
+import de.stefanocke.japkit.rules.ElementsExtensions
+import de.stefanocke.japkit.rules.ExtensionRegistry
+import de.stefanocke.japkit.rules.TypesExtensions
 import java.util.Comparator
 import java.util.List
 import java.util.Map

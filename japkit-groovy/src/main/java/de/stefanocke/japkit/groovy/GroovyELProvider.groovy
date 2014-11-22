@@ -20,13 +20,11 @@ import org.eclipse.xtext.xbase.lib.Pair
 
 import com.google.common.base.Stopwatch;
 
-import de.stefanocke.japkit.support.ExtensionRegistry;
-import de.stefanocke.japkit.support.MessageCollector;
-import de.stefanocke.japkit.support.el.ELProvider;
-import de.stefanocke.japkit.support.el.ELProviderException;
-import de.stefanocke.japkit.support.el.ElExtensionPropertiesAndMethods;
-import de.stefanocke.japkit.support.el.ElExtensions;
-import de.stefanocke.japkit.support.el.ValueStack
+import de.stefanocke.japkit.el.ELProvider;
+import de.stefanocke.japkit.el.ELProviderException;
+import de.stefanocke.japkit.el.ElExtensionPropertiesAndMethods;
+import de.stefanocke.japkit.el.ElExtensions;
+import de.stefanocke.japkit.el.ValueStack
 
 class GroovyELProvider implements ELProvider {
 
@@ -141,7 +139,7 @@ class GroovyELProvider implements ELProvider {
 			if( template == null && templateLastModified != null){
 				
 				def t = templatesStatic.get(templateUrl)
-				def ProcessingEnvironment pe = ExtensionRegistry.get(ProcessingEnvironment)
+				//def ProcessingEnvironment pe = ExtensionRegistry.get(ProcessingEnvironment)
 				//pe.messager.printMessage(Diagnostic.Kind.WARNING, "Groovy template for ${templateUrl} in static cache: ${t}. Last modified: ${templateLastModified}");
 				if(t!=null && templateLastModified<=t.key){
 					template = t.value
@@ -150,7 +148,7 @@ class GroovyELProvider implements ELProvider {
 			}
 
 			if (template == null){
-				def ProcessingEnvironment pe = ExtensionRegistry.get(ProcessingEnvironment)
+				//def ProcessingEnvironment pe = ExtensionRegistry.get(ProcessingEnvironment)
 				//pe.messager.printMessage(Diagnostic.Kind.WARNING, "Create Groovy template for ${templateUrl}. Cache: ${templates}");
 				
 				switch(templateLanguage){

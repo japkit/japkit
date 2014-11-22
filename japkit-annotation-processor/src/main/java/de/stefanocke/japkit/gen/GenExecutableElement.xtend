@@ -9,8 +9,8 @@ import javax.lang.model.element.Name
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
-import de.stefanocke.japkit.support.ExtensionRegistry
-import de.stefanocke.japkit.support.TypesExtensions
+import de.stefanocke.japkit.rules.ExtensionRegistry
+import de.stefanocke.japkit.rules.TypesExtensions
 import javax.lang.model.type.TypeKind
 
 @FieldsFromInterface

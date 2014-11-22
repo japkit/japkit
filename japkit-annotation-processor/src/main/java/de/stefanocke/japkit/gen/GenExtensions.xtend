@@ -1,9 +1,9 @@
 package de.stefanocke.japkit.gen
 
 import de.stefanocke.japkit.annotations.Order
-import de.stefanocke.japkit.support.ElementsExtensions
-import de.stefanocke.japkit.support.ExtensionRegistry
-import de.stefanocke.japkit.support.TypeElementNotFoundException
+import de.stefanocke.japkit.rules.ElementsExtensions
+import de.stefanocke.japkit.rules.ExtensionRegistry
+import de.stefanocke.japkit.rules.TypeElementNotFoundException
 import java.util.ArrayList
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
@@ -15,8 +15,8 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.support.TypeResolver
-import de.stefanocke.japkit.support.RuleUtils
+import de.stefanocke.japkit.rules.TypeResolver
+import de.stefanocke.japkit.rules.RuleUtils
 import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
 
