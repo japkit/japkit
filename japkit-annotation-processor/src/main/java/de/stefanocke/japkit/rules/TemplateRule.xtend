@@ -9,6 +9,8 @@ import de.stefanocke.japkit.metaannotations.Method
 import de.stefanocke.japkit.model.AnnotationWithDefaultAnnotation
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.TypeResolver
 import java.util.List
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
@@ -20,7 +22,7 @@ import javax.lang.model.element.VariableElement
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
-import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
+import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{

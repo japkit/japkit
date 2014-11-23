@@ -4,6 +4,12 @@ import de.stefanocke.japkit.metaannotations.Trigger
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenAnnotationValue
 import de.stefanocke.japkit.model.GenExtensions
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.MessageCollector
+import de.stefanocke.japkit.services.ProcessingException
+import de.stefanocke.japkit.services.TypeElementNotFoundException
+import de.stefanocke.japkit.services.TypesExtensions
 import java.util.ArrayList
 import java.util.List
 import javax.lang.model.element.AnnotationMirror

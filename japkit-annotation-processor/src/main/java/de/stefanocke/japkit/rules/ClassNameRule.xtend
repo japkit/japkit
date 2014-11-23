@@ -1,5 +1,6 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.services.ProcessingException
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement

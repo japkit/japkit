@@ -8,6 +8,8 @@ import de.stefanocke.japkit.model.GenInterface
 import de.stefanocke.japkit.model.GenMethod
 import de.stefanocke.japkit.model.GenParameter
 import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.TypeResolver
 import java.util.ArrayList
 import java.util.IdentityHashMap
 import java.util.Map

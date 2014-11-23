@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.rules
+package de.stefanocke.japkit.services
 
 import de.stefanocke.japkit.annotations.Order
 import de.stefanocke.japkit.annotations.ParamNames
@@ -12,8 +12,11 @@ import de.stefanocke.japkit.model.GenAnnotationValue
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenName
 import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.model.ParameterWrapper
 import de.stefanocke.japkit.model.Path
 import de.stefanocke.japkit.model.Property
+import de.stefanocke.japkit.rules.AnnotationExtensions
+import de.stefanocke.japkit.rules.RuleFactory
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.lang.annotation.Annotation
@@ -46,7 +49,6 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
-import de.stefanocke.japkit.model.ParameterWrapper
 
 class ElementsExtensions {
 	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)

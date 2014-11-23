@@ -1,6 +1,8 @@
 package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import org.eclipse.xtend.lib.annotations.Data

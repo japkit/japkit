@@ -1,10 +1,10 @@
 package de.stefanocke.japkit.util
 
+import java.util.List
 import java.util.Map
 import java.util.Set
-import java.util.List
-import java.util.TreeSet
 import java.util.SortedSet
+import java.util.TreeSet
 
 class MoreCollectionExtensions {
 	def static <K, V> V getOrCreate(Map<K, ? super V> map, K key, (K)=>V factory) {

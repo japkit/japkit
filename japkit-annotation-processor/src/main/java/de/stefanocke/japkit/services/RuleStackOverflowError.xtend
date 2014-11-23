@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.rules
+package de.stefanocke.japkit.services
 
 class RuleStackOverflowError extends Error {
 	

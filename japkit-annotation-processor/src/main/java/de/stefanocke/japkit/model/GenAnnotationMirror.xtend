@@ -2,8 +2,8 @@ package de.stefanocke.japkit.model
 
 import de.stefanocke.japkit.activeannotations.FieldsFromInterface
 import de.stefanocke.japkit.activeannotations.Required
-import de.stefanocke.japkit.rules.ExtensionRegistry
-import de.stefanocke.japkit.rules.TypesExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.TypesExtensions
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.AnnotationValue

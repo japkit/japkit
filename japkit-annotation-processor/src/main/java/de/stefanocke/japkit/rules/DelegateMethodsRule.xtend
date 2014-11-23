@@ -2,6 +2,7 @@ package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.model.GenMethod
 import de.stefanocke.japkit.model.Property
+import de.stefanocke.japkit.services.ExtensionRegistry
 import java.util.ArrayList
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element

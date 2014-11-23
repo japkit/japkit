@@ -3,11 +3,11 @@ package de.stefanocke.japkit.model
 import de.stefanocke.japkit.annotations.Order
 import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
-import de.stefanocke.japkit.rules.ElementsExtensions
-import de.stefanocke.japkit.rules.ExtensionRegistry
 import de.stefanocke.japkit.rules.RuleUtils
-import de.stefanocke.japkit.rules.TypeElementNotFoundException
-import de.stefanocke.japkit.rules.TypeResolver
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.TypeElementNotFoundException
+import de.stefanocke.japkit.services.TypeResolver
 import java.util.ArrayList
 import java.util.List
 import javax.lang.model.element.AnnotationMirror

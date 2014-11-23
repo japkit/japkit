@@ -2,9 +2,9 @@ package de.stefanocke.japkit.model
 
 import de.stefanocke.japkit.activeannotations.Derived
 import de.stefanocke.japkit.activeannotations.FieldsFromInterface
-import de.stefanocke.japkit.rules.ElementsExtensions
-import de.stefanocke.japkit.rules.ExtensionRegistry
-import de.stefanocke.japkit.rules.TypesExtensions
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.TypesExtensions
 import java.util.Comparator
 import java.util.HashSet
 import java.util.List

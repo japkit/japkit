@@ -3,6 +3,7 @@ package de.stefanocke.japkit.rules
 import de.stefanocke.japkit.metaannotations.AVMode
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenAnnotationValue
+import de.stefanocke.japkit.services.ProcessingException
 import java.util.ArrayList
 import java.util.List
 import java.util.Map

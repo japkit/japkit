@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.rules
+package de.stefanocke.japkit.services
 
 import de.stefanocke.japkit.model.Path
 import javax.tools.Diagnostic.Kind

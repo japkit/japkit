@@ -1,6 +1,9 @@
 package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.ProcessingException
 import java.util.regex.Pattern
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element

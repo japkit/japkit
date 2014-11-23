@@ -1,10 +1,16 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELSupport
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.GenerateClassContext
+import de.stefanocke.japkit.services.MessageCollector
+import de.stefanocke.japkit.services.TypesExtensions
+import de.stefanocke.japkit.services.TypesRegistry
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
-import de.stefanocke.japkit.el.ELSupport
 
 @Data
 class AbstractRule implements Rule {

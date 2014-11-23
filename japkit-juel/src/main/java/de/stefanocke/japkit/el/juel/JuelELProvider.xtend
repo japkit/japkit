@@ -2,7 +2,7 @@ package de.stefanocke.japkit.el.juel
 
 import de.odysseus.el.ExpressionFactoryImpl
 import de.odysseus.el.util.SimpleContext
-import de.stefanocke.japkit.rules.ExtensionRegistry
+import de.stefanocke.japkit.services.ExtensionRegistry
 import de.stefanocke.japkit.el.ELProvider
 import de.stefanocke.japkit.el.ELProviderException
 import de.stefanocke.japkit.el.ElExtensionPropertiesAndMethods

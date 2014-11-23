@@ -11,6 +11,9 @@ import de.stefanocke.japkit.model.GenExtensions
 import de.stefanocke.japkit.model.GenInterface
 import de.stefanocke.japkit.model.GenPackage
 import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.ProcessingException
+import de.stefanocke.japkit.services.TypeElementNotFoundException
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror

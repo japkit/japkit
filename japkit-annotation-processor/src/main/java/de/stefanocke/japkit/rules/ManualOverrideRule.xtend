@@ -3,6 +3,11 @@ package de.stefanocke.japkit.rules
 import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.MessageCollector
+import de.stefanocke.japkit.services.TypeResolver
+import de.stefanocke.japkit.services.TypesRegistry
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element

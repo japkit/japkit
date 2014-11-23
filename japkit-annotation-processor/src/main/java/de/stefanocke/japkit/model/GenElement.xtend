@@ -14,7 +14,7 @@ import javax.lang.model.element.ElementVisitor
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.Name
 
-import static de.stefanocke.japkit.rules.ElementsExtensions.*
+import static de.stefanocke.japkit.services.ElementsExtensions.VISIBILITY_MODIFIERS
 
 @FieldsFromInterface
 abstract class GenElement implements Element{

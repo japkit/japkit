@@ -3,6 +3,8 @@ package de.stefanocke.japkit.rules
 import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.ResourceTemplate
 import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.services.ProcessingException
+import de.stefanocke.japkit.services.TypeElementNotFoundException
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror

@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.rules
+package de.stefanocke.japkit.services
 
 import java.io.File
 import java.io.IOException

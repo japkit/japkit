@@ -1,5 +1,8 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.GenerateClassContext
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.VariableElement
 

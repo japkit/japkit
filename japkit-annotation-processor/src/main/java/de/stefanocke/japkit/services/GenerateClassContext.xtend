@@ -1,8 +1,9 @@
-package de.stefanocke.japkit.rules
+package de.stefanocke.japkit.services
 
 import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.el.ValueStack
 import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.rules.Rule
 import java.util.Stack
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement

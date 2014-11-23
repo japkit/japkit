@@ -2,6 +2,9 @@ package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.el.ElVariableError
 import de.stefanocke.japkit.metaannotations.ResourceLocation
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.FileExtensions
+import de.stefanocke.japkit.services.TypeElementNotFoundException
 import java.io.File
 import java.io.FileWriter
 import java.net.URL

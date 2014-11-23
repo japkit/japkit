@@ -4,6 +4,9 @@ import de.stefanocke.japkit.metaannotations.AnnotationMode
 import de.stefanocke.japkit.metaannotations.DefaultAnnotation
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.GenerateClassContext
+import de.stefanocke.japkit.services.ProcessingException
 import java.util.List
 import java.util.Map
 import java.util.Set

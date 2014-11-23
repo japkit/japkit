@@ -1,14 +1,14 @@
 package de.stefanocke.japkit.model
 
 import javax.lang.model.element.Name
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class GenName implements Name {
 	CharSequence charSequence
 	
 	override contentEquals(CharSequence cs) {
-		_charSequence.toString == cs.toString
+		charSequence.toString == cs.toString
 	}
 	
 	override charAt(int index) {

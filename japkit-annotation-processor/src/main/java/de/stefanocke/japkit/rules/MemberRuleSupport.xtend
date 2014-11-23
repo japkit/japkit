@@ -3,6 +3,7 @@ package de.stefanocke.japkit.rules
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenExtensions
 import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.services.ExtensionRegistry
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror

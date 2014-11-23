@@ -2,6 +2,8 @@ package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.metaannotations.Template
 import de.stefanocke.japkit.metaannotations.Trigger
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
 import java.util.HashMap
 import java.util.IdentityHashMap
 import java.util.Map

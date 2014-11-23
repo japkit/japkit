@@ -1,8 +1,9 @@
-package de.stefanocke.japkit.rules
+package de.stefanocke.japkit.services
 
 import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.model.AnnotationAndParent
 import de.stefanocke.japkit.model.Path
+import de.stefanocke.japkit.rules.Rule
 import java.util.List
 import java.util.Map
 import java.util.Set
@@ -13,9 +14,9 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic.Kind
+import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
-import org.eclipse.xtend.lib.annotations.Accessors
 
 /** Collects error messages for annotated classes.
  * <p>

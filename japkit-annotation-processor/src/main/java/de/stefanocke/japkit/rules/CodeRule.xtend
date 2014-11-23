@@ -5,6 +5,7 @@ import de.stefanocke.japkit.el.ValueStack
 import de.stefanocke.japkit.model.CodeBody
 import de.stefanocke.japkit.model.EmitterContext
 import de.stefanocke.japkit.model.GenElement
+import de.stefanocke.japkit.services.ExtensionRegistry
 import java.util.List
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror

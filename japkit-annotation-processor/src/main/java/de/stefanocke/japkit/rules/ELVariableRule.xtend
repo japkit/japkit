@@ -1,6 +1,9 @@
 package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.el.ElVariableError
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.TypeElementNotFoundException
+import de.stefanocke.japkit.services.TypesRegistry
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.util.ArrayList
 import java.util.Collections

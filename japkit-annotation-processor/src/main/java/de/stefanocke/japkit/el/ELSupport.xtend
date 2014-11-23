@@ -1,11 +1,11 @@
 package de.stefanocke.japkit.el
 
 import com.google.common.base.Stopwatch
-import de.stefanocke.japkit.rules.ElementsExtensions
-import de.stefanocke.japkit.rules.ExtensionRegistry
-import de.stefanocke.japkit.rules.MessageCollector
-import de.stefanocke.japkit.rules.TypeElementNotFoundException
-import de.stefanocke.japkit.rules.TypesExtensions
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.MessageCollector
+import de.stefanocke.japkit.services.TypeElementNotFoundException
+import de.stefanocke.japkit.services.TypesExtensions
 import java.io.Writer
 import java.net.URL
 import java.util.Map

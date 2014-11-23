@@ -7,6 +7,12 @@ import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenExtensions
 import de.stefanocke.japkit.model.GenParameter
+import de.stefanocke.japkit.services.ElementsExtensions
+import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.GenerateClassContext
+import de.stefanocke.japkit.services.MessageCollector
+import de.stefanocke.japkit.services.TypeResolver
+import de.stefanocke.japkit.services.TypesExtensions
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections

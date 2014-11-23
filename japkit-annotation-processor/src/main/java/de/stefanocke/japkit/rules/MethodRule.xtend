@@ -13,7 +13,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
-import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
+import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 @Data
 class MethodRule extends ExecutableElementRule<GenMethod> {
