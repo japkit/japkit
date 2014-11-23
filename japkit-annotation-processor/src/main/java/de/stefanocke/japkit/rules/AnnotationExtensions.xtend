@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.Trigger
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenAnnotationValue
@@ -16,7 +15,6 @@ class AnnotationExtensions {
 	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	val transient extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val transient extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 	/**
 	 * Maps annotations from a source element.

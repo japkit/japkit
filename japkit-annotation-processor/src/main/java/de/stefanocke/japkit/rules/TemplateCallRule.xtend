@@ -5,7 +5,7 @@ import de.stefanocke.japkit.model.GenTypeElement
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
@@ -16,9 +16,9 @@ class TemplateCallRule extends AbstractRule implements Function1<GenTypeElement,
 	
 	new(AnnotationMirror templateCallAnnotation) {
 		super(templateCallAnnotation, null)
-		_activationRule = createActivationRule(templateCallAnnotation, null)
-		_scopeRule = createScopeRule(templateCallAnnotation, null, null)
-		_templateRule = createTemplateRule(templateCallAnnotation.value("value", TypeElement));
+		activationRule = createActivationRule(templateCallAnnotation, null)
+		scopeRule = createScopeRule(templateCallAnnotation, null, null)
+		templateRule = createTemplateRule(templateCallAnnotation.value("value", TypeElement));
 	}
 
 	override apply(GenTypeElement genClass) {

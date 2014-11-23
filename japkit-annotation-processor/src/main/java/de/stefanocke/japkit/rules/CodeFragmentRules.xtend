@@ -3,7 +3,7 @@ package de.stefanocke.japkit.rules
 import de.stefanocke.japkit.el.ELSupport
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 import static extension de.stefanocke.japkit.rules.CodeRule.withLinebreak
@@ -14,7 +14,7 @@ class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
 	val List<CodeFragmentRule> rules
 	
 	new(Iterable<AnnotationMirror> metaAnnotations){
-		_rules = metaAnnotations.map[new CodeFragmentRule(it, null)].toList
+		rules = metaAnnotations.map[new CodeFragmentRule(it, null)].toList
 	} 
 
 	override code(){

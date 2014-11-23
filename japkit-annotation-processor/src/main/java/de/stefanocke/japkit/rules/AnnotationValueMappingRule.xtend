@@ -1,24 +1,18 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.AVMode
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenAnnotationValue
 import java.util.ArrayList
 import java.util.List
 import java.util.Map
-import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class AnnotationValueMappingRule extends AbstractRule{
-	val transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
-	val transient extension ProcessingEnvironment procEnv = ExtensionRegistry.get(ProcessingEnvironment)
-	val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val transient extension RuleUtils =  ExtensionRegistry.get(RuleUtils)
 
 	()=>boolean activationRule
 	String name
@@ -50,6 +44,9 @@ class AnnotationValueMappingRule extends AbstractRule{
 					case AVMode.REPLACE: { /**Nothing to do but continue. */
 					}
 					case AVMode.JOIN_LIST: { /**Nothing to do but here. TODO: After calculating the new value, apply the "join" */
+					}
+					case AVMode.MERGE:{
+						
 					}
 				}
 			}
@@ -122,13 +119,13 @@ class AnnotationValueMappingRule extends AbstractRule{
 
 	new(AnnotationMirror a) {
 		super(a, null)
-		_name = a.value(null, "name", String)
-		_value = a.value(null, "value", String)
-		_expr = a.value(null, "expr", String)
-		_lang = a.value(null, "lang", String)
-		_mode = a.value(null, "mode", AVMode)
-		_annotationMappingId = a.value(null, "annotationMappingId", String)
-		_activationRule = createActivationRule(a, null)
+		name = a.value(null, "name", String)
+		value = a.value(null, "value", String)
+		expr = a.value(null, "expr", String)
+		lang = a.value(null, "lang", String)
+		mode = a.value(null, "mode", AVMode)
+		annotationMappingId = a.value(null, "annotationMappingId", String)
+		activationRule = createActivationRule(a, null)
 
 	}
 }

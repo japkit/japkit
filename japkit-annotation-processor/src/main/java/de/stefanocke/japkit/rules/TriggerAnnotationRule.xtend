@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.ResourceTemplate
 import de.stefanocke.japkit.model.GenTypeElement
@@ -8,13 +7,10 @@ import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class TriggerAnnotationRule extends AbstractRule{
-
-	protected val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	protected val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	
 	TypeElement triggerAnnotationTypeElement
 	List<ELVariableRule> varRules
@@ -23,17 +19,16 @@ class TriggerAnnotationRule extends AbstractRule{
 	
 	new(AnnotationMirror triggerMetaAnnotation, TypeElement triggerAnnotationTypeElement){
 		super(triggerMetaAnnotation, triggerAnnotationTypeElement)
-		_triggerAnnotationTypeElement = triggerAnnotationTypeElement
+		this.triggerAnnotationTypeElement = triggerAnnotationTypeElement
 
-		_varRules=createELVariableRules(metaAnnotation, null)
+		varRules=createELVariableRules(metaAnnotation, null)
 		
 		//@Clazz
-		_classRules=triggerAnnotationTypeElement.annotationMirrors(Clazz).map[new ClassRule(it, null ,true)].toList
+		classRules=triggerAnnotationTypeElement.annotationMirrors(Clazz).map[new ClassRule(it, null ,true)].toList
 		
 		//@ResourceTemplate
 		val resourcePackage = triggerAnnotationTypeElement.package
-		_resourceRules = triggerAnnotationTypeElement.annotationMirrors(ResourceTemplate).map[new ResourceRule(it, resourcePackage)]
-		
+		resourceRules = triggerAnnotationTypeElement.annotationMirrors(ResourceTemplate).map[new ResourceRule(it, resourcePackage)]		
 	}
 	
 	

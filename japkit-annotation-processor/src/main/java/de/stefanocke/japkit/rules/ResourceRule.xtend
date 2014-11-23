@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.el.ElVariableError
 import de.stefanocke.japkit.metaannotations.ResourceLocation
 import java.io.File
@@ -10,19 +9,14 @@ import java.util.List
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class ResourceRule extends AbstractRule{
-	
-	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+
 	val transient extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
-	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	val transient extension RuleUtils ru = ExtensionRegistry.get(RuleUtils)
-	val ELSupport elSupport = ExtensionRegistry.get(ELSupport)
 	val transient extension FileExtensions = ExtensionRegistry.get(FileExtensions)
+	
 	
 	String templateName
 	String templateLang
@@ -39,21 +33,21 @@ class ResourceRule extends AbstractRule{
 	new(AnnotationMirror resourceTemplateAnnotation, PackageElement templatePackage){
 		super(resourceTemplateAnnotation, null)
 		
-		_templateName = resourceTemplateAnnotation.value("templateName", String);
-		_templateLang = resourceTemplateAnnotation.value("templateLang", String);	
+		templateName = resourceTemplateAnnotation.value("templateName", String);
+		templateLang = resourceTemplateAnnotation.value("templateLang", String);	
 		
-		_resoureNameRule = new NameRule(resourceTemplateAnnotation, "name")
-		_resourePathNameRule = new NameRule(resourceTemplateAnnotation, "path")
+		resoureNameRule = new NameRule(resourceTemplateAnnotation, "name")
+		resourePathNameRule = new NameRule(resourceTemplateAnnotation, "path")
 			
-		_resourceLocation = resourceTemplateAnnotation.value("location", ResourceLocation);
+		resourceLocation = resourceTemplateAnnotation.value("location", ResourceLocation);
 			
-		_scopeRule = createScopeRule(resourceTemplateAnnotation, null, null)
+		scopeRule = createScopeRule(resourceTemplateAnnotation, null, null)
 		
 		
 		val templatePackagePath = templatePackage.qualifiedName.toString.replace('.', '/')
 				
 		var Long lastModified=null	
-		_templateURL = if (resourceTemplateDir != null) {
+		templateURL = if (resourceTemplateDir != null) {
 			val templateDir = new File(resourceTemplateDir, templatePackagePath)
 			val file = new File(templateDir, templateName)
 			lastModified=file.lastModified
@@ -63,7 +57,7 @@ class ResourceRule extends AbstractRule{
 			//Note: This requires the templates to be in the classpath of the annotation processor
 			class.classLoader.getResource(templatePackagePath+'/'+templateName)						
 		}
-		_templateLastModified = lastModified
+		templateLastModified = lastModified
 		
 	}
 	
@@ -97,7 +91,7 @@ class ResourceRule extends AbstractRule{
 					val start = System.currentTimeMillis
 					try {
 						
-						elSupport.write(writer, templateURL, templateLang, templateLastModified)
+						write(writer, templateURL, templateLang, templateLastModified)
 	
 					} finally {
 						writer.flush

@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenExtensions
 import de.stefanocke.japkit.model.GenTypeElement
@@ -9,23 +8,11 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
 public abstract class MemberRuleSupport<E extends Element, T extends GenElement> extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
-	val protected transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
-
-	val protected transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val protected transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	val protected transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-	val protected transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	val protected transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val protected transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	val protected transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val protected transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
-	val protected RuleUtils ru = ExtensionRegistry.get(RuleUtils)
-
 
 	E template
 	String avPrefix
@@ -49,53 +36,53 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	
 	new(AnnotationMirror metaAnnotation, E template, String avPrefix){
 		super(metaAnnotation, template)
-		_template = template
-		_avPrefix = avPrefix
-		_activationRule	= createActivationRule	
-		_srcRule = createSrcRule 
-		_scopeRule = createScopeRule(srcRule)
-		_nameRule = createNameRule
-		_modifiersRule = createModifiersRule
-		_annotationsRule = createAnnotationsRule
-		_commentRule = createCommentRule
-		_genElementIsSrcForDependentRules = genElementIsSrcForDependentRulesAV
+		this.template = template
+		this.avPrefix = avPrefix
+		activationRule	= createActivationRule	
+		srcRule = createSrcRule 
+		scopeRule = createScopeRule(srcRule)
+		nameRule = createNameRule
+		modifiersRule = createModifiersRule
+		annotationsRule = createAnnotationsRule
+		commentRule = createCommentRule
+		genElementIsSrcForDependentRules = genElementIsSrcForDependentRulesAV
 		createAndAddDelegateMethodRules
 		
-		_manualOverrideRule = new ManualOverrideRule(metaAnnotation)
+		manualOverrideRule = new ManualOverrideRule(metaAnnotation)
 	}
 	
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Object> srcRule, ()=>String nameRule, ()=>CharSequence commentRule){
 		super(metaAnnotation, null)
-		_template = null
-		_avPrefix = avPrefix
-		_activationRule	= createActivationRule
-		_srcRule =  srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT 
-		_scopeRule = createScopeRule(srcRule)
-		_nameRule = nameRule
-		_modifiersRule = createModifiersRule
-		_annotationsRule = createAnnotationsRule
-		_commentRule = commentRule ?: createCommentRule
-		_genElementIsSrcForDependentRules = genElementIsSrcForDependentRulesAV
+		this.template = null
+		this.avPrefix = avPrefix
+		activationRule	= createActivationRule
+		this.srcRule =  srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT 
+		scopeRule = createScopeRule(srcRule)
+		this.nameRule = nameRule
+		modifiersRule = createModifiersRule
+		annotationsRule = createAnnotationsRule
+		this.commentRule = commentRule ?: createCommentRule
+		genElementIsSrcForDependentRules = genElementIsSrcForDependentRulesAV
 		createAndAddDelegateMethodRules
-		_manualOverrideRule = new ManualOverrideRule(metaAnnotation)
+		manualOverrideRule = new ManualOverrideRule(metaAnnotation)
 	}
 	
 	new(()=>boolean activationRule,
 		()=>Iterable<? extends Object> srcRule, ()=>String nameRule,
 		()=>Set<Modifier> modifiersRule, (GenElement)=>List<? extends AnnotationMirror> annotationsRule, ()=>CharSequence commentRule) {
 		super(null, null)
-		_template = null
-		_avPrefix = null
-		_activationRule = activationRule ?: RuleUtils.ALWAYS_ACTIVE
-		_srcRule = srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT
-		_scopeRule = createScopeRule(srcRule)
-		_nameRule = nameRule
-		_modifiersRule = modifiersRule ?: [| emptySet]
-		_annotationsRule = annotationsRule ?: [g |emptyList]
-		_commentRule = commentRule ?: [|""]
-		_genElementIsSrcForDependentRules = true
-		_manualOverrideRule = null
+		this.template = null
+		this.avPrefix = null
+		this.activationRule = activationRule ?: RuleUtils.ALWAYS_ACTIVE
+		this.srcRule = srcRule ?: RuleUtils.SINGLE_SRC_ELEMENT
+		scopeRule = createScopeRule(srcRule)
+		this.nameRule = nameRule
+		this.modifiersRule = modifiersRule ?: [| emptySet]
+		this.annotationsRule = annotationsRule ?: [g |emptyList]
+		this.commentRule = commentRule ?: [|""]
+		genElementIsSrcForDependentRules = true
+		manualOverrideRule = null
 	}
 	
 	protected def genElementIsSrcForDependentRulesAV(){
@@ -109,31 +96,31 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	
 	
 	protected def ()=>boolean createActivationRule(){
-		ru.createActivationRule(metaAnnotation, avPrefix)
+		createActivationRule(metaAnnotation, avPrefix)
 	}	
 	
 	protected def ()=>Iterable<? extends Object> createSrcRule(){
-		ru.createSrcExpressionRule(metaAnnotation, avPrefix)
+		createSrcExpressionRule(metaAnnotation, avPrefix)
 	}
 	
 	protected def ((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> createScopeRule(()=>Iterable<? extends Object> srcRule){
-		ru.createScopeRule(metaAnnotation, template, avPrefix, srcRule)  
+		createScopeRule(metaAnnotation, template, avPrefix, srcRule)  
 	}
 	
 	protected def ()=>Set<Modifier> createModifiersRule(){
-		ru.createModifiersRule(metaAnnotation, template, avPrefix)
+		createModifiersRule(metaAnnotation, template, avPrefix)
 	}
 	
 	protected def (GenElement)=>List<? extends AnnotationMirror> createAnnotationsRule(){
-		ru.createAnnotationMappingRules(metaAnnotation, template, avPrefix)
+		createAnnotationMappingRules(metaAnnotation, template, avPrefix)
 	}
 	
 	protected def ()=>String createNameRule() {
-		ru.createNameExprRule(metaAnnotation, template, avPrefix)
+		createNameExprRule(metaAnnotation, template, avPrefix)
 	}
 	
 	protected def ()=>CharSequence createCommentRule() {
-		ru.createCommentRule(metaAnnotation, template, avPrefix, null)
+		createCommentRule(metaAnnotation, template, avPrefix, null)
 	}
 	
 

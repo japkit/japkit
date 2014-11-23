@@ -3,7 +3,7 @@ package de.stefanocke.japkit.rules
 import de.stefanocke.japkit.model.GenTypeElement
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class InnerClassRule extends MemberRuleSupport<TypeElement, GenTypeElement> {
@@ -12,7 +12,7 @@ class InnerClassRule extends MemberRuleSupport<TypeElement, GenTypeElement> {
 
 	new(AnnotationMirror metaAnnotation, TypeElement template) {
 		super(metaAnnotation, template)
-		_classRule = new ClassRule(metaAnnotation, template, false)
+		classRule = new ClassRule(metaAnnotation, template, false)
 	}
 
 	override protected GenTypeElement createMember() {

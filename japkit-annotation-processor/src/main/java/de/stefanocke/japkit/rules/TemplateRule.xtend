@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.CodeFragment
 import de.stefanocke.japkit.metaannotations.Constructor
@@ -18,7 +17,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
@@ -26,12 +25,7 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singl
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
 
-	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
-	val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	val RuleUtils ru = ExtensionRegistry.get(RuleUtils)
-	val GetterSetterRules gs = ExtensionRegistry.get(GetterSetterRules)
+	val transient extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 
 	TypeElement templateClass
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
@@ -50,17 +44,17 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation, (TemplateRule)=>void registrationCallback) {
 		super(templateAnnotation, templateClass)
 		registrationCallback.apply(this) //Allows self cycles of template rules!
-		_templateClass = templateClass
+		this.templateClass = templateClass
 		
-		_methodDefaults = metaAnnotation?.value("methodDefaults", typeof(AnnotationMirror[]))?.singleValue
-		_fieldDefaults = metaAnnotation?.value("fieldDefaults", typeof(AnnotationMirror[]))?.singleValue
-		_constructorDefaults = metaAnnotation?.value("constructorDefaults", typeof(AnnotationMirror[]))?.singleValue
+		methodDefaults = metaAnnotation?.value("methodDefaults", typeof(AnnotationMirror[]))?.singleValue
+		fieldDefaults = metaAnnotation?.value("fieldDefaults", typeof(AnnotationMirror[]))?.singleValue
+		constructorDefaults = metaAnnotation?.value("constructorDefaults", typeof(AnnotationMirror[]))?.singleValue
 		
-		_allFieldsAreTemplates = metaAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
-		_allMethodsAreTemplates = metaAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
-		_allConstructorsAreTemplates = metaAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
+		allFieldsAreTemplates = metaAnnotation?.value("allFieldsAreTemplates", boolean) ?: true
+		allMethodsAreTemplates = metaAnnotation?.value("allMethodsAreTemplates", boolean) ?: true
+		allConstructorsAreTemplates = metaAnnotation?.value("allConstructorsAreTemplates", boolean) ?: true
 		
-		_memberRules=newArrayList()	
+		memberRules=newArrayList()	
 		
 		if(metaAnnotation!=null){
 			//Members from AVs
@@ -72,10 +66,10 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 			.filter[it!=null].toList
 		)	
 
-		_annotationsRule = ru.createAnnotationMappingRules(metaAnnotation, templateClass, null)
-		_scopeRule = ru.createScopeRule(metaAnnotation, _templateClass, null)
+		annotationsRule = createAnnotationMappingRules(metaAnnotation, templateClass, null)
+		scopeRule = createScopeRule(metaAnnotation, templateClass, null)
 
-		_functions = newHashMap( 		
+		functions = newHashMap( 		
 			templateClass.enclosedElementsOrdered
 				.map[createFunctionForMember]
 				.filter[it!=null])

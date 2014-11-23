@@ -5,11 +5,11 @@ import de.stefanocke.japkit.model.GenField
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
-	extension GetterSetterRules = ExtensionRegistry.get(GetterSetterRules)
+	val transient extension GetterSetterRules = ExtensionRegistry.get(GetterSetterRules)
 	
 	(GenField)=>CodeBody initCodeRule
 	
@@ -17,8 +17,8 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	
 	new(AnnotationMirror metaAnnotation, VariableElement template) {
 		super(metaAnnotation, template)
-		_initCodeRule = createInitCodeRule	
-		_typeRule = createTypeRule
+		initCodeRule = createInitCodeRule	
+		typeRule = createTypeRule
 		
 		addGetterRule
 		addSetterRule
@@ -35,7 +35,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 	
 	
 	protected def ()=>TypeMirror createTypeRule() {
-		ru.createTypeRule(metaAnnotation, template?.asType, null)
+		createTypeRule(metaAnnotation, template?.asType, null)
 	}
 	
 	override protected createMember(String name) {
@@ -46,7 +46,7 @@ class FieldRule extends MemberRuleSupport<VariableElement, GenField> {
 		super.applyRulesAfterCreation(member)
 		member.type = typeRule.apply
 		
-		member.constantExpr = _initCodeRule.apply(member)
+		member.constantExpr = initCodeRule.apply(member)
 	}
 	
 	def protected (GenField)=>CodeBody createInitCodeRule(){

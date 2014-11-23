@@ -13,9 +13,9 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic.Kind
-import org.eclipse.xtend.lib.Property
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import org.eclipse.xtend.lib.annotations.Accessors
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -32,7 +32,7 @@ class MessageCollector {
 	extension ProcessingEnvironment processingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
 	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	
-	@Property
+	@Accessors
 	boolean diagnosticLogging = false
 
 

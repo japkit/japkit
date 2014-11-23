@@ -4,6 +4,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
+import de.stefanocke.japkit.el.ELSupport
 
 @Data
 class AbstractRule implements Rule {
@@ -12,6 +13,9 @@ class AbstractRule implements Rule {
 	val transient protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val transient protected extension RuleUtils = ExtensionRegistry.get(RuleUtils)
 	val transient protected extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	val transient protected extension ELSupport = ExtensionRegistry.get(ELSupport)
+	val transient protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val transient protected extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	
 	AnnotationMirror metaAnnotation
 	Element metaElement

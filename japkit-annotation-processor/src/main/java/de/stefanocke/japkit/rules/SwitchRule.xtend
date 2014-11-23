@@ -3,12 +3,10 @@ package de.stefanocke.japkit.rules
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class SwitchRule extends AbstractRule{
-	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	
 	
 	List<Pair<ElementMatcher, String>> cases
@@ -28,7 +26,7 @@ class SwitchRule extends AbstractRule{
 	
 	new(AnnotationMirror switchAm){
 		super(switchAm, null)
-		_cases = switchAm.value("value", typeof(AnnotationMirror[])).map[ caseAm |
+		cases = switchAm.value("value", typeof(AnnotationMirror[])).map[ caseAm |
 			{
 				val matcherAm = caseAm.value("matcher", AnnotationMirror)
 				matcherAm?.createElementMatcher() 			

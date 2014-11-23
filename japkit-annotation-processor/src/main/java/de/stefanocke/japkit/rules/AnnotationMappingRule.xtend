@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.AnnotationMode
 import de.stefanocke.japkit.metaannotations.DefaultAnnotation
 import de.stefanocke.japkit.model.GenAnnotationMirror
@@ -8,25 +7,16 @@ import de.stefanocke.japkit.model.GenExtensions
 import java.util.List
 import java.util.Map
 import java.util.Set
-import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 import static de.stefanocke.japkit.metaannotations.AnnotationMode.*
 
 @Data
-class AnnotationMappingRule extends AbstractRule{
-	val transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
-	val transient extension ProcessingEnvironment procEnv = ExtensionRegistry.get(ProcessingEnvironment)
-	//val transient extension RoundEnvironment roundEnv = ExtensionRegistry.get(RoundEnvironment)
-	val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	val transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-	val transient extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
-	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val transient extension RuleUtils =  ExtensionRegistry.get(RuleUtils)
+class AnnotationMappingRule extends AbstractRule{	
+	val transient extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 
 	String id
 	()=>boolean activationRule
@@ -72,7 +62,7 @@ class AnnotationMappingRule extends AbstractRule{
 				try{
 					annotations.add(copyAnnotation)			
 				} catch(ProcessingException e){
-					messageCollector.reportError(e)
+					reportError(e)
 				}
 			]
 		}
@@ -162,7 +152,7 @@ class AnnotationMappingRule extends AbstractRule{
 		
 				} catch (RuntimeException e) {
 		
-					messageCollector.reportRuleError('''
+					reportRuleError('''
 							Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
 							Cause: «e.message»''')
 				}
@@ -176,17 +166,17 @@ class AnnotationMappingRule extends AbstractRule{
 
 	new(AnnotationMirror am) {
 		super(am, null)
-		_id = am.value("id", String)
-		_activationRule = createActivationRule(am, null)
-		_targetAnnotation = am.value("targetAnnotation", DeclaredType)
-		_valueMappings = am.value("values", typeof(AnnotationMirror[])).map[
+		id = am.value("id", String)
+		activationRule = createActivationRule(am, null)
+		targetAnnotation = am.value("targetAnnotation", DeclaredType)
+		valueMappings = am.value("values", typeof(AnnotationMirror[])).map[
 			new AnnotationValueMappingRule(it)]
-		_mode = am.value("mode", AnnotationMode)
+		mode = am.value("mode", AnnotationMode)
 		
-		_copyAnnotationsFqns = am.value("copyAnnotations", typeof(DeclaredType[])).map[qualifiedName].toSet
-		_copyAnnotationsFromPackages = am.value("copyAnnotationsFromPackages", typeof(String[]))
-		_setShadowOnTriggerAnnotations = am.value("setShadowOnTriggerAnnotations", Boolean)
-		_scopeRule = createScopeRule(am, null, null)
+		copyAnnotationsFqns = am.value("copyAnnotations", typeof(DeclaredType[])).map[qualifiedName].toSet
+		copyAnnotationsFromPackages = am.value("copyAnnotationsFromPackages", typeof(String[]))
+		setShadowOnTriggerAnnotations = am.value("setShadowOnTriggerAnnotations", Boolean)
+		scopeRule = createScopeRule(am, null, null)
 	}
 	
 	

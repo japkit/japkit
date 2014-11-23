@@ -46,6 +46,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
+import de.stefanocke.japkit.model.ParameterWrapper
 
 class ElementsExtensions {
 	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -547,11 +548,8 @@ class ElementsExtensions {
 			}
 		} else if (avType.enum) {
 			val ve = av.cast(value, annotationMirror, annotatedElement, name, VariableElement)
-
-			//xtend issue or java issue?
-			val clazz = avType as Class<?>
-			val enumClazz = clazz as  Class<? extends Enum>
-			Enum.valueOf(enumClazz, ve.simpleName.toString) as T
+						
+			Enum.valueOf(avType as Class<?> as Class<? extends Enum>, ve.simpleName.toString) as T
 
 		} else if (avType.array) {
 			val arr = Array.newInstance(avType.componentType, (value as List<AnnotationValue>).size)
@@ -569,6 +567,8 @@ class ElementsExtensions {
 		}
 	}
 	
+	
+	
 	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationAndParent annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
 		new AnnotationAndParent(avAsAnnotation, new Path.Segment(name.toString, index), annotationMirror, null)
 	}
@@ -579,13 +579,6 @@ class ElementsExtensions {
 	
 	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationMirror annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
 		avAsAnnotation
-	}
-	
-	
-	
-	//TODO: Cache?
-	private def annotationValueDeclaration(AnnotationMirror annotationMirror, CharSequence name) {
-		annotationMirror.annotationAsTypeElement.declaredMethods.findFirst[simpleName.contentEquals(name)]
 	}
 
 	def private singleAV(Iterable<AnnotationValue> values) {		

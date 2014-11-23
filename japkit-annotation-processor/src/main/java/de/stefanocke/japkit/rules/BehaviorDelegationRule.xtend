@@ -15,17 +15,11 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class BehaviorDelegationRule extends AbstractRule {
-
-	extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
-	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	extension RuleUtils = ExtensionRegistry.get(RuleUtils)
+	val transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 
 	()=>boolean activationRule
 	TypeMirror behaviorClass
@@ -37,13 +31,13 @@ class BehaviorDelegationRule extends AbstractRule {
 
 	new(AnnotationMirror metaAnnotation) {
 		super(metaAnnotation, null)
-		_activationRule = metaAnnotation.createActivationRule("customBehavior", false)
-		_behaviorClass = metaAnnotation.value("behaviorClass", TypeMirror)
-		_renamePrefix = metaAnnotation.value("behaviorGenMethodRenamePrefix", String)
-		_internalInterfaceName = metaAnnotation.value("behaviorInternalInterface", String)
-		_internalInterfaceIsInnerClass = metaAnnotation.value("behaviorInternalInterfaceIsInnerClass", Boolean)
-		_internalInterfaceImplName = metaAnnotation.value("behaviorInternalInterfaceImpl", String)
-		_abstractBehaviorClassName = metaAnnotation.value("behaviorAbstractClass", String)
+		activationRule = metaAnnotation.createActivationRule("customBehavior", false)
+		behaviorClass = metaAnnotation.value("behaviorClass", TypeMirror)
+		renamePrefix = metaAnnotation.value("behaviorGenMethodRenamePrefix", String)
+		internalInterfaceName = metaAnnotation.value("behaviorInternalInterface", String)
+		internalInterfaceIsInnerClass = metaAnnotation.value("behaviorInternalInterfaceIsInnerClass", Boolean)
+		internalInterfaceImplName = metaAnnotation.value("behaviorInternalInterfaceImpl", String)
+		abstractBehaviorClassName = metaAnnotation.value("behaviorAbstractClass", String)
 	}
 
 	def private getGenExtensions() {

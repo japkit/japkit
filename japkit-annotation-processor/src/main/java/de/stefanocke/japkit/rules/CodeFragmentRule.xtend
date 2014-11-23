@@ -3,7 +3,7 @@ package de.stefanocke.japkit.rules
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
@@ -13,8 +13,8 @@ class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 	
 	new(AnnotationMirror metaAnnotation, Element metaElement) {
 		super(metaAnnotation, metaElement, '')
-		_activation = metaAnnotation.elementMatchers("activation")
-		_scopeRule = createScopeRule(metaAnnotation, metaElement, null)
+		activation = metaAnnotation.elementMatchers("activation")
+		scopeRule = createScopeRule(metaAnnotation, metaElement, null)
 	}
 	
 	

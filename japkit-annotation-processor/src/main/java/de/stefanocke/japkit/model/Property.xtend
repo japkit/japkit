@@ -7,7 +7,7 @@ import javax.lang.model.element.ElementVisitor
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class Property implements VariableElement {
@@ -28,11 +28,11 @@ class Property implements VariableElement {
 	VariableElement field
 
 	new(TypeMirror type, String name, ExecutableElement getter, ExecutableElement setter, VariableElement field) {
-		_type = type
-		_name = name
-		_getter = getter
-		_setter = setter
-		_field = field
+		this.type = type
+		this.name = name
+		this.getter = getter
+		this.setter = setter
+		this.field = field
 	}
 	
 	new(VariableElement field, ExecutableElement getter, ExecutableElement setter) {

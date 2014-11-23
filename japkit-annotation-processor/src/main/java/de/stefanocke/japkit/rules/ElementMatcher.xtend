@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.metaannotations.TypeCategory
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
@@ -11,18 +10,12 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
 class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Function1<Element, Boolean>{
-	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	val transient extension TypesExtensions typesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val transient extension RuleUtils ruleUtils = ExtensionRegistry.get(RuleUtils)
 
 	String srcExpr
 	String srcLang
@@ -141,7 +134,7 @@ class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Functi
 	
 	def private boolean isSubtype(TypeMirror t1, TypeMirror type) {
 		type.isJavaLangObject ||  //shortcut to avoid unnecessary type lookups
-		typesExtensions.isSubtype(t1, type) //TODO: Für generierte Typen funzt das nicht... Mit generierten Typen hingegen  (Stichwort: asTypeElement) führt es zu (ggf. zirkulären) dependencies
+		_typesExtensions.isSubtype(t1, type) 
 	}
 	
 	def private boolean belongsToOneOfCategories(TypeMirror type, TypeCategory[] categories){
@@ -215,35 +208,33 @@ class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Functi
 	
 	new(AnnotationMirror am) {
 		super(am, null)
-		_srcExpr =  am.value("src", String)
-		_srcLang =  am.value("srcLang", String)
-		_name = am.value("name", String)
-		_modifiers = am.value("modifiers", typeof(Modifier[]))
-		_modifiersNot = am.value("modifiersNot", typeof(Modifier[]))
-		_kind = am.value("kind", typeof(ElementKind[]))?.toSet
-		_annotations = am.value("annotations", typeof(DeclaredType[]))
-		_annotationsNot = am.value("annotationsNot", typeof(DeclaredType[]))
-		_enclosingAnnotations = am.value("enclosingAnnotations", typeof(DeclaredType[]))
-		_enclosingAnnotationsNot = am.value("enclosingAnnotationsNot", typeof(DeclaredType[]))
-		_notDeclaredBy = am.value("notDeclaredBy", typeof(DeclaredType[]))?.map[asTypeElement.qualifiedName.toString].toSet
-		_type = am.value("type", TypeMirror)
-		_typeCategory = am.value("typeCategory", typeof(TypeCategory[]))	
-		_typeCategoryNot = am.value("typeCategoryNot", typeof(TypeCategory[]))	
-		_typeAnnotations = am.value("typeAnnotations", typeof(DeclaredType[]))	
-		_singleValueType = am.value("singleValueType", TypeMirror)
-		_singleValueTypeCategory = am.value("singleValueTypeCategory", typeof(TypeCategory[]))	
-		_singleValueTypeCategoryNot = am.value("singleValueTypeCategoryNot", typeof(TypeCategory[]))	
-		_singleValueTypeAnnotations = am.value("singleValueTypeAnnotations", typeof(DeclaredType[]))
-		_typeArg0Annotations = am.value("typeArg0Annotations", typeof(DeclaredType[]))	
-		_typeArg1Annotations = am.value("typeArg1Annotations", typeof(DeclaredType[]))	
-		_condition =  am.value("condition", String)
-		_conditionLang =  am.value("conditionLang", String)
-		_constraints = am.value("constraints", typeof(AnnotationMirror[])).map[new ConstraintRule(it)]	
-		_nameIn = createNameInSetRule(am, "nameIn", true)
-		_nameNotIn = createNameInSetRule(am, "nameNotIn", false)
+		srcExpr =  am.value("src", String)
+		srcLang =  am.value("srcLang", String)
+		name = am.value("name", String)
+		modifiers = am.value("modifiers", typeof(Modifier[]))
+		modifiersNot = am.value("modifiersNot", typeof(Modifier[]))
+		kind = am.value("kind", typeof(ElementKind[]))?.toSet
+		annotations = am.value("annotations", typeof(DeclaredType[]))
+		annotationsNot = am.value("annotationsNot", typeof(DeclaredType[]))
+		enclosingAnnotations = am.value("enclosingAnnotations", typeof(DeclaredType[]))
+		enclosingAnnotationsNot = am.value("enclosingAnnotationsNot", typeof(DeclaredType[]))
+		notDeclaredBy = am.value("notDeclaredBy", typeof(DeclaredType[]))?.map[asTypeElement.qualifiedName.toString].toSet
+		type = am.value("type", TypeMirror)
+		typeCategory = am.value("typeCategory", typeof(TypeCategory[]))	
+		typeCategoryNot = am.value("typeCategoryNot", typeof(TypeCategory[]))	
+		typeAnnotations = am.value("typeAnnotations", typeof(DeclaredType[]))	
+		singleValueType = am.value("singleValueType", TypeMirror)
+		singleValueTypeCategory = am.value("singleValueTypeCategory", typeof(TypeCategory[]))	
+		singleValueTypeCategoryNot = am.value("singleValueTypeCategoryNot", typeof(TypeCategory[]))	
+		singleValueTypeAnnotations = am.value("singleValueTypeAnnotations", typeof(DeclaredType[]))
+		typeArg0Annotations = am.value("typeArg0Annotations", typeof(DeclaredType[]))	
+		typeArg1Annotations = am.value("typeArg1Annotations", typeof(DeclaredType[]))	
+		condition =  am.value("condition", String)
+		conditionLang =  am.value("conditionLang", String)
+		constraints = am.value("constraints", typeof(AnnotationMirror[])).map[new ConstraintRule(it)]	
+		nameIn = createNameInSetRule(am, "nameIn", true)
+		nameNotIn = createNameInSetRule(am, "nameNotIn", false)
 		
 	}
-	
-	
 	
 }

@@ -7,7 +7,7 @@ import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class ManualOverrideRule {
@@ -24,8 +24,8 @@ class ManualOverrideRule {
 	(Element)=>boolean manualOverridesMatcher
 	
 	new(AnnotationMirror metaAnnotation){
-		_manualOverrides = metaAnnotation?.value("manualOverrides", TypeMirror)
-		_manualOverridesMatcher = metaAnnotation?.value("manualOverridesMatcher", AnnotationMirror)?.createElementMatcher
+		manualOverrides = metaAnnotation?.value("manualOverrides", TypeMirror)
+		manualOverridesMatcher = metaAnnotation?.value("manualOverridesMatcher", AnnotationMirror)?.createElementMatcher
 	}
 	
 	def apply(Iterable<? extends GenElement> elementsToOverride){

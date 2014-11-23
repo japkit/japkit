@@ -4,7 +4,7 @@ import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenTypeElement
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 /**supports generating members  from annotation values "fields", "methods", "constructors" and "innerClasses"*/
@@ -15,7 +15,7 @@ class MembersRule extends AbstractRule implements Function1<GenTypeElement, List
 
 	new(AnnotationMirror metaAnnotation) {
 		super(metaAnnotation, null)
-		_memberRules = newArrayList
+		memberRules = newArrayList
 
 		
 		addMemberRules("innerClasses", [new InnerClassRule(it, null)])
@@ -28,7 +28,7 @@ class MembersRule extends AbstractRule implements Function1<GenTypeElement, List
 
 	def private addMemberRules(String avName,
 		(AnnotationMirror)=>(GenTypeElement)=>List<? extends GenElement> ruleFactory) {
-		_memberRules.addAll(metaAnnotation?.value(avName, typeof(AnnotationMirror[]))?.map(ruleFactory) ?: emptyList)
+		memberRules.addAll(metaAnnotation?.value(avName, typeof(AnnotationMirror[]))?.map(ruleFactory) ?: emptyList)
 
 	}
 

@@ -1,22 +1,22 @@
 package de.stefanocke.japkit.el
 
 import java.util.Map
-import org.eclipse.xtend.lib.Property
+import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 class ElExtensionPropertiesAndMethods {
 
 	// baseClass -> ( propertyName -> ((rootProperties, base)=>resultValue) ) 
-	@Property
+	@Accessors
 	val Map<Class<?>, Map<String, (Map<String, Object>, Object)=>Object>> propertyNameToGetterClosureByClass = newHashMap
 	
 	//baseClass ->  ((rootProperties, base, propertyName)=>resultValue)  
-	@Property
+	@Accessors
 	val Map<Class<?>, (Map<String, Object>, Object, String)=>Object> getPropertyClosureByClass = newHashMap
 	
 	// baseClass -> ( methodName -> ((rootProperties, base, params)=>resultValue) ) 
-	@Property
+	@Accessors
 	val Map<Class<?>, Map<String, (Map<String, Object>, Object, Class<?>[], Object[])=>Object>> methodNameToClosureByClass = newHashMap
 	
 	def <T> void  registerProperty(Class<T> baseClass, String propertyName, (Map<String, Object>, T)=>Object getterClosure){

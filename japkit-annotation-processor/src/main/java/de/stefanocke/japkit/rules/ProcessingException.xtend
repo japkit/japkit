@@ -3,7 +3,7 @@ package de.stefanocke.japkit.rules
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.AnnotationValue
 import javax.lang.model.element.Element
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 /**
  * An exception that prevents further processing of an annotation. Should be catched by the processor and reported as error
@@ -18,10 +18,10 @@ class ProcessingException extends RuntimeException {
 	
 	new (String message, Element element, AnnotationMirror annotationMirror, CharSequence annotationValueName, AnnotationValue annotationValue){
 		super(message)
-		this._element = element
-		this._annotationMirror = annotationMirror
-		this._annotationValueName = annotationValueName
-		this._annotationValue = annotationValue
+		this.element = element
+		this.annotationMirror = annotationMirror
+		this.annotationValueName = annotationValueName
+		this.annotationValue = annotationValue
 	}
 	
 	new (String message, Element element){

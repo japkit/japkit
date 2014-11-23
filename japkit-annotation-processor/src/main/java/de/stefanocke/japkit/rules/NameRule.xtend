@@ -4,7 +4,7 @@ import de.stefanocke.japkit.el.ELSupport
 import java.util.regex.Pattern
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class NameRule extends AbstractRule{
@@ -19,10 +19,10 @@ class NameRule extends AbstractRule{
 	new(AnnotationMirror metaAnnotation, String avPrefix){
 		super(metaAnnotation, null)
 		val prefix = if(avPrefix==null) "name" else avPrefix
-		_regEx = metaAnnotation.value('''«prefix»RegEx''', Pattern)
-		_regExReplace = metaAnnotation.value('''«prefix»RegExReplace''', String)		
-		_expr =  metaAnnotation.value('''«prefix»Expr''', String)		
-		_lang =  metaAnnotation.value('''«prefix»Lang''', String)		
+		regEx = metaAnnotation.value('''«prefix»RegEx''', Pattern)
+		regExReplace = metaAnnotation.value('''«prefix»RegExReplace''', String)		
+		expr =  metaAnnotation.value('''«prefix»Expr''', String)		
+		lang =  metaAnnotation.value('''«prefix»Lang''', String)		
 	}
 	
 	def isEmpty(){

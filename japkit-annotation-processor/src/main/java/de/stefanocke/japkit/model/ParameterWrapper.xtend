@@ -1,10 +1,10 @@
-package de.stefanocke.japkit.rules
+package de.stefanocke.japkit.model
 
 import java.lang.annotation.Annotation
 import javax.lang.model.element.ElementVisitor
 import javax.lang.model.element.Name
 import javax.lang.model.element.VariableElement
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class ParameterWrapper implements VariableElement {

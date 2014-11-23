@@ -2,7 +2,7 @@ package de.stefanocke.japkit.model
 
 import java.util.HashMap
 import javax.lang.model.element.AnnotationMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class AnnotationWithDefaultAnnotation implements AnnotationMirror{

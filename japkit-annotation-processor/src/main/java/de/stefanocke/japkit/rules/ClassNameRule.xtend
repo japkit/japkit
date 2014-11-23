@@ -3,7 +3,7 @@ package de.stefanocke.japkit.rules
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class ClassNameRule extends AbstractRule{
@@ -13,11 +13,6 @@ class ClassNameRule extends AbstractRule{
 	String classPrefixToRemove
 	NameRule classNameRule
 	NameRule packageNameRule
-	
-	val transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
-	
-	
-	
 	
 	def private String generateClassName(TypeElement orgClass){
 		val orgName = orgClass.simpleName.toString
@@ -71,13 +66,13 @@ class ClassNameRule extends AbstractRule{
 	
 	new (AnnotationMirror metaAnnotation){
 		super(metaAnnotation, null)
-		_classSuffixToAppend = metaAnnotation.value("nameSuffixToAppend", String)
-		_classSuffixToRemove = metaAnnotation.value("nameSuffixToRemove", String)
-		_classPrefixToPrepend = metaAnnotation.value("namePrefixToPrepend", String)
-		_classPrefixToRemove = metaAnnotation.value("namePrefixToRemove", String)
+		classSuffixToAppend = metaAnnotation.value("nameSuffixToAppend", String)
+		classSuffixToRemove = metaAnnotation.value("nameSuffixToRemove", String)
+		classPrefixToPrepend = metaAnnotation.value("namePrefixToPrepend", String)
+		classPrefixToRemove = metaAnnotation.value("namePrefixToRemove", String)
 		
-		_classNameRule = new NameRule(metaAnnotation, "name")
-		_packageNameRule = new NameRule(metaAnnotation, "packageName")	
+		classNameRule = new NameRule(metaAnnotation, "name")
+		packageNameRule = new NameRule(metaAnnotation, "packageName")	
 		
 	}
 	

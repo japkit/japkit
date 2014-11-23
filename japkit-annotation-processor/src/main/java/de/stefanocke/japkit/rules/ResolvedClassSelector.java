@@ -12,4 +12,6 @@ class ResolvedClassSelector {
 	public TypeElement typeElement; //currently only for inner class
 	public TypeElement enclosingTypeElement; //currently only for inner class
 	public String innerClassName;
+
 }
+

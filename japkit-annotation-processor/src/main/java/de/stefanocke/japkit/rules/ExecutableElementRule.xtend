@@ -9,7 +9,7 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 abstract class ExecutableElementRule<G extends GenExecutableElement> extends MemberRuleSupport<ExecutableElement, G> {
@@ -22,8 +22,8 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 		
-		_paramRules = createParamRules
-		_codeBodyRule = createCodeBodyRule 
+		paramRules = createParamRules
+		codeBodyRule = createCodeBodyRule 
 	}
 	
 	new(()=>boolean activationRule, ()=>Iterable<? extends Object> srcRule,
@@ -32,24 +32,23 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 		()=>List<? extends GenParameter> paramRules, (G)=>CharSequence codeRule) {
 		super(activationRule, srcRule, nameRule, modifiersRule, annotationsRule, commentRule)
 		
-		_paramRules = paramRules ?: [|emptyList]
-		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement)=>CharSequence, null)
+		this.paramRules = paramRules ?: [|emptyList]
+		codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement)=>CharSequence, null)
 	}
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix, ()=>Iterable<? extends Object> srcRule,
 		()=>String nameRule, ()=>CharSequence commentRule, ()=>List<? extends GenParameter> paramRules,
 		(G)=>CharSequence codeRule) {
 		super(metaAnnotation, avPrefix, srcRule, nameRule, commentRule)
-		_paramRules = paramRules ?: [|emptyList]
+		this.paramRules = paramRules ?: [|emptyList]
 		val defaultFragments = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
-		_codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement)=>CharSequence, defaultFragments)
+		codeBodyRule = CodeRule.createCodeBodyRule(codeRule as (GenElement)=>CharSequence, defaultFragments)
 	}
 	
 	protected override applyRulesAfterCreation(G member) {
 		super.applyRulesAfterCreation(member)
-		member.parameters = _paramRules.apply
-		
-		member.body = _codeBodyRule.apply(member)
+		member.parameters = paramRules.apply		
+		member.body = codeBodyRule.apply(member)
 	}
 	
 	def protected (G)=>CodeBody createCodeBodyRule(){
@@ -59,10 +58,8 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	
 	
 	def protected ()=>List<? extends GenParameter>  createParamRules(){
-		ru.createParamRules(metaAnnotation, template, avPrefix)
+		createParamRules(metaAnnotation, template, avPrefix)
 	}
-	
-	
 	
 	
 }

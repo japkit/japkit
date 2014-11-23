@@ -11,7 +11,7 @@ import javax.lang.model.element.AnnotationValue
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.singleValue
 
@@ -24,8 +24,8 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 	
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
-		_returnTypeRule = createReturnTypeRule
-		_defaultAnnotationValueRule= createDefaultAnnotationValueRule
+		returnTypeRule = createReturnTypeRule
+		defaultAnnotationValueRule= createDefaultAnnotationValueRule
 	}
 	
 	new(()=>boolean activationRule, ()=>Iterable<? extends Object> srcRule,
@@ -34,8 +34,8 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 		()=>List<? extends GenParameter> paramRules, (GenMethod)=>CharSequence codeRule,
 		()=>TypeMirror returnTypeRule) {
 		super(activationRule, srcRule, nameRule, modifiersRule, annotationsRule, commentRule, paramRules, codeRule)
-		_returnTypeRule = returnTypeRule ?: [|null]
-		_defaultAnnotationValueRule=[m|null]
+		this.returnTypeRule = returnTypeRule ?: [|null]
+		defaultAnnotationValueRule=[m|null]
 		
 	}
 	
@@ -44,8 +44,8 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 		()=>String nameRule, ()=>CharSequence commentRule, ()=>List<? extends GenParameter> paramRules, 
 		(GenMethod)=>CharSequence codeRule, ()=>TypeMirror returnTypeRule) {
 		super(metaAnnotation, avPrefix, srcRule, nameRule, commentRule, paramRules, codeRule)	
-		_returnTypeRule = returnTypeRule ?: [|null]
-		_defaultAnnotationValueRule= [m|null]
+		this.returnTypeRule = returnTypeRule ?: [|null]
+		defaultAnnotationValueRule= [m|null]
 	}
 	
 	def (GenMethod)=>AnnotationValue createDefaultAnnotationValueRule() {
@@ -63,7 +63,7 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 	}
 	
 	def createReturnTypeRule() {
-		ru.createTypeRule(metaAnnotation, template?.returnType, "return")
+		createTypeRule(metaAnnotation, template?.returnType, "return")
 	}
 
 	protected override createMember(String name) {

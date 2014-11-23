@@ -10,21 +10,14 @@ import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend2.lib.StringConcatenation
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 @Data
 class CodeRule extends AbstractRule implements Function0<CharSequence> {
-	val protected transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val protected transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	val protected transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
+
 	val protected transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-	val protected transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	val protected transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	val protected transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	val protected transient extension RuleUtils = ExtensionRegistry.get(RuleUtils)
-	
 
 	Element template
 	List<DeclaredType> imports
@@ -48,39 +41,39 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	
 	new(AnnotationMirror metaAnnotation, Element template, String avPrefix){
 		super(metaAnnotation, template)
-		_template=template
+		this.template=template
 		
 		val codeFromJavadoc = JavadocUtil.getCode(template?.getDocCommentUsingRuntimeMetadata)
 		
-		_bodyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "code".withPrefix(avPrefix))
+		bodyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "code".withPrefix(avPrefix))
 		
-		_lang = metaAnnotation?.value("lang".withPrefix(avPrefix), String)
+		lang = metaAnnotation?.value("lang".withPrefix(avPrefix), String)
 		
 		val bodyCaseAnnotations = metaAnnotation?.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
 		
-		_bodyCases = bodyCaseAnnotations?.map[
+		bodyCases = bodyCaseAnnotations?.map[
 			elementMatchers('matcher') 
 			-> value('expr', String)
 		]?.toList ?: emptyList
 
 
-		_beforeExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "beforeIteratorCode".withPrefix(avPrefix)) 
-		_afterExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "afterIteratorCode".withPrefix(avPrefix)) 
-		_emptyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "emptyIteratorCode".withPrefix(avPrefix)) 
+		beforeExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "beforeIteratorCode".withPrefix(avPrefix)) 
+		afterExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "afterIteratorCode".withPrefix(avPrefix)) 
+		emptyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "emptyIteratorCode".withPrefix(avPrefix)) 
 
 		//body iterator
-		_iteratorExpr = metaAnnotation?.value("iterator".withPrefix(avPrefix), String)
-		_iteratorLang = metaAnnotation?.value("iteratorLang".withPrefix(avPrefix), String)
+		iteratorExpr = metaAnnotation?.value("iterator".withPrefix(avPrefix), String)
+		iteratorLang = metaAnnotation?.value("iteratorLang".withPrefix(avPrefix), String)
 
-		_separator = metaAnnotation?.value("separator".withPrefix(avPrefix), String) ?: ''
+		separator = metaAnnotation?.value("separator".withPrefix(avPrefix), String) ?: ''
 
-		_imports = metaAnnotation?.value("imports", typeof(DeclaredType[]))?.toList ?: emptyList
+		imports = metaAnnotation?.value("imports", typeof(DeclaredType[]))?.toList ?: emptyList
 		
 		
-		_linebreak = metaAnnotation?.value("linebreak".withPrefix(avPrefix), boolean) ?: false
-		_indentAfterLinebreak = metaAnnotation?.value("indentAfterLinebreak".withPrefix(avPrefix), boolean) ?: false
+		linebreak = metaAnnotation?.value("linebreak".withPrefix(avPrefix), boolean) ?: false
+		indentAfterLinebreak = metaAnnotation?.value("indentAfterLinebreak".withPrefix(avPrefix), boolean) ?: false
 		
-		_defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
+		defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
 	}
 	
 	private def stringFromAnnotationOrMap(AnnotationMirror metaAnnotation, Map<String, String> map, String name){

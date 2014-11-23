@@ -23,7 +23,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import javax.tools.StandardLocation
-import org.eclipse.xtend.lib.Property
+import org.eclipse.xtend.lib.annotations.Accessors
 import org.jgrapht.alg.StrongConnectivityInspector
 import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
@@ -383,7 +383,7 @@ class TypesRegistry {
 
 	//Some types might never be resolved since they just don't exist and won't be generated. By setting
 	//the following property to false, such error types are ignored.
-	@Property
+	@Accessors
 	boolean throwTypeElementNotFoundExceptionWhenResolvingSimpleTypeNames = true
 
 	def dispatch tryToGetFqnForErrorType(GenDeclaredType errorType) {

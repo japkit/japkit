@@ -8,7 +8,7 @@ import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class PropertyFilter {
@@ -81,18 +81,18 @@ class PropertyFilter {
 	new(AnnotationMirror metaAnnotation) {
 
 
-		_metaAnnotation = metaAnnotation
-		_sourceClass = metaAnnotation.value("sourceClass", TypeMirror)
-		_includeNamesExpr = metaAnnotation.value("includeNamesExpr", String)
-		_includeNamesLang = metaAnnotation.value("includeNamesLang", String)
+		this.metaAnnotation = metaAnnotation
+		sourceClass = metaAnnotation.value("sourceClass", TypeMirror)
+		includeNamesExpr = metaAnnotation.value("includeNamesExpr", String)
+		includeNamesLang = metaAnnotation.value("includeNamesLang", String)
 		
-		_includeNamesPrefix =  metaAnnotation.value("includeNamesPrefix", String) ?: ""
-		_includeNamesSuffix = metaAnnotation.value("includeNamesSuffix", String) ?: ""
-		_includeRules = metaAnnotation.value("includeRules", typeof(AnnotationMirror[])).map[
+		includeNamesPrefix =  metaAnnotation.value("includeNamesPrefix", String) ?: ""
+		includeNamesSuffix = metaAnnotation.value("includeNamesSuffix", String) ?: ""
+		includeRules = metaAnnotation.value("includeRules", typeof(AnnotationMirror[])).map[
 			createElementMatcher(it)]
-		_excludeRules = metaAnnotation.value("excludeRules", typeof(AnnotationMirror[])).map[
+		excludeRules = metaAnnotation.value("excludeRules", typeof(AnnotationMirror[])).map[
 			createElementMatcher(it)]
-		_ruleSource = metaAnnotation.value("ruleSource", Properties.RuleSource)
-		_fromFields = metaAnnotation.value("fromFields", Boolean)
+		ruleSource = metaAnnotation.value("ruleSource", Properties.RuleSource)
+		fromFields = metaAnnotation.value("fromFields", Boolean)
 	}
 }

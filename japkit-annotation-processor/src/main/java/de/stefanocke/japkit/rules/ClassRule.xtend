@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenAnnotationType
 import de.stefanocke.japkit.model.GenAnnotationValue
@@ -14,7 +13,6 @@ import de.stefanocke.japkit.model.GenPackage
 import de.stefanocke.japkit.model.GenTypeElement
 import java.util.List
 import java.util.Set
-import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
@@ -22,23 +20,13 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class ClassRule extends AbstractRule{
-	protected val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	protected val transient extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
-	protected val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	protected val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
-	protected val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
-	protected val transient extension ELSupport elSupport = ExtensionRegistry.get(ELSupport)
-	protected val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	protected val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	protected val transient extension TypeResolver = ExtensionRegistry.get(TypeResolver)
-	protected val transient extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-	protected val transient extension RuleUtils = ExtensionRegistry.get(RuleUtils)
-	
 
+	protected val transient extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+	
 	TemplateRule templateRule
 	MembersRule membersRule
 	ElementKind kind
@@ -65,29 +53,29 @@ class ClassRule extends AbstractRule{
 	
 	new(AnnotationMirror metaAnnotation, TypeElement templateClass, boolean isTopLevelClass, boolean isAuxClass){
 		super(metaAnnotation, templateClass)
-		_templateRule= templateClass?.createTemplateRule
-		_membersRule = new MembersRule(metaAnnotation)
-		_kind = metaAnnotation.value('kind', ElementKind)
-		_modifiersRule = createModifiersRule(metaAnnotation, templateClass, null)
+		templateRule= templateClass?.createTemplateRule
+		membersRule = new MembersRule(metaAnnotation)
+		kind = metaAnnotation.value('kind', ElementKind)
+		modifiersRule = createModifiersRule(metaAnnotation, templateClass, null)
 		
 		//TODO: Das template wird hier nicht mit hineingegeben, da die Template rule bereits selbst die annotationen des Templates kopiert.
 		//Es gibt recht viele Redundanzen zwischen @InnerClass und @Template. Vielleicht lässt sich das zusammenführen... z.B. könnte die @InnerClass
 		//Annotation STATT @Template verwendet werden. Das wäre dann aber auch für @Clazz zu überlegen. 
-		_annotationsRule = createAnnotationMappingRules(metaAnnotation, null, null)
+		annotationsRule = createAnnotationMappingRules(metaAnnotation, null, null)
 		
-		_shallCreateShadowAnnotation = metaAnnotation.value("createShadowAnnotation", Boolean) ?: false
-		_isTopLevelClass = isTopLevelClass
-		_isAuxClass = isAuxClass
-		_nameRule = if(isTopLevelClass) new ClassNameRule(metaAnnotation) else null
-		_behaviorRule = new BehaviorDelegationRule(metaAnnotation)
-		_superclassRule = createTypeRule(metaAnnotation, null, "superclass", null, null)
-		_interfaceRules = (1 .. 2).map[createTypeRule(metaAnnotation, null, '''interface«it»''', null, null)].toList
+		shallCreateShadowAnnotation = metaAnnotation.value("createShadowAnnotation", Boolean) ?: false
+		this.isTopLevelClass = isTopLevelClass
+		this.isAuxClass = isAuxClass
+		nameRule = if(isTopLevelClass) new ClassNameRule(metaAnnotation) else null
+		behaviorRule = new BehaviorDelegationRule(metaAnnotation)
+		superclassRule = createTypeRule(metaAnnotation, null, "superclass", null, null)
+		interfaceRules = (1 .. 2).map[createTypeRule(metaAnnotation, null, '''interface«it»''', null, null)].toList
 		
 		//Supports ELVariables in the scope of the generated class. For inner classes, this is already done in the inner class rule
 		//Note: src expression is currently not supported in the annotation, since generating multiple classes is not supported
 		//and would for instance be in conflict with ElementExtensions.generatedTypeElementAccordingToTriggerAnnotation 
-		_varRules = if(isTopLevelClass) createELVariableRules(metaAnnotation, null) else null;
-		_scopeRule = if(isTopLevelClass) createScopeRule(metaAnnotation, templateClass, null) else scopeWithCurrentSrc
+		varRules = if(isTopLevelClass) createELVariableRules(metaAnnotation, null) else null;
+		scopeRule = if(isTopLevelClass) createScopeRule(metaAnnotation, templateClass, null) else scopeWithCurrentSrc
 	}
 	
 	/**
@@ -258,7 +246,7 @@ class ClassRule extends AbstractRule{
 
 	def dispatch void addOrderAnnotation(GenElement element, Integer order) {
 		element.addAnnotationMirror(
-			new GenAnnotationMirror(elementUtils.getTypeElement(ORDER_ANNOTATION_NAME).asType as DeclaredType) => [
+			new GenAnnotationMirror(getTypeElement(ORDER_ANNOTATION_NAME).asType as DeclaredType) => [
 				setValue("value", [new GenAnnotationValue(order)])
 			]
 		)
@@ -275,7 +263,7 @@ class ClassRule extends AbstractRule{
 	def dispatch void addParamNamesAnnotations(GenExecutableElement element) {
 		if(!element.parameters.nullOrEmpty){
 			element.addAnnotationMirror(
-				new GenAnnotationMirror(elementUtils.getTypeElement(PARAM_NAMES_ANNOTATION_NAME).asType as DeclaredType) => [
+				new GenAnnotationMirror(getTypeElement(PARAM_NAMES_ANNOTATION_NAME).asType as DeclaredType) => [
 					setValue("value", [new GenAnnotationValue(element.parameters.map[simpleName.toString].map[new GenAnnotationValue(it)].toList)])
 				]
 			)		

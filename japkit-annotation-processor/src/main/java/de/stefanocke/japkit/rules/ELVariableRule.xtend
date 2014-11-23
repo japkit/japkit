@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.el.ElVariableError
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.util.ArrayList
@@ -11,7 +10,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
@@ -19,14 +18,6 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
-	val transient extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
-
-	extension TypesExtensions types = ExtensionRegistry.get(TypesExtensions)
-	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
-	extension ELSupport = ExtensionRegistry.get(ELSupport)
-	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
-	val transient extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 
 	String name
 	boolean ifEmpty
@@ -47,25 +38,24 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 
 	new(AnnotationMirror elVarAnnotation) {
 		super(elVarAnnotation, null)
-		_name = elVarAnnotation.value("name", String);
+		name = elVarAnnotation.value("name", String);
 		
-		_ifEmpty = elVarAnnotation.value("ifEmpty", Boolean);
-		_isFunction = elVarAnnotation.value("isFunction", Boolean);
-		_expr = elVarAnnotation.value("expr", String);
-		_lang = elVarAnnotation.value("lang", String);
-		_type = Class.forName(elVarAnnotation.value("type", TypeMirror).asElement.qualifiedName.toString);
+		ifEmpty = elVarAnnotation.value("ifEmpty", Boolean);
+		isFunction = elVarAnnotation.value("isFunction", Boolean);
+		expr = elVarAnnotation.value("expr", String);
+		lang = elVarAnnotation.value("lang", String);
+		type = Class.forName(elVarAnnotation.value("type", TypeMirror).asElement.qualifiedName.toString);
 
 		//TODO: Use Rule factory. But this is not possible, if we use triggerAnnotation. Reconsider...
-		_propertyFilterAnnotations = elVarAnnotation.value("propertyFilter", typeof(AnnotationMirror[]))
+		propertyFilterAnnotations = elVarAnnotation.value("propertyFilter", typeof(AnnotationMirror[]))
 
-		_typeQuery = elVarAnnotation.value("typeQuery", AnnotationMirror)
+		typeQuery = elVarAnnotation.value("typeQuery", AnnotationMirror)
 
-		_annotationToRetrieve = elVarAnnotation.value("annotation", TypeMirror)
+		annotationToRetrieve = elVarAnnotation.value("annotation", TypeMirror)
 
-		_matcher = elVarAnnotation.value("matcher", typeof(AnnotationMirror[])).map[createElementMatcher].singleValue
+		matcher = elVarAnnotation.value("matcher", typeof(AnnotationMirror[])).map[createElementMatcher].singleValue
 		
-		_requiredTriggerAnnotation = elVarAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
-
+		requiredTriggerAnnotation = elVarAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
 		
 	}
 
@@ -153,12 +143,12 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 				} 
 				catch (TypeElementNotFoundException tenfe) {
 					ExtensionRegistry.get(TypesRegistry).handleTypeElementNotFound(tenfe, currentAnnotatedClass)
-					new ElVariableError(_name)
+					new ElVariableError(name)
 				} catch (Exception e) {
 
 					reportRuleError('''Could not evaluate EL variable «name»: «e.message»''')
 					
-					new ElVariableError(_name)
+					new ElVariableError(name)
 				}
 			]
 			

@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.rules
 
 import javax.lang.model.element.AnnotationMirror
-import org.eclipse.xtend.lib.Data
+import org.eclipse.xtend.lib.annotations.Data
 
 /**
  * This exception is thrown if the type element for a given type mirror could not be found.
@@ -27,26 +27,26 @@ public class TypeElementNotFoundException extends RuntimeException {
 	
 	new(Throwable cause){
 		super('''«cause.message» «cause» «cause.stackTrace.join("\n")» ''', cause)
-		_fqn=UNKNOWN_TYPE
+		fqn=UNKNOWN_TYPE
 	}
 	
 	new(String fqn){
 		super(fqn)
-		_fqn=fqn
+		this.fqn=fqn
 	}
 	
 	new(String fqn, String message){
 		super(message)
-		_fqn=fqn
+		this.fqn=fqn
 	}
 	
 	new(AnnotationMirror mirror, CharSequence av) {
 		super('''Error in annotation value «av» of annotation «mirror»''')
-		_fqn=UNKNOWN_TYPE
+		this.fqn=UNKNOWN_TYPE
 	}
 	
 	new(){
-		_fqn=UNKNOWN_TYPE
+		this.fqn=UNKNOWN_TYPE
 	}
 	
 }
