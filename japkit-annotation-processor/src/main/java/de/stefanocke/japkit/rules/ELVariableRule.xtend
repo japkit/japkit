@@ -18,10 +18,13 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.services.TypeResolver
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
 
+	val private transient extension TypeResolver = ExtensionRegistry.get(TypeResolver)
+	 
 	String name
 	boolean ifEmpty
 	boolean isFunction

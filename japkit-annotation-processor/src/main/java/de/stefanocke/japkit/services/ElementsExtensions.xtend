@@ -1018,79 +1018,7 @@ class ElementsExtensions {
 		elementUtils.printElements(w, elements)
 	}
 	
-	/**
-	 * Validates if the type has (at most) one of the given trigger annotations. If so , and it is not a generated type, 
-	 * the according generated type is determined and returned.  
-	 */
-	def TypeMirror generatedTypeAccordingToTriggerAnnotation(TypeMirror type, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger
-	) {
-		var typeCandidate = type
-		
-		if (typeCandidate instanceof DeclaredType && !(typeCandidate instanceof ErrorType)) {
-			
-			
-			val typeElement = typeCandidate.asTypeElement
-			typeCandidate = 
-			generatedTypeElementAccordingToTriggerAnnotation(typeElement, triggerAnnotationTypes, mustHaveTrigger)?.asType
-		}
-		typeCandidate
-	}
 	
-	def TypeElement generatedTypeElementAccordingToTriggerAnnotation(TypeElement typeElement, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger) {
-		if(triggerAnnotationTypes.nullOrEmpty){
-			return typeElement
-		}
-		
-		val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-		if(typeElement.annotationMirrors.filter[isTriggerAnnotation].empty){
-			//If the type element has no trigger annotations at all we assume it is a "hand-written" class and leave it as it is.
-			//TODO: This could be configurable...
-			return typeElement
-		}
-		
-		
-		val triggerAnnotationTypeFqns = triggerAnnotationTypes.map[qualifiedName].toSet
-		val annotations = typeElement.annotationMirrors.filter[triggerAnnotationTypeFqns.contains(annotationType.qualifiedName)] 
-		
-		if (annotations.empty) {
-			if (mustHaveTrigger) {
-				mc.reportRuleError(
-					'''Related type «typeElement.qualifiedName» must have one of the trigger annotations «triggerAnnotationTypeFqns».''');
-				null
-
-			} else {
-				typeElement
-			}
-		}
-		
-		else if (annotations.size > 1) {
-		
-			mc.reportRuleError(
-				'''Related type «typeElement.qualifiedName» has more than one of the trigger annotations «triggerAnnotationTypeFqns».
-				 Thus, the generated type to use is not unique.''');
-			null
-		}
-		else if(!typeElement.generated) {  
-		
-			//Only apply the transformation if it is not a generated class 
-				
-			
-			val triggerAnnotation = annotations.head
-
-			val rule = ExtensionRegistry.get(RuleFactory).createTriggerAnnotationRule(triggerAnnotation.annotationAsTypeElement)
-			val fqn = rule.getGeneratedTypeElementFqn(typeElement)
-			
-			val generatedTypeElement = findTypeElement(fqn)
-			if (generatedTypeElement == null) {
-				throw new TypeElementNotFoundException(fqn, '')  
-			} else {
-				generatedTypeElement				
-			}
-				
-		} else {
-			typeElement
-		}
-	}
 	
 	//to get unique names for methods and constructors, the type parameters are appended
 	def dispatch uniqueSimpleName(ExecutableElement e){
