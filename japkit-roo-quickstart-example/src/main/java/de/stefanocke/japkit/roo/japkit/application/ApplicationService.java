@@ -11,7 +11,10 @@ import de.stefanocke.japkit.roo.japkit.Layers;
 @Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifiers = Modifier.PUBLIC, 
 	templates=@TemplateCall(ApplicationServiceTemplate.class))
 public @interface ApplicationService {
+	
 	boolean shadow() default false;
 	
 	Class<?>[] aggregateRoots() default {};
+	
+	Class<?>[] customBehaviorFor() default {};
 }

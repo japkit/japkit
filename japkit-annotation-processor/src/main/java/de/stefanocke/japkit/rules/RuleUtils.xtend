@@ -139,10 +139,13 @@ class RuleUtils {
 	/**
 	 * AV "activation" to enable or disable a rule
 	 */
-	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, boolean defaultValue) {
+	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, Boolean defaultValue) {
 
 		val activation = metaAnnotation?.elementMatchers("activation".withPrefix(avPrefix))
-		if(activation.nullOrEmpty) return [|defaultValue];
+		if(activation.nullOrEmpty) return{
+			 if (defaultValue == null) null else[|defaultValue];
+			 
+	    }
 
 		[|activation.exists[matches(currentSrcElement)]]
 	}

@@ -22,6 +22,7 @@ import javax.lang.model.element.TypeParameterElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
+import org.eclipse.xtend.lib.annotations.Accessors
 
 @FieldsFromInterface
 abstract class GenTypeElement extends GenParameterizable implements TypeElement {
@@ -30,8 +31,12 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	NestingKind nestingKind
 	TypeMirror superclass
 	//auxiliary top level classes that have been generated for this GenTypeElement
-	@org.eclipse.xtend.lib.Property
+	@Accessors
 	Set<GenTypeElement> auxTopLevelClasses = newHashSet
+	
+	//whether this is an auxiliary top level class
+	@Accessors
+	boolean auxClass
 
 	def Set<GenTypeElement> allAuxTopLevelClasses(){
 		val result = new HashSet(auxTopLevelClasses)

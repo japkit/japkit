@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
+import de.stefanocke.japkit.metaannotations.classselectors.BehaviorInnerClass;
 import de.stefanocke.japkit.metaannotations.classselectors.None;
 
 /**
@@ -158,6 +159,8 @@ public @interface Clazz {
 
 	/**
 	 * If true, a custom behavior delegation mechanism is generated. Woohaa...
+	 * <p>
+	 * If this value is empty, the custom behavior delegation mechanism is generated if the behaviorClass is found.
 	 * 
 	 * @return
 	 */

@@ -6,8 +6,7 @@ import java.lang.annotation.Target;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
-import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
-import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
+import de.stefanocke.japkit.metaannotations.classselectors.BehaviorInnerClassWithGenClassPrefix;
 import de.stefanocke.japkit.metaannotations.classselectors.None;
 
 /**
@@ -161,18 +160,8 @@ public @interface InnerClass {
 	 */
 	Matcher[]  customBehaviorActivation() default {};
 
-	Class<?> behaviorClass() default InnerClassBehaviorInnerClass.class;
+	Class<?> behaviorClass() default BehaviorInnerClassWithGenClassPrefix.class;
 	
-	/**
-	 * The behavior class for an inner class is an inner class of the annotated class whose name is #{simpleNameOfInnerClass}Behavior
-	 * @author stefan
-	 *
-	 */
-	@ClassSelector(kind=ClassSelectorKind.INNER_CLASS_NAME, expr="#{genClass.simpleName}Behavior")
-	public interface InnerClassBehaviorInnerClass{}
-
-
-
 	/**
 	 * 
 	 * @return the name of the base class for the behavior class. It is always

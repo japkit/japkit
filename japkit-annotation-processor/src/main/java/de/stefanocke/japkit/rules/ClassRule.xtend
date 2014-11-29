@@ -122,6 +122,7 @@ class ClassRule extends AbstractRule{
 				if(isIsAuxClass){
 					//early registration of aux classes to allow other aux classes to find them.
 					currentPrimaryGenClass.auxTopLevelClasses.add(generatedClass)
+					generatedClass.auxClass = true
 				}
 				
 				

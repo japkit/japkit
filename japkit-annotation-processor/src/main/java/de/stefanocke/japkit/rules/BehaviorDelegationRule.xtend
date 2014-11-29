@@ -33,7 +33,7 @@ class BehaviorDelegationRule extends AbstractRule {
 
 	new(AnnotationMirror metaAnnotation) {
 		super(metaAnnotation, null)
-		activationRule = metaAnnotation.createActivationRule("customBehavior", false)
+		activationRule = metaAnnotation.createActivationRule("customBehavior", null)
 		behaviorClass = metaAnnotation.value("behaviorClass", TypeMirror)
 		renamePrefix = metaAnnotation.value("behaviorGenMethodRenamePrefix", String)
 		internalInterfaceName = metaAnnotation.value("behaviorInternalInterface", String)
@@ -51,20 +51,29 @@ class BehaviorDelegationRule extends AbstractRule {
 	 */
 	def void createBehaviorDelegation(GenTypeElement c) {
 		inRule[
-			if (!activationRule.apply) {
+			if (activationRule != null && !activationRule.apply) {
 				return null
 			}
 			//TODO: Name of interface and base class configurable
 			//TODO: Visibility of interface and base class configurable
 			val behaviorProxyAndTypeElement = behaviorClass.resolveTypeAndCreateProxy
+			val foundBehaviorClass = behaviorProxyAndTypeElement.value
+			
+			if(activationRule==null && foundBehaviorClass==null){
+				//If there is no custom activation rule, the behavior delegation is only generated if the custom behavior class exists.
+				return null;
+			}
+			
 			val behaviorClass = behaviorProxyAndTypeElement.key
 			val behaviorClassInSamePackageAsGenClass = c.package.qualifiedName.contentEquals(
 				behaviorClass.package.qualifiedName)
+								
+				
 			val allInstanceMethods = handleTypeElementNotFound(emptyList,
 				'''Could not determine all methods of generated class «c.qualifiedName», probably due to some missing supertype.''') [
 				c.allMethods.filter[!isStatic]
 			]
-			val foundBehaviorClass = behaviorProxyAndTypeElement.value
+			
 			//Methods defined in the behavior class
 			val customBehaviorMethods = if (foundBehaviorClass == null)
 					#[]
