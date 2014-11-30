@@ -12,7 +12,6 @@ import java.io.Writer
 import java.lang.reflect.Method
 import java.net.URL
 import java.util.ArrayList
-import java.util.Map
 import java.util.WeakHashMap
 import javax.el.CompositeELResolver
 import javax.el.ELException

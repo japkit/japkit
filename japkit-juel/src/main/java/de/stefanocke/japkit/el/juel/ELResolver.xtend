@@ -1,14 +1,12 @@
 package de.stefanocke.japkit.el.juel
 
 import de.odysseus.el.util.SimpleResolver
-import javax.el.ELContext
-import de.stefanocke.japkit.el.ElExtensionPropertiesAndMethods
-import de.stefanocke.japkit.el.ELPropertyNotFoundException
-import java.util.Map
-import org.eclipse.xtext.xbase.lib.Functions.Function0
-import org.eclipse.xtext.xbase.lib.Functions.Function1
-import de.stefanocke.japkit.el.ElExtensions
 import de.stefanocke.japkit.el.ELMethodException
+import de.stefanocke.japkit.el.ELPropertyNotFoundException
+import de.stefanocke.japkit.el.ElExtensionPropertiesAndMethods
+import de.stefanocke.japkit.el.ElExtensions
+import java.util.Map
+import javax.el.ELContext
 
 class ELResolver extends SimpleResolver {
 
