@@ -147,7 +147,7 @@ class ELSupport {
 			//Do not report the error again to avoid error flooding
 			errorResult
 		} catch (Exception e) {
-			reportRuleError('''«errorMessage»: «e.message» EL expression: «expr»''')
+			reportRuleError('''«errorMessage»: «e?.class» «e.message» EL expression: «expr»''')
 			errorResult
 		}
 	}

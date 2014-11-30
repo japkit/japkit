@@ -39,9 +39,13 @@ class JuelELProvider implements ELProvider {
 			val ValueStack contextMap
 			static transient val methodCache = new WeakHashMap<Object, Method>()
 			
-			@Data
+			
 			static class Invoker{
-				Object function
+				val Object function
+				
+				new(Object function){
+					this.function=function
+				}
 				def Object invoke(Object ... params){
 					ElExtensions.invoke(function, null, params)
 				}

@@ -135,7 +135,7 @@ public class ApplicationServiceTemplate {
 					cases={
 							@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
 							@Case(matcher=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
-								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO.code()}.build()" )
+								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
 					},
 					code="command.#{src.findGetter.simpleName}()")
 		static class ParamsFromCommand{}
@@ -154,7 +154,7 @@ public class ApplicationServiceTemplate {
 		 *  @japkit.bodyCode <pre>
 		 * <code>
 		 * #{aggregate.code} #{aggregateNameLower} = find#{aggregateName}(command.getId(), command.getVersion());
-		 * #{aggregateNameLower}.#{src.simpleName}(#{paramsFromCommand.code()}); 
+		 * #{aggregateNameLower}.#{src.simpleName}(#{paramsFromCommand()}); 
 		 * </code>
 		 * </pre>
 		 * @param command
@@ -166,7 +166,7 @@ public class ApplicationServiceTemplate {
 		@Transactional
 		@CommandMethod(aggregateRoot=Aggregate.class)
 		public void $srcElementName$(Command command){}  
-		
+			
 		/**
 		 * 
 		 *  @japkit.bodyCode <pre>

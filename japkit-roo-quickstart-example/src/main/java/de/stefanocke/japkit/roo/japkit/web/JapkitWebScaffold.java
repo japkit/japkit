@@ -104,7 +104,7 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 						+ " }.flatten()}; "
 						+ "pNames(src, null)", 
 				lang = "GroovyScript"),
-		@Var(name = "propertyNames", ifEmpty=true, expr="#{allPropertyNames.eval(viewProperties)}")		
+		@Var(name = "propertyNames", ifEmpty=true, expr="#{allPropertyNames(viewProperties)}")		
 
 })
 @Clazz(
@@ -134,7 +134,7 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 				vars = {
 					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
 					@Var(name="cmdName", expr="#{cmdMethod.simpleName}"),
-					@Var(name = "cmdPropertyNames", expr="#{allPropertyNames.eval(command.asElement().properties)}"),
+					@Var(name = "cmdPropertyNames", expr="#{allPropertyNames(command.asElement().properties)}"),
 				}),
 		@ResourceTemplate(src="#{updateCommands}", srcVar="cmdMethod",
 				templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
@@ -151,7 +151,7 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 				vars = {
 					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
 					@Var(name="cmdName", expr="#{cmdMethod.simpleName}"),
-					@Var(name = "cmdPropertyNames", expr="#{allPropertyNames.eval(command.asElement().properties)}"),
+					@Var(name = "cmdPropertyNames", expr="#{allPropertyNames(command.asElement().properties)}"),
 				}),
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "show.jspx", location = ResourceLocation.WEBINF,
 				pathExpr = "views/#{path}"),
