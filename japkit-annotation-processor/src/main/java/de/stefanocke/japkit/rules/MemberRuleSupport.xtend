@@ -161,7 +161,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 					generatedMembers
 				]
 				
-				manualOverrideRule?.apply(result.map[head])  
+				manualOverrideRule?.apply(result.map[(it as Iterable<GenElement> ).head])  
 				
 				result.flatten.toList
 				
