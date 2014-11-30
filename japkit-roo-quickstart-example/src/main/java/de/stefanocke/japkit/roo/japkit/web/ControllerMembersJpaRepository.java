@@ -16,13 +16,14 @@ import de.stefanocke.japkit.roo.base.web.RepositoryAdapter;
 		vars = {
 				@Var(name = "useFboRepository", matcher = @Matcher(condition = "#{repository != null && !entityAnnotation.activeRecord}")),
 				@Var(name = "relatedEntitiesWithJpaRepositories",
-						expr = "relatedEntities.collectEntries{it->[it, it.findRepository]}.findAll{it.value!=null}", lang = "GroovyScript"),
+						expr = "relatedEntities.collectEntries{it->[it, findRepository(it.asType())]}.findAll{it.value!=null}", lang = "GroovyScript"),
+						
 				@Var(name = "entityPropertiesWithJpaRepositories", expr = "entityProperties.collectEntries{p -> [p, "
 						+ "relatedEntitiesWithJpaRepositories[p.singleValueType.asElement()]" + "]}.findAll{it.value!=null}",
 						lang = "GroovyScript") })
 public abstract class ControllerMembersJpaRepository {
-
-	@Field(activation = @Matcher(condition = "useFboRepository"))
+	/**${this.class.superclass.toString()}*/
+	@Field(activation = @Matcher(condition = "useFboRepository"), commentLang="GStringTemplateInline")
 	@Autowired
 	private Repository repository;
 

@@ -28,10 +28,6 @@ import de.stefanocke.japkit.el.ValueStack
 
 class GroovyELProvider implements ELProvider {
 
-
-
-	ThreadLocal<Map<String, Object>> contextMapTL = new ThreadLocal<Map<String, Object>>();
-
 	CompilerConfiguration conf = new CompilerConfiguration().with {
 		optimizationOptions.indy = true
 		it
@@ -44,7 +40,6 @@ class GroovyELProvider implements ELProvider {
 	)
 
 	XmlTemplateEngine xmlTemplateEngine = new XmlTemplateEngine(new XmlParser(false, true), shell)  //TODO: Make configurable.
-
 
 	private static int counter = 1;
 

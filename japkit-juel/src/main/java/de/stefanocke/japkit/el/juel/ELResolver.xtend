@@ -5,6 +5,10 @@ import javax.el.ELContext
 import de.stefanocke.japkit.el.ElExtensionPropertiesAndMethods
 import de.stefanocke.japkit.el.ELPropertyNotFoundException
 import java.util.Map
+import org.eclipse.xtext.xbase.lib.Functions.Function0
+import org.eclipse.xtext.xbase.lib.Functions.Function1
+import de.stefanocke.japkit.el.ElExtensions
+import de.stefanocke.japkit.el.ELMethodException
 
 class ELResolver extends SimpleResolver {
 
@@ -50,12 +54,26 @@ class ELResolver extends SimpleResolver {
 
 		val rootProperties = contextMap
 		
-		val closure = if(method instanceof String) findMethodClosure(base, method) else null
-
-		if (closure != null) {
-			context.setPropertyResolved(true)
-			return closure.apply(rootProperties, base, paramTypes, params)
+		if(method instanceof String){
+			val closure = findMethodClosure(base, method) 
+	
+			if (closure != null) {
+				context.setPropertyResolved(true)
+				return closure.apply(rootProperties, base, paramTypes, params)
+			}
+			
+			try{
+				context.setPropertyResolved(true)
+				return ElExtensions.invokeMethod(base, method, params, rootProperties)
+				
+			} catch(ELMethodException e){
+				//Ignore and fall back to default resolver
+				context.setPropertyResolved(false)
+				//TODO: We have a different order here compared to Groovy. In Groovy the default resolver seems to be called first !?
+			}
+		
 		}
+		
 
 		super.invoke(context, base, method, paramTypes, params)
 	}

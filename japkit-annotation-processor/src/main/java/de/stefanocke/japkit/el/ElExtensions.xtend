@@ -13,6 +13,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.stefanocke.japkit.services.ExtensionRegistry.*
@@ -193,6 +194,39 @@ class ElExtensions {
 	
 	def static Element findByName(Iterable<?> elements, CharSequence name){
 		MoreCollectionExtensions.filterInstanceOf(elements, Element).findFirst[simpleName.contentEquals(name)]
+	}
+	
+	
+	def static invokeMethod(Object base, String name, Object params){
+		
+		invokeMethod(base, name, if(params instanceof Object[]) params else #[params] , valueStack)
+	}
+	
+	def static invokeMethod(Object base, String name, Object[] params, Map<String, Object> contextMap){
+		val function =  contextMap.get(name)
+		if(function == null)
+		throw new ELMethodException('''No function with name «name» is on value stack and there is also no other property of element «base» with this name.''')	
+
+		invoke(function, base, params)
+				
+	}
+	
+	def static invoke(Object functionObject, Object base, Object[] params) {
+		if(functionObject instanceof Function0<?>){
+			if(base==null && params.empty){
+				return functionObject.apply
+			}			
+		} 
+		if(functionObject instanceof Function1){
+			if(base!=null && params.empty){
+				return functionObject.apply(base)
+			}
+			if(base==null && params.size==1){
+				return functionObject.apply(params.get(0))
+			}
+		}
+		
+		throw new ELMethodException('''«functionObject» is no function or could could not be applied to base «base» and params «params».''')
 	}
 	
 	

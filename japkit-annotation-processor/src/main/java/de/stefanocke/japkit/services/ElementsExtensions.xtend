@@ -15,8 +15,6 @@ import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.model.ParameterWrapper
 import de.stefanocke.japkit.model.Path
 import de.stefanocke.japkit.model.Property
-import de.stefanocke.japkit.rules.AnnotationExtensions
-import de.stefanocke.japkit.rules.RuleFactory
 import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.io.Writer
 import java.lang.annotation.Annotation

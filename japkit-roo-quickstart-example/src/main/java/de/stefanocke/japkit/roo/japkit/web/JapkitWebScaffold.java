@@ -46,7 +46,7 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		@Var(name = "modelAttribute", type = String.class, ifEmpty=true, expr = "#{fboName.toFirstLower}"),
 		@Var(name = "toHtmlId", isFunction=true, expr="#{src.toString().replace('.','_').toLowerCase()}" ),
 		// For making IDs in JSPs unique
-		@Var(name = "fboFqnId", expr = "#{toHtmlId.eval(fboElement.qualifiedName)}"),
+		@Var(name = "fboFqnId", expr = "#{fboElement.qualifiedName.toHtmlId()}"),	
 		@Var(name = "fboShortId", expr = "#{fboName.toLowerCase()}"),
 
 		@Var(name = "viewModel", ifEmpty=true, typeQuery = @TypeQuery(
@@ -81,9 +81,9 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		
 		//TODO: Etwas unschön, dass bei functions nur Element als Parameter erlaubt ist. Zumindest noch Type zulassen, wenn schon nicht Object.
 		@Var(name = "findRepository", isFunction = true, typeQuery = @TypeQuery(
-				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src.asType()}")),
+				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src}")),
 				
-		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fboElement.findRepository}"),
+		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo.findRepository()}"),
 		
 		@Var(name = "applicationService", ifEmpty = true, typeQuery = @TypeQuery(
 				annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots", inExpr = "#{fbo}")),

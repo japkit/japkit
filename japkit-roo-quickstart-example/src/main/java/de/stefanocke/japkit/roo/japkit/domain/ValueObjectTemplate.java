@@ -86,10 +86,9 @@ public abstract class ValueObjectTemplate {
 	static class After{};
 	
 	@CodeFragment(vars = @Var(name="param", expr ="builder.#{src.simpleName}"),
-			code = "this.#{src.simpleName} = #{rhs.code()};",	beforeFragments = "validationFragment"
-	)
+			code = "this.#{src.simpleName} = #{rhs()};",	beforeFragments = "validationFragment")
 	static class Assignment{}
-
+	
 	@Order(4)
 	@Constructor(bodyIterator = "properties", bodyCode = "assignment")
 	@ParamNames("builder")
