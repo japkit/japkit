@@ -18,7 +18,8 @@ class TriggerAnnotationRule extends AbstractRule{
 	List<ELVariableRule> varRules
 	List<ClassRule> classRules
 	List<ResourceRule> resourceRules
-	LibraryRule libraryRule
+	List<LibraryRule> libraryRules
+	LibraryRule selfLibraryRule
 	
 	new(AnnotationMirror triggerMetaAnnotation, TypeElement triggerAnnotationTypeElement){
 		super(triggerMetaAnnotation, triggerAnnotationTypeElement)
@@ -32,7 +33,8 @@ class TriggerAnnotationRule extends AbstractRule{
 		//@ResourceTemplate
 		val resourcePackage = triggerAnnotationTypeElement.package
 		resourceRules = triggerAnnotationTypeElement.annotationMirrors(ResourceTemplate).map[new ResourceRule(it, resourcePackage)]		
-		libraryRule = new LibraryRule(triggerMetaAnnotation, triggerAnnotationTypeElement)
+		selfLibraryRule = new LibraryRule(triggerMetaAnnotation, triggerAnnotationTypeElement)
+		libraryRules = createLibraryRules(triggerMetaAnnotation, null)
 	}
 	
 	
@@ -48,7 +50,8 @@ class TriggerAnnotationRule extends AbstractRule{
 		
 					valueStack.putAll(currentTriggerAnnotation.annotationValuesByNameUnwrappedAsMap)
 					
-					libraryRule.apply
+					libraryRules.forEach[apply]
+					selfLibraryRule.apply
 					
 					//EL Variables			
 					varRules.forEach[putELVariable]

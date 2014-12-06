@@ -16,6 +16,7 @@ class RuleFactory {
 		matcherCache.clear
 		annoRuleCache.clear
 		templateCache.clear
+		libraryCache.clear
 	}
 
 	//TODO: Bringt das hier überhaupt etwas, wenn der AnnotationMirror ohnehin jedes mal unterschiedlich ist?
@@ -60,6 +61,14 @@ class RuleFactory {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
 		getOrCreate(triggerAnnotationCache, triggerAnnotationClass, [new TriggerAnnotationRule(triggerAnnotationClass.annotationMirror(Trigger), triggerAnnotationClass)])
 	}
+	
+	
+	val libraryCache = new IdentityHashMap<TypeElement, LibraryRule>
+	
+	def createLibraryRule(TypeElement libraryClass){
+		getOrCreate(libraryCache, libraryClass, [new LibraryRule(null as AnnotationMirror, libraryClass)])
+	}
+	
 
 	def static <K, V> V getOrCreate(Map<K, V> cache, K key, (K,(V)=>void)=>V factory) {
 		cache.get(key) ?: {

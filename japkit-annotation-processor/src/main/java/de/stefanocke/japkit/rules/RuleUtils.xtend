@@ -43,6 +43,7 @@ class RuleUtils {
 	val protected transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	val protected transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val protected transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	val protected transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	
 	
 	public static def withPrefix(CharSequence name, String prefix){
@@ -100,7 +101,8 @@ class RuleUtils {
 	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
 			
 		val srcVarName = metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
-		val varRules = createELVariableRules(metaAnnotation, avPrefix);
+		val varRules = createELVariableRules(metaAnnotation, avPrefix)
+		val libraryRules = createLibraryRules(metaAnnotation, avPrefix);
 
 		[(Object)=>T closure |
 			
@@ -108,8 +110,8 @@ class RuleUtils {
 
 			(srcElements ?: Collections.singleton(currentSrc)).map [ e |
 				scope(e) [
-					
 					if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
+					libraryRules.forEach[apply]
 					valueStack.put("currentRule", currentRule)
 					varRules?.forEach[it.putELVariable]
 					closure.apply(e)
@@ -117,6 +119,10 @@ class RuleUtils {
 			].toList
 							
 		]
+	}
+	
+	def createLibraryRules(AnnotationMirror metaAnnotation, String avPrefix) {
+		metaAnnotation?.value("libraries".withPrefix(avPrefix), typeof(TypeMirror[]))?.map[createLibraryRule(it.asElement)] ?: emptyList
 	}
 	
 	val SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null, null)

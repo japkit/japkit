@@ -15,7 +15,7 @@ import de.stefanocke.japkit.metaannotations.Function
 @Data 
 class LibraryRule extends AbstractRule implements Procedure0 {
 	
-	Map<String,?> functions
+	Map<String, AbstractRule> functions
 	
 	new(AnnotationMirror metaAnnotation, TypeElement metaElement) {
 		super(metaAnnotation, metaElement)

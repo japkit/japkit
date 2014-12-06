@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Clazz;
-import de.stefanocke.japkit.metaannotations.Function;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
@@ -33,7 +32,9 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
 @RuntimeMetadata
-@Trigger(layer=Layers.CONTROLLERS, vars={
+@Trigger(layer=Layers.CONTROLLERS, 
+	libraries=WebScaffoldLibrary.class,
+	vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
 		@Var(name = "entityAnnotation", expr = "#{fboElement}", annotation = JapkitEntity.class),
@@ -195,25 +196,5 @@ public @interface JapkitWebScaffold {
 	// For i18n. TODO: Reconsider
 	String[] propertyNames() default {};
 	
-	
-	/**
-	 * @japkit.expr <pre>
-	 * <code>
-	 * def pNames;  
-	 * pNames={p, prfx -> 
-	 * 	p.collect{
-	 * 		def name = prfx ? prfx+'.'+it.name : it.name;
-	 * 		def names = [name];
-	 * 		if(it.isVO || it.isDTO)  names.addAll(pNames(it.asType().asElement.properties, name));
-	 *	 	names
-	 * 	}.flatten()
-	 * };
-	 * pNames(src, null)
-	 * </code>
-	 * </pre>
-	 */
-	@Function(lang = "GroovyScript")
-	class allPropertyNames {
-	}
 	
 }

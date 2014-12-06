@@ -16,7 +16,12 @@ import java.lang.annotation.Target;
 public @interface Trigger {
 	
 	/**
-	 * EL Variables in the scope of the annotated class. 
+	 * Libraries with functions to be made available for use in expressions.
+	 */
+	Class<?>[] libraries() default {};
+	
+	/**
+	 * Variables in the scope of the annotated class. 
 	 * @return
 	 */
 	Var[] vars() default {};

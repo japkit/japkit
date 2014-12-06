@@ -40,6 +40,8 @@ class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Functi
 	DeclaredType[] typeArg1Annotations
 	String condition
 	String conditionLang
+	
+	//TODO: Move this to scopeRule?
 	ConstraintRule[] constraints
 	
 	

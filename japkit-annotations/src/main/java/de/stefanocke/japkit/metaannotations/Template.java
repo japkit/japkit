@@ -45,6 +45,11 @@ public @interface Template {
 	 */
 	String srcVar() default "";
 
+	/**
+	 * Libraries with functions to be made available for use in expressions.
+	 */
+	Class<?>[] libraries() default {};
+	
 	Var[] vars() default {};
 
 	/**
