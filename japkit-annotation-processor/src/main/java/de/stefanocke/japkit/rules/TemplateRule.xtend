@@ -41,7 +41,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	boolean allMethodsAreTemplates
 	boolean allConstructorsAreTemplates
 	
-	Map<String,?> functions
+	LibraryRule libraryRule
 	
 	new(TypeElement templateClass, AnnotationMirror templateAnnotation, (TemplateRule)=>void registrationCallback) {
 		super(templateAnnotation, templateClass)
@@ -71,23 +71,9 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		annotationsRule = createAnnotationMappingRules(metaAnnotation, templateClass, null)
 		scopeRule = createScopeRule(metaAnnotation, templateClass, null)
 
-		functions = newHashMap( 		
-			templateClass.enclosedElementsOrdered
-				.map[createFunctionForMember]
-				.filter[it!=null])
+		//a template is always a library to itself
+		libraryRule = new LibraryRule(metaAnnotation, templateClass)
 		
-	}
-	
-	def private dispatch createFunctionForMember(TypeElement member){
-		val codeFragmentAnnotation = member.annotationMirror(CodeFragment)
-		if(codeFragmentAnnotation!=null){
-			return member.simpleName.toString.toFirstLower -> new CodeFragmentRule(codeFragmentAnnotation, member)
-		}
-		null
-	}
-	
-	def private dispatch createFunctionForMember(Element member){
-		null
 	}
 	
 	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(TypeElement member){
@@ -138,7 +124,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		inRule[
 			
 			scopeRule.apply [
-				valueStack.putAll(functions)
+				libraryRule.apply
 				generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
 				addInterfaces(generatedClass)				
 				memberRules.map[it.apply(generatedClass)].flatten.toList	

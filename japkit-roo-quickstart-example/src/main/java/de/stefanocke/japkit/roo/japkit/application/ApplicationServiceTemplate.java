@@ -171,7 +171,7 @@ public class ApplicationServiceTemplate {
 		 * 
 		 *  @japkit.bodyCode <pre>
 		 * <code>
-		 * #{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(#{paramsFromCommand.code()});
+		 * #{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(#{paramsFromCommand()});
 		 * #{repositoryName}.save(#{aggregateNameLower});
 		 * return #{aggregateNameLower};
 		 * </code>
