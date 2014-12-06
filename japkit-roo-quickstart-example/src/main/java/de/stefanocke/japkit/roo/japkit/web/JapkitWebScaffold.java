@@ -11,6 +11,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Function;
 import de.stefanocke.japkit.metaannotations.Matcher;
@@ -31,6 +32,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
+@RuntimeMetadata
 @Trigger(layer=Layers.CONTROLLERS, vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
@@ -75,7 +77,6 @@ import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
 		@Var(name = "relatedEntities", expr = "entityProperties.collect{it.singleValueType.asElement()}", lang="GroovyScript"),
 		
-		//TODO: Etwas unschön, dass bei functions nur Element als Parameter erlaubt ist. Zumindest noch Type zulassen, wenn schon nicht Object.
 		@Var(name = "findRepository", isFunction = true, typeQuery = @TypeQuery(
 				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src}")),
 				
@@ -195,16 +196,24 @@ public @interface JapkitWebScaffold {
 	String[] propertyNames() default {};
 	
 	
-	@Function(expr = "def pNames;  "
-			+ "pNames={p, prfx -> "
-			+ " p.collect{ "
-			+ "  def name = prfx ? prfx+'.'+it.name : it.name;"
-			+ "  def names = [name];"
-			+ "  if(it.isVO || it.isDTO)  names.addAll(pNames(it.asType().asElement.properties, name));"
-			+ "  names"
-			+ " }.flatten()}; "
-			+ "pNames(src, null)", 
-			lang = "GroovyScript")
-	class allPropertyNames{}
+	/**
+	 * @japkit.expr <pre>
+	 * <code>
+	 * def pNames;  
+	 * pNames={p, prfx -> 
+	 * 	p.collect{
+	 * 		def name = prfx ? prfx+'.'+it.name : it.name;
+	 * 		def names = [name];
+	 * 		if(it.isVO || it.isDTO)  names.addAll(pNames(it.asType().asElement.properties, name));
+	 *	 	names
+	 * 	}.flatten()
+	 * };
+	 * pNames(src, null)
+	 * </code>
+	 * </pre>
+	 */
+	@Function(lang = "GroovyScript")
+	class allPropertyNames {
+	}
 	
 }

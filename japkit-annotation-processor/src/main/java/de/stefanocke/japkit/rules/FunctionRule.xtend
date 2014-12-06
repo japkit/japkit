@@ -17,7 +17,11 @@ class FunctionRule extends AbstractRule implements Function1<Object, Object>,  F
 	
 	new(AnnotationMirror metaAnnotation, TypeElement metaElement) {
 		super(metaAnnotation, metaElement)
-		expr = metaAnnotation.value("expr", String);
+	
+		val exprFromAv = metaAnnotation.value("expr", String);
+		
+		expr = if(!exprFromAv.nullOrEmpty) exprFromAv else JavadocUtil.getCode(metaElement?.getDocCommentUsingRuntimeMetadata).get("expr")
+		
 		lang = metaAnnotation.value("lang", String);
 		type = Class.forName(metaAnnotation.value("type", TypeMirror)?.asElement?.qualifiedName?.toString ?: "java.lang.Object");
 	}
