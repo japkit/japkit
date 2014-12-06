@@ -5,8 +5,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.persistence.Id;
 import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,16 +18,13 @@ import de.stefanocke.japkit.metaannotations.ResourceTemplate;
 import de.stefanocke.japkit.metaannotations.SingleValue;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Trigger;
-import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
 import de.stefanocke.japkit.roo.japkit.application.ApplicationService;
 import de.stefanocke.japkit.roo.japkit.application.CommandMethod;
-import de.stefanocke.japkit.roo.japkit.application.DTO;
 import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
-import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
 @RuntimeMetadata
 @Trigger(layer=Layers.CONTROLLERS, 
@@ -43,7 +38,7 @@ import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 		@Var(name = "path", type = String.class, ifEmpty=true, expr = "#{fboPluralName.toLowerCase()}"),
 		//@Var(name = "path", expr="foo", ifEmpty=true),
 		@Var(name = "modelAttribute", type = String.class, ifEmpty=true, expr = "#{fboName.toFirstLower}"),
-		@Var(name = "toHtmlId", isFunction=true, expr="#{src.toString().replace('.','_').toLowerCase()}" ),
+		
 		// For making IDs in JSPs unique
 		@Var(name = "fboFqnId", expr = "#{fboElement.qualifiedName.toHtmlId()}"),	
 		@Var(name = "fboShortId", expr = "#{fboName.toLowerCase()}"),
@@ -56,33 +51,18 @@ import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 				annotationsNot = { Id.class, Version.class }))),
 		@Var(name = "explicitTableProperties", expr = "#{viewProperties}", matcher=@Matcher(annotations=TableColumn.class)),
 		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
+		
 		@Var(name = "columnAnnotation", isFunction=true, annotation = TableColumn.class),
 
-		// Some matchers for categorize properties
-		@Var(name = "isDatetime", isFunction = true, matcher = @Matcher(singleValueTypeCategory = TypeCategory.TEMPORAL)),
-		@Var(name = "isBoolean", isFunction = true, matcher = @Matcher(singleValueType = boolean.class)),
-		@Var(name = "isEnum", isFunction = true, matcher = @Matcher(singleValueTypeCategory = TypeCategory.ENUM)),
-		@Var(name = "isRequired", isFunction = true, matcher = @Matcher(annotations = NotNull.class)),
-		@Var(name = "isPast", isFunction = true, matcher = @Matcher(annotations = Past.class)),
 		@Var(name = "patternAnnotation", isFunction = true, annotation=Pattern.class),
-		@Var(name = "regexp", isFunction = true, expr = "#{src.patternAnnotation.regexp}"),
-		// The view properties that have a date or time type
-		@Var(name = "datetimeProperties", expr = "#{isDatetime.filter(viewProperties)}"),
-		@Var(name = "hasDatetimeProperties", expr = "#{!datetimeProperties.isEmpty()}"),
-		@Var(name = "enumProperties", expr = "#{isEnum.filter(viewProperties)}"),
-		@Var(name = "dtfModelAttr", isFunction = true, expr = "#{fboShortId}_#{src.name.toLowerCase()}_date_format"),
 		
-		@Var(name = "isEntity", isFunction = true,  matcher = @Matcher(singleValueTypeAnnotations = JapkitEntity.class)),
-		@Var(name = "isDTO", isFunction = true,  matcher = @Matcher(singleValueTypeAnnotations = DTO.class)),
-		@Var(name = "isVO", isFunction = true,  matcher = @Matcher(singleValueTypeAnnotations = ValueObject.class)),
 		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
 		@Var(name = "relatedEntities", expr = "entityProperties.collect{it.singleValueType.asElement()}", lang="GroovyScript"),
-		
+				
 		@Var(name = "findRepository", isFunction = true, typeQuery = @TypeQuery(
 				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src}")),
 				
-		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo.findRepository()}"),
-		
+		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo.findRepository()}"),		
 		@Var(name = "applicationService", ifEmpty = true, typeQuery = @TypeQuery(
 				annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots", inExpr = "#{fbo}")),
 		@Var(name="CommandMethod", isFunction=true, annotation=CommandMethod.class),
