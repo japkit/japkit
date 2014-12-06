@@ -138,7 +138,7 @@ public class ApplicationServiceTemplate {
 								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
 					},
 					code="command.#{src.findGetter.simpleName}()")
-		static class ParamsFromCommand{}
+		static class paramsFromCommand{}
 		
 		@CodeFragment(vars={
 				@Var(name="dtoGetter", expr="#{src.findGetter}"),
@@ -146,7 +146,7 @@ public class ApplicationServiceTemplate {
 				}, 
 				iterator="#{dto.properties}" ,
 				code=".#{src.setter.simpleName}(command.#{dtoGetter.simpleName}().#{src.getter.simpleName}())") //Quick&Dirty
-		static class FluentVOSettersFromDTO{}
+		static class fluentVOSettersFromDTO{}
 		
 		
 		/**

@@ -18,6 +18,7 @@ class TriggerAnnotationRule extends AbstractRule{
 	List<ELVariableRule> varRules
 	List<ClassRule> classRules
 	List<ResourceRule> resourceRules
+	LibraryRule libraryRule
 	
 	new(AnnotationMirror triggerMetaAnnotation, TypeElement triggerAnnotationTypeElement){
 		super(triggerMetaAnnotation, triggerAnnotationTypeElement)
@@ -31,6 +32,7 @@ class TriggerAnnotationRule extends AbstractRule{
 		//@ResourceTemplate
 		val resourcePackage = triggerAnnotationTypeElement.package
 		resourceRules = triggerAnnotationTypeElement.annotationMirrors(ResourceTemplate).map[new ResourceRule(it, resourcePackage)]		
+		libraryRule = new LibraryRule(triggerMetaAnnotation, triggerAnnotationTypeElement)
 	}
 	
 	
@@ -45,6 +47,8 @@ class TriggerAnnotationRule extends AbstractRule{
 					printDiagnosticMessage['''Process annotated class «annotatedClass», Trigger annotation «triggerAnnotation».''']
 		
 					valueStack.putAll(currentTriggerAnnotation.annotationValuesByNameUnwrappedAsMap)
+					
+					libraryRule.apply
 					
 					//EL Variables			
 					varRules.forEach[putELVariable]

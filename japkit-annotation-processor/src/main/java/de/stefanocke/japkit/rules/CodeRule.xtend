@@ -14,6 +14,8 @@ import javax.lang.model.type.DeclaredType
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend2.lib.StringConcatenation
 import org.eclipse.xtext.xbase.lib.Functions.Function0
+import de.stefanocke.japkit.services.MessageCollector
+import de.stefanocke.japkit.services.TypeElementNotFoundException
 
 @Data
 class CodeRule extends AbstractRule implements Function0<CharSequence> {
@@ -118,10 +120,18 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 			
 			withValueStack(vs)[|
 				scope [
-					it.put("ec", ec)
-					it.put("genElement", genElement)
-					val result = cr.apply(genElement)
-					defaultFragments?.apply(result) ?: result
+					try{
+						it.put("ec", ec)
+						it.put("genElement", genElement)
+						val result = cr.apply(genElement)
+						defaultFragments?.apply(result) ?: result
+					
+					} catch(TypeElementNotFoundException e){
+						throw e
+					} catch(Exception e){
+						ExtensionRegistry.get(MessageCollector).reportRuleError(e.message);
+						''''''
+					}
 				]		
 			]
 		]

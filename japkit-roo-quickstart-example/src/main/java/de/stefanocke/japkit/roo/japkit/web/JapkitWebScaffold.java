@@ -11,17 +11,14 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import de.stefanocke.japkit.metaannotations.AV;
-import de.stefanocke.japkit.metaannotations.AVMode;
-import de.stefanocke.japkit.metaannotations.Annotation;
-import de.stefanocke.japkit.metaannotations.AnnotationMode;
 import de.stefanocke.japkit.metaannotations.Clazz;
+import de.stefanocke.japkit.metaannotations.Function;
 import de.stefanocke.japkit.metaannotations.Matcher;
-import de.stefanocke.japkit.metaannotations.SingleValue;
-import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
+import de.stefanocke.japkit.metaannotations.SingleValue;
+import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
@@ -33,7 +30,6 @@ import de.stefanocke.japkit.roo.japkit.application.DTO;
 import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
-import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 
 @Trigger(layer=Layers.CONTROLLERS, vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
@@ -93,17 +89,6 @@ import de.stefanocke.japkit.roo.japkit.web.ControllerMembers.Create.Command;
 		@Var(name="updateCommands", expr="#{applicationService.asElement.declaredMethods}", 
 				matcher=@Matcher(annotations=CommandMethod.class, type=void.class , condition="#{src.CommandMethod.aggregateRoot.isSame(fbo)}")),
 				
-		@Var(name = "allPropertyNames", isFunction=true,
-				expr = "def pNames;  "
-						+ "pNames={p, prfx -> "
-						+ " p.collect{ "
-						+ "  def name = prfx ? prfx+'.'+it.name : it.name;"
-						+ "  def names = [name];"
-						+ "  if(it.isVO || it.isDTO)  names.addAll(pNames(it.asType().asElement.properties, name));"
-						+ "  names"
-						+ " }.flatten()}; "
-						+ "pNames(src, null)", 
-				lang = "GroovyScript"),
 		@Var(name = "propertyNames", ifEmpty=true, expr="#{allPropertyNames(viewProperties)}")		
 
 })
@@ -208,5 +193,18 @@ public @interface JapkitWebScaffold {
 
 	// For i18n. TODO: Reconsider
 	String[] propertyNames() default {};
+	
+	
+	@Function(expr = "def pNames;  "
+			+ "pNames={p, prfx -> "
+			+ " p.collect{ "
+			+ "  def name = prfx ? prfx+'.'+it.name : it.name;"
+			+ "  def names = [name];"
+			+ "  if(it.isVO || it.isDTO)  names.addAll(pNames(it.asType().asElement.properties, name));"
+			+ "  names"
+			+ " }.flatten()}; "
+			+ "pNames(src, null)", 
+			lang = "GroovyScript")
+	class allPropertyNames{}
 	
 }

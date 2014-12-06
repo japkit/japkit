@@ -59,12 +59,14 @@ class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
 		val beforeFragments = metaAnnotation?.value("beforeFragments".withPrefix(avPrefix), typeof(String[]))
 		val afterFragments = metaAnnotation?.value("afterFragments".withPrefix(avPrefix), typeof(String[]));
 		[ CharSequence code |
-			val before = CodeFragmentRules.code(beforeFragments)
-			val after = CodeFragmentRules.code(afterFragments)
-			CodeFragmentRules.surround(
-				surroundingFragments,
-				'''«before.withLinebreak»«code.withLinebreak(!after.nullOrEmpty)»«after»'''
-			)
+			
+				val before = CodeFragmentRules.code(beforeFragments)
+				val after = CodeFragmentRules.code(afterFragments)
+				CodeFragmentRules.surround(
+					surroundingFragments,
+					'''«before.withLinebreak»«code.withLinebreak(!after.nullOrEmpty)»«after»'''
+				)	
+
 		]
 	}
 	
