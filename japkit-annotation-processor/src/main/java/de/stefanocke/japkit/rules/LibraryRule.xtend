@@ -1,18 +1,11 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.metaannotations.CodeFragment
-import de.stefanocke.japkit.metaannotations.Function
-import de.stefanocke.japkit.metaannotations.Matcher
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure0
-import javax.lang.model.type.TypeMirror
-import de.stefanocke.japkit.metaannotations.TypeQuery
-import java.util.List
-import java.lang.annotation.Annotation
 
 /**
  * A collection of functions and code fragments to be made available on value stack.
@@ -20,7 +13,7 @@ import java.lang.annotation.Annotation
 @Data 
 class LibraryRule extends AbstractRule implements Procedure0 {
 	
-	Map<String, AbstractRule> functions 
+	Map<String, Rule> functions 
 	
 	new(AnnotationMirror metaAnnotation, TypeElement metaElement) {
 		super(metaAnnotation, metaElement)
@@ -28,7 +21,7 @@ class LibraryRule extends AbstractRule implements Procedure0 {
 		functions = newHashMap(); 		
 			
 		metaElement.enclosedElementsOrdered
-				.map[simpleName.toString -> createFunctionForMember]
+				.map[simpleName.toString -> createFunctionRule]
 				.filter[value!=null]
 				.forEach[functions.put(key, value)]
 				
@@ -51,21 +44,5 @@ class LibraryRule extends AbstractRule implements Procedure0 {
 		valueStack.putAll(functions)
 	}
 	
-	static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, TypeElement)=>AbstractRule>> 
-		functionFactories = #[
-			CodeFragment->[am, e | new CodeFragmentRule(am, e)],
-			Function->[am, e | new FunctionRule(am, e)],
-			Matcher->[am, e | new ElementMatcher(am)],
-			TypeQuery->[am, e | new TypeQueryRule(am)]
-		]
-	
-	def private dispatch createFunctionForMember(TypeElement member){
-		val factory = functionFactories.map[member.annotationMirror(key)->value].findFirst[key!=null]
-		factory?.value?.apply(factory.key, member)
-	}
-	
-	def private dispatch createFunctionForMember(Element member){
-		null
-	}
 	
 }
