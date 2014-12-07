@@ -15,7 +15,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
-class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Function1<Element, Boolean>{
+class ElementMatcher extends AbstractNoArgFunctionRule<Boolean>{
 
 	String srcExpr
 	String srcLang
@@ -28,7 +28,7 @@ class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Functi
 	DeclaredType[] enclosingAnnotations
 	DeclaredType[] enclosingAnnotationsNot
 	Set<String> notDeclaredBy //FQNs
-	TypeMirror type
+	TypeMirror elementType
 	TypeCategory[] typeCategory
 	TypeCategory[] typeCategoryNot
 	DeclaredType[] typeAnnotations
@@ -57,17 +57,13 @@ class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Functi
 		]
 	}
 	
-	override apply() {
-		currentSrcElement.matches
-	}
-	
-	override apply(Element originalSrcElement) {
-		originalSrcElement.matches
+	def matches(Element originalSrcElement){
+		apply(originalSrcElement)
 	}
 
-	def boolean matches(Element originalSrcElement) {
-		inRule[
-		val e = srcElement(originalSrcElement) 
+	override evalInternal(){
+		
+		val e = srcElement(currentSrcElement) 
 		
 		scope(e)[
 			val result = (e!=null)
@@ -84,7 +80,7 @@ class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Functi
 			&& e.isNotDeclaredBy(notDeclaredBy)
 			
 			&& e.srcType.hasAllAnnotations(typeAnnotations)		
-			&& e.srcType.isSubtype(type)
+			&& e.srcType.isSubtype(elementType)
 			&& (typeCategory.nullOrEmpty || e.srcType.belongsToOneOfCategories(typeCategory))	
 			&& !e.srcType.belongsToOneOfCategories(typeCategoryNot)	
 				
@@ -106,7 +102,7 @@ class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Functi
 		
 		]
 		
-		]
+		
 	}
 	
 	def private Element srcElement(Element element) {
@@ -209,7 +205,7 @@ class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Functi
 	
 	
 	new(AnnotationMirror am) {
-		super(am, null)
+		super(am, null, boolean)
 		srcExpr =  am.value("src", String)
 		srcLang =  am.value("srcLang", String)
 		name = am.value("name", String)
@@ -221,7 +217,7 @@ class ElementMatcher extends AbstractRule implements Function0<Boolean>,  Functi
 		enclosingAnnotations = am.value("enclosingAnnotations", typeof(DeclaredType[]))
 		enclosingAnnotationsNot = am.value("enclosingAnnotationsNot", typeof(DeclaredType[]))
 		notDeclaredBy = am.value("notDeclaredBy", typeof(DeclaredType[]))?.map[asTypeElement.qualifiedName.toString].toSet
-		type = am.value("type", TypeMirror)
+		elementType = am.value("type", TypeMirror)
 		typeCategory = am.value("typeCategory", typeof(TypeCategory[]))	
 		typeCategoryNot = am.value("typeCategoryNot", typeof(TypeCategory[]))	
 		typeAnnotations = am.value("typeAnnotations", typeof(DeclaredType[]))	
