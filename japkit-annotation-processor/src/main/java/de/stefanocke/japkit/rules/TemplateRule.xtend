@@ -1,7 +1,6 @@
 package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.metaannotations.Clazz
-import de.stefanocke.japkit.metaannotations.CodeFragment
 import de.stefanocke.japkit.metaannotations.Constructor
 import de.stefanocke.japkit.metaannotations.Field
 import de.stefanocke.japkit.metaannotations.InnerClass
@@ -12,7 +11,6 @@ import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.services.ExtensionRegistry
 import de.stefanocke.japkit.services.TypeResolver
 import java.util.List
-import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind

@@ -11,8 +11,6 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
-import org.eclipse.xtext.xbase.lib.Functions.Function0
-import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
 class ElementMatcher extends AbstractNoArgFunctionRule<Boolean>{
