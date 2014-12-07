@@ -17,6 +17,7 @@ import javax.tools.Diagnostic.Kind
 import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.el.ELProviderException
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -151,7 +152,18 @@ class MessageCollector {
 		messagesPerAnnotatedClass.remove(annotatedClassFqn)
 	}
 	
-	def reportRuleError(CharSequence msg){
+	def dispatch void reportRuleError(ELProviderException e){
+		reportRuleError(e.message)
+	}
+	
+	def dispatch void reportRuleError(Exception e){
+		reportRuleError('''«e.class» «e.message» 
+		«FOR ste : e.stackTrace»
+			«ste»
+		«ENDFOR»''')
+	}
+	
+	def dispatch void reportRuleError(CharSequence msg){
 		reportRuleError(currentRule, msg, null)
 	}
 	

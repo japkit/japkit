@@ -17,12 +17,9 @@ import de.stefanocke.japkit.metaannotations.ResourceTemplate;
 import de.stefanocke.japkit.metaannotations.SingleValue;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Trigger;
-import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
-import de.stefanocke.japkit.roo.japkit.application.ApplicationService;
 import de.stefanocke.japkit.roo.japkit.application.CommandMethod;
-import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @RuntimeMetadata
@@ -43,8 +40,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 		@Var(name = "fboFqnId", expr = "#{fboElement.qualifiedName.toHtmlId()}"),	
 		@Var(name = "fboShortId", expr = "#{fboName.toLowerCase()}"),
 
-		@Var(name = "viewModel", ifEmpty=true, typeQuery = @TypeQuery(
-				annotation = ViewModel.class, shadow = true, unique = true, filterAV = "formBackingObject", inExpr = "#{fbo}")),
+		@Var(name = "viewModel", expr="#{fbo.findViewModel()}"),
 		
 		// The properties to show
 		@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = ViewModelSelector.class, includeRules = @Matcher(
@@ -55,12 +51,8 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
 		@Var(name = "relatedEntities", expr = "entityProperties.collect{it.singleValueType.asElement()}", lang="GroovyScript"),
 				
-		@Var(name = "findRepository", isFunction = true, typeQuery = @TypeQuery(
-				annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src}")),
-				
 		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo.findRepository()}"),		
-		@Var(name = "applicationService", ifEmpty = true, typeQuery = @TypeQuery(
-				annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots", inExpr = "#{fbo}")),
+		@Var(name = "applicationService", expr="#{fbo.findApplicationService()}"),
 
 		@Var(name="createCommands", expr="#{applicationService.asElement.declaredMethods}", 
 				matcher=@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo) && src.CommandMethod.aggregateRoot.isSame(fbo)}")),

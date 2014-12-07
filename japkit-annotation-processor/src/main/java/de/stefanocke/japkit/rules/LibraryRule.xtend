@@ -10,6 +10,9 @@ import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure0
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.metaannotations.TypeQuery
+import java.util.List
+import java.lang.annotation.Annotation
 
 /**
  * A collection of functions and code fragments to be made available on value stack.
@@ -21,13 +24,13 @@ class LibraryRule extends AbstractRule implements Procedure0 {
 	
 	new(AnnotationMirror metaAnnotation, TypeElement metaElement) {
 		super(metaAnnotation, metaElement)
-		
-		
-		
-		functions = newHashMap( 		
-			metaElement.enclosedElementsOrdered
-				.map[createFunctionForMember]
-				.filter[it!=null])
+
+		functions = newHashMap(); 		
+			
+		metaElement.enclosedElementsOrdered
+				.map[simpleName.toString -> createFunctionForMember]
+				.filter[value!=null]
+				.forEach[functions.put(key, value)]
 				
 		//annotations that shall be accessed by their simple names like this: typeElement.Entity
 		metaAnnotation?.value("annotationImports", typeof(TypeMirror[]))?.forEach[functions.put(simpleName, createAnnotationFunction)]
@@ -48,22 +51,17 @@ class LibraryRule extends AbstractRule implements Procedure0 {
 		valueStack.putAll(functions)
 	}
 	
+	static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, TypeElement)=>AbstractRule>> 
+		functionFactories = #[
+			CodeFragment->[am, e | new CodeFragmentRule(am, e)],
+			Function->[am, e | new FunctionRule(am, e)],
+			Matcher->[am, e | new ElementMatcher(am)],
+			TypeQuery->[am, e | new TypeQueryRule(am)]
+		]
+	
 	def private dispatch createFunctionForMember(TypeElement member){
-		val codeFragmentAnnotation = member.annotationMirror(CodeFragment)
-		val name = member.simpleName.toString 
-		if(codeFragmentAnnotation!=null){
-			return name -> new CodeFragmentRule(codeFragmentAnnotation, member)
-		}
-		val functionAnnotation =  member.annotationMirror(Function)
-		if(functionAnnotation!=null){
-			return name -> new FunctionRule(functionAnnotation, member)
-		}
-		val matcherAnnotation =  member.annotationMirror(Matcher)
-		if(matcherAnnotation!=null){
-			return name -> new ElementMatcher(matcherAnnotation)
-		}
-		
-		null
+		val factory = functionFactories.map[member.annotationMirror(key)->value].findFirst[key!=null]
+		factory?.value?.apply(factory.key, member)
 	}
 	
 	def private dispatch createFunctionForMember(Element member){

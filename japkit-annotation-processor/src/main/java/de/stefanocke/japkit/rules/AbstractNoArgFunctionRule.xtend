@@ -29,7 +29,7 @@ abstract class AbstractNoArgFunctionRule<T> extends AbstractRule implements Func
 			} catch (TypeElementNotFoundException tenfe) {
 				throw tenfe
 			} catch (Exception e) {
-				reportRuleError(e.message)				
+				reportRuleError(e)				
 				throw e
 			}
 			

@@ -9,7 +9,11 @@ import de.stefanocke.japkit.metaannotations.Function;
 import de.stefanocke.japkit.metaannotations.Library;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.TypeCategory;
+import de.stefanocke.japkit.metaannotations.TypeQuery;
+import de.stefanocke.japkit.metaannotations.Var;
+import de.stefanocke.japkit.roo.japkit.application.ApplicationService;
 import de.stefanocke.japkit.roo.japkit.application.DTO;
+import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
@@ -61,6 +65,15 @@ public class WebScaffoldLibrary {
 	
 	@Matcher(singleValueTypeAnnotations = ValueObject.class)
 	class isVO{}
+	
+	@TypeQuery(annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType")
+	class findRepository{}
+	
+	@TypeQuery(annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots")
+	class findApplicationService{}
+	
+	@TypeQuery(annotation = ViewModel.class, shadow = true, unique = true, filterAV = "formBackingObject")
+	class findViewModel{}
 	
 	/**
 	 * @japkit.expr <pre>
