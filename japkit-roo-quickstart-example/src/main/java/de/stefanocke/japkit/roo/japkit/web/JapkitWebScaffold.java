@@ -5,7 +5,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.persistence.Id;
 import javax.persistence.Version;
-import javax.validation.constraints.Pattern;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -29,6 +28,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 @RuntimeMetadata
 @Trigger(layer=Layers.CONTROLLERS, 
 	libraries=WebScaffoldLibrary.class,
+	annotationImports=CommandMethod.class,
 	vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
@@ -52,10 +52,6 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 		@Var(name = "explicitTableProperties", expr = "#{viewProperties}", matcher=@Matcher(annotations=TableColumn.class)),
 		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
 		
-		@Var(name = "columnAnnotation", isFunction=true, annotation = TableColumn.class),
-
-		@Var(name = "patternAnnotation", isFunction = true, annotation=Pattern.class),
-		
 		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
 		@Var(name = "relatedEntities", expr = "entityProperties.collect{it.singleValueType.asElement()}", lang="GroovyScript"),
 				
@@ -65,7 +61,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo.findRepository()}"),		
 		@Var(name = "applicationService", ifEmpty = true, typeQuery = @TypeQuery(
 				annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots", inExpr = "#{fbo}")),
-		@Var(name="CommandMethod", isFunction=true, annotation=CommandMethod.class),
+
 		@Var(name="createCommands", expr="#{applicationService.asElement.declaredMethods}", 
 				matcher=@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo) && src.CommandMethod.aggregateRoot.isSame(fbo)}")),
 		@Var(name="updateCommands", expr="#{applicationService.asElement.declaredMethods}", 

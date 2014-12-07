@@ -172,4 +172,11 @@ public @interface Template {
 	 * @return the templates to be called by this template.
 	 */
 	TemplateCall[] templates() default {};
+	
+	/**
+	 * Annotations that shall be accessed by their simple names like this: typeElement.Entity
+	 * 
+	 * @return
+	 */
+	Class<? extends java.lang.annotation.Annotation>[] annotationImports() default {};
 }

@@ -9,6 +9,7 @@ import java.util.IdentityHashMap
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.metaannotations.Library
 
 class RuleFactory {
 	
@@ -66,7 +67,8 @@ class RuleFactory {
 	val libraryCache = new IdentityHashMap<TypeElement, LibraryRule>
 	
 	def createLibraryRule(TypeElement libraryClass){
-		getOrCreate(libraryCache, libraryClass, [new LibraryRule(null as AnnotationMirror, libraryClass)])
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+		getOrCreate(libraryCache, libraryClass, [new LibraryRule(libraryClass.annotationMirror(Library), libraryClass)])
 	}
 	
 

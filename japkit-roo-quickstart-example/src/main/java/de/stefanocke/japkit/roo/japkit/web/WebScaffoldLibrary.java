@@ -2,9 +2,11 @@ package de.stefanocke.japkit.roo.japkit.web;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Function;
+import de.stefanocke.japkit.metaannotations.Library;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.roo.japkit.application.DTO;
@@ -12,6 +14,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
 @RuntimeMetadata
+@Library(annotationImports={TableColumn.class, Pattern.class})
 public class WebScaffoldLibrary {
 	
 	@Function(expr="#{src.toString().replace('.','_').toLowerCase()}")
@@ -34,7 +37,7 @@ public class WebScaffoldLibrary {
 	@Matcher(annotations = Past.class)
 	class isPast{}
 	
-	@Function(expr = "#{src.patternAnnotation.regexp}")
+	@Function(expr = "#{src.Pattern.regexp}")
 	class regexp{}
 
 	// The view properties that have a date or time type

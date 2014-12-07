@@ -21,6 +21,13 @@ public @interface Trigger {
 	Class<?>[] libraries() default {};
 	
 	/**
+	 * Annotations that shall be accessed by their simple names like this: typeElement.Entity
+	 * 
+	 * @return
+	 */
+	Class<? extends java.lang.annotation.Annotation>[] annotationImports() default {};
+	
+	/**
 	 * Variables in the scope of the annotated class. 
 	 * @return
 	 */
