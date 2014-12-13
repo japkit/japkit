@@ -3,15 +3,12 @@ package de.stefanocke.japkit.roo.japkit.web;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import javax.persistence.Id;
-import javax.persistence.Version;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Matcher;
-import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
 import de.stefanocke.japkit.metaannotations.SingleValue;
@@ -20,11 +17,12 @@ import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
 import de.stefanocke.japkit.roo.japkit.application.CommandMethod;
+import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @RuntimeMetadata
 @Trigger(layer=Layers.CONTROLLERS, 
-	libraries=WebScaffoldLibrary.class,
+	libraries={DomainLibrary.class, WebScaffoldLibrary.class},  //TODO: WebScaffoldLibrary to import DomainLibrary
 	annotationImports=CommandMethod.class,
 	vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),

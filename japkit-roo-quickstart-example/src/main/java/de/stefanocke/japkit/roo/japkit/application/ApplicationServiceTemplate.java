@@ -16,6 +16,7 @@ import de.stefanocke.japkit.metaannotations.Case;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Field;
+import de.stefanocke.japkit.metaannotations.Function;
 import de.stefanocke.japkit.metaannotations.Getter;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
@@ -23,36 +24,33 @@ import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
-import de.stefanocke.japkit.metaannotations.TypeQuery;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.BehaviorInnerClassWithGenClassPrefix;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 import de.stefanocke.japkit.roo.japkit.application.ApplicationServiceTemplate.ApplicationServiceMethodsForAggregate.DTOforVO.DTOClass;
-import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
+import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
 @RuntimeMetadata
 @Service
 //TODO: Den Call hier könnte man sich ggf. sparen, wenn Templates innerhalb von templates immer direkt ausgeführt würden.
-@Template(templates=@TemplateCall(ApplicationServiceTemplate.ApplicationServiceMethodsForAggregate.class)) 
+@Template(
+		templates=@TemplateCall(ApplicationServiceTemplate.ApplicationServiceMethodsForAggregate.class)
+) 
 public class ApplicationServiceTemplate {
+	
 	@Template(src="#{aggregateRoots}", srcVar="aggregate", 
+		libraries=DomainLibrary.class,	
 		vars={
 			@Var(name="aggregateName", expr="#{src.asElement.simpleName}"),
 			@Var(name="aggregateNameLower", expr="#{aggregateName.toFirstLower}"),
 			@Var(name="aggregateUpdateMethods", expr="#{src.asElement.declaredMethods}", matcher=@Matcher(modifiers=Modifier.PUBLIC, type=void.class) ),
 			@Var(name="aggregateCreateMethods", expr="#{src.asElement.declaredConstructors}", matcher=@Matcher(modifiers=Modifier.PUBLIC, condition="#{!src.parameters.isEmpty()}") ),
-			@Var(name = "repository", typeQuery = @TypeQuery(
-					annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType", inExpr = "#{src}")),
+			@Var(name = "repository", expr="#{findRepository()}"),
 			@Var(name="repositoryName", expr="#{aggregateNameLower}Repository"),
-			@Var(name="nameList", isFunction=true, expr="src.collect{it.simpleName}.join(',')", lang="GroovyScript"),
-			@Var(name="valueObject", isFunction=true, annotation=ValueObject.class),
-			@Var(name = "findGetter", isFunction=true, expr="#{cmdProperties.findByName(src.simpleName).getter}"),
-					
-			
-			
+		
 		})
 	public static class ApplicationServiceMethodsForAggregate {
 		
@@ -91,7 +89,7 @@ public class ApplicationServiceTemplate {
 		
 		
 		@Template(templates=@TemplateCall( 
-						activation=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
+						activation=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
 						value=DTOforVO.class , src="#{src.asType()}"),
 						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 								getter=@Getter, setter=@Setter)
@@ -100,14 +98,14 @@ public class ApplicationServiceTemplate {
 			
 			
 			/**
-			 * #{src.asType().asElement.valueObject.toString()}
+			 * #{src.asType().asElement.ValueObject.toString()}
 			 *
 			 */			
-			@Field( activation=@Matcher(condition="#{src.asType().asElement.valueObject == null}"))
+			@Field( activation=@Matcher(condition="#{src.asType().asElement.ValueObject == null}"))
 			private SrcType $srcElementName$;
 			
 			
-			@Field( activation=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), nameExpr="#{src.simpleName}")
+			@Field( activation=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), nameExpr="#{src.simpleName}")
 			private DTOClass dtoForVO;
 			
 			
@@ -129,12 +127,15 @@ public class ApplicationServiceTemplate {
 //			private VO $srcElementName$FromDTO(){return null;}
 		}
 		
+		@Function(expr="#{cmdProperties.findByName(src.simpleName).getter}")
+		class findGetter{}
+		
 		@CodeFragment( 
 					iterator="#{src.parameters}" , 
 					separator = ",",  
 					cases={
 							@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
-							@Case(matcher=@Matcher(condition="#{src.asType().asElement.valueObject != null}"), 
+							@Case(matcher=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
 								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
 					},
 					code="command.#{src.findGetter.simpleName}()")
