@@ -12,8 +12,13 @@ import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 
-@Template(vars = @Var(name = "toStringProperties", propertyFilter = @Properties(sourceClass = GeneratedClass.class)))
+@Template(vars = @Var(name = "toStringProperties", expr="#{genClass.properties}"))
 public abstract class ToString {
+	
+	//Idea:
+	//@TemplateParams
+	//void params(List<Property> properties)
+	
 	@Method(imports = { ToStringBuilder.class, ToStringStyle.class },
 			
 			bodyIterator="#{toStringProperties}",

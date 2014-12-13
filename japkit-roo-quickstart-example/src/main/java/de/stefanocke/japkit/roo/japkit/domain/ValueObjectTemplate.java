@@ -31,7 +31,7 @@ import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 
 @RuntimeMetadata
-@Template()
+@Template(vars=@Var(name="properties", expr="#{src.declaredFields}"))
 @Embeddable
 public abstract class ValueObjectTemplate {
 	/**

@@ -6,12 +6,10 @@ import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.InnerClass;
 import de.stefanocke.japkit.metaannotations.Method;
-import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
-import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 
-@Template(vars=@Var(name="properties", propertyFilter=@Properties(sourceClass=GeneratedClass.class)))
+@Template(vars=@Var(name="properties", expr="#{genClass.properties}"))
 public class PropertyRefsTemplate {
 	
 	@Clazz(nameSuffixToRemove = "Def",
