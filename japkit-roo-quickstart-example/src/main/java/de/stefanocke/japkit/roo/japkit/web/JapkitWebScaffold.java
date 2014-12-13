@@ -43,8 +43,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 		@Var(name = "viewModel", expr="#{fbo.findViewModel()}"),
 		
 		// The properties to show
-		@Var(name = "viewProperties", propertyFilter = @Properties(sourceClass = ViewModelSelector.class, includeRules = @Matcher(
-				annotationsNot = { Id.class, Version.class }))),
+		@Var(name = "viewProperties", expr="#{(viewModel != null ? viewModel : fbo).asElement.viewableProperties()}"),
 		@Var(name = "explicitTableProperties", expr = "#{viewProperties}", matcher=@Matcher(annotations=TableColumn.class)),
 		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
 		

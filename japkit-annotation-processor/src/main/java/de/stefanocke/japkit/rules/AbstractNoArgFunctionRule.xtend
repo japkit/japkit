@@ -36,7 +36,7 @@ abstract class AbstractNoArgFunctionRule<T> extends AbstractRule implements Func
 		]
 	}
 	
-	def protected T evalInternal()
+	def protected abstract T evalInternal()
 	
 	override T apply(Object src) {
 		eval(src)

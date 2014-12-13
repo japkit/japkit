@@ -16,9 +16,10 @@ import org.eclipse.xtend2.lib.StringConcatenation
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import de.stefanocke.japkit.services.MessageCollector
 import de.stefanocke.japkit.services.TypeElementNotFoundException
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
-class CodeRule extends AbstractRule implements Function0<CharSequence> {
+class CodeRule extends AbstractRule implements Function0<CharSequence>, Function1<Object, CharSequence> {
 
 	val protected transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 
@@ -202,7 +203,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	private def CharSequence code(List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
 		val bodyExprToUse = bodyCases.findFirst[
 			val matcher = key
-			!matcher.nullOrEmpty && matcher.exists[matches(currentSrcElement)]
+			!matcher.nullOrEmpty && matcher.exists[currentSrc instanceof Element && matches(currentSrcElement)]
 		]?.value ?: bodyExpr
 		
 		
@@ -222,6 +223,12 @@ class CodeRule extends AbstractRule implements Function0<CharSequence> {
 	
 	override apply() {
 		code()
+	}
+	
+	override apply(Object p) {
+		scope(p)[
+			code()
+		]
 	}
 	
 }

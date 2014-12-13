@@ -17,7 +17,7 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
-class PropertyFilter {
+class PropertyFilter extends AbstractNoArgFunctionRule<List>{
 	val transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
@@ -36,22 +36,28 @@ class PropertyFilter {
 	List<ElementMatcher> excludeRules
 	Properties.RuleSource ruleSource
 
-	AnnotationMirror metaAnnotation;
-
 	boolean fromFields;
 
+
+	
 	/**
 	 * Property source is determined by AV "sourceClass"
 	 */
 	def List<Property> getFilteredProperties() {
+		//TODO: Cleanup TENFE handling?
 		val propertySource = handleTypeElementNotFound(null,
-			'''Could not find property source. No properties will be generated.''', currentAnnotatedClass ) [
-			sourceClass.resolveType.asTypeElement
+			'''Could not find property source. No properties will be generated.''') [
+			sourceClass?.resolveType?.asTypeElement
 		]
 		if (propertySource != null) {
 			handleTypeElementNotFound(emptyList,
-				'''Could not determine properties of source «propertySource.qualifiedName».''', currentAnnotatedClass ) [
+				'''Could not determine properties of source «propertySource.qualifiedName».''') [
 				getFilteredProperties(propertySource)
+			]
+		} else if(currentSrc instanceof TypeElement){
+			handleTypeElementNotFound(emptyList,
+				'''Could not determine properties of source «currentSrc».''') [
+				getFilteredProperties(currentSrc as TypeElement)
 			]
 		} else
 			emptyList
@@ -85,9 +91,8 @@ class PropertyFilter {
 	}
 
 	new(AnnotationMirror metaAnnotation) {
+		super(metaAnnotation, null, List)
 
-
-		this.metaAnnotation = metaAnnotation
 		sourceClass = metaAnnotation.value("sourceClass", TypeMirror)
 		includeNamesExpr = metaAnnotation.value("includeNamesExpr", String)
 		includeNamesLang = metaAnnotation.value("includeNamesLang", String)
@@ -101,4 +106,9 @@ class PropertyFilter {
 		ruleSource = metaAnnotation.value("ruleSource", Properties.RuleSource)
 		fromFields = metaAnnotation.value("fromFields", Boolean)
 	}
+	
+	override protected evalInternal() {
+		filteredProperties
+	}
+	
 }

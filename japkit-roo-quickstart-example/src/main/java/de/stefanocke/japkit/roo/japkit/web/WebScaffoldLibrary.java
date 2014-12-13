@@ -1,5 +1,7 @@
 package de.stefanocke.japkit.roo.japkit.web;
 
+import javax.persistence.Id;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
@@ -8,9 +10,9 @@ import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Function;
 import de.stefanocke.japkit.metaannotations.Library;
 import de.stefanocke.japkit.metaannotations.Matcher;
+import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
-import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.application.ApplicationService;
 import de.stefanocke.japkit.roo.japkit.application.DTO;
 import de.stefanocke.japkit.roo.japkit.domain.JapJpaRepository;
@@ -74,6 +76,9 @@ public class WebScaffoldLibrary {
 	
 	@TypeQuery(annotation = ViewModel.class, shadow = true, unique = true, filterAV = "formBackingObject")
 	class findViewModel{}
+	
+	@Properties(includeRules = @Matcher(annotationsNot = { Id.class, Version.class }))
+	class viewableProperties{}
 	
 	/**
 	 * @japkit.expr <pre>

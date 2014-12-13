@@ -153,11 +153,15 @@ class MessageCollector {
 	}
 	
 	def dispatch void reportRuleError(ELProviderException e){
-		reportRuleError(e.message)
+		reportRuleError('''«e.message», cause: «e.rootCause.message»''')
+	}
+	
+	def private Throwable getRootCause(Throwable t) {
+		t.cause?.rootCause ?: t
 	}
 	
 	def dispatch void reportRuleError(Exception e){
-		reportRuleError('''«e.class» «e.message» 
+		reportRuleError('''«e.message», cause: «e.rootCause.message» 
 		«FOR ste : e.stackTrace»
 			«ste»
 		«ENDFOR»''')

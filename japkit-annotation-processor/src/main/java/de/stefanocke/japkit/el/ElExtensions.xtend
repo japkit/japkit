@@ -125,7 +125,7 @@ class ElExtensions {
 		get(e, functionName, valueStack)
 	}
 	
-	//TODO: ggf. aus der Properties-Annotation einen "PropertyFilter" herauslösen und allgemein verfügbar machen...
+
 	def static getProperties(TypeElement e){
 		val extension JavaBeansExtensions = get(JavaBeansExtensions)
 		e.properties(Object.name, false)

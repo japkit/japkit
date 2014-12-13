@@ -79,14 +79,14 @@ public abstract class ValueObjectTemplate {
 	private ValueObjectTemplate() {
 	};
 	
-	@CodeFragment(code = "#{param}", surroundingFragments = "defensiveCopyFragment")
+	@CodeFragment(code = "#{src}", surroundingFragments = "defensiveCopyFragment")
 	static class rhs{}
 	
 	@CodeFragment(code = "/**after*/")
 	static class after{};
 	
 	@CodeFragment(vars = @Var(name="param", expr ="builder.#{src.simpleName}"),
-			code = "this.#{src.simpleName} = #{rhs()};",	beforeFragments = "validationFragment")
+			code = "this.#{src.simpleName} = #{rhs(param)};",	beforeFragments = "validationFragment")
 	static class assignment{}
 	
 	@Order(4)

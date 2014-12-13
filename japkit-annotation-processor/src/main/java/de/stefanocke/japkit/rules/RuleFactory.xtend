@@ -17,6 +17,7 @@ import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.metaannotations.Properties
 
 class RuleFactory {
 	
@@ -94,7 +95,8 @@ class RuleFactory {
 			CodeFragment->[am, e | new CodeFragmentRule(am, e)],
 			Function->[am, e | new FunctionRule(am, e)],
 			Matcher->[am, e | new ElementMatcher(am)],
-			TypeQuery->[am, e | new TypeQueryRule(am)]
+			TypeQuery->[am, e | new TypeQueryRule(am)],
+			Properties->[am, e | new PropertyFilter(am)]
 		]
 	
 	def private dispatch createFunctionInternal(TypeElement element){
