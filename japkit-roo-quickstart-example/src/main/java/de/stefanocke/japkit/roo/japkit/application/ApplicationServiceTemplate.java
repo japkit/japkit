@@ -35,7 +35,7 @@ import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
 @RuntimeMetadata
 @Service
-//TODO: Den Call hier könnte man sich ggf. sparen, wenn Templates innerhalb von templates immer direkt ausgeführt würden.
+//TODO: Den Call hier könnte man sich ggf. sparen, wenn (non-static ?) Templates innerhalb von templates immer direkt ausgeführt würden.
 @Template(
 		templates=@TemplateCall(ApplicationServiceTemplate.ApplicationServiceMethodsForAggregate.class)
 ) 
