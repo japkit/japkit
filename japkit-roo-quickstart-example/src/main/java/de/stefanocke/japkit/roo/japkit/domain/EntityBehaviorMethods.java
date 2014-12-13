@@ -24,10 +24,10 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 		@Var(name="entityName", expr="#{genClass.simpleName}")})
 public abstract class EntityBehaviorMethods {
 	
-	@CodeFragment(iterator = "propertiesToAssign", code = "#{src.setter.simpleName}(#{src.simpleName});")
+	@CodeFragment(iterator = "#{src}", code = "#{src.setter.simpleName}(#{src.simpleName});", indentAfterLinebreak=false)
 	static class assignments{}
 	/**
-	 * Default constructor for JPA. //TODO: Make protected as soon as contollers support that.
+	 * Default constructor for JPA. //TODO: Make protected as soon as controllers support that.
 	 */
 	@Constructor()
 	public EntityBehaviorMethods() {
@@ -53,34 +53,28 @@ public abstract class EntityBehaviorMethods {
 	/**
 	 */
 	@Constructor(activation = @Matcher(src = "#{genClass}", modifiersNot = Modifier.ABSTRACT),
-			vars = { 
-				@Var(name = "propertiesToAssign",
-						propertyFilter = @Properties(sourceClass = GeneratedClass.class, 
-						includeNamesExpr = "createCommandProperties",
-						includeRules = @Matcher(condition="#{createCommandProperties.isEmpty()}"),
-						excludeRules={@Matcher(annotations=Id.class), @Matcher(annotations=Version.class)} ))},
-					bodyCode="assignments"
-	
+		vars = @Var(name="cmdPropertiesWhiteList", expr="#{createCommandProperties}"),
+		bodyCode="#{assignments(commandProperties())}"	
 	)
 	public EntityBehaviorMethods(
-		@Param(src = "propertiesToAssign", 
+		@Param(src = "commandProperties", 
 			annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT})) 
 		SrcType $srcElementName$) {
 
 	}
 
-	@Method(activation =  @Matcher(src = "#{genClass}", modifiersNot = Modifier.ABSTRACT), 
-			
-			vars = @Var(name = "propertiesToAssign",
-			propertyFilter = @Properties(sourceClass = GeneratedClass.class, 
-			includeNamesExpr = "updateCommandProperties",
-			includeRules = @Matcher(condition="#{updateCommandProperties.isEmpty()}"),
-			excludeRules={@Matcher(annotations=Id.class), @Matcher(annotations=Version.class)} )),
-			bodyCode="assignments")
+	@Method(activation =  @Matcher(src = "#{genClass}", modifiersNot = Modifier.ABSTRACT), 			
+			vars = @Var(name="cmdPropertiesWhiteList", expr="#{updateCommandProperties}"),
+			bodyCode="#{assignments(commandProperties())}")
 	public void update$entityName$(
-			@Param(src = "propertiesToAssign", 
+			@Param(src = "commandProperties", 
 				annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT})) 
 			SrcType $srcElementName$){}
 	
+	@Properties(sourceClass = GeneratedClass.class, 
+			includeNamesExpr = "cmdPropertiesWhiteList",
+			includeRules = @Matcher(condition="#{cmdPropertiesWhiteList.isEmpty()}"),
+			excludeRules={@Matcher(annotations=Id.class), @Matcher(annotations=Version.class)} )
+	class commandProperties{}
 
 }
