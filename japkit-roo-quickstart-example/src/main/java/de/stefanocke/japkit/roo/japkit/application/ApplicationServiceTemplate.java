@@ -31,7 +31,6 @@ import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 import de.stefanocke.japkit.roo.japkit.application.ApplicationServiceTemplate.ApplicationServiceMethodsForAggregate.DTOforVO.DTOClass;
 import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
-import de.stefanocke.japkit.roo.japkit.domain.ValueObject;
 
 @RuntimeMetadata
 @Service
@@ -46,14 +45,18 @@ public class ApplicationServiceTemplate {
 		vars={
 			@Var(name="aggregateName", expr="#{src.asElement.simpleName}"),
 			@Var(name="aggregateNameLower", expr="#{aggregateName.toFirstLower}"),
-			@Var(name="aggregateUpdateMethods", expr="#{src.asElement.declaredMethods}", matcher=@Matcher(modifiers=Modifier.PUBLIC, type=void.class) ),
-			@Var(name="aggregateCreateMethods", expr="#{src.asElement.declaredConstructors}", matcher=@Matcher(modifiers=Modifier.PUBLIC, condition="#{!src.parameters.isEmpty()}") ),
+			@Var(name="aggregateUpdateMethods", expr="#{publicVoid.filter(src.asElement.declaredMethods)}"),
+			@Var(name="aggregateCreateMethods", expr="#{hasParams.filter(src.asElement.declaredConstructors)}"),
 			@Var(name = "repository", expr="#{findRepository()}"),
 			@Var(name="repositoryName", expr="#{aggregateNameLower}Repository"),
 		
 		})
 	public static class ApplicationServiceMethodsForAggregate {
+		@Matcher(modifiers=Modifier.PUBLIC, type=void.class)
+		class publicVoid{}
 		
+		@Matcher(modifiers=Modifier.PUBLIC, condition="#{!src.parameters.isEmpty()}") 
+		class hasParams{}
 	
 		@ClassSelector
 		public static class Repository{}

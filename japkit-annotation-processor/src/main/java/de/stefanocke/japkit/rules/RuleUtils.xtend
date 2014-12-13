@@ -29,6 +29,7 @@ import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
+import javax.lang.model.element.TypeElement
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -92,17 +93,25 @@ class RuleUtils {
 	
 	/**Scope rule that gets the source element from "src" AV */
 	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
-		createScopeRule(metaAnnotation, metaElement, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
 	}
 	
+	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, String avPrefix) {
+		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
+	}
+	
+	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))	
+	}
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
 	 */
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
+	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
 			
 		val srcVarName = metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
 		val varRules = createELVariableRules(metaAnnotation, avPrefix)
 		val libraryRules = createLibraryRules(metaAnnotation, avPrefix);
+		val selfLibrary = if(isLibrary) new LibraryRule(metaAnnotation, metaElement as TypeElement);
 
 		[(Object)=>T closure |
 			
@@ -112,6 +121,7 @@ class RuleUtils {
 				scope(e) [
 					if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
 					libraryRules.forEach[apply]
+					selfLibrary?.apply
 					valueStack.put("currentRule", currentRule)
 					varRules?.forEach[it.putELVariable]
 					closure.apply(e)
