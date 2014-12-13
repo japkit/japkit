@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.stefanocke.japkit.metaannotations.Field;
-import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.Var;
@@ -14,7 +13,6 @@ import de.stefanocke.japkit.roo.base.web.RepositoryAdapter;
 
 @Template(
 		vars = {
-				@Var(name = "useFboRepository", matcher = @Matcher(condition = "#{repository != null && !entityAnnotation.activeRecord}")),
 				@Var(name = "relatedEntitiesWithJpaRepositories",
 						expr = "relatedEntities.collectEntries{it->[it, findRepository(it.asType())]}.findAll{it.value!=null}", lang = "GroovyScript"),
 						
@@ -23,7 +21,7 @@ import de.stefanocke.japkit.roo.base.web.RepositoryAdapter;
 						lang = "GroovyScript") })
 public abstract class ControllerMembersJpaRepository {
 	/**${this.class.superclass.toString()}*/
-	@Field(activation = @Matcher(condition = "useFboRepository"), commentLang="GStringTemplateInline")
+	@Field(commentLang="GStringTemplateInline")
 	@Autowired
 	private Repository repository;
 
@@ -32,7 +30,7 @@ public abstract class ControllerMembersJpaRepository {
 	@Autowired
 	private RelatedEntityRepository relatedEntityRepository;
 
-	@Method(activation = @Matcher(condition = "useFboRepository"), imports = RepositoryAdapter.class,
+	@Method(imports = RepositoryAdapter.class,
 			bodyCode = "return new RepositoryAdapter<#{fbo.code}>(repository);")
 	protected abstract CrudOperations<FormBackingObject> crudOperations();
 

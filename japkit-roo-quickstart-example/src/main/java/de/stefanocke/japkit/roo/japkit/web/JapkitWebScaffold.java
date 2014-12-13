@@ -27,7 +27,6 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 	vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
-		@Var(name = "entityAnnotation", expr = "#{fboElement}", annotation = JapkitEntity.class),
 		@Var(name = "fboName", type = String.class, ifEmpty=true, expr = "#{fboElement.simpleName.toString()}"),
 		@Var(name = "fboPluralName", type = String.class, ifEmpty=true, expr = "#{fboName}s"),
 		@Var(name = "path", type = String.class, ifEmpty=true, expr = "#{fboPluralName.toLowerCase()}"),
