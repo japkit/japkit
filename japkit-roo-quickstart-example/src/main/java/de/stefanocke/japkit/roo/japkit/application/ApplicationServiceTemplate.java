@@ -153,8 +153,6 @@ public class ApplicationServiceTemplate {
 			 */
 			@Order(2)
 			@Method(src="aggregateCreateMethods", vars={ @Var(name="cmdProperties", expr="#{command.properties}")})
-			//Das ist etwas wacklig, da für das Auflösen des ClassSelectors die passende src bereitstehen muss.
-			//Alternativ könnte man auch alles, was mit dem Command zu tun hat, als dependent rules formulieren, die dann die Command-Klasse als Gen-Element bekommen.
 			@Transactional
 			@CommandMethod(aggregateRoot=Aggregate.class)
 			public Aggregate create$aggregateName$(CreateCommand command){
