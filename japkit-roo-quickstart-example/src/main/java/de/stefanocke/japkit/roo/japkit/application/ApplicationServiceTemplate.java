@@ -162,7 +162,9 @@ public class ApplicationServiceTemplate {
 		}
 	
 		
-		@Template(templates=@TemplateCall(CommandFieldTemplate.ForVO.class),
+		@Template(
+				vars=@Var(name="srcTypeElement", expr="#{src.asType().asElement}"),
+				templates=@TemplateCall(CommandFieldTemplate.ForVO.class),
 						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 								getter=@Getter, setter=@Setter)
 		)
@@ -171,13 +173,13 @@ public class ApplicationServiceTemplate {
 			
 			/**
 			 */			
-			@Field( activation=@Matcher(condition="#{src.asType().asElement.ValueObject == null}"))
+			@Field( activation=@Matcher(condition="#{srcTypeElement.ValueObject == null}"))
 			private SrcType $srcElementName$;
 			
-			@Template(activation=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"))
+			@Template(activation=@Matcher(condition="#{srcTypeElement.ValueObject != null}"))
 			static class ForVO{
 				@Order(1)
-				@Clazz(src="#{src.asType().asElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
+				@Clazz(src="#{srcTypeElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
 						 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
 				@ClassSelector(expr="#{dtoClass.asType()}")
 				@ResultVar("dtoClass")
@@ -185,8 +187,7 @@ public class ApplicationServiceTemplate {
 				public class DTOClass{}	
 				
 				@Order(2)
-				@Field( activation=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
-						nameExpr="#{src.simpleName}",getter=@Getter, setter=@Setter)
+				@Field( nameExpr="#{src.simpleName}",getter=@Getter, setter=@Setter)
 				private DTOClass dtoForVO;
 			}			
 			
