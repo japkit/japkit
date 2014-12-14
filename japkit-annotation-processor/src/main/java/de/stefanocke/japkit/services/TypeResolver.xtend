@@ -93,25 +93,9 @@ class TypeResolver {
 			}
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe;
-		} catch (RuntimeException e) {
-
-			//Wenn in einer annotation ein nicht exisitierender Typ referenziert wird, dann liefert javac dafür leider keinen
-			//ErrorType, sondern den String (!) "<error>" als Annotation-Value. Das ist Mist, denn so wissen wir nicht, auf
-			//welchen typ wir warten...
-			//Daraus folgt, dass manche zyklische Abhängigkeiten evtl. überhaupt nicht aufgelöst werden können.
-			//Beispiel: Kind-Entität verweist in ihren Annotationen auf Aggregat-Root. Aggregat-Root enthält liste der Kinder.
-			//Ggf kann man hier immer einen Zyklus "vermuten". Aber welche Elemente sind in diesem enthalten?
-			//
-			//Man kann das umgehen, indem in Trigger-Annotationen immer auf die annotierte Klasse verwiesen wird und nicht auf 
-			//die daraus generierte Klasse.
-			//
-			//Vermutlich ein JDK-Bug. Anstatt eine ErrorType zu liefern, wird hier eine Instanz von com.sun.tools.javac.code.Attribute.Error
-			//geliefert. Und das liefert immer "<error>" als value.
-			//Sieht aber so aus, als ob das in JDK8 etwas besser wird. Hier gibt es für diesen Fall eine "UnresolvedClass" als AV, die den Error-Type enthält.
-			//
-			//
-			//http://hg.openjdk.java.net/jdk8/tl/langtools/rev/e811fb09a1dc
-			throw new TypeElementNotFoundException(e);
+		} catch (Exception e) {
+			reportRuleError(e)
+			throw e;
 		}
 
 	}
@@ -289,10 +273,11 @@ class TypeResolver {
 							null, null)
 			}
 
-		} catch (ProcessingException pe) {
-			throw pe
-		} catch (RuntimeException e) {
-			throw new TypeElementNotFoundException(e);
+		} catch (TypeElementNotFoundException tenfe) {
+			throw tenfe
+		} catch (Exception e) {
+			reportRuleError(e)
+			throw e;
 		}
 
 	}

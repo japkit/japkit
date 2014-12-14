@@ -20,7 +20,7 @@ import de.stefanocke.japkit.metaannotations.Function;
 import de.stefanocke.japkit.metaannotations.Getter;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
-import de.stefanocke.japkit.metaannotations.Properties;
+import de.stefanocke.japkit.metaannotations.ResultVar;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
@@ -50,7 +50,11 @@ public class ApplicationServiceTemplate {
 			@Var(name = "repository", expr="#{findRepository()}"),
 			@Var(name="repositoryName", expr="#{aggregateNameLower}Repository"),
 		
-		})
+		},
+		templates={
+			@TemplateCall(ApplicationServiceMethodsForAggregate.UpdateCommands.class),
+			@TemplateCall(ApplicationServiceMethodsForAggregate.CreateCommands.class)}
+	)
 	public static class ApplicationServiceMethodsForAggregate {
 		@Matcher(modifiers=Modifier.PUBLIC, type=void.class)
 		class publicVoid{}
@@ -58,6 +62,28 @@ public class ApplicationServiceTemplate {
 		@Matcher(modifiers=Modifier.PUBLIC, condition="#{!src.parameters.isEmpty()}") 
 		class hasParams{}
 	
+		@Function(expr="#{cmdProperties.findByName(src.simpleName).getter}")
+		class findGetter{}
+
+		@CodeFragment( 
+					iterator="#{src.parameters}" , 
+					separator = ",",  
+					cases={
+							@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
+							@Case(matcher=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
+								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
+					},
+					code="command.#{src.findGetter.simpleName}()")
+		static class paramsFromCommand{}
+
+		@CodeFragment(vars={
+				@Var(name="dtoGetter", expr="#{src.findGetter}"),
+				@Var(name="dto", expr="#{dtoGetter.returnType.asElement}"),
+				}, 
+				iterator="#{dto.properties}" ,
+				code=".#{src.setter.simpleName}(command.#{dtoGetter.simpleName}().#{src.getter.simpleName}())") //Quick&Dirty
+		static class fluentVOSettersFromDTO{}
+
 		@ClassSelector
 		public static class Repository{}
 		
@@ -70,26 +96,73 @@ public class ApplicationServiceTemplate {
 		private Repository $repositoryName$;
 		
 		@Order(1)
-		@Clazz(src="aggregateUpdateMethods", srcVar="method", nameExpr="#{method.simpleName.toFirstUpper}Command", 
-			behaviorClass=BehaviorInnerClassWithGenClassPrefix.class)
-		@ClassSelector(kind=ClassSelectorKind.FQN, expr="#{genClass.enclosingElement.qualifiedName}.#{src.simpleName.toFirstUpper}Command")
-		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), allFieldsAreTemplates=true,
-		 templates = @TemplateCall(value=CommandFieldTemplate.class, src="#{src.parameters}"))
-		public class Command{
-			Long id; //TODO: GUID instead of DB ID !
+		@Template(src="aggregateUpdateMethods", srcVar="method")
+		static class UpdateCommands{
+			@Order(1)
+			@Clazz(nameExpr="#{method.simpleName.toFirstUpper}Command", behaviorClass=BehaviorInnerClassWithGenClassPrefix.class)
+			@ClassSelector(expr="#{command.asType()}")
+			@ResultVar("command")
+			@Template(
+				fieldDefaults=@Field(getter=@Getter, setter=@Setter),
+				allFieldsAreTemplates=true,
+				templates = @TemplateCall(value=CommandFieldTemplate.class, src="#{src.parameters}"))
+			public class Command{
+				Long id; //TODO: GUID instead of DB ID !
+				
+				Long version;		
+			};
 			
-			Long version;		
-		};
-
-		@Order(3)
-		@Clazz(src="aggregateCreateMethods", nameExpr="Create#{aggregateName}Command")
-		@ClassSelector(kind=ClassSelectorKind.FQN, expr="#{genClass.enclosingElement.qualifiedName}.Create#{aggregateName}Command")
-		@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), 
-				 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{src.parameters}"),
-			})
-		public class CreateCommand{
-		};
+			/**
+			 * @japkit.bodyCode <pre>
+			 * <code>
+			 * #{aggregate.code} #{aggregateNameLower} = find#{aggregateName}(command.getId(), command.getVersion());
+			 * #{aggregateNameLower}.#{src.simpleName}(#{paramsFromCommand()}); 
+			 * </code>
+			 * </pre>
+			 * @param command
+			 */
+			@Order(2)
+			@Method(vars={ @Var(name="cmdProperties", expr="#{command.properties}")})
+			@Transactional
+			@CommandMethod(aggregateRoot=Aggregate.class)
+			public void $srcElementName$(Command command){} 
+		}
 		
+		@Order(2)
+		@Template(src="aggregateCreateMethods", srcVar="method")
+		static class CreateCommands{
+			@Order(1)
+			@Clazz(nameExpr="Create#{aggregateName}Command")
+			@ClassSelector(expr="#{command.asType()}")
+			@ResultVar("command")
+			@Template(fieldDefaults=@Field(getter=@Getter, setter=@Setter), 
+					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{src.parameters}"),
+				})
+			public class CreateCommand{};
+			
+			/**
+			 * 
+			 *  @japkit.bodyCode <pre>
+			 * <code>
+			 * #{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(#{paramsFromCommand()});
+			 * #{repositoryName}.save(#{aggregateNameLower});
+			 * return #{aggregateNameLower};
+			 * </code>
+			 * </pre>
+			 * @param command
+			 */
+			@Order(2)
+			@Method(src="aggregateCreateMethods", vars={ @Var(name="cmdProperties", expr="#{command.properties}")})
+			//Das ist etwas wacklig, da für das Auflösen des ClassSelectors die passende src bereitstehen muss.
+			//Alternativ könnte man auch alles, was mit dem Command zu tun hat, als dependent rules formulieren, die dann die Command-Klasse als Gen-Element bekommen.
+			@Transactional
+			@CommandMethod(aggregateRoot=Aggregate.class)
+			public Aggregate create$aggregateName$(CreateCommand command){
+				return null;
+			}
+			
+		}
+	
 		
 		@Template(templates=@TemplateCall( 
 						activation=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
@@ -130,67 +203,6 @@ public class ApplicationServiceTemplate {
 //			private VO $srcElementName$FromDTO(){return null;}
 		}
 		
-		@Function(expr="#{cmdProperties.findByName(src.simpleName).getter}")
-		class findGetter{}
-		
-		@CodeFragment( 
-					iterator="#{src.parameters}" , 
-					separator = ",",  
-					cases={
-							@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
-							@Case(matcher=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
-								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
-					},
-					code="command.#{src.findGetter.simpleName}()")
-		static class paramsFromCommand{}
-		
-		@CodeFragment(vars={
-				@Var(name="dtoGetter", expr="#{src.findGetter}"),
-				@Var(name="dto", expr="#{dtoGetter.returnType.asElement}"),
-				}, 
-				iterator="#{dto.properties}" ,
-				code=".#{src.setter.simpleName}(command.#{dtoGetter.simpleName}().#{src.getter.simpleName}())") //Quick&Dirty
-		static class fluentVOSettersFromDTO{}
-		
-		
-		/**
-		 * 
-		 *  @japkit.bodyCode <pre>
-		 * <code>
-		 * #{aggregate.code} #{aggregateNameLower} = find#{aggregateName}(command.getId(), command.getVersion());
-		 * #{aggregateNameLower}.#{src.simpleName}(#{paramsFromCommand()}); 
-		 * </code>
-		 * </pre>
-		 * @param command
-		 */
-		@Order(4)
-		@Method(src="aggregateUpdateMethods", vars={ @Var(name="cmdProperties", propertyFilter=@Properties(sourceClass=Command.class))})
-		//Das ist etwas wacklig, da für das Auflösen des ClassSelectors die passende src bereitstehen muss.
-		//Alternativ könnte man auch alles, was mit dem Command zu tun hat, als dependent rules formulieren, die dann die Command-Klasse als Gen-Element bekommen.
-		@Transactional
-		@CommandMethod(aggregateRoot=Aggregate.class)
-		public void $srcElementName$(Command command){}  
-			
-		/**
-		 * 
-		 *  @japkit.bodyCode <pre>
-		 * <code>
-		 * #{aggregate.code} #{aggregateNameLower} = new #{aggregate.code}(#{paramsFromCommand()});
-		 * #{repositoryName}.save(#{aggregateNameLower});
-		 * return #{aggregateNameLower};
-		 * </code>
-		 * </pre>
-		 * @param command
-		 */
-		@Order(5)
-		@Method(src="aggregateCreateMethods", vars={ @Var(name="cmdProperties", propertyFilter=@Properties(sourceClass=CreateCommand.class))})
-		//Das ist etwas wacklig, da für das Auflösen des ClassSelectors die passende src bereitstehen muss.
-		//Alternativ könnte man auch alles, was mit dem Command zu tun hat, als dependent rules formulieren, die dann die Command-Klasse als Gen-Element bekommen.
-		@Transactional
-		@CommandMethod(aggregateRoot=Aggregate.class)
-		public Aggregate create$aggregateName$(CreateCommand command){
-			return null;
-		}
 		
 		/**
 		 *  @japkit.bodyCode <pre>

@@ -80,7 +80,6 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 			val cr = new ClassRule(clazzAnnotation, member, true, true);
 			return	[
 					cr.generateClass(null, null)
-					emptyList
 				]
 		}
 		return null

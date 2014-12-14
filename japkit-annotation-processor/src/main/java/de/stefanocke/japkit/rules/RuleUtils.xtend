@@ -24,12 +24,13 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
+import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
-import javax.lang.model.element.TypeElement
+import de.stefanocke.japkit.metaannotations.ResultVar
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -56,7 +57,7 @@ class RuleUtils {
 	/**
 	 * To iterate over a collection of elements and apply the rule for each element.
 	 */
-	public def ()=>Iterable<? extends Object> createSrcExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	public def ()=>Object createSrcExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
 		val srcExpr = metaAnnotation.value("src".withPrefix(avPrefix), String)
@@ -65,7 +66,7 @@ class RuleUtils {
 
 		[|
 			var srcElements = if (srcExpr.nullOrEmpty) {
-					Collections.singleton(currentSrc) //Use parent's src. 
+					currentSrc //Use parent's src. 
 				} else {
 					val elements = eval(srcExpr, srcLang, Object,
 						'''Src expression «srcExpr» could not be evaluated''', emptyList)
@@ -77,11 +78,11 @@ class RuleUtils {
 						Arrays.asList(elements)
 					} 
 					else {
-						Collections.singleton(elements)
+						elements
 					} 
 				} 
-			if(!srcFilter.nullOrEmpty){
-				srcElements = srcElements.filter[
+			if(!srcFilter.nullOrEmpty && srcElements instanceof Iterable<?>){
+				srcElements = (srcElements as Iterable<?>).filter[
 					scope(it)[
 						eval(srcFilter, srcLang, Boolean, '''Src filter expression could not be evaluated''' , false) ?: false
 					]
@@ -93,41 +94,63 @@ class RuleUtils {
 	
 	/**Scope rule that gets the source element from "src" AV */
 	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
-		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix), true)
 	}
 	
 	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, String avPrefix) {
-		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))
+		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix), true)
 	}
 	
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
-		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix))	
+	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Object srcRule) {
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix), true)	
 	}
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
 	 */
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, String avPrefix, ()=>Iterable<? extends Object> srcRule) {
+	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, 
+		String avPrefix, ()=>Object srcRule, boolean iterateIfIterable
+	) {
 			
 		val srcVarName = metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
 		val varRules = createELVariableRules(metaAnnotation, avPrefix)
-		val libraryRules = createLibraryRules(metaAnnotation, avPrefix);
-		val selfLibrary = if(isLibrary) new LibraryRule(metaAnnotation, metaElement as TypeElement);
+		val libraryRules = createLibraryRules(metaAnnotation, avPrefix)
+		val selfLibrary = if(isLibrary) new LibraryRule(metaAnnotation, metaElement as TypeElement)
+		
+		val resultVarAnnotation = metaElement?.annotationMirror(ResultVar)		
+		val resultVarAV =  resultVarAnnotation?.value("value".withPrefix(avPrefix), String);	
+		val resultVarName = if(resultVarAV.nullOrEmpty) metaElement?.simpleName?.toString else resultVarAV;
+			
+		
 
 		[(Object)=>T closure |
 			
-			val srcElements = srcRule?.apply ?: Collections.singleton(currentSrcElement)		
+			val src = srcRule?.apply ?: currentSrc;
 
-			(srcElements ?: Collections.singleton(currentSrc)).map [ e |
-				scope(e) [
-					if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, e)}
-					libraryRules.forEach[apply]
-					selfLibrary?.apply
-					valueStack.put("currentRule", currentRule)
-					varRules?.forEach[it.putELVariable]
-					closure.apply(e)
-				]
-			].toList
-							
+			val iterate = iterateIfIterable && src instanceof Iterable<?>		
+			
+			val result = if(iterate){ (src as Iterable<?>).map [ e |
+					doInScope(e, srcVarName, libraryRules, selfLibrary, varRules, closure)
+				].toList			
+			}
+			else{ 
+				newArrayList(doInScope(src, srcVarName, libraryRules, selfLibrary, varRules, closure))				
+			};	
+			if(resultVarAnnotation!=null && !resultVarName.nullOrEmpty){
+				valueStack.put(resultVarName, if(iterate) result else result.head)
+			}
+			
+			result
+		]
+	}
+	
+	private def <T> T doInScope(Object src, String srcVarName, List<LibraryRule> libraryRules, LibraryRule selfLibrary, List<ELVariableRule> varRules, (Object)=>T closure) {
+		scope(src) [
+			if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, src)}
+			libraryRules.forEach[apply]
+			selfLibrary?.apply
+			valueStack.put("currentRule", currentRule)
+			varRules?.forEach[it.putELVariable]
+			closure.apply(src)
 		]
 	}
 	
@@ -282,7 +305,7 @@ class RuleUtils {
 			if (!type.isVoid) {
 				type
 			} else {
-				if(template != null){ template.resolveType ?: getNoType(TypeKind.VOID)} else defaultValue?.apply 
+				if(template != null){ template.resolveType /**?: getNoType(TypeKind.VOID)*/} else defaultValue?.apply 
 			}
 		]
 	}

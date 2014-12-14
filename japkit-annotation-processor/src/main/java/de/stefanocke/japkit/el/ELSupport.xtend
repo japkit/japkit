@@ -138,7 +138,7 @@ class ELSupport {
 		T errorResult) {
 		try {
 			
-			val resultFromValueStack = evalFromValueStack(expr, lang)
+			val resultFromValueStack = evalFromValueStack(expr, lang, expectedType)
 			
 			return resultFromValueStack ?: eval(expr, lang, expectedType)
 		} catch (TypeElementNotFoundException tenfe) {
@@ -154,14 +154,18 @@ class ELSupport {
 	
 	//If the expression language is not set, look on value stack at first
 	//TODO: only for legal Java identifiers?
-	def private <T> T evalFromValueStack(String expr, String lang) {
+	def private <T> T evalFromValueStack(String expr, String lang,  Class<T> expectedType) {
 		if(lang.nullOrEmpty){
 			val v = valueStack.get(expr)
-			if(v instanceof Function0<?>){
-				(v as Function0<T>).apply
+			val result = if(v instanceof Function0<?>){
+				v.apply
 			} else {
-				v as T
+				v 
 			}
+			if(result!=null && !expectedType.isInstance(result)){
+				throw new ELProviderException('''Value or function «expr» on values stack is not of expected type «expectedType», but «result.class»''')
+			}
+			result as T
 		} else null
 	}
 

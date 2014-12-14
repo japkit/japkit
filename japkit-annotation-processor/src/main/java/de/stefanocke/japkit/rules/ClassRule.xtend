@@ -84,7 +84,7 @@ class ClassRule extends AbstractRule{
 	/**
 	 * Generates a top level or inner class and potentially some auxillary classes.
 	 * 
-	 * @return the set of generated top level classes. 
+	 * @return the list of generated classes (one per source). Does not contain the aux classes.
 	 */
 	def List<? extends GenTypeElement> generateClass(String name, Set<GenTypeElement> generatedTopLevelClasses
 	) {

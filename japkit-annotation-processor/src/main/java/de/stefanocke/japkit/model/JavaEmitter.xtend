@@ -283,7 +283,8 @@ class JavaEmitter implements EmitterContext{
 	}
 	
 	def dispatch typeRef(Void type){	
-			"void"
+		//for null use "Object". Method return types won't be null, but NoType.VOID
+		"Object"
 	}
 	
 	def dispatch CharSequence typeRef(DeclaredType type){

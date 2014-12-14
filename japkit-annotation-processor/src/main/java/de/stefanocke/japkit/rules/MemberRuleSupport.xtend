@@ -20,7 +20,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	
 	()=>boolean activationRule
 	((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> scopeRule
-	()=>Iterable<? extends Object> srcRule
+	()=>Object srcRule
 	()=>String nameRule
 	()=>Set<Modifier> modifiersRule
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
@@ -100,11 +100,11 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 		createActivationRule(metaAnnotation, avPrefix)
 	}	
 	
-	protected def ()=>Iterable<? extends Object> createSrcRule(){
+	protected def ()=>Object createSrcRule(){
 		createSrcExpressionRule(metaAnnotation, avPrefix)
 	}
 	
-	protected def ((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> createScopeRule(()=>Iterable<? extends Object> srcRule){
+	protected def ((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> createScopeRule(()=>Object srcRule){
 		createScopeRule(metaAnnotation, template, avPrefix, srcRule)  
 	}
 	
@@ -153,7 +153,9 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 						valueStack.put("genElement", member)
 						dependentMemberRules.forEach [ r |
 							//apply dependent rules. 
-							generatedMembers.addAll(r.apply(generatedClass))
+							val elements = r.apply(generatedClass)
+							//TODO: only return the primary members or also the dependent ones?
+							//generatedMembers.addAll(elements)
 						
 						]
 						null			
