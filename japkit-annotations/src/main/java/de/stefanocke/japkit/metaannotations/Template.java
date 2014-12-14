@@ -9,6 +9,8 @@ package de.stefanocke.japkit.metaannotations;
  */
 @MemberGeneratorAnnotation
 public @interface Template {
+	Matcher[] activation() default {};
+	
 	/**
 	 * An expression to determine the source object for generating this element.
 	 * The source element is available as "src" in expressions and is used in

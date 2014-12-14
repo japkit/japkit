@@ -30,6 +30,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	TypeElement templateClass
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
 	List<(GenTypeElement)=> List<? extends GenElement>> memberRules
+	()=>boolean activationRule
 	((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> scopeRule
 	AnnotationMirror fieldDefaults
 	AnnotationMirror methodDefaults
@@ -65,6 +66,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		)	
 
 		annotationsRule = createAnnotationMappingRules(metaAnnotation, templateClass, null)
+		activationRule = createActivationRule(templateAnnotation, null)
 		scopeRule = createScopeRule(metaAnnotation, templateClass, true, null)
 
 	
@@ -115,6 +117,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 
 	override apply(GenTypeElement generatedClass) {
 		inRule[
+			if(!activationRule.apply) return emptyList
 			
 			scopeRule.apply [
 				generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)

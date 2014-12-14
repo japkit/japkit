@@ -76,7 +76,10 @@ abstract class GenExecutableElement extends GenParameterizable implements Execut
 	}
 	
 	def void setReturnType(TypeMirror returnType){
-		this.returnType = returnType ?:  { ExtensionRegistry.get(TypesExtensions).getNoType(TypeKind.VOID) }
+		//Always "normalize" return type to VOID if it is a no-type
+		this.returnType = if(returnType==null || returnType.kind == TypeKind.NONE || returnType.kind == TypeKind.NULL)  
+			ExtensionRegistry.get(TypesExtensions).getNoType(TypeKind.VOID) 
+			else returnType
 	}
  	
 }

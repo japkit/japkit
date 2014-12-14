@@ -162,9 +162,7 @@ public class ApplicationServiceTemplate {
 		}
 	
 		
-		@Template(templates=@TemplateCall( 
-						activation=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
-						value=DTOforVO.class , src="#{src.asType()}"),
+		@Template(templates=@TemplateCall(CommandFieldTemplate.ForVO.class),
 						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 								getter=@Getter, setter=@Setter)
 		)
@@ -172,16 +170,25 @@ public class ApplicationServiceTemplate {
 			
 			
 			/**
-			 * #{src.asType().asElement.ValueObject.toString()}
-			 *
 			 */			
 			@Field( activation=@Matcher(condition="#{src.asType().asElement.ValueObject == null}"))
 			private SrcType $srcElementName$;
 			
-			
-			@Field( activation=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), nameExpr="#{src.simpleName}")
-			private DTOClass dtoForVO;
-			
+			@Template(activation=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"))
+			static class ForVO{
+				@Order(1)
+				@Clazz(src="#{src.asType().asElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
+						 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
+				@ClassSelector(expr="#{dtoClass.asType()}")
+				@ResultVar("dtoClass")
+				@DTO
+				public class DTOClass{}	
+				
+				@Order(2)
+				@Field( activation=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
+						nameExpr="#{src.simpleName}",getter=@Getter, setter=@Setter)
+				private DTOClass dtoForVO;
+			}			
 			
 		}
 		
@@ -192,13 +199,7 @@ public class ApplicationServiceTemplate {
 					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
 			@ClassSelector(kind=ClassSelectorKind.FQN,  expr="#{genClass.enclosingElement.qualifiedName}.#{src.asType().asElement.simpleName}DTO")
 			@DTO
-			public class DTOClass{				
-			}			
-//			@ClassSelector(expr="#{vo.asType()}") 
-//			class VO{}
-//			
-//			@SuppressWarnings("unused")
-//			private VO $srcElementName$FromDTO(){return null;}
+			public class DTOClass{}			
 		}
 		
 		

@@ -153,7 +153,7 @@ class MessageCollector {
 	}
 	
 	def dispatch void reportRuleError(ELProviderException e){
-		reportRuleError('''«e.message», cause: «e.rootCause.message»''')
+		reportRuleError('''«e.rootCause.message»''')
 	}
 	
 	def private Throwable getRootCause(Throwable t) {
@@ -161,8 +161,8 @@ class MessageCollector {
 	}
 	
 	def dispatch void reportRuleError(Exception e){
-		reportRuleError('''«e.message», cause: «e.rootCause.message» 
-		«FOR ste : e.stackTrace»
+		reportRuleError('''«e», cause: «e.rootCause.message» 
+		«FOR ste : e.stackTrace.subList(0, Math.min(20, e.stackTrace.length))»
 			«ste»
 		«ENDFOR»''')
 	}

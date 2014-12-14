@@ -31,6 +31,7 @@ import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
 import de.stefanocke.japkit.metaannotations.ResultVar
+import de.stefanocke.japkit.el.ELProviderException
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -70,11 +71,14 @@ class RuleUtils {
 				} else {
 					val elements = eval(srcExpr, srcLang, Object,
 						'''Src expression «srcExpr» could not be evaluated''', emptyList)
-						
-					if(elements instanceof Iterable<?>){	
+					if(elements==null){
+						//TODO: Right exception type?
+						throw new ELProviderException('''Src expression «srcExpr» result is null.''')
+					}	
+					else if(elements instanceof Iterable<?>){	
 						elements				
 					}
-					else if(elements?.class.array) {
+					else if(elements.class.array) {
 						Arrays.asList(elements)
 					} 
 					else {
@@ -305,7 +309,7 @@ class RuleUtils {
 			if (!type.isVoid) {
 				type
 			} else {
-				if(template != null){ template.resolveType /**?: getNoType(TypeKind.VOID)*/} else defaultValue?.apply 
+				if(template != null){ template.resolveType ?: getNoType(TypeKind.NONE)} else defaultValue?.apply 
 			}
 		]
 	}

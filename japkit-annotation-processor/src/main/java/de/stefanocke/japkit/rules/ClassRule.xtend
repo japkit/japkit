@@ -170,7 +170,7 @@ class ClassRule extends AbstractRule{
 					handleTypeElementNotFound(tenfe, currentAnnotatedClass)
 					
 				} catch(Exception re) {
-					reportRuleError('''Error in trigger annotation rule: «re»''')				
+					reportRuleError(re)				
 				}
 				finally{
 					if(isTopLevelClass && !isAuxClass && generatedClass!=null){
