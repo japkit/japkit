@@ -63,22 +63,27 @@ class TypeResolver {
 		selectors.map(s|s.resolveType)
 
 	}
-
+	
 	def TypeMirror resolveType(TypeMirror selector) {
+		resolveType(selector, true)
+	}
+
+	def TypeMirror resolveType(TypeMirror selector, boolean required) {
 		if(selector instanceof ArrayType){
-			new GenArrayType(selector.componentType.resolveType)
+			new GenArrayType(selector.componentType.resolveType(required))
 		} else {
-			selector.resolveType_
+			selector.resolveType_(required)
 		}
 	}
 	
-	def private TypeMirror resolveType_(TypeMirror selector) {
+	def private TypeMirror resolveType_(TypeMirror selector, boolean required) {
 
 		
 		try {			
 			var type = resolveClassSelector(selector)
 			
-			if (type != null) {
+			//TODO: Wird das hier wirklich noch benötigt oder ist das redundant zu anderen Mechanismen (tenfe)?
+			if (type != null && required) {
 				currentAnnotatedClass.registerTypeDependencyForAnnotatedClass(type)
 			}
 			
@@ -96,7 +101,7 @@ class TypeResolver {
 				}	
 			}
 		} catch (TypeElementNotFoundException tenfe) {
-			throw tenfe;
+			throw tenfe 
 		} catch (Exception e) {
 			reportRuleError(e)
 			throw e;
@@ -211,66 +216,7 @@ class TypeResolver {
 		
 	}
 	
-	
-	
-//	def private getClassSelectorAvName(AnnotationMirror classSelectorAnnotation, TypeElement te) {
-//		var avName = classSelectorAnnotation.value("avName", String);
-//		if(avName.nullOrEmpty){
-//			avName = te.simpleName.toString.toFirstLower
-//		}
-//		avName
-//	}
-	
-	
-	/**Resolves the class selector and creates a "proxy" for the type element so that it is available even if it does not really exist yet.
-	 * TODO: Braucht man hier wirklich einen separaten Proxy? Ggf spezieller "UnresolvedType" der bei asElement das TypeElement liefert?
-	 * Vllt kann man das dann auch mit der anderen resolve-MEthode vereinheitlichen und generell per Flag steuern, ob eine TENFE geworfen wird
-	 * oder auf den Proxy verwiesen wird.
-	 */
-	def public resolveTypeAndCreateProxy(TypeMirror selector) {
-		try {
 
-			var tm = resolveClassSelector(selector)
-			var TypeElementNotFoundException tenfe
-			
-			var TypeElement te = try {
-					tm.asTypeElement
-				} catch (TypeElementNotFoundException e) {
-					tenfe = e
-					null
-				}
-			
-			if(te!=null){
-				//The class has already been created by the user.
-				// Nevertheless create a proxy to provide a place to add expected interfaces and superclasses. 
-				val proxy = new GenClass(te.simpleName)
-				proxy.enclosingElement = te.enclosingElement
-				proxy -> te
-			} else {
-				if(tm instanceof GenUnresolvedType){
-					val proxy = if(tm.innerClass){
-						new GenClass(tm.simpleName, findTypeElement(tm.enclosingQualifiedName))
-					} else {
-						new GenClass(tm.simpleName, tm.enclosingQualifiedName)
-					}
-					proxy -> null
-				} else {
-					throw tenfe
-				}
-				
-			}
-			
-
-			
-
-		} catch (TypeElementNotFoundException tenfe) {
-			throw tenfe
-		} catch (Exception e) {
-			reportRuleError(e)
-			throw e;
-		}
-
-	}
 	
 	/**
 	 * Validates if the type has (at most) one of the given trigger annotations. If so , and it is not a generated type, 

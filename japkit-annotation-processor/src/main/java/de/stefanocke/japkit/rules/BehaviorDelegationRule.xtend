@@ -8,13 +8,16 @@ import de.stefanocke.japkit.model.GenInterface
 import de.stefanocke.japkit.model.GenMethod
 import de.stefanocke.japkit.model.GenParameter
 import de.stefanocke.japkit.model.GenTypeElement
+import de.stefanocke.japkit.model.GenUnresolvedType
 import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.TypeElementNotFoundException
 import java.util.ArrayList
 import java.util.IdentityHashMap
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
+import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
@@ -235,5 +238,51 @@ class BehaviorDelegationRule extends AbstractRule {
 			simpleName»«ENDFOR»);'''
 
 	//TODO: Make delegation code gen available in some extension class and support more complex delegation styles
+	}
+	
+	
+	def public resolveTypeAndCreateProxy(TypeMirror selector) {
+		try {
+
+			var tm = resolveType(selector, false)
+			var TypeElementNotFoundException tenfe
+			
+			var TypeElement te = try {
+					tm.asTypeElement
+				} catch (TypeElementNotFoundException e) {
+					tenfe = e
+					null
+				}
+			
+			if(te!=null){
+				//The class has already been created by the user.
+				// Nevertheless create a proxy to provide a place to add expected interfaces and superclasses. 
+				val proxy = new GenClass(te.simpleName)
+				proxy.enclosingElement = te.enclosingElement
+				proxy -> te
+			} else {
+				if(tm instanceof GenUnresolvedType){
+					val proxy = if(tm.innerClass){
+						new GenClass(tm.simpleName, findTypeElement(tm.enclosingQualifiedName))
+					} else {
+						new GenClass(tm.simpleName, tm.enclosingQualifiedName)
+					}
+					proxy -> null
+				} else {
+					throw tenfe
+				}
+				
+			}
+			
+
+			
+
+		} catch (TypeElementNotFoundException tenfe) {
+			throw tenfe
+		} catch (Exception e) {
+			reportRuleError(e)
+			throw e;
+		}
+
 	}
 }
