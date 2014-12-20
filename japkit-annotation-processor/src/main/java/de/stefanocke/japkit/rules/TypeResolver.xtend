@@ -75,10 +75,8 @@ class TypeResolver {
 	def private TypeMirror resolveType_(TypeMirror selector) {
 
 		
-		try {
-			var resolved =  resolveClassSelector(selector)
-			
-			var type = resolved.type
+		try {			
+			var type = resolveClassSelector(selector)
 			
 			if (type != null) {
 				currentAnnotatedClass.registerTypeDependencyForAnnotatedClass(type)
@@ -109,7 +107,7 @@ class TypeResolver {
 	/**
 	 * If the type element is annotated with @ClassSelector, the selector is resolved.
 	 */
-	def private ResolvedClassSelector resolveClassSelector(TypeMirror type) {
+	def private TypeMirror resolveClassSelector(TypeMirror type) {
 
 		val resolvedSelector = new ResolvedClassSelector
 		resolvedSelector.type = type
@@ -152,8 +150,7 @@ class TypeResolver {
 						val fqn = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, null, String)
 						resolvedSelector.type = findTypeElement(fqn)?.asType
 						if(resolvedSelector.type == null){
-							//Do not throw a TENFE here but allow the type to be resolved later.
-							resolvedSelector.type = new GenUnresolvedType(fqn)
+							resolvedSelector.type = new GenUnresolvedType(fqn, false)
 						}
 					}
 					default: {
@@ -175,7 +172,7 @@ class TypeResolver {
 
 		}
 		
-		resolvedSelector
+		resolvedSelector.type
 	}
 	
 	
@@ -200,7 +197,7 @@ class TypeResolver {
 		resolvedSelector.typeElement = resolvedSelector.enclosingTypeElement.declaredTypes.findFirst[simpleName.contentEquals(resolvedSelector.innerClassName)]
 		resolvedSelector.type = if(resolvedSelector.typeElement != null)
 			resolvedSelector.typeElement.asType
-			else new GenUnresolvedType('''«resolvedSelector.enclosingTypeElement.qualifiedName».«resolvedSelector.innerClassName»''')
+			else new GenUnresolvedType('''«resolvedSelector.enclosingTypeElement.qualifiedName».«resolvedSelector.innerClassName»''', true)
 	}
 	
 	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, ()=>String defaultExpr, Class<T> targetType) {
@@ -233,51 +230,38 @@ class TypeResolver {
 	def public resolveTypeAndCreateProxy(TypeMirror selector) {
 		try {
 
-			var resolved = resolveClassSelector(selector)
-
-			var tm = resolved.type
-			var selectorKind = resolved.kind
-
-			if (selectorKind == null || selectorKind == ClassSelectorKind.EXPR) {
-				var TypeElement te
-
-				try {
-					te = tm.asTypeElement
-				} catch (TypeElementNotFoundException tenfe) {
-					//That's ok here	
+			var tm = resolveClassSelector(selector)
+			var TypeElementNotFoundException tenfe
+			
+			var TypeElement te = try {
+					tm.asTypeElement
+				} catch (TypeElementNotFoundException e) {
+					tenfe = e
+					null
 				}
-
-				var GenClass proxy
-				if (te != null) {
-					proxy = new GenClass(te.simpleName)
-					proxy.setEnclosingElement(te.enclosingElement)
-				} else {
-
-					//Type Element does not exist... Best guess...
-					val fqn = tm.toString
-					val segments = fqn.split('\\.')
-					val simpleName = segments.last
-
-					val packageName = if (segments.length == 1) {
-							currentAnnotatedClass.package.qualifiedName
-						} else {
-							fqn.substring(0, fqn.length - simpleName.length - 1)
-						}
-
-					proxy = new GenClass(simpleName, packageName.toString)
-				}
+			
+			if(te!=null){
+				//The class has already been created by the user.
+				// Nevertheless create a proxy to provide a place to add expected interfaces and superclasses. 
+				val proxy = new GenClass(te.simpleName)
+				proxy.enclosingElement = te.enclosingElement
 				proxy -> te
-
-			} else if(selectorKind == ClassSelectorKind.INNER_CLASS_NAME){
-				
-					val proxy = new GenClass(resolved.innerClassName)
-					proxy.setEnclosingElement(resolved.enclosingTypeElement )
-					proxy -> resolved.typeElement
-				
 			} else {
-				throw new ProcessingException('''Selector «selectorKind» not supported''', currentAnnotatedClass, currentTriggerAnnotation,
-							null, null)
+				if(tm instanceof GenUnresolvedType){
+					val proxy = if(tm.innerClass){
+						new GenClass(tm.simpleName, findTypeElement(tm.enclosingQualifiedName))
+					} else {
+						new GenClass(tm.simpleName, tm.enclosingQualifiedName)
+					}
+					proxy -> null
+				} else {
+					throw tenfe
+				}
+				
 			}
+			
+
+			
 
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
@@ -292,7 +276,7 @@ class TypeResolver {
 	 * Validates if the type has (at most) one of the given trigger annotations. If so , and it is not a generated type, 
 	 * the according generated type is determined and returned.  
 	 */
-	def TypeMirror generatedTypeAccordingToTriggerAnnotation(TypeMirror type, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger
+	def private TypeMirror generatedTypeAccordingToTriggerAnnotation(TypeMirror type, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger
 	) {
 		var typeCandidate = type
 		
@@ -306,7 +290,7 @@ class TypeResolver {
 		typeCandidate
 	}
 	
-	def TypeElement generatedTypeElementAccordingToTriggerAnnotation(TypeElement typeElement, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger) {
+	def private TypeElement generatedTypeElementAccordingToTriggerAnnotation(TypeElement typeElement, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger) {
 		if(triggerAnnotationTypes.nullOrEmpty){
 			return typeElement
 		}

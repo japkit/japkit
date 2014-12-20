@@ -27,9 +27,7 @@ import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.BehaviorInnerClassWithGenClassPrefix;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
-import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
-import de.stefanocke.japkit.roo.japkit.application.ApplicationServiceTemplate.ApplicationServiceMethodsForAggregate.DTOforVO.DTOClass;
 import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 
 @RuntimeMetadata
@@ -193,15 +191,6 @@ public class ApplicationServiceTemplate {
 			
 		}
 		
-		
-		@Template(src="#{src.asElement}", srcVar="vo")
-		public static class DTOforVO{
-			@Clazz( nameExpr="#{vo.simpleName}DTO",
-					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
-			@ClassSelector(kind=ClassSelectorKind.FQN,  expr="#{genClass.enclosingElement.qualifiedName}.#{src.asType().asElement.simpleName}DTO")
-			@DTO
-			public class DTOClass{}			
-		}
 		
 		
 		/**

@@ -30,7 +30,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	String expr
 	String lang
 	Class<?> type
-	Set<TypeMirror> requiredTriggerAnnotation
 
 
 	//TODO: Das könnten auch direkt PropertyFilter sein, aber im Moment ist die Trigger Anntoation Teil ihres State...
@@ -59,8 +58,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		annotationToRetrieve = elVarAnnotation.value("annotation", TypeMirror)
 
 		matcher = elVarAnnotation.value("matcher", typeof(AnnotationMirror[])).map[createElementMatcher].singleValue
-		
-		requiredTriggerAnnotation = elVarAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
 		
 	}
 
@@ -123,16 +120,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 						}
 					} else {
 						value
-					}
-
-					if (!requiredTriggerAnnotation.nullOrEmpty) {
-						if (value instanceof TypeElement) {
-							value = generatedTypeElementAccordingToTriggerAnnotation(value, requiredTriggerAnnotation,
-								false)
-						} else if (value instanceof TypeMirror) {
-							value = generatedTypeAccordingToTriggerAnnotation(value, requiredTriggerAnnotation, false)
-						}
-
 					}
 
 					val valueForVariable = if (annotationToRetrieve == null) {

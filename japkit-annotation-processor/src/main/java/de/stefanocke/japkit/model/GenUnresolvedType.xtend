@@ -11,10 +11,14 @@ public class GenUnresolvedType extends GenDeclaredType implements ErrorType {
 	private String qualifiedName_;
 	private String simpleName_;
 	
-	new(String qualifiedName) {
+	//true, if it's known to be an inner class. False if it is not known or it is not an inner class.
+	private boolean innerClass;
+	
+	new(String qualifiedName, boolean innerClass) {
 		super(null);
 		this.qualifiedName_ = qualifiedName
 		this.simpleName_ = qualifiedName.substring(qualifiedName.lastIndexOf('.')+1)
+		this.innerClass = innerClass
 	}
 	
 	override qualifiedName() {
@@ -25,9 +29,17 @@ public class GenUnresolvedType extends GenDeclaredType implements ErrorType {
 		this.simpleName_
 	}
 	
+	def getEnclosingQualifiedName(){
+		qualifiedName.substring(0, qualifiedName.lastIndexOf('.'))
+	}
+	
 	override erasure() {
 		if(typeArguments.nullOrEmpty) this else
-			new GenUnresolvedType(qualifiedName_)
+			new GenUnresolvedType(qualifiedName_, innerClass)
+	}
+	
+	def boolean isInnerClass(){
+		innerClass
 	}
 
 }
