@@ -18,7 +18,6 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
 import de.stefanocke.japkit.roo.japkit.application.CommandMethod;
 import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
-import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity;
 
 @RuntimeMetadata
 @Trigger(layer=Layers.CONTROLLERS, 

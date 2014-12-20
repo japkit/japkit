@@ -6,11 +6,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import de.stefanocke.japkit.metaannotations.Case;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
-import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.TypeCategory;
 import de.stefanocke.japkit.metaannotations.Var;
-import de.stefanocke.japkit.metaannotations.classselectors.GeneratedClass;
 
 @Template(vars = @Var(name = "toStringProperties", expr="#{genClass.properties}"))
 public abstract class ToString {

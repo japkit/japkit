@@ -1,11 +1,11 @@
 package de.stefanocke.japkit.roo.japkit.web;
 
-import de.stefanocke.japkit.metaannotations.Trigger;
-import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
+import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
+import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
 
 @Trigger(layer=Layers.WEB_APP, vars={
