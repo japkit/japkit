@@ -4,6 +4,7 @@ import de.stefanocke.japkit.metaannotations.CodeFragment
 import de.stefanocke.japkit.metaannotations.Function
 import de.stefanocke.japkit.metaannotations.Library
 import de.stefanocke.japkit.metaannotations.Matcher
+import de.stefanocke.japkit.metaannotations.Properties
 import de.stefanocke.japkit.metaannotations.Template
 import de.stefanocke.japkit.metaannotations.Trigger
 import de.stefanocke.japkit.metaannotations.TypeQuery
@@ -17,7 +18,6 @@ import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
-import de.stefanocke.japkit.metaannotations.Properties
 
 class RuleFactory {
 	

@@ -3,11 +3,9 @@ package de.stefanocke.japkit.model
 import de.stefanocke.japkit.annotations.Order
 import de.stefanocke.japkit.metaannotations.Clazz
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
-import de.stefanocke.japkit.rules.RuleUtils
 import de.stefanocke.japkit.services.ElementsExtensions
 import de.stefanocke.japkit.services.ExtensionRegistry
 import de.stefanocke.japkit.services.TypeElementNotFoundException
-import de.stefanocke.japkit.services.TypeResolver
 import java.util.ArrayList
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
@@ -184,14 +182,4 @@ class GenExtensions {
 		
 	}
 	
-	//Transformer to be used when copying annotations from templates. Resolves types and evaluates expressions.
-	public val static (Object)=>Object templateAnnotationValueTransformer = [
-		if(it instanceof TypeMirror){
-			ExtensionRegistry.get(TypeResolver).resolveType(it)
-		} else if(it instanceof String){
-			ExtensionRegistry.get(RuleUtils).replaceExpressionInTemplate(it, true, null)?.toString //TODO: make lang configurable
-		}  else {
-			it
-		}
-	]
 }

@@ -9,7 +9,6 @@ import de.stefanocke.japkit.model.AnnotationWithDefaultAnnotation
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.services.ExtensionRegistry
-import de.stefanocke.japkit.services.TypeResolver
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element

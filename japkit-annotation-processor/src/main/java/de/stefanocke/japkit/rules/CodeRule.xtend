@@ -6,6 +6,8 @@ import de.stefanocke.japkit.model.CodeBody
 import de.stefanocke.japkit.model.EmitterContext
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.services.ExtensionRegistry
+import de.stefanocke.japkit.services.MessageCollector
+import de.stefanocke.japkit.services.TypeElementNotFoundException
 import java.util.List
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
@@ -14,8 +16,6 @@ import javax.lang.model.type.DeclaredType
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend2.lib.StringConcatenation
 import org.eclipse.xtext.xbase.lib.Functions.Function0
-import de.stefanocke.japkit.services.MessageCollector
-import de.stefanocke.japkit.services.TypeElementNotFoundException
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data

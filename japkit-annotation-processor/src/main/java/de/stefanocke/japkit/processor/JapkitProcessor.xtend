@@ -7,12 +7,12 @@ import de.stefanocke.japkit.model.GenTypeElement
 import de.stefanocke.japkit.model.JavaEmitter
 import de.stefanocke.japkit.rules.AnnotationExtensions
 import de.stefanocke.japkit.rules.RuleFactory
+import de.stefanocke.japkit.rules.TypeResolver
 import de.stefanocke.japkit.services.ElementsExtensions
 import de.stefanocke.japkit.services.ExtensionRegistry
 import de.stefanocke.japkit.services.GenerateClassContext
 import de.stefanocke.japkit.services.MessageCollector
 import de.stefanocke.japkit.services.TypeElementNotFoundException
-import de.stefanocke.japkit.services.TypeResolver
 import de.stefanocke.japkit.services.TypesExtensions
 import de.stefanocke.japkit.services.TypesRegistry
 import java.util.Collections
@@ -48,7 +48,7 @@ class JapkitProcessor extends AbstractProcessor {
 	extension TypesExtensions typesExtensions
 
 	extension AnnotationExtensions annotationExtensions
-	extension TypeResolver typesResolver
+
 	extension MessageCollector messageCollector
 	extension GenerateClassContext generateClassContext
 	extension TypesRegistry typesRegistry
@@ -78,7 +78,7 @@ class JapkitProcessor extends AbstractProcessor {
 		messageCollector.diagnosticLogging = "true".equals(processingEnv.options.get("diagnosticMessages"))
 
 		generateClassContext = ExtensionRegistry.get(GenerateClassContext)
-		typesResolver = ExtensionRegistry.get(TypeResolver)
+
 		typesRegistry = ExtensionRegistry.get(TypesRegistry)
 		ruleFactory = ExtensionRegistry.get(RuleFactory)
 		elSupport = ExtensionRegistry.get(ELSupport)

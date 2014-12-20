@@ -55,7 +55,7 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 			if (avMapping != null) {
 				avMapping.mapAnnotationValue(null, m.returnType, null)
 			} else if(avFromTemplate!=null) {
-				GenExtensions.copy(avFromTemplate, GenExtensions.templateAnnotationValueTransformer)
+				GenExtensions.copy(avFromTemplate, RuleUtils.templateAnnotationValueTransformer)
 			} else {
 				null
 			}

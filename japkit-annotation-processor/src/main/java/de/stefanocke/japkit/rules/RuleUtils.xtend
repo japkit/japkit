@@ -1,8 +1,10 @@
 package de.stefanocke.japkit.rules
 
+import de.stefanocke.japkit.el.ELProviderException
 import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.el.ElVariableError
 import de.stefanocke.japkit.metaannotations.Param
+import de.stefanocke.japkit.metaannotations.ResultVar
 import de.stefanocke.japkit.model.GenAnnotationMirror
 import de.stefanocke.japkit.model.GenElement
 import de.stefanocke.japkit.model.GenExtensions
@@ -11,7 +13,6 @@ import de.stefanocke.japkit.services.ElementsExtensions
 import de.stefanocke.japkit.services.ExtensionRegistry
 import de.stefanocke.japkit.services.GenerateClassContext
 import de.stefanocke.japkit.services.MessageCollector
-import de.stefanocke.japkit.services.TypeResolver
 import de.stefanocke.japkit.services.TypesExtensions
 import java.util.ArrayList
 import java.util.Arrays
@@ -30,8 +31,6 @@ import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
-import de.stefanocke.japkit.metaannotations.ResultVar
-import de.stefanocke.japkit.el.ELProviderException
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -265,13 +264,24 @@ class RuleUtils {
 		
 		[ genElement|
 			val existingAnnotationsAndTemplateAnnotations = new ArrayList(genElement.annotationMirrors.map[it as GenAnnotationMirror])
-			existingAnnotationsAndTemplateAnnotations.addAll(template?.copyAnnotations(isNoJapkitAnnotationFilter, GenExtensions.templateAnnotationValueTransformer) ?: emptyList)
+			existingAnnotationsAndTemplateAnnotations.addAll(template?.copyAnnotations(isNoJapkitAnnotationFilter, templateAnnotationValueTransformer) ?: emptyList)
 						
 			if(mappings.nullOrEmpty) return existingAnnotationsAndTemplateAnnotations
 			
 			mapAnnotations(mappings, existingAnnotationsAndTemplateAnnotations)
 		]
 	}
+	
+	//Transformer to be used when copying annotations from templates. Resolves types and evaluates expressions.
+	public val static (Object)=>Object templateAnnotationValueTransformer = [
+		if(it instanceof TypeMirror){
+			ExtensionRegistry.get(TypeResolver).resolveType(it)
+		} else if(it instanceof String){
+			ExtensionRegistry.get(RuleUtils).replaceExpressionInTemplate(it, true, null)?.toString //TODO: make lang configurable
+		}  else {
+			it
+		}
+	]
 	
 	 
 	
