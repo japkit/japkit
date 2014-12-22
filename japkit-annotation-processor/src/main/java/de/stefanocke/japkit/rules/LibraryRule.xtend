@@ -22,11 +22,17 @@ class LibraryRule extends AbstractRule implements Procedure0 {
 			
 		metaElement.enclosedElementsOrdered
 				.map[simpleName.toString -> createFunctionRule]
-				.filter[value!=null]
+				.filter[value!=null && value.mayBePutOntoValueStack]
 				.forEach[functions.put(key, value)]
 				
 		//annotations that shall be accessed by their simple names like this: typeElement.Entity
 		metaAnnotation?.value("annotationImports", typeof(TypeMirror[]))?.forEach[functions.put(simpleName, createAnnotationFunction)]
+	}
+	
+	def boolean mayBePutOntoValueStack(Rule rule){
+		if(rule instanceof TypeRule){
+			!rule.isVarRef
+		} else true
 	}
 	
 	def createAnnotationFunction(TypeMirror annotationType) {

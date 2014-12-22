@@ -1,16 +1,10 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELSupport
-import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
-import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind
 import de.stefanocke.japkit.model.GenArrayType
-import de.stefanocke.japkit.model.GenClass
-import de.stefanocke.japkit.model.GenUnresolvedType
 import de.stefanocke.japkit.services.ElementsExtensions
 import de.stefanocke.japkit.services.ExtensionRegistry
 import de.stefanocke.japkit.services.GenerateClassContext
 import de.stefanocke.japkit.services.MessageCollector
-import de.stefanocke.japkit.services.ProcessingException
 import de.stefanocke.japkit.services.TypeElementNotFoundException
 import de.stefanocke.japkit.services.TypesExtensions
 import de.stefanocke.japkit.services.TypesRegistry
@@ -28,7 +22,7 @@ class TypeResolver {
 	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val transient extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
-	val transient extension ELSupport =  ExtensionRegistry.get(ELSupport)
+	val transient extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	
 	def TypeMirror resolveType(
@@ -80,7 +74,7 @@ class TypeResolver {
 
 		
 		try {			
-			var type = resolveClassSelector(selector)
+			var type = resolveTypeFunctionIfNecessary(selector)
 			
 			//TODO: Wird das hier wirklich noch benötigt oder ist das redundant zu anderen Mechanismen (tenfe)?
 			if (type != null && required) {
@@ -110,186 +104,37 @@ class TypeResolver {
 	}
 	
 	/**
-	 * If the type element is annotated with @ClassSelector, the selector is resolved.
+	 * Checks it the type refers to a function. If so, the function is called and the resulting type mirror is returned.
 	 */
-	def private TypeMirror resolveClassSelector(TypeMirror type) {
-
-		val resolvedSelector = new ResolvedClassSelector
-		resolvedSelector.type = type
+	def private TypeMirror resolveTypeFunctionIfNecessary(TypeMirror type) {
 
 		if (type instanceof DeclaredType && !(type instanceof ErrorType)) {
-			val TypeElement te = 
-			try {
+			val TypeElement te = try {
 				//zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): Arrays mit UnresolvedTypeBindings werden nicht resolved.
+				//TODO: Ist das schon in ElementsExtensions geregelt?
 				getTypeElement(type.asTypeElement.qualifiedName)
 			} catch (TypeElementNotFoundException tenfe) {
 				null
 			}
 			
-
-			val classSelectorAnnotation = te?.annotationMirror(ClassSelector)
+			//if it is a function, call it and return the resulting type
+			val function = createFunctionRule(te);
 			
-			
-			if (classSelectorAnnotation != null) {
-				resolvedSelector.kind = classSelectorAnnotation.value("kind", ClassSelectorKind);
-				switch (resolvedSelector.kind) {
-					case ClassSelectorKind.NONE:
-						resolvedSelector.type = null
-					case ClassSelectorKind.ANNOTATED_CLASS:
-						resolvedSelector.type = currentAnnotatedClass?.asType
-					case ClassSelectorKind.GENERATED_CLASS:
-						resolvedSelector.type = currentGeneratedClass?.asType
-					case ClassSelectorKind.SRC_TYPE:
-						resolvedSelector.type = currentSrc.srcType
-					case ClassSelectorKind.SRC_SINGLE_VALUE_TYPE:
-						resolvedSelector.type = currentSrc.srcType?.singleValueType
-					case ClassSelectorKind.INNER_CLASS_NAME:
-					{	
-						resolveInnerClassSelector(resolvedSelector, classSelectorAnnotation, te)	
+			if(function!=null){
+				if(function instanceof AbstractNoArgFunctionRule<?>){
+					val result = function.apply
+					if(result == null || result instanceof TypeMirror){
+						return result as TypeMirror
+					} else {
+						reportRuleError('''«te.qualifiedName» cannot be used as type since it's result is not a TypeMirror but «result».''')
 					}
-					
-					case ClassSelectorKind.EXPR : {
-						resolvedSelector.type = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, [|te.simpleName.toString.toFirstLower], TypeMirror)
-					}
-					case ClassSelectorKind.FQN : {
-						val fqn = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, null, String)
-						resolvedSelector.type = findTypeElement(fqn)?.asType
-						if(resolvedSelector.type == null){
-							resolvedSelector.type = new GenUnresolvedType(fqn, false)
-						}
-					}
-					default: {
-						resolvedSelector.type = null
-						reportRuleError('''Selector «resolvedSelector.kind» not supported''')
-					}
-						
+				} else {
+					reportRuleError('''«te.qualifiedName» cannot be used as type since it is not a no-arg function.''')
 				}
-
-			
-			
-				val requiredTriggerAnnotation = classSelectorAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
-				
-				if (!requiredTriggerAnnotation.nullOrEmpty && resolvedSelector.type !=null) {
-					resolvedSelector.type = generatedTypeAccordingToTriggerAnnotation(resolvedSelector.type, requiredTriggerAnnotation, true)
-				}
-			
-			}
-
-		}
-		
-		resolvedSelector.type
-	}
-	
-	
-	private def getEnclosingTypeElement(AnnotationMirror classSelectorAnnotation) {
-		val enclosing = classSelectorAnnotation.value("enclosing", TypeMirror)?.resolveType?.asTypeElement
-		enclosing
-	}
-	
-	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector, AnnotationMirror classSelectorAnnotation, TypeElement te) {
-		resolvedSelector.enclosingTypeElement = getEnclosingTypeElement(classSelectorAnnotation)
-		if(resolvedSelector.enclosingTypeElement==null){
-			reportRuleError('''Could not determine enclosing type element for inner class.''')
-			return
-		}
-		resolvedSelector.innerClassName = evalClassSelectorExpr(classSelectorAnnotation, resolvedSelector, null, String)
-		
-		//simple name of the type template as fallback
-		if(resolvedSelector.innerClassName==null){
-			resolvedSelector.innerClassName=te.simpleName.toString
-		}
-		
-		resolvedSelector.typeElement = resolvedSelector.enclosingTypeElement.declaredTypes.findFirst[simpleName.contentEquals(resolvedSelector.innerClassName)]
-		resolvedSelector.type = if(resolvedSelector.typeElement != null)
-			resolvedSelector.typeElement.asType
-			else new GenUnresolvedType('''«resolvedSelector.enclosingTypeElement.qualifiedName».«resolvedSelector.innerClassName»''', true)
-	}
-	
-	private def <T> T evalClassSelectorExpr(AnnotationMirror classSelectorAnnotation, ResolvedClassSelector resolvedSelector, ()=>String defaultExpr, Class<T> targetType) {
-		val exprFromAV = classSelectorAnnotation.value("expr", String);
-		val expr = if(exprFromAV.nullOrEmpty) defaultExpr?.apply else exprFromAV
-		if(expr.nullOrEmpty) return null
-		val lang = classSelectorAnnotation.value("lang", String);
-		ExtensionRegistry.get(ELSupport).eval(expr, lang, targetType,
-			'''Error when evaluating class selector expression '«expr»'  ''', null			
-		)	
-		
-	}
-	
-
-	
-	/**
-	 * Validates if the type has (at most) one of the given trigger annotations. If so , and it is not a generated type, 
-	 * the according generated type is determined and returned.  
-	 */
-	def private TypeMirror generatedTypeAccordingToTriggerAnnotation(TypeMirror type, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger
-	) {
-		var typeCandidate = type
-		
-		if (typeCandidate instanceof DeclaredType && !(typeCandidate instanceof ErrorType)) {
-			
-			
-			val typeElement = typeCandidate.asTypeElement
-			typeCandidate = 
-			generatedTypeElementAccordingToTriggerAnnotation(typeElement, triggerAnnotationTypes, mustHaveTrigger)?.asType
-		}
-		typeCandidate
-	}
-	
-	def private TypeElement generatedTypeElementAccordingToTriggerAnnotation(TypeElement typeElement, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger) {
-		if(triggerAnnotationTypes.nullOrEmpty){
-			return typeElement
-		}
-		
-		val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-		if(typeElement.annotationMirrors.filter[isTriggerAnnotation].empty){
-			//If the type element has no trigger annotations at all we assume it is a "hand-written" class and leave it as it is.
-			//TODO: This could be configurable...
-			return typeElement
-		}
-		
-		
-		val triggerAnnotationTypeFqns = triggerAnnotationTypes.map[qualifiedName].toSet
-		val annotations = typeElement.annotationMirrors.filter[triggerAnnotationTypeFqns.contains(annotationType.qualifiedName)] 
-		
-		if (annotations.empty) {
-			if (mustHaveTrigger) {
-				reportRuleError(
-					'''Related type «typeElement.qualifiedName» must have one of the trigger annotations «triggerAnnotationTypeFqns».''');
-				null
-
-			} else {
-				typeElement
 			}
 		}
 		
-		else if (annotations.size > 1) {
-		
-			reportRuleError(
-				'''Related type «typeElement.qualifiedName» has more than one of the trigger annotations «triggerAnnotationTypeFqns».
-				 Thus, the generated type to use is not unique.''');
-			null
-		}
-		else if(!typeElement.generated) {  
-		
-			//Only apply the transformation if it is not a generated class 
-				
-			
-			val triggerAnnotation = annotations.head
-
-			val rule = ExtensionRegistry.get(RuleFactory).createTriggerAnnotationRule(triggerAnnotation.annotationAsTypeElement)
-			val fqn = rule.getGeneratedTypeElementFqn(typeElement)
-			
-			val generatedTypeElement = findTypeElement(fqn)
-			if (generatedTypeElement == null) {
-				throw new TypeElementNotFoundException(fqn, '')  
-			} else {
-				generatedTypeElement				
-			}
-				
-		} else {
-			typeElement
-		}
+		type
 	}
 
 }

@@ -8,6 +8,7 @@ import de.stefanocke.japkit.metaannotations.Properties
 import de.stefanocke.japkit.metaannotations.Template
 import de.stefanocke.japkit.metaannotations.Trigger
 import de.stefanocke.japkit.metaannotations.TypeQuery
+import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
 import de.stefanocke.japkit.services.ElementsExtensions
 import de.stefanocke.japkit.services.ExtensionRegistry
 import java.lang.annotation.Annotation
@@ -96,6 +97,7 @@ class RuleFactory {
 			Function->[am, e | new FunctionRule(am, e)],
 			Matcher->[am, e | new ElementMatcher(am)],
 			TypeQuery->[am, e | new TypeQueryRule(am)],
+			ClassSelector->[am, e | new TypeRule(am, e)],
 			Properties->[am, e | new PropertyFilter(am)]
 		]
 	
