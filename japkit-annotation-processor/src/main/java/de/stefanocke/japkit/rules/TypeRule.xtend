@@ -61,7 +61,21 @@ class TypeRule extends AbstractNoArgFunctionRule<TypeMirror> {
 			}
 			
 			case ClassSelectorKind.EXPR : {
-				resolvedSelector.type = evalClassSelectorExpr(resolvedSelector, TypeMirror)
+				resolvedSelector.type = { 
+					val result = evalClassSelectorExpr(resolvedSelector, Object)
+					//TODO: Move this to type resolver (as soon as @VarRef is introduced and EXPR is removed)?
+					if(result instanceof TypeMirror){
+						result
+					} else if(result instanceof TypeElement){
+						result.asType()
+					} else if(result == null){
+						null
+					} else {
+						reportRuleError('''The result of «expr» must be a TypeMirror or a TypeElement, but not «result.class»''')
+						null
+					}
+					
+				}
 			}
 			case ClassSelectorKind.FQN : {
 				val fqn = evalClassSelectorExpr(resolvedSelector, String)
