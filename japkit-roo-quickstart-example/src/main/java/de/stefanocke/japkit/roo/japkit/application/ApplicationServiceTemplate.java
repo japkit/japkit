@@ -27,7 +27,6 @@ import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.BehaviorInnerClassWithGenClassPrefix;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
-import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 
 @RuntimeMetadata
