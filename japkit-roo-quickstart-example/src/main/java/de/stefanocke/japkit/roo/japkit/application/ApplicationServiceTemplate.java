@@ -161,15 +161,15 @@ public class ApplicationServiceTemplate {
 	
 		
 		@Template(
-				vars={@Var(name="srcTypeElement", expr="#{src.asType().asElement}"), @Var(name="fieldType", expr = "#{src.asType()}")},
+				vars={@Var(name="fieldTypeElement", expr="#{src.asType().asElement}"), @Var(name="fieldType", expr = "#{src.asType()}")},
 						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 								getter=@Getter, setter=@Setter)
 		)
 		public static class CommandFieldTemplate{
 			
 			@Order(1)
-			@Clazz(activation=@Matcher(condition="#{srcTypeElement.ValueObject != null}"),
-					src="#{srcTypeElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
+			@Clazz(activation=@Matcher(condition="#{fieldTypeElement.ValueObject != null}"),
+					src="#{fieldTypeElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
 					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
 			@ResultVar("fieldType")
 			@DTO
