@@ -24,12 +24,14 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
+import java.util.Collections
 
 @Data
 class ClassRule extends AbstractRule{
 
 	protected val transient extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 	
+	()=>boolean activationRule
 	TemplateRule templateRule
 	MembersRule membersRule
 	ElementKind kind
@@ -56,6 +58,7 @@ class ClassRule extends AbstractRule{
 	
 	new(AnnotationMirror metaAnnotation, TypeElement templateClass, boolean isTopLevelClass, boolean isAuxClass){
 		super(metaAnnotation, templateClass)
+		activationRule = createActivationRule(metaAnnotation, null)
 		templateRule= templateClass?.createTemplateRule
 		membersRule = new MembersRule(metaAnnotation)
 		kind = metaAnnotation.value('kind', ElementKind)
@@ -89,6 +92,7 @@ class ClassRule extends AbstractRule{
 	def List<? extends GenTypeElement> generateClass(String name, Set<GenTypeElement> generatedTopLevelClasses
 	) {
 		inRule[
+			if (!activationRule.apply) return Collections.<GenTypeElement>emptyList
 			
 			val enclosingClass = if (!isTopLevelClass) {
 					if (currentGeneratedClass == null) {

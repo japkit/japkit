@@ -57,6 +57,8 @@ public @interface Clazz {
 	 */
 	String srcVar() default "";
 	
+	Matcher[] activation() default {};
+	
 	/**
 	 * 
 	 * @return the kind of type element to generate. Allowed values: CLASS, INTERFACE, ENUM
