@@ -4,18 +4,13 @@ import de.stefanocke.japkit.el.ElVariableError
 import de.stefanocke.japkit.services.ExtensionRegistry
 import de.stefanocke.japkit.services.TypeElementNotFoundException
 import de.stefanocke.japkit.services.TypesRegistry
-import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.util.ArrayList
-import java.util.Collections
-import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
-
-import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
@@ -27,7 +22,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	Class<?> type
 
 	TypeMirror annotationToRetrieve
-	ElementMatcher matcher
 
 	new(AnnotationMirror elVarAnnotation) {
 		super(elVarAnnotation, null)
@@ -39,8 +33,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		type = Class.forName(elVarAnnotation.value("type", TypeMirror).asElement.qualifiedName.toString);
 
 		annotationToRetrieve = elVarAnnotation.value("annotation", TypeMirror)
-
-		matcher = elVarAnnotation.value("matcher", typeof(AnnotationMirror[])).map[createElementMatcher].singleValue
 		
 	}
 
@@ -77,19 +69,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 
 					value = if (!expr.nullOrEmpty) {
 						eval(expr, lang, type);
-					} else {
-						value
-					}
-
-					value = if (matcher != null) {
-						if (value instanceof Iterable<?>) {
-							matcher.filter(value)
-						} else if (value instanceof Element) {
-							matcher.matches(value)
-						} else {
-							throw new IllegalArgumentException(
-								'''If matcher is set, expr must yield an element collection or an element, but not «value»''');
-						}
 					} else {
 						value
 					}

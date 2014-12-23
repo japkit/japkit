@@ -26,13 +26,6 @@ public @interface Var {
 
 	Class<?> type() default Object.class;
 
-
-	/**
-	 * If set, and expr is set, the matcher is applied to the result of
-	 * expression and the result (true or false) is put on value stack. 
-	 */
-	Matcher[] matcher() default {};
-
 	/**
 	 * If set, the according annotation of the result of the expression,
 	 * property filter or type query is retrieved. This is possible for
