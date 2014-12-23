@@ -8,10 +8,8 @@ import de.stefanocke.japkit.util.MoreCollectionExtensions
 import java.util.ArrayList
 import java.util.Collections
 import java.util.List
-import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function0
@@ -21,12 +19,9 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.*
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
-
-	val private transient extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 	 
 	String name
 	boolean ifEmpty
-	boolean isFunction
 	String expr
 	String lang
 	Class<?> type
@@ -35,8 +30,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	//TODO: Das könnten auch direkt PropertyFilter sein, aber im Moment ist die Trigger Anntoation Teil ihres State...
 	AnnotationMirror[] propertyFilterAnnotations
 
-	//TODO: TypeQuery Rule?
-	AnnotationMirror typeQuery
 	TypeMirror annotationToRetrieve
 	ElementMatcher matcher
 
@@ -45,15 +38,12 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		name = elVarAnnotation.value("name", String);
 		
 		ifEmpty = elVarAnnotation.value("ifEmpty", Boolean);
-		isFunction = elVarAnnotation.value("isFunction", Boolean);
 		expr = elVarAnnotation.value("expr", String);
 		lang = elVarAnnotation.value("lang", String);
 		type = Class.forName(elVarAnnotation.value("type", TypeMirror).asElement.qualifiedName.toString);
 
 		//TODO: Use Rule factory. But this is not possible, if we use triggerAnnotation. Reconsider...
 		propertyFilterAnnotations = elVarAnnotation.value("propertyFilter", typeof(AnnotationMirror[]))
-
-		typeQuery = elVarAnnotation.value("typeQuery", AnnotationMirror)
 
 		annotationToRetrieve = elVarAnnotation.value("annotation", TypeMirror)
 
@@ -63,15 +53,12 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 
 	def void putELVariable() {
 		
-			if (isFunction) {
-				valueStack.put(name, this)
-			} else {
-				val exisitingValue = valueStack.get(name)
-				if(ifEmpty && exisitingValue!==null && !exisitingValue.emptyVar) return
-				
-				val value = eval(currentSrc)
-				valueStack.put(name, value)
-			}
+		val exisitingValue = valueStack.get(name)
+		if(ifEmpty && exisitingValue!==null && !exisitingValue.emptyVar) return
+		
+		val value = eval(currentSrc)
+		valueStack.put(name, value)
+			
 	}
 	
 	
@@ -103,8 +90,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 						val propertyFilters = propertyFilterAnnotations.map[new PropertyFilter(it)]
 						propertyFilters.map[getFilteredProperties()].flatten.toList
 
-					} else if (typeQuery != null) {
-						evalTypeQuery(typeQuery)
 					} else {
 						value
 					}
@@ -165,52 +150,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		throw new IllegalArgumentException('''Cannot retrieve annotation «annotationFqn» for «object»''')
 	}
 
-	def private evalTypeQuery(AnnotationMirror typeQuery) {
-		val triggerAnnotation = typeQuery.value("annotation", TypeMirror);
-		val shadow = typeQuery.value("shadow", Boolean);
-		val unique = typeQuery.value("unique", Boolean);
-		val filterAV = typeQuery.value("filterAV", String);
-		val inExpr = typeQuery.value("inExpr", String);
-		val inExprLang = typeQuery.value("inExprLang", String);
-
-		//TODO: constant
-		val ac = currentAnnotatedClass
-
-		val inTypesSet = if (filterAV.nullOrEmpty)
-				emptySet
-			else {
-				val inTypes =  eval(inExpr, inExprLang, Object)
-				
-
-				(if (inTypes instanceof Iterable<?>) {
-					(inTypes as Iterable<TypeMirror>).toSet
-				} else {
-					Collections.singleton(inTypes as TypeMirror)
-				}).map[qualifiedName].toSet
-
-			}
-
-		val types = ExtensionRegistry.get(TypesRegistry).
-			findAllTypeElementsWithTriggerAnnotation(ac, triggerAnnotation.qualifiedName, shadow).filter [ te |
-				filterAV.nullOrEmpty || {
-					val t = te.annotationMirror(triggerAnnotation.qualifiedName).annotationValuesByNameUnwrapped.apply(filterAV)
-					if(t instanceof TypeMirror){
-						inTypesSet.contains(t.qualifiedName)				
-					} else if(t instanceof List<?>){
-						//if both values are sets, we return true if they are not disjoint. Does this make any sense? 
-						val filterTypes = t.filterInstanceOf(TypeMirror).map[qualifiedName].toSet
-						filterTypes.retainAll(inTypesSet)
-						!filterTypes.empty
-					} else {
-						throw new IllegalArgumentException("filterAV must be a type or a set of types, but not "+t);
-					}
-				}
-			].map[asType];
-
-		if(unique) MoreCollectionExtensions.singleValue(types) else types
-
-	}
-	
 	override apply(Object p) {
 		eval(p)
 	}

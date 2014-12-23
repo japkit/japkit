@@ -72,7 +72,11 @@ class JuelELProvider implements ELProvider {
 			def private Method createStaticDelegateMethod(String functionName, Invoker invoker) {
 				val argTypes = new ArrayList<Class<?>>()
 				argTypes.add(typeof(Object[]))
-										
+									
+				//TODO: This probably causes a perm gen space memory leak since the classes
+				//won't get unloaded, an they are re-generated every round of annotation processing :(	
+				//On the other hand, the Javadoc of ClassLoadingStrategy.Default.WRAPPER sounds as if
+				//the classes would be properly garbage collected. TODO: check if that works as expected. 
 				val invokerClass = new ByteBuddy()
 					.subclass(Object)
 					.name(class.package.name+".functioninvokers."+functionName.toFirstUpper)

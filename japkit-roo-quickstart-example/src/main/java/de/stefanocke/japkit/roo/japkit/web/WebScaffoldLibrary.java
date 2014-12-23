@@ -23,9 +23,6 @@ public class WebScaffoldLibrary {
 	// The view properties that have a date or time type
 	@Function(expr = "#{isDatetime.filter(viewProperties)}")
 	class datetimeProperties{}
-	
-	@Function(expr = "#{!datetimeProperties.isEmpty()}")
-	class hasDatetimeProperties{}
 
 	@Function(expr = "#{isEnum.filter(viewProperties)}")
 	class enumProperties{}
@@ -42,6 +39,9 @@ public class WebScaffoldLibrary {
 	
 	@TypeQuery(annotation = ViewModel.class, shadow = true, unique = true, filterAV = "formBackingObject")
 	class findViewModel{}
+	
+	@TypeQuery(annotation = JapkitWebScaffold.class, shadow = true)
+	class findAllControllers{} 
 	
 	@Properties(includeRules = @Matcher(annotationsNot = { Id.class, Version.class }))
 	class viewableProperties{}

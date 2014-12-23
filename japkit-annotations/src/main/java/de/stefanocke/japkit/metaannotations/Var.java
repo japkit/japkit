@@ -12,17 +12,6 @@ public @interface Var {
 	boolean ifEmpty() default false;
 
 	/**
-	 * If true, the EL-Variable is not evaluated immediately. Instead, it is
-	 * put as a function on the value stack and can be evaluated later by
-	 * calling its eval, filter or map method. The parameter to this methods must
-	 * be the element or list of elements to apply the function for.
-	 * 
-	 * @return
-	 */
-	boolean isFunction() default false;
-
-
-	/**
 	 * The expression to be evaluated.
 	 * 
 	 * @return
@@ -45,12 +34,6 @@ public @interface Var {
 	 */
 	Properties[] propertyFilter() default {};
 
-	/**
-	 * If this value is set, the expression is ignored and a type query is executed instead.
-	 * 
-	 * @return
-	 */
-	TypeQuery[] typeQuery() default {};
 
 	/**
 	 * If set, and expr is set, the matcher is applied to the result of
