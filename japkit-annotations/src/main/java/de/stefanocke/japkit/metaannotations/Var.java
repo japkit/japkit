@@ -26,14 +26,6 @@ public @interface Var {
 
 	Class<?> type() default Object.class;
 
-	/**
-	 * If this value is set, the expression is ignored and the variable is a
-	 * list of properties instead, according to the given filter criteria.
-	 * 
-	 * @return
-	 */
-	Properties[] propertyFilter() default {};
-
 
 	/**
 	 * If set, and expr is set, the matcher is applied to the result of

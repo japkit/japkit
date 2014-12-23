@@ -26,10 +26,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	String lang
 	Class<?> type
 
-
-	//TODO: Das könnten auch direkt PropertyFilter sein, aber im Moment ist die Trigger Anntoation Teil ihres State...
-	AnnotationMirror[] propertyFilterAnnotations
-
 	TypeMirror annotationToRetrieve
 	ElementMatcher matcher
 
@@ -41,9 +37,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		expr = elVarAnnotation.value("expr", String);
 		lang = elVarAnnotation.value("lang", String);
 		type = Class.forName(elVarAnnotation.value("type", TypeMirror).asElement.qualifiedName.toString);
-
-		//TODO: Use Rule factory. But this is not possible, if we use triggerAnnotation. Reconsider...
-		propertyFilterAnnotations = elVarAnnotation.value("propertyFilter", typeof(AnnotationMirror[]))
 
 		annotationToRetrieve = elVarAnnotation.value("annotation", TypeMirror)
 
@@ -84,12 +77,6 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 
 					value = if (!expr.nullOrEmpty) {
 						eval(expr, lang, type);
-					} else if (!propertyFilterAnnotations.nullOrEmpty) {
-
-						//TODO: Rule caching?
-						val propertyFilters = propertyFilterAnnotations.map[new PropertyFilter(it)]
-						propertyFilters.map[getFilteredProperties()].flatten.toList
-
 					} else {
 						value
 					}
