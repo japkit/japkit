@@ -16,13 +16,12 @@ import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
-import de.stefanocke.japkit.roo.japkit.application.CommandMethod;
+import de.stefanocke.japkit.roo.japkit.application.ApplicationServiceLibrary;
 import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 
 @RuntimeMetadata
 @Trigger(layer=Layers.CONTROLLERS, 
-	libraries={DomainLibrary.class, WebScaffoldLibrary.class},  //TODO: WebScaffoldLibrary to import DomainLibrary
-	annotationImports=CommandMethod.class,
+	libraries={DomainLibrary.class, ApplicationServiceLibrary.class, WebScaffoldLibrary.class},
 	vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
 		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
@@ -40,7 +39,11 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 		
 		// The properties to show
 		@Var(name = "viewProperties", expr="#{(viewModel != null ? viewModel : fbo).asElement.viewableProperties()}"),
-		@Var(name = "explicitTableProperties", expr = "#{viewProperties}", matcher=@Matcher(annotations=TableColumn.class)),
+		@Var(name = "datetimeProperties", expr = "#{isDatetime.filter(viewProperties)}"),
+		@Var(name = "enumProperties", expr = "#{isEnum.filter(viewProperties)}"),
+
+		
+		@Var(name = "explicitTableProperties", expr = "#{isTableColumn.filter(viewProperties)}"),
 		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
 		
 		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
@@ -49,11 +52,8 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo.findRepository()}"),		
 		@Var(name = "applicationService", expr="#{fbo.findApplicationService()}"),
 
-		@Var(name="createCommands", expr="#{applicationService.asElement.declaredMethods}", 
-				matcher=@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo) && src.CommandMethod.aggregateRoot.isSame(fbo)}")),
-		@Var(name="updateCommands", expr="#{applicationService.asElement.declaredMethods}", 
-				matcher=@Matcher(annotations=CommandMethod.class, type=void.class , condition="#{src.CommandMethod.aggregateRoot.isSame(fbo)}")),
-				
+		@Var(name="createCommands", expr="#{applicationService.asElement.findCreateCommands()}"),
+		@Var(name="updateCommands", expr="#{applicationService.asElement.findUpdateCommands()}"),
 		@Var(name = "propertyNames", ifEmpty=true, expr="#{allPropertyNames(viewProperties)}")		
 
 })

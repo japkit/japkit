@@ -19,13 +19,6 @@ public class WebScaffoldLibrary {
 	
 	@Function(expr="#{src.toString().replace('.','_').toLowerCase()}")
 	class toHtmlId{}
-
-	// The view properties that have a date or time type
-	@Function(expr = "#{isDatetime.filter(viewProperties)}")
-	class datetimeProperties{}
-
-	@Function(expr = "#{isEnum.filter(viewProperties)}")
-	class enumProperties{}
 	
 	@Function(expr = "#{fboShortId}_#{src.name.toLowerCase()}_date_format")
 	class dtfModelAttr{}
@@ -33,9 +26,8 @@ public class WebScaffoldLibrary {
 	@Matcher(singleValueTypeAnnotations = DTO.class)
 	class isDTO{}
 	
-	
-	@TypeQuery(annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots")
-	class findApplicationService{}
+	@Matcher(annotations=TableColumn.class)
+	class isTableColumn{}
 	
 	@TypeQuery(annotation = ViewModel.class, shadow = true, unique = true, filterAV = "formBackingObject")
 	class findViewModel{}
