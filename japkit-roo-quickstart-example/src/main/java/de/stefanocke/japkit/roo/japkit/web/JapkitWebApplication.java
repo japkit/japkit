@@ -8,8 +8,7 @@ import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
 
 @Trigger(layer=Layers.WEB_APP, libraries=WebScaffoldLibrary.class, vars={
-		@Var(name = "controllers", ifEmpty=true, expr="#{findAllControllers()}"),
-		@Var(name = "controllerAnnotations", expr = "#{controllers}", annotation = JapkitWebScaffold.class) })
+		@Var(name = "controllers", ifEmpty=true, expr="#{findAllControllers()}")})
 @ResourceTemplate.List({
 		@ResourceTemplate(templateLang = "GStringTemplate", templateName = "application.jspx", pathExpr = "i18n",
 				nameExpr = "application.properties", location = ResourceLocation.WEBINF),

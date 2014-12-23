@@ -2,7 +2,6 @@ package de.stefanocke.japkit.roo.japkit.web;
 
 import javax.persistence.Id;
 import javax.persistence.Version;
-import javax.validation.constraints.Pattern;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Function;
@@ -10,11 +9,10 @@ import de.stefanocke.japkit.metaannotations.Library;
 import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Properties;
 import de.stefanocke.japkit.metaannotations.TypeQuery;
-import de.stefanocke.japkit.roo.japkit.application.ApplicationService;
 import de.stefanocke.japkit.roo.japkit.application.DTO;
 
 @RuntimeMetadata
-@Library(annotationImports={TableColumn.class, Pattern.class})
+@Library(annotationImports={TableColumn.class, JapkitWebScaffold.class})
 public class WebScaffoldLibrary {
 	
 	@Function(expr="#{src.toString().replace('.','_').toLowerCase()}")

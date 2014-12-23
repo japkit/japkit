@@ -6,7 +6,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,7 +27,8 @@ import de.stefanocke.japkit.roo.base.web.ResourceBundleNameProvider;
 @Controller
 @RequestMapping("/$path$")
 @RuntimeMetadata
-@Template(templates={@TemplateCall(ControllerMembers.Create.class), @TemplateCall(ControllerMembers.Update.class)})
+@Template(
+		templates={@TemplateCall(ControllerMembers.Create.class), @TemplateCall(ControllerMembers.Update.class)})
 public abstract class ControllerMembers implements ResourceBundleNameProvider{
 	@ClassSelector
 	class ApplicationService{}
@@ -177,10 +177,9 @@ public abstract class ControllerMembers implements ResourceBundleNameProvider{
 	abstract void addDateTimeFormatPatterns(Model uiModel);
 
 	/**
-	 * @japkit.bodyCode <code>return "#{dtfAnnotation.style}";</code>
+	 * @japkit.bodyCode <code>return "#{dateTimeFormatStyle()}";</code>
 	 */
-	@Method(src = "datetimeProperties", srcVar="p", nameExpr = "getDateTimeFormat#{p.name.toFirstUpper}", vars = @Var(
-			name = "dtfAnnotation", expr = "#{p}", annotation = DateTimeFormat.class))
+	@Method(src = "datetimeProperties", nameExpr = "getDateTimeFormat#{src.name.toFirstUpper}")
 	abstract String getDateTimeFormat();
 
 	//TODO: Eigentlich singleValueType.

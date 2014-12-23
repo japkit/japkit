@@ -3,7 +3,7 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <menu:menu id="_menu" z="0">       
-        <%controllerAnnotations.each{
+        <%controllers.collect{it.asElement.JapkitWebScaffold}.each{
         	def path = it.path	
         	def id = it.fboShortId
         %>
