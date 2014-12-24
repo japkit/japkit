@@ -22,9 +22,15 @@ public class ApplicationServiceLibrary {
 	 * src is the AppService.
 	 */
 	@Function(expr="#{isCreateCommand.filter(src.declaredMethods)}")
-	class findCreateCommands{}
+	class findCreateCommandMethods{}
 	
 	@Function(expr="#{isUpdateCommand.filter(src.declaredMethods)}")
-	class findUpdateCommands{}
+	class findUpdateCommandMethods{}
+	
+	/**
+	 * src is the command method.
+	 */
+	@Function(expr="#{src.parameters.get(0).asType()}")
+	class command{}
 			
 }

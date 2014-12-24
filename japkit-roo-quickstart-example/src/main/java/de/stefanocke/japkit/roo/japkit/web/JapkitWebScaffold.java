@@ -52,8 +52,8 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo.findRepository()}"),		
 		@Var(name = "applicationService", expr="#{fbo.findApplicationService()}"),
 
-		@Var(name="createCommands", expr="#{applicationService.asElement.findCreateCommands()}"),
-		@Var(name="updateCommands", expr="#{applicationService.asElement.findUpdateCommands()}"),
+		@Var(name="createCommands", expr="#{applicationService.asElement.findCreateCommandMethods()}"),
+		@Var(name="updateCommands", expr="#{applicationService.asElement.findUpdateCommandMethods()}"),
 		@Var(name = "propertyNames", ifEmpty=true, expr="#{allPropertyNames(viewProperties)}")		
 
 })
@@ -74,7 +74,7 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 				templateLang = "GStringTemplate", templateName = "createOrUpdate.jspx", pathExpr = "views/#{path}",
 				nameExpr = "create.jspx", location = ResourceLocation.WEBINF, 
 				vars ={ @Var(name = "update", expr = "#{false}"), 
-					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+					@Var(name="command", expr="#{cmdMethod.command()}"),
 					@Var(name="modelAttribute", expr="#{command.asElement().simpleName.toFirstLower}"),
 					@Var(name = "viewProperties", expr="#{command.asElement().properties}"),
 				}),
@@ -82,7 +82,7 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 				templateLang = "GStringTemplate", templateName = "command_i18n.jspx", pathExpr = "i18n/#{path}",
 				nameExpr = "#{cmdMethod.simpleName}.properties", location = ResourceLocation.WEBINF, 
 				vars = {
-					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+					@Var(name="command", expr="#{cmdMethod.command()}"),
 					@Var(name="cmdName", expr="#{cmdMethod.simpleName}"),
 					@Var(name = "cmdPropertyNames", expr="#{allPropertyNames(command.asElement().properties)}"),
 				}),
@@ -91,7 +91,7 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 				nameExpr = "#{cmdMethod.simpleName.toFirstLower}.jspx", location = ResourceLocation.WEBINF, 
 				vars = {
 					@Var(name = "update", expr = "#{true}"),
-					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+					@Var(name="command", expr="#{cmdMethod.command()}"),
 					@Var(name="modelAttribute", expr="#{command.asElement().simpleName.toFirstLower}"),
 					@Var(name = "viewProperties", expr="#{command.asElement().properties}"),
 				}),
@@ -99,7 +99,7 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 				templateLang = "GStringTemplate", templateName = "command_i18n.jspx", pathExpr = "i18n/#{path}",
 				nameExpr = "#{cmdMethod.simpleName}.properties", location = ResourceLocation.WEBINF, 
 				vars = {
-					@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
+					@Var(name="command", expr="#{cmdMethod.command()}"),
 					@Var(name="cmdName", expr="#{cmdMethod.simpleName}"),
 					@Var(name = "cmdPropertyNames", expr="#{allPropertyNames(command.asElement().properties)}"),
 				}),
