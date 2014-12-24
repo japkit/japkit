@@ -17,6 +17,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.stefanocke.japkit.services.ExtensionRegistry.*
+import javax.lang.model.type.DeclaredType
 
 class ElExtensions {
 
@@ -129,6 +130,10 @@ class ElExtensions {
 	def static getProperties(TypeElement e){
 		val extension JavaBeansExtensions = get(JavaBeansExtensions)
 		e.properties(Object.name, false)
+	}
+	
+	def static getProperties(DeclaredType t){
+		get(TypesExtensions).asElement(t).properties
 	}
 	
 	def static getDeclaredFields(TypeElement type) {
@@ -264,6 +269,8 @@ class ElExtensions {
 		elExtensions.registerProperty(CharSequence, "toFirstLower", [context, s|s.toFirstLower])
 		
 		elExtensions.registerProperty(TypeElement, "properties", [context, t|t.properties])
+		
+		elExtensions.registerProperty(DeclaredType, "properties", [context, t|t.properties])
 		
 		elExtensions.registerProperty(TypeElement, "declaredFields", [context, t|t.declaredFields])
 		

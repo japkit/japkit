@@ -29,7 +29,7 @@ public class DomainLibrary {
 	@Matcher(singleValueTypeCategory = TypeCategory.TEMPORAL)
 	class isDatetime{}
 	
-	@Function(expr="src.DateTimeFormat.style")
+	@Function(expr="#{src.DateTimeFormat.style}")
 	class dateTimeFormatStyle{}
 	
 	@Matcher(singleValueType = boolean.class)
