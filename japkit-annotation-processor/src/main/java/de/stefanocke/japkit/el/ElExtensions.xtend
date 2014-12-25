@@ -140,23 +140,42 @@ class ElExtensions {
 		val extension ElementsExtensions = get(ElementsExtensions)
 		type.declaredFields()
 	}
+	
+	def static getDeclaredFields(DeclaredType t) {
+		get(TypesExtensions).asElement(t).declaredFields
+	}
 
 	def static getDeclaredMethods(TypeElement type) {
 		val extension ElementsExtensions = get(ElementsExtensions)
 		type.declaredMethods()
+	}
+	
+	def static getDeclaredMethods(DeclaredType t) {
+		get(TypesExtensions).asElement(t).declaredMethods
 	}
 
 	def static getDeclaredConstructors(TypeElement type) {
 		val extension ElementsExtensions = get(ElementsExtensions)
 		type.declaredConstructors()
 	}
-
+	
+	def static getDeclaredConstructors(DeclaredType t) {
+		get(TypesExtensions).asElement(t).declaredConstructors
+	}	
+	
 	def static getDeclaredTypes(TypeElement type) {
 		val extension ElementsExtensions = get(ElementsExtensions)
 		type.declaredTypes()
 	}
-
-
+	
+	def static getDeclaredTypes(DeclaredType t) {
+		get(TypesExtensions).asElement(t).declaredTypes
+	}
+	
+	def static getSimpleName(DeclaredType t){
+		get(TypesExtensions).asElement(t).simpleName
+	}
+	
 	private def static getEmitterContext(Map<String, Object> context) {
 		context.get("ec") as EmitterContext
 	}
@@ -279,6 +298,16 @@ class ElExtensions {
 		elExtensions.registerProperty(TypeElement, "declaredTypes", [context, t|t.declaredTypes])
 		
 		elExtensions.registerProperty(TypeElement, "declaredMethods", [context, t|t.declaredMethods])
+		
+		elExtensions.registerProperty(DeclaredType, "declaredFields", [context, t|t.declaredFields])
+		
+		elExtensions.registerProperty(DeclaredType, "declaredConstructors", [context, t|t.declaredConstructors])
+		
+		elExtensions.registerProperty(DeclaredType, "declaredTypes", [context, t|t.declaredTypes])
+		
+		elExtensions.registerProperty(DeclaredType, "declaredMethods", [context, t|t.declaredMethods])
+		
+		elExtensions.registerProperty(DeclaredType, "simpleName", [context, t|t.simpleName])
 	}
 
 	def static registerExtensionMethods(ElExtensionPropertiesAndMethods elExtensions) {

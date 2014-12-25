@@ -75,7 +75,7 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 				nameExpr = "create.jspx", location = ResourceLocation.WEBINF, 
 				vars ={ @Var(name = "update", expr = "#{false}"), 
 					@Var(name="command", expr="#{cmdMethod.command()}"),
-					@Var(name="modelAttribute", expr="#{command.asElement().simpleName.toFirstLower}"),
+					@Var(name="modelAttribute", expr="#{command.simpleName.toFirstLower}"),
 					@Var(name = "viewProperties", expr="#{command.properties}"),
 				}),
 		@ResourceTemplate(src="#{createCommands}", srcVar="cmdMethod",
@@ -92,7 +92,7 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 				vars = {
 					@Var(name = "update", expr = "#{true}"),
 					@Var(name="command", expr="#{cmdMethod.command()}"),
-					@Var(name="modelAttribute", expr="#{command.asElement().simpleName.toFirstLower}"),
+					@Var(name="modelAttribute", expr="#{command.simpleName.toFirstLower}"),
 					@Var(name = "viewProperties", expr="#{command.properties}"),
 				}),
 		@ResourceTemplate(src="#{updateCommands}", srcVar="cmdMethod",
