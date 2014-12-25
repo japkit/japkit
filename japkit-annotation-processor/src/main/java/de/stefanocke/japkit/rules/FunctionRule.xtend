@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.rules
 
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.TypeElement
+import javax.lang.model.element.Element
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
@@ -10,7 +10,7 @@ class FunctionRule extends AbstractNoArgFunctionRule<Object> {
 	String expr
 	String lang
 	
-	new(AnnotationMirror metaAnnotation, TypeElement metaElement) {
+	new(AnnotationMirror metaAnnotation, Element metaElement) {
 		super(metaAnnotation, metaElement, null)
 	
 		val exprFromAv = metaAnnotation.value("expr", String);

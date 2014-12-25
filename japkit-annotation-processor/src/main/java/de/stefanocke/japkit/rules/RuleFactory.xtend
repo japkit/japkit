@@ -91,28 +91,21 @@ class RuleFactory {
 		getOrCreate(functionCache, element, [createFunctionInternal(element)])
 	}
 	
-	private static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, TypeElement)=>AbstractRule>> 
+	private static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, Element)=>AbstractRule>> 
 		functionFactories = #[
 			CodeFragment->[am, e | new CodeFragmentRule(am, e)],
 			Function->[am, e | new FunctionRule(am, e)],
-			Matcher->[am, e | new ElementMatcher(am)],
-			TypeQuery->[am, e | new TypeQueryRule(am)],
+			Matcher->[am, e | new ElementMatcher(am, e)],
+			TypeQuery->[am, e | new TypeQueryRule(am, e)],
 			ClassSelector->[am, e | new TypeRule(am, e)],
-			Properties->[am, e | new PropertyFilter(am)]
+			Properties->[am, e | new PropertyFilter(am, e)]
 		]
 	
-	def private dispatch createFunctionInternal(TypeElement element){
+	def private createFunctionInternal(Element element){
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
 		val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key!=null]
 		factory?.value?.apply(factory.key, element)
 	}
-	
-	def private dispatch createFunctionInternal(Element element){
-		null
-	}
-	
-	
-	
 	
 
 	def static <K, V> V getOrCreate(Map<K, V> cache, K key, (K,(V)=>void)=>V factory) {

@@ -1,18 +1,18 @@
 package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.el.ELSupport
-import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelectorKind
 import de.stefanocke.japkit.model.GenUnresolvedType
 import de.stefanocke.japkit.services.ExtensionRegistry
 import de.stefanocke.japkit.services.TypeElementNotFoundException
+import java.util.Set
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
-import java.util.Set
 
 @Data
 class TypeRule extends AbstractNoArgFunctionRule<TypeMirror> {
@@ -25,8 +25,8 @@ class TypeRule extends AbstractNoArgFunctionRule<TypeMirror> {
 	//this rule refers directly to a var on value stack, since no expression is set
 	boolean isVarRef
 	
-	new(AnnotationMirror metaAnnotation, TypeElement typeElement){
-		super(metaAnnotation, typeElement, TypeMirror)
+	new(AnnotationMirror metaAnnotation, Element element){
+		super(metaAnnotation, element, TypeMirror)
 		kind= metaAnnotation.value("kind", ClassSelectorKind)		
 		requiredTriggerAnnotation = metaAnnotation.value("requiredTriggerAnnotation", typeof(TypeMirror[])).toSet
 		enclosing = metaAnnotation.value("enclosing", TypeMirror)
@@ -35,7 +35,7 @@ class TypeRule extends AbstractNoArgFunctionRule<TypeMirror> {
 		val exprFromAV = metaAnnotation.value("expr", String);
 		isVarRef = (kind == ClassSelectorKind.EXPR) && exprFromAV.nullOrEmpty  //TODO: Maybe for this case there could be a more generic @VarRef annotation.
 		
-		expr = if(isVarRef) typeElement.simpleName.toString.toFirstLower else exprFromAV
+		expr = if(isVarRef) element.simpleName.toString.toFirstLower else exprFromAV
 	}
 	
 	override protected TypeMirror evalInternal() {

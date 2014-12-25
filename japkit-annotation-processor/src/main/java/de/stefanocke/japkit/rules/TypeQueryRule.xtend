@@ -10,6 +10,7 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.filterInstanceOf
+import javax.lang.model.element.Element
 
 @Data
 class TypeQueryRule extends AbstractNoArgFunctionRule<Object> {
@@ -22,7 +23,11 @@ class TypeQueryRule extends AbstractNoArgFunctionRule<Object> {
 	String inExpr
 	
 	new(AnnotationMirror typeQuery){
-		super(typeQuery, null, Object)
+		this(typeQuery, null)
+	}
+	
+	new(AnnotationMirror typeQuery, Element e){
+		super(typeQuery, e, Object)
 		triggerAnnotation = typeQuery.value("annotation", TypeMirror);
 		shadow = typeQuery.value("shadow", Boolean);
 		unique = typeQuery.value("unique", Boolean);

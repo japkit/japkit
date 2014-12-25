@@ -18,6 +18,8 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.stefanocke.japkit.services.ExtensionRegistry.*
 import javax.lang.model.type.DeclaredType
+import de.stefanocke.japkit.rules.AbstractNoArgFunctionRule
+import java.util.ArrayList
 
 class ElExtensions {
 
@@ -240,6 +242,17 @@ class ElExtensions {
 	}
 	
 	def static invoke(Object functionObject, Object base, Object[] params) {
+		if(functionObject instanceof AbstractNoArgFunctionRule<?>){
+			if(functionObject.mustBeCalledWithParams){
+				if(base==null){
+					return functionObject.evalWithParams(params)
+				} else {
+					val paramsWithBase = newArrayList(base)
+					paramsWithBase.addAll(params.toList)
+					return functionObject.evalWithParams(params)
+				}
+			}
+		}
 		if(functionObject instanceof Function0<?>){
 			if(base==null && params.empty){
 				return functionObject.apply

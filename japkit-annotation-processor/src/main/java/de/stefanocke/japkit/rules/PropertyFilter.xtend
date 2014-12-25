@@ -5,16 +5,16 @@ import de.stefanocke.japkit.metaannotations.Properties
 import de.stefanocke.japkit.model.Property
 import de.stefanocke.japkit.services.ElementsExtensions
 import de.stefanocke.japkit.services.ExtensionRegistry
-import de.stefanocke.japkit.services.GenerateClassContext
 import de.stefanocke.japkit.services.MessageCollector
 import de.stefanocke.japkit.services.TypesRegistry
 import java.util.Collection
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
-import javax.lang.model.type.DeclaredType
 
 @Data
 class PropertyFilter extends AbstractNoArgFunctionRule<List>{
@@ -99,8 +99,12 @@ class PropertyFilter extends AbstractNoArgFunctionRule<List>{
 		].filter[excludeRules.forall[r|!r.matches(getSourceElement(ruleSource))]].toList
 	}
 
-	new(AnnotationMirror metaAnnotation) {
-		super(metaAnnotation, null, List)
+	new(AnnotationMirror metaAnnotation){
+		this(metaAnnotation, null)	
+	}
+	
+	new(AnnotationMirror metaAnnotation, Element element) {
+		super(metaAnnotation, element, List)
 
 		sourceClass = metaAnnotation.value("sourceClass", TypeMirror)
 		includeNamesExpr = metaAnnotation.value("includeNamesExpr", String)

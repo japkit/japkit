@@ -201,9 +201,12 @@ class ElementMatcher extends AbstractNoArgFunctionRule<Boolean>{
 		e.annotationMirrors.exists[am|am.hasFqn(annotationType.qualifiedName)]
 	}
 	
-	
 	new(AnnotationMirror am) {
-		super(am, null, boolean)
+		this(am, null)
+	}
+	
+	new(AnnotationMirror am, Element element) {
+		super(am, element, boolean)
 		srcExpr =  am.value("src", String)
 		srcLang =  am.value("srcLang", String)
 		name = am.value("name", String)

@@ -4,6 +4,8 @@ import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.JSR303;
 import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.SPRING_FORMAT;
 
 import javax.annotation.Resource;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 
 import org.springframework.stereotype.Service;
@@ -52,29 +54,29 @@ public class ApplicationServiceTemplate {
 			@TemplateCall(ApplicationServiceMethodsForAggregate.UpdateCommands.class),
 			@TemplateCall(ApplicationServiceMethodsForAggregate.CreateCommands.class)}
 	)
-	public static class ApplicationServiceMethodsForAggregate {
+	public static abstract class ApplicationServiceMethodsForAggregate {
 		@Matcher(modifiers=Modifier.PUBLIC, type=void.class)
 		class publicVoid{}
 		
 		@Matcher(modifiers=Modifier.PUBLIC, condition="#{!src.parameters.isEmpty()}") 
 		class hasParams{}
 	
-		@Function(expr="#{cmdProperties.findByName(src.simpleName).getter}")
-		class findGetter{}
+		@Function(expr="#{cmdProperties.findByName(e.simpleName).getter}")
+		abstract ExecutableElement findGetter(Iterable<?> cmdProperties, Element e);
 
 		@CodeFragment( 
 					iterator="#{src.parameters}" , 
 					separator = ",",  
 					cases={
-							@Case(matcher=@Matcher(condition="#{src.findGetter==null}"), expr="null"),
+							@Case(matcher=@Matcher(condition="#{findGetter(cmdProperties, src)==null}"), expr="null"),
 							@Case(matcher=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
 								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
 					},
-					code="command.#{src.findGetter.simpleName}()")
+					code="command.#{findGetter(cmdProperties, src).simpleName}()")
 		static class paramsFromCommand{}
 
 		@CodeFragment(vars={
-				@Var(name="dtoGetter", expr="#{src.findGetter}"),
+				@Var(name="dtoGetter", expr="#{findGetter(cmdProperties, src)}"),
 				@Var(name="dto", expr="#{dtoGetter.returnType.asElement}"),
 				}, 
 				iterator="#{dto.properties}" ,

@@ -94,14 +94,15 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	}
 	
 	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(ExecutableElement member){
+		val isNoFunction = createFunctionRule(member) == null
 		if(member.kind == ElementKind.METHOD){
 			val annotation =  member.annotationMirror(Method)
-			if(annotation != null || allMethodsAreTemplates)
+			if(annotation != null || allMethodsAreTemplates && isNoFunction)
 				return new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotation, methodDefaults), member)
 			
 		} else (member.kind == ElementKind.CONSTRUCTOR ){
 			val annotation =  member.annotationMirror(Constructor)
-			if(annotation != null || (allConstructorsAreTemplates && !member.isDefaultConstructor))
+			if(annotation != null || (allConstructorsAreTemplates && !member.isDefaultConstructor && isNoFunction))
 				return new ConstructorRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotation, constructorDefaults), member)
 		} 
 		return null
