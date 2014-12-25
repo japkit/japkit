@@ -36,7 +36,7 @@ public abstract class ControllerMembersJpaRepository {
 
 	@Method(src = "#{entityPropertiesWithJpaRepositories.keySet()}", nameExpr = "get#{src.name.toFirstUpper}Choices", vars = {
 			@Var(name = "relatedEntity", expr = "#{src.singleValueType}"),
-			@Var(name = "relatedEntityRepositoryName", expr = "#{relatedEntity.asElement.simpleName.toFirstLower}Repository") },
+			@Var(name = "relatedEntityRepositoryName", expr = "#{relatedEntity.simpleName.toFirstLower}Repository") },
 			bodyCode = "return #{relatedEntityRepositoryName}.findAll();")
 	protected abstract List<RelatedEntity> getEntityChoices();
 
