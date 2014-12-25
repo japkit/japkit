@@ -176,6 +176,10 @@ class ElExtensions {
 		get(TypesExtensions).asElement(t).simpleName
 	}
 	
+	def static getQualifiedName(DeclaredType t){
+		get(TypesExtensions).asElement(t).qualifiedName
+	}
+	
 	private def static getEmitterContext(Map<String, Object> context) {
 		context.get("ec") as EmitterContext
 	}
@@ -308,6 +312,8 @@ class ElExtensions {
 		elExtensions.registerProperty(DeclaredType, "declaredMethods", [context, t|t.declaredMethods])
 		
 		elExtensions.registerProperty(DeclaredType, "simpleName", [context, t|t.simpleName])
+		
+		elExtensions.registerProperty(DeclaredType, "qualifiedName", [context, t|t.qualifiedName])
 	}
 
 	def static registerExtensionMethods(ElExtensionPropertiesAndMethods elExtensions) {

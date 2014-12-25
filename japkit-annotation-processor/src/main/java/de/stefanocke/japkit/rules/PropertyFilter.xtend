@@ -14,6 +14,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
+import javax.lang.model.type.DeclaredType
 
 @Data
 class PropertyFilter extends AbstractNoArgFunctionRule<List>{
@@ -23,7 +24,6 @@ class PropertyFilter extends AbstractNoArgFunctionRule<List>{
 	val transient extension JavaBeansExtensions javaBeansExtensions = ExtensionRegistry.get(JavaBeansExtensions)
 	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
-	val transient extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
 	val transient extension ELSupport = ExtensionRegistry.get(ELSupport)
 
 	TypeMirror sourceClass
@@ -53,13 +53,23 @@ class PropertyFilter extends AbstractNoArgFunctionRule<List>{
 				'''Could not determine properties of source «propertySource.qualifiedName».''') [
 				getFilteredProperties(propertySource)
 			]
-		} else if(currentSrc instanceof TypeElement){
+		} else {
+			val TypeElement src = if (currentSrc instanceof TypeElement)
+					currentSrc as TypeElement
+				else if (currentSrc instanceof DeclaredType)
+					(currentSrc as DeclaredType).asTypeElement
+				else {
+					reportRuleError(
+						'''Could not determine properties of source «currentSrc», since it is neither a TypeElement nor a declared type.''')
+					return emptyList
+				}		
+			
 			handleTypeElementNotFound(emptyList,
 				'''Could not determine properties of source «currentSrc».''') [
-				getFilteredProperties(currentSrc as TypeElement)
+				getFilteredProperties(src)
 			]
-		} else
-			emptyList
+		
+		}
 	}
 
 	def List<Property> getFilteredProperties(TypeElement propertySource) {

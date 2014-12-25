@@ -1,7 +1,6 @@
 package de.stefanocke.japkit.roo.japkit.web;
 
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,21 +23,19 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 	libraries={DomainLibrary.class, ApplicationServiceLibrary.class, WebScaffoldLibrary.class},
 	vars={
 		@Var(name = "fbo", expr = "#{formBackingObject}"),
-		@Var(name = "fboElement", type = TypeElement.class, expr = "#{fbo.asElement}"),
-		@Var(name = "fboName", type = String.class, ifEmpty=true, expr = "#{fboElement.simpleName.toString()}"),
+		@Var(name = "fboName", type = String.class, ifEmpty=true, expr = "#{fbo.simpleName.toString()}"),
 		@Var(name = "fboPluralName", type = String.class, ifEmpty=true, expr = "#{fboName}s"),
 		@Var(name = "path", type = String.class, ifEmpty=true, expr = "#{fboPluralName.toLowerCase()}"),
-		//@Var(name = "path", expr="foo", ifEmpty=true),
 		@Var(name = "modelAttribute", type = String.class, ifEmpty=true, expr = "#{fboName.toFirstLower}"),
 		
 		// For making IDs in JSPs unique
-		@Var(name = "fboFqnId", expr = "#{fboElement.qualifiedName.toHtmlId()}"),	
+		@Var(name = "fboFqnId", expr = "#{fbo.qualifiedName.toHtmlId()}"),	
 		@Var(name = "fboShortId", expr = "#{fboName.toLowerCase()}"),
 
 		@Var(name = "viewModel", expr="#{fbo.findViewModel()}"),
 		
 		// The properties to show
-		@Var(name = "viewProperties", expr="#{(viewModel != null ? viewModel : fbo).asElement.viewableProperties()}"),
+		@Var(name = "viewProperties", expr="#{(viewModel != null ? viewModel : fbo).viewableProperties()}"),
 		@Var(name = "datetimeProperties", expr = "#{isDatetime.filter(viewProperties)}"),
 		@Var(name = "enumProperties", expr = "#{isEnum.filter(viewProperties)}"),
 
@@ -52,8 +49,8 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo.findRepository()}"),		
 		@Var(name = "applicationService", expr="#{fbo.findApplicationService()}"),
 
-		@Var(name="createCommands", expr="#{applicationService.asElement.findCreateCommandMethods()}"),
-		@Var(name="updateCommands", expr="#{applicationService.asElement.findUpdateCommandMethods()}"),
+		@Var(name="createCommands", expr="#{applicationService.findCreateCommandMethods()}"),
+		@Var(name="updateCommands", expr="#{applicationService.findUpdateCommandMethods()}"),
 		@Var(name = "propertyNames", ifEmpty=true, expr="#{allPropertyNames(viewProperties)}")		
 
 })
