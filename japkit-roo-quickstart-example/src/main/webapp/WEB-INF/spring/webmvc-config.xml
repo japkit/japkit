@@ -37,7 +37,7 @@
     <bean class="org.springframework.context.support.ReloadableResourceBundleMessageSource" id="messageSource" 
     	p:basenames-ref="resourceBundleNameRegistry" p:fallbackToSystemLocale="false"/>
 
-	<bean id="resourceBundleNameRegistry" class="de.stefanocke.japkit.roo.quickstart.web.ResourceBundleNameRegistry" 
+	<bean id="resourceBundleNameRegistry" class="de.stefanocke.japkit.roo.base.web.ResourceBundleNameRegistry" 
 		p:path="WEB-INF/i18n/" p:common="application,messages" />
 	
 	
@@ -79,5 +79,5 @@
       </list>
     </property>
   </bean>
-<bean class="de.stefanocke.japkit.roo.quickstart.web.ApplicationConversionServiceFactoryBean" id="applicationConversionService"/>
+<bean class="de.stefanocke.japkit.roo.base.web.ApplicationConversionServiceFactoryBean" id="applicationConversionService"/>
 </beans>

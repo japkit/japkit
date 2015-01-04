@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
+import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Template;
@@ -29,7 +31,7 @@ import de.stefanocke.japkit.roo.base.web.ResourceBundleNameProvider;
 @RuntimeMetadata
 @Template(
 		templates={@TemplateCall(ControllerMembers.Create.class), @TemplateCall(ControllerMembers.Update.class)})
-public abstract class ControllerMembers implements ResourceBundleNameProvider{
+public abstract class ControllerMembers {
 	@ClassSelector
 	class ApplicationService{}
 	
@@ -106,15 +108,24 @@ public abstract class ControllerMembers implements ResourceBundleNameProvider{
 	@Field(initLang="GroovyScript")  //TODO: Modus, der wie bei AVs funktioniert, damit man den Wert auch direkt setzen kann
 	public static String[] UPDATE_COMMANDS;
 	
-	/**
-	 * @japkit.bodyCode <pre>
-	 * <code>	
-	 * return new String[]{<%= (updateCommands.toSet() + createCommands.toSet()).collect{'"'+path+'/'+it.simpleName+'"'}.join(', ') %>};
-	 * </code>
-	 * </pre>
-	 */
-	@Method(bodyLang="GStringTemplateInline")
-	public abstract String[] getResourceBundleBaseNames();
+	
+	@Clazz(nameExpr="#{fboName}ResourceBundleNameProvider")
+	@Template
+	@Component
+	public abstract class ResourceBundleNameProviderForCommands implements ResourceBundleNameProvider{
+		/**
+		 * @japkit.bodyCode <pre>
+		 * <code>	
+		 * return new String[]{<%= (updateCommands.toSet() + createCommands.toSet()).collect{'"'+path+'/'+it.simpleName+'"'}.join(', ') %>};
+		 * </code>
+		 * </pre>
+		 */
+		@Method(bodyLang="GStringTemplateInline")
+		public abstract String[] getResourceBundleBaseNames();
+	}
+	
+	
+	
 	
 	@Template(src="#{updateCommands}", srcVar="cmdMethod", 
 			vars={@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),

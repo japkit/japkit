@@ -1,4 +1,4 @@
-package de.stefanocke.japkit.roo.quickstart.web;
+package de.stefanocke.japkit.roo.petclinic;
 
 import de.stefanocke.japkit.roo.japkit.web.JapkitWebApplication;
 

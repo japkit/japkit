@@ -20,4 +20,23 @@
 		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jspx" />
 	</definition>
 
+	<definition name="index" extends="default">
+		<put-attribute name="body" value="/WEB-INF/views/index.jspx" />
+	</definition>
+
+	<definition name="dataAccessFailure" extends="public">
+		<put-attribute name="body"
+			value="/WEB-INF/views/dataAccessFailure.jspx" />
+	</definition>
+
+	<definition name="resourceNotFound" extends="public">
+		<put-attribute name="body"
+			value="/WEB-INF/views/resourceNotFound.jspx" />
+	</definition>
+
+	<definition name="uncaughtException" extends="public">
+		<put-attribute name="body"
+			value="/WEB-INF/views/uncaughtException.jspx" />
+	</definition>
+
 </tiles-definitions>

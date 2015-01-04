@@ -1,12 +1,10 @@
-package de.stefanocke.japkit.roo.quickstart.web;
+package de.stefanocke.japkit.roo.base.web;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import de.stefanocke.japkit.roo.base.web.ResourceBundleNameProvider;
 
 public class ResourceBundleNameRegistry implements FactoryBean<String[]>{
 	@Autowired(required=false)
