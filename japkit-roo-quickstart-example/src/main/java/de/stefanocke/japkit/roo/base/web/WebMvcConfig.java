@@ -18,9 +18,6 @@ import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
 @ComponentScan
 public class WebMvcConfig extends WebMvcConfigurerAdapter{
 	/**
-	 * Initialise Tiles on application startup and identify the location of the
-	 * tiles configuration file, tiles.xml.
-	 *
 	 * @return tiles configurer
 	 */
 	@Bean
