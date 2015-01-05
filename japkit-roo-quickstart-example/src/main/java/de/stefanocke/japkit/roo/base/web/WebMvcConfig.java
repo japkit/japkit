@@ -1,10 +1,8 @@
 package de.stefanocke.japkit.roo.base.web;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.convert.converter.Converter;
@@ -18,6 +16,7 @@ import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
 
 @Configuration
+@ComponentScan
 public class WebMvcConfig extends WebMvcConfigurerAdapter{
 	/**
 	 * Initialise Tiles on application startup and identify the location of the
@@ -71,21 +70,14 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter{
 		return resolver;
 	}
 	
-	@Autowired(required=false)
-	private List<ConverterProvider> converterProviders = new ArrayList<ConverterProvider>();
+	@Bean
+	public Converters converters(){
+		return new Converters();
+	}; 
 	
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
-		for (ConverterProvider provider : converterProviders) {
-			provider.registerConverters(registry);	
-		}
-		registry.addConverter(new Converter<Object, String>() {
-
-			@Override
-			public String convert(Object source) {
-				return source.toString();
-			}
-		});
+		converters().registerConverters(registry);
 	}
 	
 }
