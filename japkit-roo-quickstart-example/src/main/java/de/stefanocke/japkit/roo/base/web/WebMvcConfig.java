@@ -1,15 +1,14 @@
 package de.stefanocke.japkit.roo.base.web;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.ui.context.ThemeSource;
 import org.springframework.ui.context.support.ResourceBundleThemeSource;
 import org.springframework.web.servlet.ThemeResolver;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.theme.CookieThemeResolver;
 import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
@@ -73,11 +72,16 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter{
 	@Bean
 	public Converters converters(){
 		return new Converters();
-	}; 
+	} 
 	
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
 		converters().registerConverters(registry);
+	}
+	
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		registry.addViewController("/").setViewName("index");
 	}
 	
 }
