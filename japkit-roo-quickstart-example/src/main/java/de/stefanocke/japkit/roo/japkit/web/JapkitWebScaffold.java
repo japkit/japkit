@@ -64,7 +64,7 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 		templates = {
 				@TemplateCall(ControllerMembers.class),
 				@TemplateCall(ControllerMembersJpaRepository.class) ,
-				@TemplateCall(ControllerConverterProviderMembers.class)
+				@TemplateCall(ControllerFormatterMembers.class)
 				})
 @ResourceTemplate.List({
 		@ResourceTemplate(src="#{createCommands.get(0)}", srcVar="cmdMethod", 

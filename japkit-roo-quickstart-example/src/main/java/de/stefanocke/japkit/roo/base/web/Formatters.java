@@ -5,15 +5,16 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.converter.ConverterRegistry;
+import org.springframework.format.FormatterRegistrar;
+import org.springframework.format.FormatterRegistry;
 
-public class Converters {
+public class Formatters {
 	@Autowired(required=false)
-	private List<ConverterProvider> converterProviders = new ArrayList<ConverterProvider>();
+	private List<FormatterRegistrar> formatterRegistrars = new ArrayList<FormatterRegistrar>();
 	
-	public void registerConverters(ConverterRegistry registry){
-		for (ConverterProvider provider : converterProviders) {
-			provider.registerConverters(registry);	
+	public void registerConverters(FormatterRegistry registry){
+		for (FormatterRegistrar provider : formatterRegistrars) {
+			provider.registerFormatters(registry);	
 		}
 		registry.addConverter(new Converter<Object, String>() {
 

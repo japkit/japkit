@@ -67,13 +67,13 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter{
 	}
 	
 	@Bean
-	public Converters converters(){
-		return new Converters();
+	public Formatters formatters(){
+		return new Formatters();
 	} 
 	
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
-		converters().registerConverters(registry);
+		formatters().registerConverters(registry);
 	}
 	
 	@Override
