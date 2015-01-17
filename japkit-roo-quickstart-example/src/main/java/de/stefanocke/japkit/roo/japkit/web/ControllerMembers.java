@@ -3,7 +3,6 @@ package de.stefanocke.japkit.roo.japkit.web;
 import java.util.Arrays;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Component;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Clazz;
@@ -54,14 +54,15 @@ public abstract class ControllerMembers {
 		 * }
 		 * uiModel.asMap().clear();
 		 * #{fbo.code} fbo =  applicationService.#{cmdMethod.simpleName}(#{cmdName});
-		 * return "redirect:/#{path}/" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);
+		 * redirectAttributes.addAttribute("id", fbo.getId());
+		 * return "redirect:/#{path}/{id}";
 		 * </code>
 		 * </pre>
 		 */
 		@Method(imports = ControllerUtil.class)
 		@RequestMapping(method = RequestMethod.POST, produces = "text/html")
 		public abstract String create(@Valid Command $cmdName$, BindingResult bindingResult, Model uiModel,
-				HttpServletRequest httpServletRequest);
+				RedirectAttributes redirectAttributes);
 	
 		@ClassSelector
 		class Command{}
@@ -142,14 +143,15 @@ public abstract class ControllerMembers {
 		 * }
 		 * uiModel.asMap().clear();
 		 * applicationService.#{cmdMethodName}(#{cmdName});
-		 * return "redirect:/#{path}/" + ControllerUtil.encodeUrlPathSegment(#{cmdName}.getId().toString(), httpServletRequest);
+		 * redirectAttributes.addAttribute("id", #{cmdName}.getId());
+		 * return "redirect:/#{path}/{id}";
 		 * </code>
 		 * </pre>
 		 */
 		@Method(imports = ControllerUtil.class)
 		@RequestMapping(value = "/$cmdMethodName$", method = RequestMethod.POST, produces = "text/html")
 		public abstract String $cmdName$(@Valid Command $cmdName$, BindingResult bindingResult, Model uiModel,
-				HttpServletRequest httpServletRequest);
+				RedirectAttributes redirectAttributes);
 	
 		@ClassSelector
 		class Command{}
@@ -246,36 +248,6 @@ public abstract class ControllerMembers {
 	public abstract String list(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size",
 			required = false) Integer size, @RequestParam(value = "sortFieldName", required = false) String sortFieldName, @RequestParam(
 			value = "sortOrder", required = false) String sortOrder, Model uiModel);
-
-	/**
-	 * @japkit.bodyCode <pre>
-	 * <code>
-	 * if (bindingResult.hasErrors()) {
-	 * 	populateEditForm(uiModel, fbo);
-	 * 	return "#{path}/update";
-	 * }
-	 * uiModel.asMap().clear();
-	 * crudOperations().merge(fbo);
-	 * return "redirect:/#{path}/" + ControllerUtil.encodeUrlPathSegment(fbo.getId().toString(), httpServletRequest);
-	 * </code>
-	 * </pre>
-	 */
-	@Method(imports = ControllerUtil.class)
-	@RequestMapping(produces = "text/html", method = RequestMethod.PUT)
-	public abstract String update(@Valid FormBackingObject fbo, BindingResult bindingResult, Model uiModel,
-			HttpServletRequest httpServletRequest);
-
-	/**
-	 * @japkit.bodyCode <pre>
-	 * <code>
-	 * populateEditForm(uiModel, crudOperations().find(id)); 
-	 * return "${path}/update";
-	 * </code>
-	 * </pre>
-	 */
-	@Method
-	@RequestMapping(value = "/{id}", params = "form", produces = "text/html")
-	public abstract String updateForm(@PathVariable("id") Long id, Model uiModel);
 
 	/**
 	 * @japkit.bodyCode <pre>
