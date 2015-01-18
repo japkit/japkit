@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.roo.base.web;
 
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.converter.ConverterRegistry;
+import org.springframework.format.FormatterRegistry;
 
 /**
  * TODO: Composite keys?
@@ -12,11 +12,11 @@ import org.springframework.core.convert.converter.ConverterRegistry;
  */
 public class EntityConverterUtil {
 
-	public static <E> void registerConverters(Class<E> entityClass, ConverterRegistry converterRegistry, CrudOperations<E> crudOperations,
+	public static <E> void registerConverters(Class<E> entityClass, FormatterRegistry formatterRegistry, CrudOperations<E> crudOperations,
 			LabelProvider<E> labelProvider) {
-		converterRegistry.addConverter(entityClass, String.class, getEntityToStringConverter(labelProvider));
-		converterRegistry.addConverter(Long.class, entityClass, getIdToEntityConverter(crudOperations));
-		converterRegistry.addConverter(String.class, entityClass, getStringToEntityConverter(crudOperations));
+		formatterRegistry.addConverter(entityClass, String.class, getEntityToStringConverter(labelProvider));
+		formatterRegistry.addConverter(Long.class, entityClass, getIdToEntityConverter(crudOperations));
+		formatterRegistry.addConverter(String.class, entityClass, getStringToEntityConverter(crudOperations));
 	}
 
 	public static <E> Converter<E, String> getEntityToStringConverter(final LabelProvider<E> labelProvider) {
