@@ -47,8 +47,7 @@ public abstract class ValueObjectTemplate {
 	static class validationFragment{}
 	
 	@CodeFragment(imports = Date.class,
-			cases = { @Case(matcher = @Matcher(type = Date.class),
-					expr = "new Date(#{surrounded}.getTime())") })
+			cases = { @Case(cond = "isDate", value = "new Date(#{surrounded}.getTime())") })
 	static class defensiveCopyFragment {
 	}
 

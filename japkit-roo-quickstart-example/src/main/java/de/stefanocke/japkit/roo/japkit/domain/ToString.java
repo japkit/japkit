@@ -25,8 +25,8 @@ public abstract class ToString {
 			
 			bodyCases={
 				//Only summary for collections
-				@Case(matcher=@Matcher(typeCategory=TypeCategory.COLLECTION), 
-						expr = "append(\"#{src.simpleName}\", #{src.getter.simpleName}(), false)."),
+				@Case(cond="isCollection", 
+						value = "append(\"#{src.simpleName}\", #{src.getter.simpleName}(), false)."),
 			},
 			bodyCode = "append(\"#{src.simpleName}\", #{src.getter.simpleName}()).",
 			bodyAfterIteratorCode = "toString();",

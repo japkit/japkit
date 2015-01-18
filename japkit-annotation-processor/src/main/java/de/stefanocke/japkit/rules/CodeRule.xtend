@@ -28,7 +28,7 @@ class CodeRule extends AbstractRule implements Function0<CharSequence>, Function
 	String iteratorExpr
 	String iteratorLang
 	String bodyExpr
-	List<Pair<List<ElementMatcher>, String>> bodyCases
+	List<Pair<String, String>> bodyCases
 	String lang
 	String beforeExpr
 	String afterExpr
@@ -56,8 +56,8 @@ class CodeRule extends AbstractRule implements Function0<CharSequence>, Function
 		val bodyCaseAnnotations = metaAnnotation?.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
 		
 		bodyCases = bodyCaseAnnotations?.map[
-			elementMatchers('matcher') 
-			-> value('expr', String)
+			value('cond', String) 
+			-> value('value', String)
 		]?.toList ?: emptyList
 
 
@@ -200,10 +200,10 @@ class CodeRule extends AbstractRule implements Function0<CharSequence>, Function
 	}
 	
 	
-	private def CharSequence code(List<Pair<List<ElementMatcher>, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
+	private def CharSequence code(List<Pair<String, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
 		val bodyExprToUse = bodyCases.findFirst[
-			val matcher = key
-			!matcher.nullOrEmpty && matcher.exists[currentSrc instanceof Element && matches(currentSrcElement)]
+			val cond = key
+			!cond.nullOrEmpty && eval(cond, lang, Boolean, "Error in condition", false)
 		]?.value ?: bodyExpr
 		
 		

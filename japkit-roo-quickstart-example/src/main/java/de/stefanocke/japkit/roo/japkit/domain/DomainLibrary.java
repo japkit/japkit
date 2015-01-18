@@ -1,5 +1,7 @@
 package de.stefanocke.japkit.roo.japkit.domain;
 
+import java.util.Date;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
@@ -29,6 +31,9 @@ public class DomainLibrary {
 	@Matcher(singleValueTypeCategory = TypeCategory.TEMPORAL)
 	class isDatetime{}
 	
+	@Matcher(type = Date.class)
+	class isDate{}
+	
 	@Function(expr="#{src.DateTimeFormat.style}")
 	class dateTimeFormatStyle{}
 	
@@ -46,4 +51,7 @@ public class DomainLibrary {
 	
 	@Function(expr = "#{src.Pattern.regexp}")
 	class regexp{}
+	
+	@Matcher(typeCategory=TypeCategory.COLLECTION)
+	class isCollection{}
 }

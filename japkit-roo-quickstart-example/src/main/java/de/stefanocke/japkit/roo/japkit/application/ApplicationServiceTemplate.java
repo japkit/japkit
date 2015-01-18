@@ -68,16 +68,16 @@ public class ApplicationServiceTemplate {
 					iterator="#{src.parameters}" , 
 					separator = ",",  
 					cases={
-							@Case(matcher=@Matcher(condition="#{findGetter(cmdProperties, src)==null}"), expr="null"),
-							@Case(matcher=@Matcher(condition="#{src.asType().asElement.ValueObject != null}"), 
-								expr="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
+							@Case(cond ="#{findGetter(cmdProperties, src)==null}", value="null"),
+							@Case(cond ="#{src.asType().asElement.ValueObject != null}", 
+								value="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
 					},
 					code="command.#{findGetter(cmdProperties, src).simpleName}()")
 		static class paramsFromCommand{}
 
 		@CodeFragment(vars={
 				@Var(name="dtoGetter", expr="#{findGetter(cmdProperties, src)}"),
-				@Var(name="dto", expr="#{dtoGetter.returnType.asElement}"),
+				@Var(name="dto", expr="#{dtoGetter.returnType.asElement}")
 				}, 
 				iterator="#{dto.properties}" ,
 				code=".#{src.setter.simpleName}(command.#{dtoGetter.simpleName}().#{src.getter.simpleName}())") //Quick&Dirty
@@ -162,14 +162,15 @@ public class ApplicationServiceTemplate {
 	
 		
 		@Template(
-				vars={@Var(name="fieldTypeElement", expr="#{src.asType().asElement}"), @Var(name="fieldType", expr = "#{src.asType()}")},
+				vars={@Var(name="fieldTypeElement", expr="#{src.asType().asElement}"), 
+						@Var(name="fieldType", expr = "#{src.asType()}")},
 						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 								getter=@Getter, setter=@Setter)
 		)
 		public static class CommandFieldTemplate{
 			
 			@Order(1)
-			@Clazz(activation=@Matcher(condition="#{fieldTypeElement.ValueObject != null}"),
+			@Clazz(activation=@Matcher(condition="#{src.isVO}"),
 					src="#{fieldTypeElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
 					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
 			@ResultVar("fieldType")
