@@ -13,7 +13,7 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
-class ElementMatcher extends AbstractNoArgFunctionRule<Boolean>{
+class ElementMatcher extends AbstractFunctionRule<Boolean>{
 
 	String srcExpr
 	String srcLang

@@ -36,7 +36,7 @@ class LibraryRule extends AbstractRule implements Procedure0 {
 	}
 	
 	def createAnnotationFunction(TypeMirror annotationType) {
-		new AbstractNoArgFunctionRule<AnnotationMirror>(metaAnnotation, metaElement as TypeElement, AnnotationMirror) {
+		new AbstractFunctionRule<AnnotationMirror>(metaAnnotation, metaElement as TypeElement, AnnotationMirror) {
 
 			override protected evalInternal() {
 				_eLSupport.getCurrentSrcElement().annotationMirror(annotationType.qualifiedName)

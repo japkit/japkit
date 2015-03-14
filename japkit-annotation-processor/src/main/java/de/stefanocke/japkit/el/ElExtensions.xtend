@@ -18,7 +18,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.stefanocke.japkit.services.ExtensionRegistry.*
 import javax.lang.model.type.DeclaredType
-import de.stefanocke.japkit.rules.AbstractNoArgFunctionRule
+import de.stefanocke.japkit.rules.AbstractFunctionRule
 import java.util.ArrayList
 
 class ElExtensions {
@@ -242,7 +242,7 @@ class ElExtensions {
 	}
 	
 	def static invoke(Object functionObject, Object base, Object[] params) {
-		if(functionObject instanceof AbstractNoArgFunctionRule<?>){
+		if(functionObject instanceof AbstractFunctionRule<?>){
 			if(functionObject.mustBeCalledWithParams){
 				if(base==null){
 					return functionObject.evalWithParams(params)

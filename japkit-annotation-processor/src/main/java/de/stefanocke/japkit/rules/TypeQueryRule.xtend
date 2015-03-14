@@ -13,7 +13,7 @@ import static extension de.stefanocke.japkit.util.MoreCollectionExtensions.filte
 import javax.lang.model.element.Element
 
 @Data
-class TypeQueryRule extends AbstractNoArgFunctionRule<Object> {
+class TypeQueryRule extends AbstractFunctionRule<Object> {
 		
 	TypeMirror triggerAnnotation
 	Boolean shadow	

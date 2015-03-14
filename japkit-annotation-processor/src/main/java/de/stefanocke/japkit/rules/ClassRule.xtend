@@ -123,7 +123,7 @@ class ClassRule extends AbstractRule{
 				varRules?.forEach[it.putELVariable]
 				//superclass with type args
 				val generatedClass = createClass(enclosingClass, name)
-				if(isIsAuxClass){
+				if(isAuxClass){
 					//early registration of aux classes to allow other aux classes to find them.
 					currentPrimaryGenClass.auxTopLevelClasses.add(generatedClass)
 					generatedClass.auxClass = true

@@ -5,7 +5,7 @@ import javax.lang.model.element.Element
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
-class FunctionRule extends AbstractNoArgFunctionRule<Object> {
+class FunctionRule extends AbstractFunctionRule<Object> {
 	
 	String expr
 	String lang

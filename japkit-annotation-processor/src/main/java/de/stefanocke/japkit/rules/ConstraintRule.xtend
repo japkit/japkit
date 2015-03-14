@@ -5,6 +5,7 @@ import javax.lang.model.element.Element
 import javax.tools.Diagnostic.Kind
 import org.eclipse.xtend.lib.annotations.Data
 
+//TODO: Move this into srcRule to allow constraints at all places where a new child context is entered
 @Data
 class ConstraintRule extends AbstractRule{
 	

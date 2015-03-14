@@ -121,7 +121,7 @@ class TypeResolver {
 			val function = createFunctionRule(te);
 			
 			if(function!=null){
-				if(function instanceof AbstractNoArgFunctionRule<?>){
+				if(function instanceof AbstractFunctionRule<?>){
 					val result = function.apply
 					if(result == null || result instanceof TypeMirror){
 						return result as TypeMirror
@@ -129,7 +129,7 @@ class TypeResolver {
 						reportRuleError('''«te.qualifiedName» cannot be used as type since it's result is not a TypeMirror but «result».''')
 					}
 				} else {
-					reportRuleError('''«te.qualifiedName» cannot be used as type since it is not a no-arg function.''')
+					reportRuleError('''«te.qualifiedName» cannot be used as type since it is not a function.''')
 				}
 			}
 		}

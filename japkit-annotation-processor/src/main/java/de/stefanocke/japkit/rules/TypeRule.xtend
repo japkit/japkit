@@ -15,7 +15,7 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
-class TypeRule extends AbstractNoArgFunctionRule<TypeMirror> {
+class TypeRule extends AbstractFunctionRule<TypeMirror> {
 	
 	ClassSelectorKind kind
 	Set<TypeMirror> requiredTriggerAnnotation

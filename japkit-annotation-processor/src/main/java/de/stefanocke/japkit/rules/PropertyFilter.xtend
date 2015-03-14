@@ -17,7 +17,7 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
-class PropertyFilter extends AbstractNoArgFunctionRule<List>{
+class PropertyFilter extends AbstractFunctionRule<List>{
 	val transient extension ElementsExtensions jme = ExtensionRegistry.get(ElementsExtensions)
 	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
