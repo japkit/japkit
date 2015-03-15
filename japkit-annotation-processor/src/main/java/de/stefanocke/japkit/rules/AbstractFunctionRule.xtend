@@ -32,7 +32,7 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements Function1
 	
 	def List<Pair<Class<?>, String>> createParams(Element element){
 		if(element instanceof ExecutableElement){
-			element.parameters.map[p | p.asType.loadClass -> p.simpleName.toString]
+			element.parametersWithSrcNames.map[p | p.asType.loadClass -> p.simpleName.toString]
 		} else null
 	}
 	
