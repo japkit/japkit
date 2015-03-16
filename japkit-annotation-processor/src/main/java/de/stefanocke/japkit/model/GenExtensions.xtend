@@ -17,9 +17,11 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.rules.TypeResolver
 
 class GenExtensions {
 	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
+	val transient extension TypeResolver = ExtensionRegistry.get(TypeResolver)
 	
 	def createOverride(ExecutableElement m, CodeBody b) {
 		//TODO: Check, if method can be overridden?
@@ -68,7 +70,7 @@ class GenExtensions {
 				annotationMirrors = m.copyAnnotations
 			}
 			if(m.kind == ElementKind.METHOD){
-				returnType = typeTransformer.apply(m.returnType)
+				returnType = typeTransformer.apply(m.returnType)?.resolveType  //resolveType is called since we don't want to copy ErrorTypes
 			
 			}
 			setThrownTypes(m.thrownTypes.map[typeTransformer.apply(it)])
@@ -98,7 +100,7 @@ class GenExtensions {
 	
 	//Copy a field 
 	def dispatch copyFrom(VariableElement ve, boolean copyAnnotations, (TypeMirror)=>TypeMirror typeTransformer) {
-		new GenField(ve.simpleName, typeTransformer.apply(ve.asType)) => [
+		new GenField(ve.simpleName, typeTransformer.apply(ve.asType?.resolveType)) => [
 			modifiers = ve.modifiers
 			if (copyAnnotations) {
 				annotationMirrors = ve.copyAnnotations

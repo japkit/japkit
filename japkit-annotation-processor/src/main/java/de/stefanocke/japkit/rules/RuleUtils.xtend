@@ -308,7 +308,7 @@ class RuleUtils {
 	}
 	
 	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avPrefix) {
-		createTypeRule(metaAnnotation, template, "type", avPrefix, [| currentSrcElement.srcType])
+		createTypeRule(metaAnnotation, template, "type", avPrefix, [| currentSrcElement.srcType?.resolveType])
 	}
 	
 	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avName,

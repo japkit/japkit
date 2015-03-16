@@ -15,6 +15,7 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
+import de.stefanocke.japkit.model.GenDeclaredType
 
 /**Resolves type references / class selectors from templates and annotations.*/
 class TypeResolver {
@@ -76,6 +77,9 @@ class TypeResolver {
 		try {			
 			var type = resolveTypeFunctionIfNecessary(selector)
 			
+			//Always try to resolve error type if the type is required
+			type = if(type instanceof ErrorType && required) type.asTypeElement.asType else type
+			
 			//TODO: Wird das hier wirklich noch benötigt oder ist das redundant zu anderen Mechanismen (tenfe)?
 			if (type != null && required) {
 				currentAnnotatedClass.registerTypeDependencyForAnnotatedClass(type)
@@ -108,31 +112,35 @@ class TypeResolver {
 	 */
 	def private TypeMirror resolveTypeFunctionIfNecessary(TypeMirror type) {
 
-		if (type instanceof DeclaredType && !(type instanceof ErrorType)) {
-			val TypeElement te = try {
+			if (type instanceof DeclaredType && !(type instanceof ErrorType)) {
 				//zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): Arrays mit UnresolvedTypeBindings werden nicht resolved.
 				//TODO: Ist das schon in ElementsExtensions geregelt?
-				getTypeElement(type.asTypeElement.qualifiedName)
-			} catch (TypeElementNotFoundException tenfe) {
-				null
-			}
-			
-			//if it is a function, call it and return the resulting type
-			val function = createFunctionRule(te);
-			
-			if(function!=null){
-				if(function instanceof AbstractFunctionRule<?>){
-					val result = function.apply
-					if(result == null || result instanceof TypeMirror){
-						return result as TypeMirror
+				var TypeElement te = type.asTypeElement
+				if(!(type instanceof GenDeclaredType)){
+					te =  getTypeElement(te.qualifiedName)		
+					if(te==null){
+						throw new TypeElementNotFoundException(te.qualifiedName.toString)
+					}		
+				}
+		
+				//if it is a function, call it and return the resulting type
+				val function = createFunctionRule(te);
+				
+				if(function!=null){
+					if(function instanceof AbstractFunctionRule<?>){
+						val result = function.apply
+						if(result == null || result instanceof TypeMirror){
+							return result as TypeMirror
+						} else {
+							reportRuleError('''«te.qualifiedName» cannot be used as type since it's result is not a TypeMirror but «result».''')
+						}
 					} else {
-						reportRuleError('''«te.qualifiedName» cannot be used as type since it's result is not a TypeMirror but «result».''')
+						reportRuleError('''«te.qualifiedName» cannot be used as type since it is not a function.''')
 					}
-				} else {
-					reportRuleError('''«te.qualifiedName» cannot be used as type since it is not a function.''')
 				}
 			}
-		}
+		
+		
 		
 		type
 	}

@@ -395,10 +395,16 @@ class TypesExtensions /**implements Types*/{
 	}
 	
 	def dispatch boolean isSubtype(GenDeclaredType t1, TypeMirror t2) {
+		if(!(t2 instanceof DeclaredType)){
+			return false;
+		}
 		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtype(t2)  //TODO: What about type args here?
 	}
 	
 	def dispatch boolean isSubtype(DeclaredType t1, GenTypeMirror t2) {
+		if(!(t2 instanceof DeclaredType)){
+			return false;
+		}
 		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtype(t2)  //TODO: What about type args here?
 	}
 	
