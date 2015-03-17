@@ -17,7 +17,7 @@ import javax.lang.model.element.Name
 import static de.stefanocke.japkit.services.ElementsExtensions.VISIBILITY_MODIFIERS
 
 @FieldsFromInterface
-abstract class GenElement implements Element{
+abstract class GenElement extends GenAnnotatedConstruct implements Element{
 	
 	@Required
 	Name simpleName
@@ -34,10 +34,6 @@ abstract class GenElement implements Element{
 	
 	override asType() {
 		throw new UnsupportedOperationException("asType() is not supported for "+this)
-	}
-	
-	override <A extends Annotation> A getAnnotation(Class<A> annotationType){
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 	
 	override abstract ElementKind getKind()

@@ -14,7 +14,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
 
 @FieldsFromInterface
-abstract class GenExecutableElement extends GenParameterizable implements ExecutableElement {
+abstract class GenExecutableElement extends GenJava8ExecutableElement implements ExecutableElement {
 	
 	CodeBody body
 	AnnotationValue defaultValue
@@ -81,5 +81,6 @@ abstract class GenExecutableElement extends GenParameterizable implements Execut
 			ExtensionRegistry.get(TypesExtensions).getNoType(TypeKind.VOID) 
 			else returnType
 	}
+	
  	
 }

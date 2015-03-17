@@ -7,7 +7,7 @@ import javax.lang.model.element.VariableElement
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
-class ParameterWrapper implements VariableElement {
+class ParameterWrapper extends GenAnnotatedConstruct implements VariableElement {
 	VariableElement delegate;
 	Name name;
 	

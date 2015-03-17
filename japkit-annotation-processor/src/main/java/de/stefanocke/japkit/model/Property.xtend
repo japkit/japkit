@@ -10,7 +10,7 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
-class Property implements VariableElement {
+class Property extends GenAnnotatedConstruct implements VariableElement {
 
 	/** The type of the property. */
 	TypeMirror type //TODO: Redundant?

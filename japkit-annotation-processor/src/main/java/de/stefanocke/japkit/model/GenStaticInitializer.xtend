@@ -11,4 +11,5 @@ class GenStaticInitializer extends GenExecutableElement implements ExecutableEle
 	
 	public static val simpleName_default = "<clinit>"
 	
+	
 }
