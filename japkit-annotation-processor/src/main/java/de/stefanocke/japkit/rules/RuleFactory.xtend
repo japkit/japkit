@@ -83,7 +83,7 @@ class RuleFactory {
 	}
 	
 	
-	val functionCache = new HashMap<Element, Rule>
+	val functionCache = new HashMap<Element, IParameterlessFunctionRule<?>>
 	
 	/**
 	 * Creates a function rule if the element has a function annotation. Otherwise returns null.
@@ -92,7 +92,7 @@ class RuleFactory {
 		getOrCreate(functionCache, element, [createFunctionInternal(element)])
 	}
 	
-	private static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, Element)=>AbstractRule>> 
+	private static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, Element)=>IParameterlessFunctionRule<?>>> 
 		functionFactories = #[
 			CodeFragment->[am, e | new CodeFragmentRule(am, e)],
 			Function->[am, e | new FunctionRule(am, e)],

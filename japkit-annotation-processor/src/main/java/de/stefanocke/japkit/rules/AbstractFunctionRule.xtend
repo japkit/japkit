@@ -2,21 +2,19 @@ package de.stefanocke.japkit.rules
 
 import de.stefanocke.japkit.services.TypeElementNotFoundException
 import java.lang.reflect.Array
+import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.TypeMirror
-import org.eclipse.xtend.lib.annotations.Data
-import org.eclipse.xtext.xbase.lib.Functions.Function0
-import org.eclipse.xtext.xbase.lib.Functions.Function1
 import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
-import java.util.List
-import javax.lang.model.element.ExecutableElement
+import javax.lang.model.type.TypeMirror
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
-abstract class AbstractFunctionRule<T> extends AbstractRule implements Function1<Object, T>,  Function0<T>{
+abstract class AbstractFunctionRule<T> extends AbstractRule implements IParameterlessFunctionRule<T>{
 	
 	Class<T> type
 	
@@ -26,7 +24,7 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements Function1
 		super(metaAnnotation, metaElement)
 		params = createParams(metaElement)
 		val typeAV = metaAnnotation.value("type", TypeMirror)
-		this.type = type ?: typeAV.loadClass as Class<T>
+		this.type = (type ?: typeAV?.loadClass ?: Object) as Class<T>
 	}
 	
 	def List<Pair<Class<?>, String>> createParams(Element element){

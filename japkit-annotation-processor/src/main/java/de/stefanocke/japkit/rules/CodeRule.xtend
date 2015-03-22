@@ -15,11 +15,9 @@ import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend2.lib.StringConcatenation
-import org.eclipse.xtext.xbase.lib.Functions.Function0
-import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 @Data
-class CodeRule extends AbstractRule implements Function0<CharSequence>, Function1<Object, CharSequence> {
+class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSequence> {
 
 	val protected transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 

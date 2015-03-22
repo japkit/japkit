@@ -24,12 +24,14 @@ import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.ResultVar;
 import de.stefanocke.japkit.metaannotations.Setter;
+import de.stefanocke.japkit.metaannotations.Switch;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.metaannotations.classselectors.BehaviorInnerClassWithGenClassPrefix;
 import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
+import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary.isVO;
 
 @RuntimeMetadata
 @Service
@@ -162,8 +164,7 @@ public class ApplicationServiceTemplate {
 	
 		
 		@Template(
-				vars={@Var(name="fieldTypeElement", expr="#{src.asType().asElement}"), 
-						@Var(name="fieldType", expr = "#{src.asType()}")},
+				vars={@Var(name="fieldTypeElement", expr="#{src.asType().asElement}")},
 						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 								getter=@Getter, setter=@Setter)
 		)
@@ -173,11 +174,14 @@ public class ApplicationServiceTemplate {
 			@Clazz(activation=@Matcher(condition="#{src.isVO}"),
 					src="#{fieldTypeElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
 					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
-			@ResultVar("fieldType")
+			@ResultVar("dtoClass")
 			@DTO
 			public class DTOClass{}	
 			
-			@ClassSelector()
+			@Switch({
+				@Case(condFunction=isVO.class, value="#{dtoClass.asType()}"),
+				@Case(cond="#{true}", value = "#{src.asType()}" )
+			})
 			class FieldType{}
 			
 			@Order(2)			

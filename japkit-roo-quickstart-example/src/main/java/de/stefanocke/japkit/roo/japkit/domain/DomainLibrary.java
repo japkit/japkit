@@ -20,10 +20,10 @@ public class DomainLibrary {
 	class findRepository{}
 	
 	@Matcher(singleValueTypeAnnotations = JapkitEntity.class)
-	class isEntity{}
+	public class isEntity{}
 	
 	@Matcher(singleValueTypeAnnotations = ValueObject.class)
-	class isVO{}
+	public class isVO{}
 	
 	
 	// Some matchers for categorizing properties

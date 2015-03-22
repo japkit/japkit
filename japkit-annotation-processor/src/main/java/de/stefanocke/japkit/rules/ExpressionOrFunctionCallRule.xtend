@@ -13,7 +13,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 	String functionAvName
 	String expr
 	String lang
-	Rule function
+	()=>Object function
 	
 	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type, String exprAvName, String langAvName, String functionAvName) {
 		super(metaAnnotation, metaElement, type)
@@ -31,11 +31,11 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 		if(!expr.nullOrEmpty){
 			eval(expr, lang, type)
 		} else if(function != null) {
-			val result = function.apply
+			val result = function.apply()
 			if(!type.isInstance(result)){
 				reportRuleError('''The function «function» returned «result» of type «result?.class», but the required type is «type»''')
 			}
-			result
+			result as T
 		} else {
 			//TODO: Move this check to constructor but still provide proper error msg location
 			reportRuleError('''Either «exprAvName» or «functionAvName» must be set or «metaElement» must be a function.''')
