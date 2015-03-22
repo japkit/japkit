@@ -15,7 +15,6 @@ import javax.lang.model.type.TypeKind
 import java.util.List
 import javax.lang.model.element.ExecutableElement
 
-////TODO: The name is not correct any,ore, since params are supported. Clients must use mustBeCalledWithParams to determine whether params are required or not.
 @Data
 abstract class AbstractFunctionRule<T> extends AbstractRule implements Function1<Object, T>,  Function0<T>{
 	
