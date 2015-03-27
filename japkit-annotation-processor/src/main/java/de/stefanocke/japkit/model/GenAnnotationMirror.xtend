@@ -21,7 +21,7 @@ class GenAnnotationMirror implements AnnotationMirror {
 	@Required
 	DeclaredType annotationType
 	
-	Map<ExecutableElement, GenAnnotationValue> elementValues = newHashMap
+	Map<ExecutableElement, GenAnnotationValue> elementValues = newLinkedHashMap
 	
 	def setValue(String name, (TypeMirror)=>GenAnnotationValue valueFactory){
 		val exEl = getAVMethod(name, true)
