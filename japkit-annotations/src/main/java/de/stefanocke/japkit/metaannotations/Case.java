@@ -6,11 +6,11 @@ public @interface Case {
 	
 	String condLang() default "";
 	
-	Class<?>[] condFunction() default {};
+	Class<?>[] condFun() default {};
 	
 	String value() default "";
 	
 	String valueLang() default "";
 	
-	Class<?>[] valueFunction() default {};
+	Class<?>[] valueFun() default {};
 }

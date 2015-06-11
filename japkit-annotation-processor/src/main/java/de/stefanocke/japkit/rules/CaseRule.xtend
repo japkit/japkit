@@ -8,7 +8,7 @@ import org.eclipse.xtend.lib.annotations.Data
 import java.util.List
 
 /** A case rule at first checks, if the condition matches. 
- * If so, it evaluates the value expression or function an returns the result.
+ * If so, it evaluates the value expression or function and returns the result.
  */
 @Data
 class CaseRule<T> extends AbstractRule implements Function0<Pair<Boolean, T>>{
@@ -19,11 +19,11 @@ class CaseRule<T> extends AbstractRule implements Function0<Pair<Boolean, T>>{
 	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type) {
 		super(metaAnnotation, metaElement)
 		
-		conditionRule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, "cond", "condLang", "condFunction")
+		conditionRule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, "cond", "condLang", "condFun")
 		
 		// Note: the metaElement is passed in here to allow the Case annotation to be located on a function instead
 		// of referring to a function.
-		valueRule = new ExpressionOrFunctionCallRule<T>(metaAnnotation, metaElement, type, "value", "valueLang", "valueFunction")
+		valueRule = new ExpressionOrFunctionCallRule<T>(metaAnnotation, metaElement, type, "value", "valueLang", "valueFun")
 	}
 	
 	/**

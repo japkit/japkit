@@ -179,7 +179,7 @@ public class ApplicationServiceTemplate {
 			public class DTOClass{}	
 			
 			@Switch({
-				@Case(condFunction=isVO.class, value="#{dtoClass.asType()}"),
+				@Case(condFun=isVO.class, value="#{dtoClass.asType()}"),
 				@Case(cond="#{true}", value = "#{src.asType()}" )
 			})
 			class FieldType{}
