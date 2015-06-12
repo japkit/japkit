@@ -22,6 +22,13 @@ public @interface Param {
 	 * @return
 	 */
 	String src() default "";
+
+	/**
+	 * As an alternative to the src expression, a function can be called to determine the source object.
+	 * 
+	 * @return
+	 */
+	Class<?>[] srcFun() default {};
 	
 	/**
 	 * A filter expression to be applied to src in case it is a collection. Must be boolean. 

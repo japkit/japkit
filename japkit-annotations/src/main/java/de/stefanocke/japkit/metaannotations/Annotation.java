@@ -41,6 +41,13 @@ public @interface Annotation {
 	 * @return
 	 */
 	String src() default "";
+	
+	/**
+	 * As an alternative to the src expression, a function can be called to determine the source object.
+	 * 
+	 * @return
+	 */
+	Class<?>[] srcFun() default {};
 
 	/**
 	 * 

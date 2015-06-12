@@ -18,6 +18,7 @@ import de.stefanocke.japkit.metaannotations.Case;
 import de.stefanocke.japkit.metaannotations.CodeFragment;
 import de.stefanocke.japkit.metaannotations.Constructor;
 import de.stefanocke.japkit.metaannotations.Field;
+import de.stefanocke.japkit.metaannotations.Function;
 import de.stefanocke.japkit.metaannotations.Getter;
 import de.stefanocke.japkit.metaannotations.InnerClass;
 import de.stefanocke.japkit.metaannotations.Matcher;
@@ -51,8 +52,11 @@ public abstract class ValueObjectTemplate {
 	static class defensiveCopyFragment {
 	}
 
+	@Function(expr="#{properties}")
+	class props{}
+	
 	@Order(1)
-	@InnerClass(fields = @Field(src = "#{properties}", modifiers = Modifier.PRIVATE,
+	@InnerClass(fields = @Field(srcFun = props.class, modifiers = Modifier.PRIVATE,
 			annotations = @Annotation(copyAnnotationsFromPackages = { JPA, JSR303, SPRING_FORMAT }), 
 				getter = @Getter(/*fluent = true*/), setter = @Setter(/*fluent = true,*/
 					chain = true), commentFromSrc = true))

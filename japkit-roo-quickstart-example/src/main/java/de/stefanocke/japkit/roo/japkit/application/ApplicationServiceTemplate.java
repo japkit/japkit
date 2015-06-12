@@ -2,11 +2,11 @@ package de.stefanocke.japkit.roo.japkit.application;
 
 import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.JSR303;
 import static de.stefanocke.japkit.roo.japkit.domain.AnnotationPackages.SPRING_FORMAT;
+import static javax.lang.model.element.Modifier.PUBLIC;
 
 import javax.annotation.Resource;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,10 +57,10 @@ public class ApplicationServiceTemplate {
 			@TemplateCall(ApplicationServiceMethodsForAggregate.CreateCommands.class)}
 	)
 	public static abstract class ApplicationServiceMethodsForAggregate {
-		@Matcher(modifiers=Modifier.PUBLIC, type=void.class)
+		@Matcher(modifiers=PUBLIC, type=void.class)
 		class publicVoid{}
 		
-		@Matcher(modifiers=Modifier.PUBLIC, condition="#{!src.parameters.isEmpty()}") 
+		@Matcher(modifiers=PUBLIC, condition="#{!src.parameters.isEmpty()}") 
 		class hasParams{}
 	
 		@Function(expr="#{cmdProperties.findByName(e.simpleName).getter}")
@@ -153,7 +153,7 @@ public class ApplicationServiceTemplate {
 			 * @param command
 			 */
 			@Order(2)
-			@Method(src="aggregateCreateMethods", vars={ @Var(name="cmdProperties", expr="#{command.properties}")})
+			@Method(vars={ @Var(name="cmdProperties", expr="#{command.properties}")})
 			@Transactional
 			@CommandMethod(aggregateRoot=Aggregate.class)
 			public Aggregate create$aggregateName$(CreateCommand command){

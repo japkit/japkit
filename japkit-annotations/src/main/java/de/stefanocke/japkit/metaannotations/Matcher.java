@@ -21,6 +21,13 @@ public @interface Matcher {
 	String src() default "";
 
 	/**
+	 * As an alternative to the src expression, a function can be called to determine the source object.
+	 * 
+	 * @return
+	 */
+	Class<?>[] srcFun() default {};
+	
+	/**
 	 * 
 	 * @return language for the src expression. Defaults to Java EL.
 	 */

@@ -136,11 +136,8 @@ class ELSupport {
 
 	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
 		T errorResult) {
-		try {
-			
-			val resultFromValueStack = evalFromValueStack(expr, lang, expectedType)
-			
-			return resultFromValueStack ?: eval(expr, lang, expectedType)
+		try {			
+			eval(expr, lang, expectedType, true)
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
 		} catch(ElVariableError e){
@@ -170,6 +167,15 @@ class ELSupport {
 	}
 
 	def <T> T eval(String expr, String lang, Class<T> expectedType) {
+		eval(expr, lang, expectedType, false)
+	}
+	
+	def <T> T eval(String expr, String lang, Class<T> expectedType, boolean evalFromValueStackFirst) {
+		if(evalFromValueStackFirst){
+			val resultFromValueStack = evalFromValueStack(expr, lang, expectedType)
+			if(resultFromValueStack != null) return resultFromValueStack
+		}
+		
 		if(expr.nullOrEmpty && expectedType == String){
 			return ("" as Object) as T //WTF!?!
 		}

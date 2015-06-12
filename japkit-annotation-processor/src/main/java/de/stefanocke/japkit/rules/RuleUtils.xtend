@@ -60,19 +60,20 @@ class RuleUtils {
 	public def ()=>Object createSrcExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
-		val srcExpr = metaAnnotation.value("src".withPrefix(avPrefix), String)
+		
+		
+		val srcExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, null, Object, 
+			"src".withPrefix(avPrefix), "srcLang".withPrefix(avPrefix), "srcFun".withPrefix(avPrefix), [| currentSrc])
+			
 		val srcLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String)
 		val srcFilter = metaAnnotation.value("srcFilter".withPrefix(avPrefix), String);
 
 		[|
-			var srcElements = if (srcExpr.nullOrEmpty) {
-					currentSrc //Use parent's src. 
-				} else {
-					val elements = eval(srcExpr, srcLang, Object,
-						'''Src expression «srcExpr» could not be evaluated''', emptyList)
+			var srcElements =  {
+					val elements = srcExprOrFunction.apply()
 					if(elements==null){
 						//TODO: Right exception type?
-						throw new ELProviderException('''Src expression «srcExpr» result is null.''')
+						throw new ELProviderException('''Src expression or function result is null.''')
 					}	
 					else if(elements instanceof Iterable<?>){	
 						elements				
