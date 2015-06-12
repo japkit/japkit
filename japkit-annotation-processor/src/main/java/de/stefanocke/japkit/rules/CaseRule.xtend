@@ -19,11 +19,11 @@ class CaseRule<T> extends AbstractRule implements Function0<Pair<Boolean, T>>{
 	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type) {
 		super(metaAnnotation, metaElement)
 		
-		conditionRule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, "cond", "condLang", "condFun", null)
+		conditionRule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, "cond", "condLang", "condFun", null, [|false])
 		
 		// Note: the metaElement is passed in here to allow the Case annotation to be located on a function instead
 		// of referring to a function.
-		valueRule = new ExpressionOrFunctionCallRule<T>(metaAnnotation, metaElement, type, "value", "valueLang", "valueFun", null)
+		valueRule = new ExpressionOrFunctionCallRule<T>(metaAnnotation, metaElement, type, "value", "valueLang", "valueFun", null, null)
 	}
 	
 	/**

@@ -121,6 +121,7 @@ class MessageCollector {
 	def boolean supportsNestedAnnotations(){
 		//Eclipse implementation of messager does not support nested annotations
 		//!isEclipse()
+		//Since Eclipse Mars, nested annotations are supported...
 		true
 	}
 	
@@ -152,29 +153,35 @@ class MessageCollector {
 		messagesPerAnnotatedClass.remove(annotatedClassFqn)
 	}
 	
-	def dispatch void reportRuleError(ELProviderException e){
-		reportRuleError('''«e.rootCause.message»''')
-	}
+	
 	
 	def private Throwable getRootCause(Throwable t) {
 		t.cause?.rootCause ?: t
 	}
 	
+	def dispatch void reportRuleError(CharSequence msg){
+		reportRuleError(msg, null)
+	}
+	
 	def dispatch void reportRuleError(Exception e){
+		reportRuleError(e, null)
+	}
+	
+	def dispatch void reportRuleError(ELProviderException e, CharSequence metaAnnotationValueName){
+		reportRuleError('''«e.rootCause.message»''', metaAnnotationValueName)
+	}
+	
+	def dispatch void reportRuleError(Exception e, CharSequence metaAnnotationValueName){
 		reportRuleError('''«e», cause: «e.rootCause.message» 
 		«FOR ste : e.stackTrace.subList(0, Math.min(20, e.stackTrace.length))»
 			«ste»
-		«ENDFOR»''')
+		«ENDFOR»''', metaAnnotationValueName)
 	}
 	
-	def dispatch void reportRuleError(CharSequence msg){
-		reportRuleError(currentRule, msg, null)
-	}
-	
-	def reportRuleError(CharSequence msg, CharSequence metaAnnotationValueName){
+	def dispatch void reportRuleError(CharSequence msg, CharSequence metaAnnotationValueName){
 		reportRuleError(currentRule, msg, metaAnnotationValueName)
 	}
-	
+		
 	def reportRuleError(Rule rule, CharSequence msg, CharSequence metaAnnotationValueName){
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 		

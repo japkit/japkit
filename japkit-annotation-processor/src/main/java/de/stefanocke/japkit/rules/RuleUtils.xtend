@@ -31,6 +31,7 @@ import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
+import de.stefanocke.japkit.services.TypeElementNotFoundException
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -63,7 +64,7 @@ class RuleUtils {
 		
 		
 		val srcExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, null, Object, 
-			"src".withPrefix(avPrefix), "srcLang".withPrefix(avPrefix), "srcFun".withPrefix(avPrefix), [| currentSrc])
+			"src".withPrefix(avPrefix), "srcLang".withPrefix(avPrefix), "srcFun".withPrefix(avPrefix), [| currentSrc], [| emptyList])
 			
 		val srcLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String)
 		val srcFilter = metaAnnotation.value("srcFilter".withPrefix(avPrefix), String);
@@ -408,6 +409,21 @@ class RuleUtils {
 			nameSet.contains(it.toString)
 			
 		]
+	}
+	
+	//Catches Exceptions and reports them as errors for the current meta annotation.
+	// The AV name can be provided to report the error for that AV of the meta annotation.
+	// TODO: We have this in many places with subtle differences. Refactor for harmonization?
+	def <T> T handleException(()=>T errorResult, String avName, ()=>T closure){
+		try {
+			closure.apply()
+		} catch (TypeElementNotFoundException tenfe) {
+			//Always throw TENFE (?)
+			throw tenfe
+		} catch (Exception e) {
+			reportRuleError(e, avName)
+			if(errorResult != null) return errorResult.apply() else throw e
+		}
 	}
 	
 }

@@ -14,9 +14,12 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 	String expr
 	String lang
 	()=>Object function
-	()=>T defaultValue
+	()=>T defaultValue  //The value to be used if neither the expression nor the function is set
+	()=>T errorValue  //The value to be used if an exception is catched
 	
-	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type, String exprAvName, String langAvName, String functionAvName, ()=>T defaultValue) {
+	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type, String exprAvName, String langAvName, String functionAvName, 
+		()=>T defaultValue, ()=>T errorValue
+	) {
 		super(metaAnnotation, metaElement, type)
 	
 		this.exprAvName = exprAvName
@@ -27,17 +30,22 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 		
 		function = functionClass?.createFunctionRule ?: metaElement?.createFunctionRule
 		this.defaultValue = defaultValue
+		this.errorValue = errorValue
 	}
 	
 	override evalInternal(){ 
 		if(!expr.nullOrEmpty){
-			eval(expr, lang, type, true)
+			handleException(errorValue, exprAvName)[
+				eval(expr, lang, type, true)			
+			]
 		} else if(function != null) {
-			val result = function.apply()
-			if(!type.isInstance(result)){
-				reportRuleError('''The function «function» returned «result» of type «result?.class», but the required type is «type»''')
-			}
-			result as T
+			handleException(errorValue, functionAvName)[
+				val result = function.apply()
+				if(!type.isInstance(result)){
+					reportRuleError('''The function «function» returned «result» of type «result?.class», but the required type is «type»''', functionAvName)
+				}
+				result as T		
+			]
 		} else if(defaultValue != null){
 			defaultValue.apply()
 		} else {
