@@ -171,6 +171,10 @@ class MessageCollector {
 		reportRuleError('''«e.rootCause.message»''', metaAnnotationValueName)
 	}
 	
+	def dispatch void reportRuleError(RuleException e, CharSequence metaAnnotationValueName){
+		reportRuleError('''«e.message»''', metaAnnotationValueName)
+	}
+	
 	def dispatch void reportRuleError(Exception e, CharSequence metaAnnotationValueName){
 		reportRuleError('''«e», cause: «e.rootCause.message» 
 		«FOR ste : e.stackTrace.subList(0, Math.min(20, e.stackTrace.length))»

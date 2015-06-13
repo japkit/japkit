@@ -10,6 +10,7 @@ import org.eclipse.xtend.lib.annotations.Data
  * at an appropriate location.
  */
 @Data
+@Deprecated
 class ProcessingException extends RuntimeException {
 	Element element
 	AnnotationMirror annotationMirror
