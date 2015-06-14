@@ -23,8 +23,7 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements IParamete
 	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type){
 		super(metaAnnotation, metaElement)
 		params = createParams(metaElement)
-		val typeAV = metaAnnotation.value("type", TypeMirror)
-		this.type = (type ?: typeAV?.loadClass ?: Object) as Class<T>
+		this.type = (type ?: metaAnnotation?.value("type", TypeMirror)?.loadClass ?: Object) as Class<T>
 	}
 	
 	def List<Pair<Class<?>, String>> createParams(Element element){

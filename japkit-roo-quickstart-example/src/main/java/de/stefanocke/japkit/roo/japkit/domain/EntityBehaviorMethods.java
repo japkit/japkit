@@ -50,9 +50,12 @@ public abstract class EntityBehaviorMethods {
 	//			
 	//			)
 
+	@Matcher(src = "#{genClass}", modifiersNot = Modifier.ABSTRACT)
+	class genClassNotAbstract{};
+	
 	/**
 	 */
-	@Constructor(activation = @Matcher(src = "#{genClass}", modifiersNot = Modifier.ABSTRACT),
+	@Constructor(condFun = genClassNotAbstract.class,
 		vars = @Var(name="cmdPropertiesWhiteList", expr="#{createCommandProperties}"),
 		bodyCode="#{assignments(commandProperties())}"	
 	)
@@ -63,7 +66,7 @@ public abstract class EntityBehaviorMethods {
 
 	}
 
-	@Method(activation =  @Matcher(src = "#{genClass}", modifiersNot = Modifier.ABSTRACT), 			
+	@Method(condFun = genClassNotAbstract.class, 			
 			vars = @Var(name="cmdPropertiesWhiteList", expr="#{updateCommandProperties}"),
 			bodyCode="#{assignments(commandProperties())}")
 	public void update$entityName$(

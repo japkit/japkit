@@ -11,7 +11,6 @@ import de.stefanocke.japkit.metaannotations.Annotation;
 import de.stefanocke.japkit.metaannotations.Clazz;
 import de.stefanocke.japkit.metaannotations.Field;
 import de.stefanocke.japkit.metaannotations.Getter;
-import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.Setter;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Trigger;
@@ -21,7 +20,7 @@ import de.stefanocke.japkit.roo.japkit.domain.JapkitEntity.SuperclassSelector;
 
 @Trigger(layer=Layers.ENTITIES)
 @Clazz(nameSuffixToRemove = "Def", nameSuffixToAppend = "", modifiers = Modifier.PUBLIC, modifiersFromSrc=true, 
-		customBehaviorActivation=@Matcher(condition="#{customBehavior}"),
+		customBehaviorCond="#{customBehavior}",
 		annotations = { @Annotation(
 		targetAnnotation = Entity.class) }, superclass = SuperclassSelector.class, templates = { @TemplateCall(IdAndVersion.class), 
 		@TemplateCall(PropertyRefsTemplate.class),

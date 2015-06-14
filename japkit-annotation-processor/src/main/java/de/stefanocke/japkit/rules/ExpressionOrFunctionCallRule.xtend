@@ -25,13 +25,16 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 	
 		this.exprAvName = exprAvName
 		this.functionAvName = functionAvName
-		expr = metaAnnotation.value(exprAvName, String)	
-		lang = metaAnnotation.value(langAvName, String)
-		this.functionClass = metaAnnotation.value(functionAvName, TypeElement)
-		
-		
+		expr = metaAnnotation?.value(exprAvName, String)	
+		lang = metaAnnotation?.value(langAvName, String)
+		this.functionClass = metaAnnotation?.value(functionAvName, TypeElement)	
 		this.defaultValue = defaultValue
 		this.errorValue = errorValue
+	}
+	
+	//true if neither an expression nor a funtion is set and if no default value has been provided
+	def boolean isUndefined() {
+		expr.nullOrEmpty && functionClass == null && defaultValue == null
 	}
 	
 	override evalInternal(){ 

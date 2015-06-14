@@ -60,7 +60,7 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
 		//superclassTypeArgs=FormBackingObject.class,
 		
 		modifiers = Modifier.PUBLIC,
-		customBehaviorActivation=@Matcher(condition="#{triggerAnnotation.customBehavior}"),
+		customBehaviorCond="#{triggerAnnotation.customBehavior}",
 		templates = {
 				@TemplateCall(ControllerMembers.class),
 				@TemplateCall(ControllerMembersJpaRepository.class) ,

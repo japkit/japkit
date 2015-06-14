@@ -177,21 +177,18 @@ class RuleUtils {
 	public static val ALWAYS_ACTIVE = [| true]
 	
 	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
-		createActivationRule(metaAnnotation, avPrefix, true)
+		createActivationRule(metaAnnotation, avPrefix, [| true])
 	}
 	
 	/**
-	 * AV "activation" to enable or disable a rule
+	 * AV "cond" to enable or disable a rule
 	 */
-	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, Boolean defaultValue) {
+	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, ()=>Boolean defaultValue) {
 
-		val activation = metaAnnotation?.elementMatchers("activation".withPrefix(avPrefix))
-		if(activation.nullOrEmpty) return{
-			 if (defaultValue == null) null else[|defaultValue];
-			 
-	    }
-
-		[|activation.exists[matches(currentSrcElement)]]
+		val rule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, 
+		"cond".withPrefix(avPrefix), "condLang".withPrefix(avPrefix), "condFun".withPrefix(avPrefix), defaultValue , [|false]);
+		
+		if(rule.undefined) null else rule	
 	}
 	
 	public static val NO_NAME = [|null as String]

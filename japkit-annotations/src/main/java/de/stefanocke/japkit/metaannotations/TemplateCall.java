@@ -4,15 +4,25 @@ package de.stefanocke.japkit.metaannotations;
 public @interface TemplateCall {
 	
 	/**
-	 * By default, this annotation is active an will call the template.
-	 * To switch it on or of case by case, a Matcher can be used here.
-	 * <p>
-	 * In case of multiple matchers, at least one must match to activate the
-	 * rule.
+	 * By default, this rule is active.
+	 * To switch it on or of case by case, a boolean expression can be used here. 
+	 * 
+	 * @return 
+	 */
+	String cond() default "";
+	
+	/**
+	 * The expression language for the cond expression.
+	 * @return
+	 */
+	String condLang() default "";
+	
+	/**
+	 * As an alternative to the cond expression, a boolean function can be called.
 	 * 
 	 * @return
 	 */
-	Matcher[] activation() default {}; 
+	Class<?>[] condFun() default {};
 	
 	/**
 	 * An expression to determine the source object for calling the template.

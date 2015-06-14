@@ -9,7 +9,26 @@ package de.stefanocke.japkit.metaannotations;
  */
 @MemberGeneratorAnnotation
 public @interface Template {
-	Matcher[] activation() default {};
+	/**
+	 * By default, this rule is active.
+	 * To switch it on or of case by case, a boolean expression can be used here. 
+	 * 
+	 * @return 
+	 */
+	String cond() default "";
+	
+	/**
+	 * The expression language for the cond expression.
+	 * @return
+	 */
+	String condLang() default "";
+	
+	/**
+	 * As an alternative to the cond expression, a boolean function can be called.
+	 * 
+	 * @return
+	 */
+	Class<?>[] condFun() default {};
 	
 	/**
 	 * An expression to determine the source object for generating this element.

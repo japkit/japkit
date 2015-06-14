@@ -15,13 +15,17 @@ public @interface AnnotationTemplateAVMembers {
 	SrcSingleValueType[]  $srcElementName$() default {};
 	
 	
+	
+	@Matcher(condition="#{src.singleValueType.kind == 'DECLARED' && src.singleValueType.asElement.kind == 'ANNOTATION_TYPE'}")
+	class isAnnotationType{};
+	
 	/**
 	 * #{src}
 	 * #{src.returnType}
 	 * #{src.singleValueType.asElement.simpleName}
 	 * #{src.singleValueType.kind == 'DECLARED' && src.singleValueType.asElement.kind == 'ANNOTATION_TYPE'}
 	 * */
-	@Method(activation = @Matcher(condition="#{src.singleValueType.kind == 'DECLARED' && src.singleValueType.asElement.kind == 'ANNOTATION_TYPE'}"))
+	@Method(condFun = isAnnotationType.class)
 	AnnotationTemplateType[] _$srcElementName$() default {}; 
 	
 	//TODOs: 

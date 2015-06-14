@@ -35,6 +35,9 @@ import de.stefanocke.japkit.metaannotations.classselectors.SrcType;
 @Template(vars=@Var(name="properties", expr="#{src.declaredFields}"))
 @Embeddable
 public abstract class ValueObjectTemplate {
+	@Matcher(annotations = NotNull.class)
+	class mandatory{};
+	
 	/**
 	 * @japkit.code <pre>
 	 * <code>
@@ -44,7 +47,7 @@ public abstract class ValueObjectTemplate {
 	 * </code>
 	 * </pre>
 	 */
-	@CodeFragment(activation = @Matcher(annotations = NotNull.class))
+	@CodeFragment(condFun = mandatory.class)
 	static class validationFragment{}
 	
 	@CodeFragment(imports = Date.class,

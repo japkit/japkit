@@ -19,13 +19,16 @@ import de.stefanocke.japkit.metaannotations.Var;
 			values={
 				@AV(name="id", expr="#{elements.uniqueNameWithinTopLevelEnclosingTypeElement(src)}"), 
 				@AV(name="comment", expr="#{elements.getDocComment(src)}"),
-				@AV(activation=@Matcher(kind={METHOD, CONSTRUCTOR}), name="paramNames", expr="#{src.parameters}")
+				@AV(condFun=RuntimeMetadata.methodOrConstructor.class, name="paramNames", expr="#{src.parameters}")
 		}),
 	@Annotation(targetAnnotation=List.class, mode=AnnotationMode.MERGE, 
 		values=@AV(name = "value", expr="#{elements.elementAndAllEnclosedElements(src)}", mode=AVMode.JOIN_LIST, annotationMappingId="elementMetadata"))
 })
 
 public @interface RuntimeMetadata {
+	@Matcher(kind={METHOD, CONSTRUCTOR})
+	class methodOrConstructor{}
+	
 	public static final String CLASS_SUFFIX = "_RuntimeMetadata";
 	
 	boolean shadow() default false;
