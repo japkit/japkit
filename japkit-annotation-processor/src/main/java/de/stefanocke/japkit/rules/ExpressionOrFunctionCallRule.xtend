@@ -5,6 +5,7 @@ import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
 import javax.lang.model.element.Element
 import de.stefanocke.japkit.services.RuleException
+import static extension de.stefanocke.japkit.rules.RuleUtils.withPrefix
 
 /** At several places in meta annotations it is possible to either directly use an expression or to refer to a function to be called. */
 @Data
@@ -19,16 +20,16 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 	()=>T errorValue  //The value to be used if an exception is catched
 	(boolean, Object, IParameterlessFunctionRule<?>)=>Object combiner //Calls the funtion and combines the result with the previous one
 	
-	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type, String exprAvName, String langAvName, String functionAvName, 
+	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type, String exprAvName, String langAvName, String functionAvName, String avPrefix,
 		()=>T defaultValue, ()=>T errorValue, (boolean, Object, IParameterlessFunctionRule<?>)=>Object combiner 
 	) {
 		super(metaAnnotation, metaElement, type)
 	
-		this.exprAvName = exprAvName
-		this.functionAvName = functionAvName
-		expr = metaAnnotation?.value(exprAvName, String)	
-		lang = metaAnnotation?.value(langAvName, String)
-		this.functionClasses = metaAnnotation?.value(functionAvName, typeof(TypeElement[]))	
+		this.exprAvName = exprAvName.withPrefix(avPrefix)
+		this.functionAvName = functionAvName.withPrefix(avPrefix)
+		this.expr = metaAnnotation?.value(this.exprAvName, String)	
+		this.lang = metaAnnotation?.value(langAvName.withPrefix(avPrefix), String)
+		this.functionClasses = metaAnnotation?.value(this.functionAvName, typeof(TypeElement[]))	
 		this.defaultValue = defaultValue
 		this.errorValue = errorValue
 		this.combiner = combiner ?: FLUENT_COMBINER

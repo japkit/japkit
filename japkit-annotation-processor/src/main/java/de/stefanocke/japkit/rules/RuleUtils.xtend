@@ -58,13 +58,13 @@ class RuleUtils {
 	/**
 	 * To iterate over a collection of elements and apply the rule for each element.
 	 */
-	public def ()=>Object createSrcExpressionRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	public def ()=>Object createSrcRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
 		
 		
 		val srcExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, null, Object, 
-			"src".withPrefix(avPrefix), "srcLang".withPrefix(avPrefix), "srcFun".withPrefix(avPrefix), [| currentSrc], [| emptyList], null)
+			"src", "srcLang", "srcFun", avPrefix, [| currentSrc], [| emptyList], null)
 			
 		val srcLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String)
 		val srcFilter = metaAnnotation.value("srcFilter".withPrefix(avPrefix), String);
@@ -99,15 +99,15 @@ class RuleUtils {
 	
 	/**Scope rule that gets the source element from "src" AV */
 	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
-		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix), true)
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcRule(metaAnnotation, avPrefix), true)
 	}
 	
 	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, String avPrefix) {
-		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix), true)
+		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, createSrcRule(metaAnnotation, avPrefix), true)
 	}
 	
 	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Object srcRule) {
-		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcExpressionRule(metaAnnotation, avPrefix), true)	
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcRule(metaAnnotation, avPrefix), true)	
 	}
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
@@ -196,8 +196,7 @@ class RuleUtils {
 	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, ()=>Boolean defaultValue) {
 
 		val rule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, 
-		"cond".withPrefix(avPrefix), "condLang".withPrefix(avPrefix), "condFun".withPrefix(avPrefix), 
-			defaultValue , [|false], ExpressionOrFunctionCallRule.AND_COMBINER);
+		"cond", "condLang", "condFun", avPrefix, defaultValue , [|false], ExpressionOrFunctionCallRule.AND_COMBINER);
 		
 		if(rule.undefined) null else rule	
 	}
@@ -348,7 +347,7 @@ class RuleUtils {
 	
 	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation, VariableElement template, String avPrefix){
 		
-		val srcRule = createSrcExpressionRule(paramAnnotation, avPrefix)
+		val srcRule = createSrcRule(paramAnnotation, avPrefix)
 		val scopeRule = createScopeRule(paramAnnotation, template, avPrefix, srcRule)
 		val nameRule = createNameExprRule(paramAnnotation, template, avPrefix)
 		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation, template,  avPrefix)

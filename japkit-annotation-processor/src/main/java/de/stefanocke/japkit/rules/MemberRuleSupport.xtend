@@ -102,7 +102,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}	
 	
 	protected def ()=>Object createSrcRule(){
-		createSrcExpressionRule(metaAnnotation, avPrefix)
+		createSrcRule(metaAnnotation, avPrefix)
 	}
 	
 	protected def ((Object)=>Iterable<? extends GenElement>)=>Iterable<Iterable<? extends GenElement>> createScopeRule(()=>Object srcRule){
