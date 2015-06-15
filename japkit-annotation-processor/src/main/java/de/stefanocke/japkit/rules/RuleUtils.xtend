@@ -64,7 +64,7 @@ class RuleUtils {
 		
 		
 		val srcExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, null, Object, 
-			"src".withPrefix(avPrefix), "srcLang".withPrefix(avPrefix), "srcFun".withPrefix(avPrefix), [| currentSrc], [| emptyList])
+			"src".withPrefix(avPrefix), "srcLang".withPrefix(avPrefix), "srcFun".withPrefix(avPrefix), [| currentSrc], [| emptyList], null)
 			
 		val srcLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String)
 		val srcFilter = metaAnnotation.value("srcFilter".withPrefix(avPrefix), String);
@@ -128,23 +128,33 @@ class RuleUtils {
 		
 
 		[(Object)=>T closure |
+			try {
+						
+				val src = srcRule?.apply ?: currentSrc;
+	
+				val iterate = iterateIfIterable && src instanceof Iterable<?>		
+				
+				val result = if(iterate){ (src as Iterable<?>).map [ e |
+						doInScope(e, srcVarName, libraryRules, selfLibrary, varRules, closure)
+					].toList			
+				}
+				else{ 
+					newArrayList(doInScope(src, srcVarName, libraryRules, selfLibrary, varRules, closure))				
+				};	
+				if(resultVarAnnotation!=null && !resultVarName.nullOrEmpty){
+					valueStack.put(resultVarName, if(iterate) result else result.head)
+				}
+				
+				result
 			
-			val src = srcRule?.apply ?: currentSrc;
-
-			val iterate = iterateIfIterable && src instanceof Iterable<?>		
-			
-			val result = if(iterate){ (src as Iterable<?>).map [ e |
-					doInScope(e, srcVarName, libraryRules, selfLibrary, varRules, closure)
-				].toList			
+			} catch (Exception e){
+				//To avoid error flooding or misleading errors
+				//TODO: Reconsider resultVar. Better use some functional approach + "mapping cache" instead
+				if(resultVarAnnotation!=null && !resultVarName.nullOrEmpty){
+					valueStack.put(resultVarName, new ElVariableError(resultVarName))
+				}
+				throw e
 			}
-			else{ 
-				newArrayList(doInScope(src, srcVarName, libraryRules, selfLibrary, varRules, closure))				
-			};	
-			if(resultVarAnnotation!=null && !resultVarName.nullOrEmpty){
-				valueStack.put(resultVarName, if(iterate) result else result.head)
-			}
-			
-			result
 		]
 	}
 	
@@ -186,7 +196,8 @@ class RuleUtils {
 	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, ()=>Boolean defaultValue) {
 
 		val rule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, 
-		"cond".withPrefix(avPrefix), "condLang".withPrefix(avPrefix), "condFun".withPrefix(avPrefix), defaultValue , [|false]);
+		"cond".withPrefix(avPrefix), "condLang".withPrefix(avPrefix), "condFun".withPrefix(avPrefix), 
+			defaultValue , [|false], ExpressionOrFunctionCallRule.AND_COMBINER);
 		
 		if(rule.undefined) null else rule	
 	}

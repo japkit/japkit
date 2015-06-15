@@ -14,12 +14,13 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 	String functionAvName
 	String expr
 	String lang
-	TypeElement functionClass
+	TypeElement[] functionClasses
 	()=>T defaultValue  //The value to be used if neither the expression nor the function is set
 	()=>T errorValue  //The value to be used if an exception is catched
+	(boolean, Object, IParameterlessFunctionRule<?>)=>Object combiner //Calls the funtion and combines the result with the previous one
 	
 	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type, String exprAvName, String langAvName, String functionAvName, 
-		()=>T defaultValue, ()=>T errorValue
+		()=>T defaultValue, ()=>T errorValue, (boolean, Object, IParameterlessFunctionRule<?>)=>Object combiner 
 	) {
 		super(metaAnnotation, metaElement, type)
 	
@@ -27,39 +28,72 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 		this.functionAvName = functionAvName
 		expr = metaAnnotation?.value(exprAvName, String)	
 		lang = metaAnnotation?.value(langAvName, String)
-		this.functionClass = metaAnnotation?.value(functionAvName, TypeElement)	
+		this.functionClasses = metaAnnotation?.value(functionAvName, typeof(TypeElement[]))	
 		this.defaultValue = defaultValue
 		this.errorValue = errorValue
+		this.combiner = combiner ?: FLUENT_COMBINER
 	}
 	
-	//true if neither an expression nor a funtion is set and if no default value has been provided
+	//Combiner that concatenates the function calls in a fluent way. At first, the expression is evaluated (if not empty). 
+	//For the result, the first function is applied. For its result, the second function is applied. And so on.
+	public static val (boolean, Object, IParameterlessFunctionRule<?>)=>Object FLUENT_COMBINER 
+		= [isFirst, previous, function | if(isFirst) function.apply() else function.apply(previous)  ]
+	
+	//Combiner for boolean functions. Applies a logical AND. 	
+	public static val (boolean, Object, IParameterlessFunctionRule<?>)=>Object AND_COMBINER 
+		= [isFirst, previous, function | (if(isFirst) true else previous as Boolean) && {
+			val r = function.apply
+			if(!(r instanceof Boolean)){
+				throw new RuleException('''The function returned «r» of type «r?.class», but the required type is Boolean''');
+			} 
+			r as Boolean}
+		]
+	
+	//true if neither an expression nor a function is set and if no default value has been provided
 	def boolean isUndefined() {
-		expr.nullOrEmpty && functionClass == null && defaultValue == null
+		expr.nullOrEmpty && functionClasses.nullOrEmpty && defaultValue == null
 	}
 	
 	override evalInternal(){ 
-		if(!expr.nullOrEmpty){
+		if(isUndefined){
+			throw new RuleException('''Either «exprAvName» or «functionAvName» must be set or «metaElement» must be a function.''')	
+		}
+		
+		val UNDEFINED = new Object()
+		
+		val exprResult = if(!expr.nullOrEmpty){
 			handleException(errorValue, exprAvName)[
 				eval(expr, lang, type, true)			
 			]
-		} else if(functionClass != null) {			
-			handleException(errorValue, functionAvName)[
+		} else UNDEFINED
+		
+				
+		val result = if (!functionClasses.nullOrEmpty) handleException(errorValue, functionAvName) [
+			var r = exprResult
+			for (functionClass : functionClasses) {
 				val function = functionClass?.createFunctionRule ?: metaElement?.createFunctionRule
-				if(function==null){
+				if (function == null) {
 					throw new RuleException('''«functionClass» is not a function.''');
 				}
-				val result = function.apply()
-				if(!type.isInstance(result)){
-					throw new RuleException('''The function «functionClass» returned «result» of type «result?.class», but the required type is «type»''')
+				try{
+					r = combiner.apply(r == UNDEFINED, r, function)			
+				} catch (Exception e){
+					throw new RuleException('''Error when calling function «functionClass»: «e.message»''');
 				}
-				result as T		
-			]
-		} else if(defaultValue != null){
-			defaultValue.apply()
-		} else {
-			//TODO: Move this check to constructor but still provide proper error msg location?
-			throw new RuleException('''Either «exprAvName» or «functionAvName» must be set or «metaElement» must be a function.''')			
+			}
+			if(!type.isInstance(r)) {
+				throw new RuleException('''The function «functionClasses.last» returned «r» of type «r?.class», but the required type is «type»''')
+			}
+			r
+		] else exprResult
+				
+		if(result == UNDEFINED){
+			return defaultValue.apply()
 		}
+		
+		result as T
+		
+
 	}
 
 }

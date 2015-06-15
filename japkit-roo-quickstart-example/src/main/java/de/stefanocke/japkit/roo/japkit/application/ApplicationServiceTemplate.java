@@ -171,7 +171,7 @@ public class ApplicationServiceTemplate {
 		public static class CommandFieldTemplate{
 			
 			@Order(1)
-			@Clazz(cond="#{src.isVO}",
+			@Clazz(condFun=isVO.class,
 					src="#{fieldTypeElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
 					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
 			@ResultVar("dtoClass")

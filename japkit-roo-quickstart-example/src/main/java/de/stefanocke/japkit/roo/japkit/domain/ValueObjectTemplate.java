@@ -55,11 +55,11 @@ public abstract class ValueObjectTemplate {
 	static class defensiveCopyFragment {
 	}
 
-	@Function(expr="#{properties}")
+	@Function(expr="#{src.declaredFields}")
 	class props{}
 	
 	@Order(1)
-	@InnerClass(fields = @Field(srcFun = props.class, modifiers = Modifier.PRIVATE,
+	@InnerClass(fields = @Field(srcFun = {props.class}, modifiers = Modifier.PRIVATE,
 			annotations = @Annotation(copyAnnotationsFromPackages = { JPA, JSR303, SPRING_FORMAT }), 
 				getter = @Getter(/*fluent = true*/), setter = @Setter(/*fluent = true,*/
 					chain = true), commentFromSrc = true))
