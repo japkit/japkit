@@ -32,6 +32,7 @@ import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
 import de.stefanocke.japkit.services.TypeElementNotFoundException
+import de.stefanocke.japkit.services.RuleException
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -66,17 +67,15 @@ class RuleUtils {
 		val srcExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, null, Object, 
 			"src", "srcLang", "srcFun", avPrefix, [| currentSrc], [| emptyList], null)
 			
-		val srcLang = metaAnnotation.value("srcLang".withPrefix(avPrefix), String)
-		val srcFilter = metaAnnotation.value("srcFilter".withPrefix(avPrefix), String);
+		
+		val srcFilterExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, null, Boolean, 
+			"srcFilter", "srcLang", "srcFilterFun", avPrefix, null, [| false], ExpressionOrFunctionCallRule.AND_COMBINER);
 
 		[|
 			var srcElements =  {
 					val elements = srcExprOrFunction.apply()
-					if(elements==null){
-						//TODO: Right exception type?
-						throw new ELProviderException('''Src expression or function result is null.''')
-					}	
-					else if(elements instanceof Iterable<?>){	
+					
+					if(elements instanceof Iterable<?>){	
 						elements				
 					}
 					else if(elements.class.array) {
@@ -86,10 +85,10 @@ class RuleUtils {
 						elements
 					} 
 				} 
-			if(!srcFilter.nullOrEmpty && srcElements instanceof Iterable<?>){
+			if(!srcFilterExprOrFunction.undefined){
 				srcElements = (srcElements as Iterable<?>).filter[
 					scope(it)[
-						eval(srcFilter, srcLang, Boolean, '''Src filter expression could not be evaluated''' , false) ?: false
+						srcFilterExprOrFunction.apply ?: false
 					]
 				]
 			}

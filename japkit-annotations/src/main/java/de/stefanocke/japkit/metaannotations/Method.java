@@ -52,6 +52,14 @@ public @interface Method {
 	String srcFilter() default "";
 
 	/**
+	 * As an alternative to srcFilter, one or more boolean functions can be called. 
+	 * Only if the conjunction of their results is true, the rule is applied for the considered element of the src collection.
+	 * 
+	 * @return
+	 */
+	Class<?>[] srcFilterFun() default {};
+	
+	/**
 	 * 
 	 * @return the language of the src expression. Defaults to Java EL.
 	 */

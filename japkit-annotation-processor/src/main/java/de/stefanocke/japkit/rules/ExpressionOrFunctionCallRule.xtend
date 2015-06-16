@@ -64,7 +64,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 		
 		val exprResult = if(!expr.nullOrEmpty){
 			handleException(errorValue, exprAvName)[
-				eval(expr, lang, type, true)			
+				checkNotNull(eval(expr, lang, type, true))			
 			]
 		} else UNDEFINED
 		
@@ -77,7 +77,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 					throw new RuleException('''«functionClass» is not a function.''');
 				}
 				try{
-					r = combiner.apply(r == UNDEFINED, r, function)			
+					r = checkNotNull(combiner.apply(r == UNDEFINED, r, function))			
 				} catch (Exception e){
 					throw new RuleException('''Error when calling function «functionClass»: «e.message»''');
 				}
@@ -95,6 +95,11 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 		result as T
 		
 
+	}
+	
+	def <V> checkNotNull(V value) {
+		if(value == null )throw new RuleException("The result is null. This is not allowed here.")		
+		value
 	}
 
 }
