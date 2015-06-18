@@ -17,13 +17,13 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 	String lang
 	TypeElement[] functionClasses
 	()=>T defaultValue  //The value to be used if neither the expression nor the function is set
-	()=>T errorValue  //The value to be used if an exception is catched
 	(boolean, Object, IParameterlessFunctionRule<?>)=>Object combiner //Calls the funtion and combines the result with the previous one
+	boolean nullable //whether the result or any of the intermediate results might be null
 	
-	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type, String exprAvName, String langAvName, String functionAvName, String avPrefix,
-		()=>T defaultValue, ()=>T errorValue, (boolean, Object, IParameterlessFunctionRule<?>)=>Object combiner 
+	new(AnnotationMirror metaAnnotation, Element metaElement, Class<? extends T> type, String exprAvName, String langAvName, String functionAvName, String avPrefix,
+		()=>T defaultValue, ()=>T errorValue, boolean nullable, (boolean, Object, IParameterlessFunctionRule<?>)=>Object combiner 
 	) {
-		super(metaAnnotation, metaElement, type)
+		super(metaAnnotation, metaElement, type, errorValue)
 	
 		this.exprAvName = exprAvName.withPrefix(avPrefix)
 		this.functionAvName = functionAvName.withPrefix(avPrefix)
@@ -31,7 +31,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 		this.lang = metaAnnotation?.value(langAvName.withPrefix(avPrefix), String)
 		this.functionClasses = metaAnnotation?.value(this.functionAvName, typeof(TypeElement[]))	
 		this.defaultValue = defaultValue
-		this.errorValue = errorValue
+		this.nullable = nullable
 		this.combiner = combiner ?: FLUENT_COMBINER
 	}
 	
@@ -63,13 +63,14 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 		val UNDEFINED = new Object()
 		
 		val exprResult = if(!expr.nullOrEmpty){
-			handleException(errorValue, exprAvName)[
-				checkNotNull(eval(expr, lang, type, true))			
+			handleException(null, exprAvName)[
+				checkNotNull(eval(expr, lang, type, true))									
 			]
 		} else UNDEFINED
 		
+		if(exprResult==null) return null;
 				
-		val result = if (!functionClasses.nullOrEmpty) handleException(errorValue, functionAvName) [
+		val result = if (!functionClasses.nullOrEmpty) handleException(null, functionAvName) [
 			var r = exprResult
 			for (functionClass : functionClasses) {
 				val function = functionClass?.createFunctionRule ?: metaElement?.createFunctionRule
@@ -77,7 +78,8 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 					throw new RuleException('''«functionClass» is not a function.''');
 				}
 				try{
-					r = checkNotNull(combiner.apply(r == UNDEFINED, r, function))			
+					r = checkNotNull(combiner.apply(r == UNDEFINED, r, function))	
+					if(r==null) return null; //Don't call further functions		
 				} catch (Exception e){
 					throw new RuleException('''Error when calling function «functionClass»: «e.message»''');
 				}
@@ -98,7 +100,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 	}
 	
 	def <V> checkNotNull(V value) {
-		if(value == null )throw new RuleException("The result is null. This is not allowed here.")		
+		if(value == null && !nullable)throw new RuleException("The result is null. This is not allowed here.")		
 		value
 	}
 

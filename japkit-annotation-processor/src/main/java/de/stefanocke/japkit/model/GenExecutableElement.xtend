@@ -82,5 +82,8 @@ abstract class GenExecutableElement extends GenJava8ExecutableElement implements
 			else returnType
 	}
 	
- 	
+ 	//Not for code gen!
+	override toString() {
+		'''«returnType» «simpleName»(«FOR p : parameters SEPARATOR ', '»p«ENDFOR»)'''
+	}
 }

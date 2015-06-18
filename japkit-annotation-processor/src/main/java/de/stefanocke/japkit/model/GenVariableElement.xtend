@@ -24,4 +24,9 @@ abstract class GenVariableElement extends GenElement implements VariableElement{
 			type = parameterizable.resolveTypeVariables(type)
 	}
 	
+	//Not for code gen!
+	override toString() {
+		'''«type» «simpleName»'''
+	}
+	
 }

@@ -1,7 +1,5 @@
 package de.stefanocke.japkit.metaannotations;
 
-import java.lang.annotation.Annotation;
-
 public @interface Var {
 	String name();
 	
@@ -23,17 +21,40 @@ public @interface Var {
 	 * @return
 	 */
 	String lang() default "";
-
-	Class<?> type() default Object.class;
-
+	
 	/**
-	 * If set, the according annotation of the result of the expression,
-	 * property filter or type query is retrieved. This is possible for
-	 * Elements, Collection of Elements, Types and collections of types.
+	 * As an alternative or additionally to the expression, a function can be called to determine the source object.
+	 * In case of more than one function, they are called in a "fluent" style. That is each one is applied to the result of the previous one.
+	 * The first function is always applied to the result of the expr or to the current "src" if expr is empty. 
 	 * 
 	 * @return
 	 */
-	Class<? extends Annotation>[] annotation() default {};
+	Class<?>[] fun() default {};
+	
+	/**
+	 * A filter expression to be applied to the result of the expression or function(s) in case it is a collection. Must be boolean. 
+	 * The variable name for the current collection element to be filtered is "src". 
+	 * @return
+	 */
+	String filter() default "";
+
+	/**
+	 * As an alternative to filter, one or more boolean functions can be called. 
+	 * Only if the conjunction of their results is true, the rule is applied for the considered element of the src collection.
+	 * 
+	 * @return
+	 */
+	Class<?>[] filterFun() default {};
+	
+
+	Class<?> type() default Object.class;
+	
+	/**
+	 * Whether the variable might be null. By default, this is not allowed.
+	 * @return
+	 */
+	boolean nullable() default false;
+
 
 	
 	@interface List {

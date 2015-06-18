@@ -9,7 +9,7 @@ import de.stefanocke.japkit.metaannotations.TypeQuery;
 public class ApplicationServiceLibrary {
 	
 	@TypeQuery(annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots")
-	class findApplicationService{}
+	public class findApplicationService{}
 	
 	
 	@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo) && src.CommandMethod.aggregateRoot.isSame(fbo)}")
@@ -22,10 +22,10 @@ public class ApplicationServiceLibrary {
 	 * src is the AppService.
 	 */
 	@Function(expr="#{isCreateCommand.filter(src.declaredMethods)}")
-	class findCreateCommandMethods{}
+	public class findCreateCommandMethods{}
 	
 	@Function(expr="#{isUpdateCommand.filter(src.declaredMethods)}")
-	class findUpdateCommandMethods{}
+	public class findUpdateCommandMethods{}
 	
 	/**
 	 * src is the command method.

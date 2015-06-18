@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import de.stefanocke.japkit.annotations.RuntimeMetadata;
 import de.stefanocke.japkit.metaannotations.Clazz;
-import de.stefanocke.japkit.metaannotations.Matcher;
 import de.stefanocke.japkit.metaannotations.ResourceLocation;
 import de.stefanocke.japkit.metaannotations.ResourceTemplate;
 import de.stefanocke.japkit.metaannotations.SingleValue;
@@ -16,42 +15,54 @@ import de.stefanocke.japkit.metaannotations.Trigger;
 import de.stefanocke.japkit.metaannotations.Var;
 import de.stefanocke.japkit.roo.japkit.Layers;
 import de.stefanocke.japkit.roo.japkit.application.ApplicationServiceLibrary;
+import de.stefanocke.japkit.roo.japkit.application.ApplicationServiceLibrary.findApplicationService;
+import de.stefanocke.japkit.roo.japkit.application.ApplicationServiceLibrary.findCreateCommandMethods;
+import de.stefanocke.japkit.roo.japkit.application.ApplicationServiceLibrary.findUpdateCommandMethods;
 import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary;
+import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary.findRepository;
+import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary.isDatetime;
+import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary.isEntity;
+import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary.isEnum;
+import de.stefanocke.japkit.roo.japkit.web.WebScaffoldLibrary.allPropertyNames;
+import de.stefanocke.japkit.roo.japkit.web.WebScaffoldLibrary.findViewModel;
+import de.stefanocke.japkit.roo.japkit.web.WebScaffoldLibrary.isTableColumn;
+import de.stefanocke.japkit.roo.japkit.web.WebScaffoldLibrary.toHtmlId;
+import de.stefanocke.japkit.roo.japkit.web.WebScaffoldLibrary.viewableProperties;
 
 @RuntimeMetadata
 @Trigger(layer=Layers.CONTROLLERS, 
 	libraries={DomainLibrary.class, ApplicationServiceLibrary.class, WebScaffoldLibrary.class},
 	vars={
-		@Var(name = "fbo", expr = "#{formBackingObject}"),
+		@Var(name = "fbo", expr = "formBackingObject"),
 		@Var(name = "fboName", type = String.class, ifEmpty=true, expr = "#{fbo.simpleName.toString()}"),
 		@Var(name = "fboPluralName", type = String.class, ifEmpty=true, expr = "#{fboName}s"),
 		@Var(name = "path", type = String.class, ifEmpty=true, expr = "#{fboPluralName.toLowerCase()}"),
 		@Var(name = "modelAttribute", type = String.class, ifEmpty=true, expr = "#{fboName.toFirstLower}"),
 		
 		// For making IDs in JSPs unique
-		@Var(name = "fboFqnId", expr = "#{fbo.qualifiedName.toHtmlId()}"),	
+		@Var(name = "fboFqnId", expr = "#{fbo.qualifiedName}", fun=toHtmlId.class),	
 		@Var(name = "fboShortId", expr = "#{fboName.toLowerCase()}"),
 
-		@Var(name = "viewModel", expr="#{fbo.findViewModel()}"),
+		@Var(name = "viewModel", expr="#{fbo}", fun=findViewModel.class, nullable=true),
 		
 		// The properties to show
-		@Var(name = "viewProperties", expr="#{(viewModel != null ? viewModel : fbo).viewableProperties()}"),
-		@Var(name = "datetimeProperties", expr = "#{isDatetime.filter(viewProperties)}"),
-		@Var(name = "enumProperties", expr = "#{isEnum.filter(viewProperties)}"),
+		@Var(name = "viewProperties", expr="#{viewModel != null ? viewModel : fbo}", fun=viewableProperties.class),
+		@Var(name = "datetimeProperties", expr = "#{viewProperties}", filterFun = isDatetime.class),
+		@Var(name = "enumProperties", expr = "#{viewProperties}", filterFun = isEnum.class),
 
 		
-		@Var(name = "explicitTableProperties", expr = "#{isTableColumn.filter(viewProperties)}"),
+		@Var(name = "explicitTableProperties", expr = "#{viewProperties}", filterFun = isTableColumn.class),
 		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
 		
-		@Var(name = "entityProperties", expr = "#{isEntity.filter(viewProperties)}"),
+		@Var(name = "entityProperties", expr = "#{viewProperties}", filterFun = isEntity.class),
 		@Var(name = "relatedEntities", expr = "entityProperties.collect{it.singleValueType.asElement()}", lang="GroovyScript"),
 				
-		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo.findRepository()}"),		
-		@Var(name = "applicationService", expr="#{fbo.findApplicationService()}"),
+		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo}", fun=findRepository.class),		
+		@Var(name = "applicationService", expr="#{fbo}", fun=findApplicationService.class),
 
-		@Var(name="createCommands", expr="#{applicationService.findCreateCommandMethods()}"),
-		@Var(name="updateCommands", expr="#{applicationService.findUpdateCommandMethods()}"),
-		@Var(name = "propertyNames", ifEmpty=true, expr="#{allPropertyNames(viewProperties)}")		
+		@Var(name="createCommands", expr="#{applicationService}", fun=findCreateCommandMethods.class),
+		@Var(name="updateCommands", expr="#{applicationService}", fun=findUpdateCommandMethods.class),
+		@Var(name = "propertyNames", ifEmpty=true, expr="#{viewProperties}", fun=allPropertyNames.class)		
 
 })
 @Clazz(

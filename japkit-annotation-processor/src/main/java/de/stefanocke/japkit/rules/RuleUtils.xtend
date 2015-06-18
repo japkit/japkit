@@ -1,6 +1,5 @@
 package de.stefanocke.japkit.rules
 
-import de.stefanocke.japkit.el.ELProviderException
 import de.stefanocke.japkit.el.ELSupport
 import de.stefanocke.japkit.el.ElVariableError
 import de.stefanocke.japkit.metaannotations.Param
@@ -13,6 +12,7 @@ import de.stefanocke.japkit.services.ElementsExtensions
 import de.stefanocke.japkit.services.ExtensionRegistry
 import de.stefanocke.japkit.services.GenerateClassContext
 import de.stefanocke.japkit.services.MessageCollector
+import de.stefanocke.japkit.services.TypeElementNotFoundException
 import de.stefanocke.japkit.services.TypesExtensions
 import java.util.ArrayList
 import java.util.Arrays
@@ -31,8 +31,6 @@ import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
-import de.stefanocke.japkit.services.TypeElementNotFoundException
-import de.stefanocke.japkit.services.RuleException
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -57,19 +55,35 @@ class RuleUtils {
 	public static val ()=>Iterable<? extends Object> SINGLE_SRC_ELEMENT = [|  Collections.singleton(ExtensionRegistry.get(ELSupport).currentSrc)]
 	
 	/**
-	 * To iterate over a collection of elements and apply the rule for each element.
+	 * Provides the source element(s) for rules 
 	 */
 	public def ()=>Object createSrcRule(AnnotationMirror metaAnnotation, String avPrefix) {
+		createExpressionOrFunctionCallAndFilterRule(metaAnnotation, "src", "srcFun", "srcLang", "srcFilter", "srcFilterFun", "srcType", 
+				avPrefix, [| currentSrc], [| emptyList], false
+		)
+	}
+	
+	/**
+	 * Evaluates and expression and / or function(s) and optionally filters the results.
+	 */
+	public def ()=>Object createExpressionOrFunctionCallAndFilterRule(AnnotationMirror metaAnnotation, 
+		String exprAV, String funAV, String langAV, String filterExprAV, String filterFunAV, String typeAV, String avPrefix,
+		()=>Object defaultValue, ()=>Object errorValue, boolean nullable
+	) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
+		val type = metaAnnotation?.value(typeAV?.withPrefix(avPrefix), TypeMirror)
 		
-		
-		val srcExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, null, Object, 
-			"src", "srcLang", "srcFun", avPrefix, [| currentSrc], [| emptyList], null)
+		val typeClass = if(type!=null){
+			Class.forName(type.asElement.qualifiedName.toString);
+		} else Object
+			
+		val srcExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, null, typeClass, 
+			exprAV, langAV, funAV, avPrefix, defaultValue, errorValue, nullable, null)
 			
 		
 		val srcFilterExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, null, Boolean, 
-			"srcFilter", "srcLang", "srcFilterFun", avPrefix, null, [| false], ExpressionOrFunctionCallRule.AND_COMBINER);
+			filterExprAV, langAV, filterFunAV, avPrefix, null, [| false], false, ExpressionOrFunctionCallRule.AND_COMBINER);
 
 		[|
 			var srcElements =  {
@@ -78,14 +92,14 @@ class RuleUtils {
 					if(elements instanceof Iterable<?>){	
 						elements				
 					}
-					else if(elements.class.array) {
+					else if(elements != null && elements.class.array) {
 						Arrays.asList(elements)
 					} 
 					else {
 						elements
 					} 
 				} 
-			if(!srcFilterExprOrFunction.undefined){
+			if(srcElements instanceof Iterable<?> && !srcFilterExprOrFunction.undefined){
 				srcElements = (srcElements as Iterable<?>).filter[
 					scope(it)[
 						srcFilterExprOrFunction.apply ?: false
@@ -195,7 +209,7 @@ class RuleUtils {
 	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, ()=>Boolean defaultValue) {
 
 		val rule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, 
-		"cond", "condLang", "condFun", avPrefix, defaultValue , [|false], ExpressionOrFunctionCallRule.AND_COMBINER);
+		"cond", "condLang", "condFun", avPrefix, defaultValue , [|false], false, ExpressionOrFunctionCallRule.AND_COMBINER);
 		
 		if(rule.undefined) null else rule	
 	}

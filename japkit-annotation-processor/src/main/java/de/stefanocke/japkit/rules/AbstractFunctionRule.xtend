@@ -16,14 +16,21 @@ import org.eclipse.xtend.lib.annotations.Data
 @Data
 abstract class AbstractFunctionRule<T> extends AbstractRule implements IParameterlessFunctionRule<T>{
 	
-	Class<T> type
+	Class<? extends T> type
 	
 	List<Pair<Class<?>, String>> params;
 	
-	new(AnnotationMirror metaAnnotation, Element metaElement, Class<T> type){
+	()=>T errorValue  //The value to be used if an exception is catched
+	
+	new(AnnotationMirror metaAnnotation, Element metaElement, Class<? extends T> type) {
+		this(metaAnnotation, metaElement, type, null)
+	}
+	
+	new(AnnotationMirror metaAnnotation, Element metaElement, Class<? extends T> type, ()=>T errorValue){
 		super(metaAnnotation, metaElement)
 		params = createParams(metaElement)
 		this.type = (type ?: metaAnnotation?.value("type", TypeMirror)?.loadClass ?: Object) as Class<T>
+		this.errorValue = errorValue
 	}
 	
 	def List<Pair<Class<?>, String>> createParams(Element element){
@@ -41,18 +48,11 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements IParamete
 			throw new IllegalStateException("A function with params must be called using the evalWithParams method")
 		}
 		inRule[
-			try{
-				scope(src) [
-					evalInternal()
+			scope(src) [
+				handleException(errorValue, null)[
+					evalInternal()				
 				]
-			
-			} catch (TypeElementNotFoundException tenfe) {
-				throw tenfe
-			} catch (Exception e) {
-				reportRuleError(e)				
-				throw e
-			}
-			
+			]
 		]
 	}
 	

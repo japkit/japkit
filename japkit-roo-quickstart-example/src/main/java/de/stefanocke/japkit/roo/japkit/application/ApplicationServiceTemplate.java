@@ -164,7 +164,7 @@ public class ApplicationServiceTemplate {
 	
 		
 		@Template(
-				vars={@Var(name="fieldTypeElement", expr="#{src.asType().asElement}")},
+				vars={@Var(name="fieldType", expr="#{src.asType()}")},
 						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 								getter=@Getter, setter=@Setter)
 		)
@@ -172,7 +172,7 @@ public class ApplicationServiceTemplate {
 			
 			@Order(1)
 			@Clazz(condFun=isVO.class,
-					src="#{fieldTypeElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
+					src="#{fieldType.asElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
 					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
 			@ResultVar("dtoClass")
 			@DTO
@@ -180,7 +180,7 @@ public class ApplicationServiceTemplate {
 			
 			@Switch({
 				@Case(condFun=isVO.class, value="#{dtoClass.asType()}"),
-				@Case(cond="#{true}", value = "#{src.asType()}" )
+				@Case(cond="#{true}", value = "#{fieldType}" )
 			})
 			class FieldType{}
 			

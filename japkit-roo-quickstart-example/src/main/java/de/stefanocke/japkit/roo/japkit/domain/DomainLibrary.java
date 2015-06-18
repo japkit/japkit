@@ -17,7 +17,7 @@ import de.stefanocke.japkit.metaannotations.TypeQuery;
 @Library(annotationImports={ValueObject.class, JapkitEntity.class, DateTimeFormat.class, Pattern.class})
 public class DomainLibrary {
 	@TypeQuery(annotation = JapJpaRepository.class, shadow = true, unique = true, filterAV = "domainType")
-	class findRepository{}
+	public class findRepository{}
 	
 	@Matcher(singleValueTypeAnnotations = JapkitEntity.class)
 	public class isEntity{}
@@ -29,29 +29,29 @@ public class DomainLibrary {
 	// Some matchers for categorizing properties
 	
 	@Matcher(singleValueTypeCategory = TypeCategory.TEMPORAL)
-	class isDatetime{}
+	public class isDatetime{}
 	
 	@Matcher(type = Date.class)
-	class isDate{}
+	public class isDate{}
 	
 	@Function(expr="#{src.DateTimeFormat.style}")
-	class dateTimeFormatStyle{}
+	public class dateTimeFormatStyle{}
 	
 	@Matcher(singleValueType = boolean.class)
-	class isBoolean{}
+	public class isBoolean{}
 	
 	@Matcher(singleValueTypeCategory = TypeCategory.ENUM)
-	class isEnum{}
+	public class isEnum{}
 	
 	@Matcher(annotations = NotNull.class)
-	class isRequired{}
+	public class isRequired{}
 	
 	@Matcher(annotations = Past.class)
-	class isPast{}
+	public class isPast{}
 	
 	@Function(expr = "#{src.Pattern.regexp}")
-	class regexp{}
+	public class regexp{}
 	
 	@Matcher(typeCategory=TypeCategory.COLLECTION)
-	class isCollection{}
+	public class isCollection{}
 }
