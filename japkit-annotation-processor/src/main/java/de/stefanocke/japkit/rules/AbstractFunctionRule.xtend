@@ -12,6 +12,7 @@ import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
+import de.stefanocke.japkit.services.RuleException
 
 @Data
 abstract class AbstractFunctionRule<T> extends AbstractRule implements IParameterlessFunctionRule<T>{
@@ -61,11 +62,11 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements IParamete
 		inRule[
 			try{
 				if(params==null){
-					throw new IllegalStateException("A function without params cannot be called using the evalWithParams method")
+					throw new RuleException("A function without params cannot be called using the evalWithParams method")
 				}
 				if(args.length != params.length){
 					//TODO: Varargs support
-					throw new IllegalArgumentException('''The function requires «params.length» parameters but only «args.length» are passed in.''')	
+					throw new RuleException('''The function requires «params.length» parameters but only «args.length» are passed in.''')	
 				}
 				
 				scope [

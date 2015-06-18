@@ -22,7 +22,7 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		val nullable = elVarAnnotation.value("nullable", Boolean) ?: false;
 		
 		exprOrFunctionCallRule = createExpressionOrFunctionCallAndFilterRule(metaAnnotation, 
-			"expr", "fun", "lang", "filter", "filterFun", "type", null,
+			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "type", null,
 			[|currentSrc], [| new ElVariableError(name)], nullable
 		)
 		

@@ -55,7 +55,7 @@ import de.stefanocke.japkit.roo.japkit.web.WebScaffoldLibrary.viewableProperties
 		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
 		
 		@Var(name = "entityProperties", expr = "#{viewProperties}", filterFun = isEntity.class),
-		@Var(name = "relatedEntities", expr = "entityProperties.collect{it.singleValueType.asElement()}", lang="GroovyScript"),
+		@Var(name = "relatedEntities", expr = "#{entityProperties}", collect="#{src.singleValueType.asElement()}"),
 				
 		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo}", fun=findRepository.class),		
 		@Var(name = "applicationService", expr="#{fbo}", fun=findApplicationService.class),

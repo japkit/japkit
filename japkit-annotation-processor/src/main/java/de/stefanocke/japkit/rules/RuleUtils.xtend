@@ -58,7 +58,10 @@ class RuleUtils {
 	 * Provides the source element(s) for rules 
 	 */
 	public def ()=>Object createSrcRule(AnnotationMirror metaAnnotation, String avPrefix) {
-		createExpressionOrFunctionCallAndFilterRule(metaAnnotation, "src", "srcFun", "srcLang", "srcFilter", "srcFilterFun", "srcType", 
+		createExpressionOrFunctionCallAndFilterRule(metaAnnotation, "src", "srcFun", "srcLang", 
+			"srcFilter", "srcFilterFun", 
+			"srcCollect", "srcCollectFun", 
+			"srcType", 
 				avPrefix, [| currentSrc], [| emptyList], false
 		)
 	}
@@ -67,7 +70,10 @@ class RuleUtils {
 	 * Evaluates and expression and / or function(s) and optionally filters the results.
 	 */
 	public def ()=>Object createExpressionOrFunctionCallAndFilterRule(AnnotationMirror metaAnnotation, 
-		String exprAV, String funAV, String langAV, String filterExprAV, String filterFunAV, String typeAV, String avPrefix,
+		String exprAV, String funAV, String langAV, 
+		String filterExprAV, String filterFunAV, 
+		String collectExprAV, String collectFunAV, 
+		String typeAV, String avPrefix,
 		()=>Object defaultValue, ()=>Object errorValue, boolean nullable
 	) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
@@ -77,7 +83,12 @@ class RuleUtils {
 		val typeClass = if(type!=null){
 			Class.forName(type.asElement.qualifiedName.toString);
 		} else Object
+		
+		val collectExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, null, Object, 
+			collectExprAV, langAV, collectFunAV, avPrefix, null, null, nullable, null)
 			
+		//TODO: Typecheck here does not make sense in case of collect !? 	
+		//TODO: Error value in case of exception in collect? Maybe move error value higher (f.e. to ELVariableRule)
 		val srcExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, null, typeClass, 
 			exprAV, langAV, funAV, avPrefix, defaultValue, errorValue, nullable, null)
 			
@@ -103,6 +114,13 @@ class RuleUtils {
 				srcElements = (srcElements as Iterable<?>).filter[
 					scope(it)[
 						srcFilterExprOrFunction.apply ?: false
+					]
+				]
+			}
+			if(srcElements instanceof Iterable<?> && !collectExprOrFunction.undefined){
+				srcElements = (srcElements as Iterable<?>).map[
+					scope(it)[
+						collectExprOrFunction.apply ?: false
 					]
 				]
 			}
@@ -222,7 +240,7 @@ class RuleUtils {
 	//They have to be enclosed in $...$ there.
 	static val expressionInTemplate = Pattern.compile('''\$(.+?)\$''')
 	
-	public def replaceExpressionInTemplate(CharSequence template, boolean canBeExpression, String lang) {
+	public def replaceExpressionInTemplate(CharSequence template, boolean canBeExpression, String lang, boolean autoCamelCase) {
 		
 		val vs = ExtensionRegistry.get(ELSupport).valueStack
 		val matcher = expressionInTemplate.matcher(template)
@@ -248,7 +266,7 @@ class RuleUtils {
 				} else {
 					eval(expr, lang, String, '''Expression «expr» in "«template»"" could not be resolved.''', expr)
 				}
-			matcher.appendReplacement(sb, value);
+			matcher.appendReplacement(sb, if(autoCamelCase && matcher.start>0) value.toFirstUpper else value);
 		}
 		matcher.appendTail(sb);
 	}
@@ -263,7 +281,7 @@ class RuleUtils {
 		val nameLang = metaAnnotation?.value("nameLang".withPrefix(avPrefix), String);
 
 		[ |
-			val nameFromTemplateResolved = nameFromTemplate?.replaceExpressionInTemplate(false, null)?.toString
+			val nameFromTemplateResolved = nameFromTemplate?.replaceExpressionInTemplate(false, null, true)?.toString
 			val result = if (!nameExpr.nullOrEmpty) {
 				eval(nameExpr, nameLang, String, '''Member name could not be generated''',
 					nameFromTemplateResolved ?: 'invalidMemberName')
@@ -299,7 +317,7 @@ class RuleUtils {
 		if(it instanceof TypeMirror){
 			ExtensionRegistry.get(TypeResolver).resolveType(it)
 		} else if(it instanceof String){
-			ExtensionRegistry.get(RuleUtils).replaceExpressionInTemplate(it, true, null)?.toString //TODO: make lang configurable
+			ExtensionRegistry.get(RuleUtils).replaceExpressionInTemplate(it, true, null, false)?.toString //TODO: make lang configurable
 		}  else {
 			it
 		}
