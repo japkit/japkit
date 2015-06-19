@@ -48,7 +48,7 @@ public @interface Var {
 	
 	/**
 	 * An expression to be applied to the result of the expression or function(s) in case it is a collection. It's applied to each element.
-	 * The variable name for the current collection element is "src". 
+	 * The variable name for the current collection element is "src". Collect is applied after filtering.
 	 * 
 	 * @return
 	 */

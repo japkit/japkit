@@ -60,6 +60,23 @@ public @interface Method {
 	Class<?>[] srcFilterFun() default {};
 	
 	/**
+	 * An expression to be applied to the result of the expression or function(s) in case it is a collection. It's applied to each element.
+	 * The variable name for the current collection element is "src". Collect is applied after filtering.
+	 * 
+	 * @return
+	 */
+	String srcCollect() default "";
+
+	/**
+	 * As an alternative or additionally to the collect expression, one or more functions can be called. 
+	 * In case of more than one function, they are called in a "fluent" style. That is each one is applied to the result of the previous one. 
+	 * The first function is always applied to the result of the collect expression or to the current collection element if collect expression is empty.
+	 *  
+	 * @return
+	 */
+	Class<?>[] srcCollectFun() default {};
+	
+	/**
 	 * 
 	 * @return the language of the src expression. Defaults to Java EL.
 	 */
