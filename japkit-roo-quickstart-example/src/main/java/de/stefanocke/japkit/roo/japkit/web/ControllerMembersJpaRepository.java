@@ -10,6 +10,7 @@ import de.stefanocke.japkit.metaannotations.Method;
 import de.stefanocke.japkit.metaannotations.Template;
 import de.stefanocke.japkit.metaannotations.TemplateCall;
 import de.stefanocke.japkit.metaannotations.Var;
+import de.stefanocke.japkit.metaannotations.classselectors.ClassSelector;
 import de.stefanocke.japkit.roo.base.web.CrudOperations;
 import de.stefanocke.japkit.roo.base.web.RepositoryAdapter;
 import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary.findRepository;
@@ -19,6 +20,9 @@ import de.stefanocke.japkit.roo.japkit.domain.DomainLibrary.findRepository;
 		templates=@TemplateCall(value = ControllerMembersJpaRepository.RelatedEntityMembers.class)
 		)
 public abstract class ControllerMembersJpaRepository {
+	@ClassSelector
+	class Repository {}
+	
 	/**${this.class.superclass.toString()}*/
 	@Field(commentLang="GStringTemplateInline")
 	@Autowired
@@ -34,6 +38,9 @@ public abstract class ControllerMembersJpaRepository {
 		@Field(cond="#{repository!=null}")
 		@Autowired
 		private Repository $repositoryFieldName$;
+		
+		@ClassSelector
+		class RelatedEntity {}
 		
 		/**
 		 * #{src}  #{src.singleValueType} #{repository}
