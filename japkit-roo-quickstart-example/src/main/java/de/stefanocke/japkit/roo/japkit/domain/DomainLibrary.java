@@ -49,7 +49,7 @@ public class DomainLibrary {
 	@Matcher(annotations = Past.class)
 	public class isPast{}
 	
-	@Function(expr = "#{src.Pattern.regexp}")
+	@Function(expr = "#{src.Pattern.regexp}", nullable=true)
 	public class regexp{}
 	
 	@Matcher(typeCategory=TypeCategory.COLLECTION)

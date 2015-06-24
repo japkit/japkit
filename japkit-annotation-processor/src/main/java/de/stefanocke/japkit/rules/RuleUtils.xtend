@@ -58,7 +58,7 @@ class RuleUtils {
 	 * Provides the source element(s) for rules 
 	 */
 	public def ()=>Object createSrcRule(AnnotationMirror metaAnnotation, String avPrefix) {
-		createExpressionOrFunctionCallAndFilterRule(metaAnnotation, "src", "srcFun", "srcLang", 
+		createExpressionOrFunctionCallAndFilterRule(metaAnnotation, null, "src", "srcFun", "srcLang", 
 			"srcFilter", "srcFilterFun", 
 			"srcCollect", "srcCollectFun", 
 			"srcType", 
@@ -69,7 +69,7 @@ class RuleUtils {
 	/**
 	 * Evaluates and expression and / or function(s) and optionally filters the results.
 	 */
-	public def ()=>Object createExpressionOrFunctionCallAndFilterRule(AnnotationMirror metaAnnotation, 
+	public def ()=>Object createExpressionOrFunctionCallAndFilterRule(AnnotationMirror metaAnnotation, Element metaElement,
 		String exprAV, String funAV, String langAV, 
 		String filterExprAV, String filterFunAV, 
 		String collectExprAV, String collectFunAV, 
@@ -84,16 +84,16 @@ class RuleUtils {
 			Class.forName(type.asElement.qualifiedName.toString);
 		} else Object
 		
-		val collectExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, null, Object, 
+		val collectExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, metaElement, Object, 
 			collectExprAV, langAV, collectFunAV, avPrefix, null, null, nullable, null)
 			
 		//TODO: Typecheck here does not make sense in case of collect !? 	
 		//TODO: Error value in case of exception in collect? Maybe move error value higher (f.e. to ELVariableRule)
-		val srcExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, null, typeClass, 
+		val srcExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, metaElement, typeClass, 
 			exprAV, langAV, funAV, avPrefix, defaultValue, errorValue, nullable, null)
 			
 		
-		val srcFilterExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, null, Boolean, 
+		val srcFilterExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, metaElement, Boolean, 
 			filterExprAV, langAV, filterFunAV, avPrefix, null, [| false], false, ExpressionOrFunctionCallRule.AND_COMBINER);
 
 		[|
@@ -212,7 +212,7 @@ class RuleUtils {
 	
 	
 	public def createELVariableRules(AnnotationMirror metaAnnotation, String avPrefix){
-		metaAnnotation?.value("vars".withPrefix(avPrefix), typeof(AnnotationMirror[]))?.map[new ELVariableRule(it)] ?: emptyList;
+		metaAnnotation?.value("vars".withPrefix(avPrefix), typeof(AnnotationMirror[]))?.map[new ELVariableRule(it, null)] ?: emptyList;
 	}
 	
 	public static val ALWAYS_ACTIVE = [| true]

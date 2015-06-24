@@ -23,7 +23,7 @@ public @interface Var {
 	String lang() default "";
 	
 	/**
-	 * As an alternative or additionally to the expression, a function can be called to determine the source object.
+	 * As an alternative or additionally to the expression, a function can be called to calculate the value for the variable.
 	 * In case of more than one function, they are called in a "fluent" style. That is each one is applied to the result of the previous one.
 	 * The first function is always applied to the result of the expr or to the current "src" if expr is empty. 
 	 * 

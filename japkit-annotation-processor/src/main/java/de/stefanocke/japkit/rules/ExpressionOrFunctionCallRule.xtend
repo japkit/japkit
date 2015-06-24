@@ -23,11 +23,16 @@ class ExpressionOrFunctionCallRule<T> extends AbstractFunctionRule<T> {
 	new(AnnotationMirror metaAnnotation, Element metaElement, Class<? extends T> type, String exprAvName, String langAvName, String functionAvName, String avPrefix,
 		()=>T defaultValue, ()=>T errorValue, boolean nullable, (boolean, Object, IParameterlessFunctionRule<?>)=>Object combiner 
 	) {
-		super(metaAnnotation, metaElement, type, errorValue)
+		//TODO: Q&D: metaElement is null here, since we don't want the "params" feature of the superclass
+		//Maybe the superclass is just not the appropriate one here ...
+		super(metaAnnotation, null, type, errorValue) 
 	
 		this.exprAvName = exprAvName.withPrefix(avPrefix)
 		this.functionAvName = functionAvName.withPrefix(avPrefix)
-		this.expr = metaAnnotation?.value(this.exprAvName, String)	
+		
+		val exprFromAv = metaAnnotation?.value(this.exprAvName, String)	;	
+		this.expr = if(!exprFromAv.nullOrEmpty) exprFromAv else JavadocUtil.getCode(metaElement?.getDocCommentUsingRuntimeMetadata)?.get(exprAvName)
+		
 		this.lang = metaAnnotation?.value(langAvName.withPrefix(avPrefix), String)
 		this.functionClasses = metaAnnotation?.value(this.functionAvName, typeof(TypeElement[]))	
 		this.defaultValue = defaultValue

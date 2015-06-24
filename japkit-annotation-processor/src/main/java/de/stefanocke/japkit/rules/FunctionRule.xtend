@@ -7,22 +7,22 @@ import org.eclipse.xtend.lib.annotations.Data
 @Data
 class FunctionRule extends AbstractFunctionRule<Object> {
 	
-	String expr
-	String lang
+	()=>Object exprOrFunctionCallRule
 	
 	new(AnnotationMirror metaAnnotation, Element metaElement) {
 		super(metaAnnotation, metaElement, null)
 	
-		val exprFromAv = metaAnnotation.value("expr", String);
+		val nullable = metaAnnotation.value("nullable", Boolean) ?: false;
 		
-		expr = if(!exprFromAv.nullOrEmpty) exprFromAv else JavadocUtil.getCode(metaElement?.getDocCommentUsingRuntimeMetadata).get("expr")
-		
-		lang = metaAnnotation.value("lang", String);
+		exprOrFunctionCallRule = createExpressionOrFunctionCallAndFilterRule(metaAnnotation, metaElement,
+			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "type", null,
+			[|currentSrc], null, nullable
+		)
 		
 	}
 	
 	override evalInternal(){ 
-		eval(expr, lang, type)
+		exprOrFunctionCallRule.apply
 	}
 
 }

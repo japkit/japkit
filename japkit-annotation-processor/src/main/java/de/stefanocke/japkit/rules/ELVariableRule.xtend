@@ -5,6 +5,7 @@ import javax.lang.model.element.AnnotationMirror
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
+import javax.lang.model.element.Element
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
@@ -13,7 +14,7 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 	boolean ifEmpty
 	()=>Object exprOrFunctionCallRule
 
-	new(AnnotationMirror elVarAnnotation) {
+	new(AnnotationMirror elVarAnnotation, Element metaElement) {
 		super(elVarAnnotation, null)
 		name = elVarAnnotation.value("name", String);
 		
@@ -21,7 +22,7 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		
 		val nullable = elVarAnnotation.value("nullable", Boolean) ?: false;
 		
-		exprOrFunctionCallRule = createExpressionOrFunctionCallAndFilterRule(metaAnnotation, 
+		exprOrFunctionCallRule = createExpressionOrFunctionCallAndFilterRule(metaAnnotation, metaElement,
 			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "type", null,
 			[|currentSrc], [| new ElVariableError(name)], nullable
 		)

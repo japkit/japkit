@@ -46,7 +46,7 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements IParamete
 		
 	def eval(Object src){
 		if(params!=null){
-			throw new IllegalStateException("A function with params must be called using the evalWithParams method")
+			throw new IllegalStateException("A function with params must be called using the evalWithParams method "+metaElement+" "+metaAnnotation+" "+src)
 		}
 		inRule[
 			scope(src) [
