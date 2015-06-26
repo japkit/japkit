@@ -15,6 +15,7 @@ import javax.lang.model.element.Element
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 import static de.stefanocke.japkit.util.MoreCollectionExtensions.*
+import de.stefanocke.japkit.services.RuleException
 
 class ELSupport {
 	val transient extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
@@ -114,7 +115,11 @@ class ELSupport {
 	}
 	
 	def <T> T getCurrentSrc(Class<T> clazz){
-		clazz.cast(getCurrentSrc)
+		val currSrc = getCurrentSrc
+		if(currSrc != null && !clazz.isInstance(currSrc)){
+			throw new RuleException('''Current src «currSrc» is of type «currSrc?.class», but type «clazz» is required here.''');
+		}
+		clazz.cast(currSrc)
 	}
 	
 	def Object getCurrentSrc(){

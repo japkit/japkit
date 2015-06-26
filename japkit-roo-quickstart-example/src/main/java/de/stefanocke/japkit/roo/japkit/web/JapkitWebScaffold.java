@@ -33,7 +33,7 @@ import de.stefanocke.japkit.roo.japkit.web.WebScaffoldLibrary.viewableProperties
 @Trigger(layer=Layers.CONTROLLERS, 
 	libraries={DomainLibrary.class, ApplicationServiceLibrary.class, WebScaffoldLibrary.class},
 	vars={
-		@Var(name = "fbo", expr = "formBackingObject"),
+		@Var(name = "fbo", expr = "#{formBackingObject}"),
 		@Var(name = "fboName", type = String.class, ifEmpty=true, expr = "#{fbo.simpleName.toString()}"),
 		@Var(name = "fboPluralName", type = String.class, ifEmpty=true, expr = "#{fboName}s"),
 		@Var(name = "path", type = String.class, ifEmpty=true, expr = "#{fboPluralName.toLowerCase()}"),

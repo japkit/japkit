@@ -24,7 +24,7 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		
 		exprOrFunctionCallRule = createExpressionOrFunctionCallAndFilterRule(metaAnnotation, metaElement,
 			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "type", null,
-			[|currentSrc], [| new ElVariableError(name)], nullable
+			[|currentSrc], nullable
 		)
 		
 	}
@@ -34,7 +34,9 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 		val exisitingValue = valueStack.get(name)
 		if(ifEmpty && exisitingValue!==null && !exisitingValue.emptyVar) return
 		
-		val value = eval(currentSrc)
+		val value = handleException([| new ElVariableError(name) as Object], null)[
+			eval(currentSrc)
+		]
 		valueStack.put(name, value)
 			
 	}

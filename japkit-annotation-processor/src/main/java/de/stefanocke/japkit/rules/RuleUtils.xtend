@@ -61,8 +61,7 @@ class RuleUtils {
 		createExpressionOrFunctionCallAndFilterRule(metaAnnotation, null, "src", "srcFun", "srcLang", 
 			"srcFilter", "srcFilterFun", 
 			"srcCollect", "srcCollectFun", 
-			"srcType", 
-				avPrefix, [| currentSrc], [| emptyList], false
+			"srcType", avPrefix, [| currentSrc], false
 		)
 	}
 	
@@ -74,7 +73,7 @@ class RuleUtils {
 		String filterExprAV, String filterFunAV, 
 		String collectExprAV, String collectFunAV, 
 		String typeAV, String avPrefix,
-		()=>Object defaultValue, ()=>Object errorValue, boolean nullable
+		()=>Object defaultValue, boolean nullable
 	) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
@@ -85,16 +84,15 @@ class RuleUtils {
 		} else Object
 		
 		val collectExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, metaElement, Object, 
-			collectExprAV, langAV, collectFunAV, avPrefix, null, null, nullable, null)
+			collectExprAV, langAV, collectFunAV, avPrefix, null, nullable, null)
 			
 		//TODO: Typecheck here does not make sense in case of collect !? 	
-		//TODO: Error value in case of exception in collect? Maybe move error value higher (f.e. to ELVariableRule)
 		val srcExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, metaElement, typeClass, 
-			exprAV, langAV, funAV, avPrefix, defaultValue, errorValue, nullable, null)
+			exprAV, langAV, funAV, avPrefix, defaultValue, nullable, null)
 			
 		
 		val srcFilterExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, metaElement, Boolean, 
-			filterExprAV, langAV, filterFunAV, avPrefix, null, [| false], false, ExpressionOrFunctionCallRule.AND_COMBINER);
+			filterExprAV, langAV, filterFunAV, avPrefix, null, false, ExpressionOrFunctionCallRule.AND_COMBINER);
 
 		[|
 			var srcElements =  {
@@ -227,7 +225,7 @@ class RuleUtils {
 	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix, ()=>Boolean defaultValue) {
 
 		val rule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, 
-		"cond", "condLang", "condFun", avPrefix, defaultValue , [|false], false, ExpressionOrFunctionCallRule.AND_COMBINER);
+		"cond", "condLang", "condFun", avPrefix, defaultValue , false, ExpressionOrFunctionCallRule.AND_COMBINER);
 		
 		if(rule.undefined) null else rule	
 	}
