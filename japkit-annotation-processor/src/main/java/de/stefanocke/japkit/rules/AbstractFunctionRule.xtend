@@ -60,7 +60,7 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements IParamete
 	def evalWithParams(Object[] args){
 		
 		inRule[
-			try{
+			handleException(errorValue, null)[
 				if(params==null){
 					throw new RuleException("A function without params cannot be called using the evalWithParams method")
 				}
@@ -75,14 +75,8 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements IParamete
 						valueStack.put(params.get(it).value, args.get(it))
 					]
 					evalInternal()
-				]
-			
-			} catch (TypeElementNotFoundException tenfe) {
-				throw tenfe
-			} catch (Exception e) {
-				reportRuleError(e)				
-				throw e
-			}
+				]		
+			]
 			
 		]
 		

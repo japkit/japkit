@@ -13,6 +13,7 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
 import org.eclipse.xtend.lib.annotations.Data
+import de.stefanocke.japkit.services.ReportedException
 
 @Data
 class ResourceRule extends AbstractRule{
@@ -106,7 +107,7 @@ class ResourceRule extends AbstractRule{
 			} catch (TypeElementNotFoundException tenfe) { 
 				handleTypeElementNotFound(
 					'''Type element not found when processing resource template «templateName».''',	tenfe.fqn)
-			} catch(ElVariableError e){
+			} catch(ReportedException e){
 				printDiagnosticMessage[e.message]
 				//no error here, since it was already reported by the EL var rule
 			} 

@@ -35,9 +35,6 @@ public abstract class ControllerMembers {
 	@ClassSelector
 	class ApplicationService{}
 	
-	/**
-	 * #{createCommands.toString()}
-	 */
 	@Resource
 	private ApplicationService applicationService;
 	

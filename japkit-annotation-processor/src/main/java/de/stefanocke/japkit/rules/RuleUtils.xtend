@@ -31,6 +31,7 @@ import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
+import de.stefanocke.japkit.services.ReportedException
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -456,12 +457,12 @@ class RuleUtils {
 		} catch (TypeElementNotFoundException tenfe) {
 			//Always rethrow TENFE (?)
 			throw tenfe
-		} catch(ElVariableError e){
+		} catch(ReportedException e){
 			//Do not report the error again to avoid error flooding
 			if(errorResult != null) return errorResult.apply() else throw e
 		} catch (Exception e) {
 			reportRuleError(e, avName)
-			if(errorResult != null) return errorResult.apply() else throw e
+			if(errorResult != null) return errorResult.apply() else throw new ReportedException(e)
 		}
 	}
 	

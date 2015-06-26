@@ -16,6 +16,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 import static de.stefanocke.japkit.util.MoreCollectionExtensions.*
 import de.stefanocke.japkit.services.RuleException
+import de.stefanocke.japkit.services.ReportedException
 
 class ELSupport {
 	val transient extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
@@ -145,7 +146,7 @@ class ELSupport {
 			eval(expr, lang, expectedType, true)
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
-		} catch(ElVariableError e){
+		} catch(ReportedException e){
 			//Do not report the error again to avoid error flooding
 			errorResult
 		} catch (Exception e) {

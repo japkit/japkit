@@ -1,12 +1,13 @@
 package de.stefanocke.japkit.el;
 
+import de.stefanocke.japkit.services.ReportedException;
 
 /**
  * This exception is put as value on the value stack, when there was an error during evaluation of an EL variable.
  * @author stefan
  *
  */
-public class ElVariableError extends RuntimeException {
+public class ElVariableError extends ReportedException {
 
 	/**
 	 * 

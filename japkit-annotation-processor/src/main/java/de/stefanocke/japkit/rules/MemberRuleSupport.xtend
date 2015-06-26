@@ -12,6 +12,7 @@ import javax.lang.model.element.Modifier
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 import de.stefanocke.japkit.services.TypeElementNotFoundException
+import de.stefanocke.japkit.services.ReportedException
 
 @Data
 public abstract class MemberRuleSupport<E extends Element, T extends GenElement> extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
@@ -171,6 +172,9 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 			} catch (TypeElementNotFoundException tenfe) {
 				//If there is a tenfe, no members are generated and the dependency to the unknown type is registered
 				handleTypeElementNotFound(tenfe, currentAnnotatedClass)
+				emptyList
+			} catch (ReportedException re){
+				//Do not report again to avoid error flooding
 				emptyList
 			} catch(Exception re) {
 

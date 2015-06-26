@@ -25,6 +25,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 import java.util.Collections
+import de.stefanocke.japkit.services.ReportedException
 
 @Data
 class ClassRule extends AbstractRule{
@@ -173,8 +174,10 @@ class ClassRule extends AbstractRule{
 				} catch (TypeElementNotFoundException tenfe) {
 					handleTypeElementNotFound(tenfe, currentAnnotatedClass)
 					
-				} catch(Exception re) {
-					reportRuleError(re)				
+				} catch (ReportedException re){
+					//Do not report again to avoid error flooding
+				} catch(Exception e) {
+					reportRuleError(e)				
 				}
 				finally{
 					if(isTopLevelClass && !isAuxClass && generatedClass!=null){
