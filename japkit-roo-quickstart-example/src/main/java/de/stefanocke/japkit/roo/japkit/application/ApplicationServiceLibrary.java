@@ -11,20 +11,24 @@ public class ApplicationServiceLibrary {
 	@TypeQuery(annotation = ApplicationService.class, shadow = true, unique = true, filterAV = "aggregateRoots")
 	public class findApplicationService{}
 	
+	@Function(expr="#{src.CommandMethod.aggregateRoot}")
+	class cmdAggregateRoot{}
 	
-	@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo) && src.CommandMethod.aggregateRoot.isSame(fbo)}")
+	@Matcher(annotations=CommandMethod.class, condition="#{src.returnType.isSame(fbo) && src.cmdAggregateRoot.isSame(fbo)}")
 	class isCreateCommand{}
 	
-	@Matcher(annotations=CommandMethod.class, type=void.class , condition="#{src.CommandMethod.aggregateRoot.isSame(fbo)}")
+	@Matcher(annotations=CommandMethod.class, type=void.class , condition="#{src.cmdAggregateRoot.isSame(fbo)}")
 	class isUpdateCommand{}
 			
+	@Function(expr="#{src.declaredMethods}")
+	class declaredMethods{}
 	/**
 	 * src is the AppService.
 	 */
-	@Function(expr="#{src.declaredMethods}", filterFun=isCreateCommand.class)
+	@Function(fun=declaredMethods.class, filterFun=isCreateCommand.class)
 	public class findCreateCommandMethods{}
 	
-	@Function(expr="#{src.declaredMethods}", filterFun=isUpdateCommand.class)
+	@Function(fun=declaredMethods.class, filterFun=isUpdateCommand.class)
 	public class findUpdateCommandMethods{}
 	
 	/**
