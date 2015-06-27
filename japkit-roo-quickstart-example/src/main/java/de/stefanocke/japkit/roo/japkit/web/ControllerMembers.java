@@ -38,10 +38,15 @@ public abstract class ControllerMembers {
 	@Resource
 	private ApplicationService applicationService;
 	
-	@Template(src="#{createCommands.get(0)}", srcVar="cmdMethod", 
-			vars={@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
-			@Var(name="cmdName", expr="#{command.asElement().simpleName.toFirstLower}")})
+	@Template(src="#{createCommands.get(0)}", srcVar="cmdMethod")
 	abstract class Create{
+		@Var(expr="#{cmdMethod.parameters.get(0).asType()}")
+		@ClassSelector
+		class Command{}
+		
+		@Var(expr="#{command.asElement().simpleName.toFirstLower}")
+		class cmdName{}
+		
 		/**
 		 * @japkit.bodyCode <pre>
 		 * <code>
@@ -61,8 +66,6 @@ public abstract class ControllerMembers {
 		public abstract String create(@Valid Command $cmdName$, BindingResult bindingResult, Model uiModel,
 				RedirectAttributes redirectAttributes);
 	
-		@ClassSelector
-		class Command{}
 		
 		/**
 		 * @japkit.bodyCode <pre>

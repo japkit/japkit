@@ -25,7 +25,7 @@ class TriggerAnnotationRule extends AbstractRule{
 		super(triggerMetaAnnotation, triggerAnnotationTypeElement)
 		this.triggerAnnotationTypeElement = triggerAnnotationTypeElement
 
-		varRules=createELVariableRules(metaAnnotation, null)
+		varRules=createELVariableRules(metaAnnotation, triggerAnnotationTypeElement, null)
 		
 		//@Clazz
 		classRules=triggerAnnotationTypeElement.annotationMirrors(Clazz).map[new ClassRule(it, null ,true)].toList

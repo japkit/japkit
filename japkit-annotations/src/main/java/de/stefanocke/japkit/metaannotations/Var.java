@@ -1,7 +1,7 @@
 package de.stefanocke.japkit.metaannotations;
 
 public @interface Var {
-	String name();
+	String name() default "";
 	
 	/**
 	 * If true, the variable is not set if it already exists and is not null or empty.

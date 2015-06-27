@@ -6,6 +6,7 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 import javax.lang.model.element.Element
+import de.stefanocke.japkit.services.RuleException
 
 @Data
 class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
@@ -16,7 +17,11 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 
 	new(AnnotationMirror elVarAnnotation, Element metaElement) {
 		super(elVarAnnotation, null)
-		name = elVarAnnotation.value("name", String);
+		val nameFromAV = elVarAnnotation.value("name", String);
+		name = if(nameFromAV.nullOrEmpty) metaElement?.simpleName?.toString?.toFirstLower else nameFromAV
+		if(name.nullOrEmpty){
+			throw new RuleException("Either the name annotation value mut be set or the @Var annotation must be used at a member of a class.");
+		}
 		
 		ifEmpty = elVarAnnotation.value("ifEmpty", Boolean);
 		

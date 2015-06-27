@@ -32,6 +32,7 @@ import javax.lang.model.type.TypeMirror
 
 import static extension de.stefanocke.japkit.rules.JavadocUtil.*
 import de.stefanocke.japkit.services.ReportedException
+import de.stefanocke.japkit.metaannotations.Var
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -147,7 +148,7 @@ class RuleUtils {
 	) {
 			
 		val srcVarName = metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
-		val varRules = createELVariableRules(metaAnnotation, avPrefix)
+		val varRules = createELVariableRules(metaAnnotation, metaElement, avPrefix)
 		val libraryRules = createLibraryRules(metaAnnotation, avPrefix)
 		val selfLibrary = if(isLibrary) new LibraryRule(metaAnnotation, metaElement as TypeElement)
 		
@@ -210,8 +211,23 @@ class RuleUtils {
 	}
 	
 	
-	public def createELVariableRules(AnnotationMirror metaAnnotation, String avPrefix){
-		metaAnnotation?.value("vars".withPrefix(avPrefix), typeof(AnnotationMirror[]))?.map[new ELVariableRule(it, null)] ?: emptyList;
+	public def createELVariableRules(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix){
+		val rules = newArrayList();
+		//Create VarRules from the "vars" AV
+		rules.addAll(metaAnnotation?.value("vars".withPrefix(avPrefix), typeof(AnnotationMirror[]))?.map[new ELVariableRule(it, null)] ?: emptyList)
+		
+		//if the metaElement is a type element, search for members annotates with @Var and create variable rules for them
+		if(metaElement instanceof TypeElement){
+			rules.addAll(
+				metaElement.enclosedElementsOrdered.filter[isVariable].map[new ELVariableRule(it.annotationMirror(Var), it)]
+			)
+		}
+		
+		rules
+	}
+	
+	def boolean isVariable(Element memberElement) {
+		memberElement.annotationMirror(Var) != null
 	}
 	
 	public static val ALWAYS_ACTIVE = [| true]

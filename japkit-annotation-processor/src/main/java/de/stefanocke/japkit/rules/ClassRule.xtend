@@ -81,7 +81,7 @@ class ClassRule extends AbstractRule{
 		//Supports ELVariables in the scope of the generated class. For inner classes, this is already done in the inner class rule
 		//Note: src expression is currently not supported in the annotation, since generating multiple classes is not supported
 		//and would for instance be in conflict with ElementExtensions.generatedTypeElementAccordingToTriggerAnnotation 
-		varRules = if(isTopLevelClass) createELVariableRules(metaAnnotation, null) else null;
+		varRules = if(isTopLevelClass) createELVariableRules(metaAnnotation, templateClass, null) else null;
 		scopeRule = if(isTopLevelClass) createScopeRule(metaAnnotation, templateClass, null) else scopeWithCurrentSrc
 	}
 	

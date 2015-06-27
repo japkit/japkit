@@ -60,6 +60,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		}
 		
 		memberRules.addAll(templateClass.enclosedElementsOrdered
+			.filter[!isVariable]  //TODO: Violates SRP, since the knowledge about how to handle variables is spread to several places? Anyway: This is redundant as soon as a var is a function...
 			.map[createRuleForMember]
 			.filter[it!=null].toList
 		)	
