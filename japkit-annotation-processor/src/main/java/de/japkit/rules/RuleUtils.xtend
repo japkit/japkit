@@ -33,6 +33,7 @@ import javax.lang.model.type.TypeMirror
 import static extension de.japkit.rules.JavadocUtil.*
 import de.japkit.services.ReportedException
 import de.japkit.metaannotations.Var
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -270,10 +271,20 @@ class RuleUtils {
 						currentSrcElement.simpleName.toString
 					else {
 						try{
-							vs.get(expr)?.toString ?: {
-								reportRuleError('''Variable «expr» in "«template»"" could not be resolved.''')
+							var v = vs.get(expr);
+							if(v instanceof Function0<?>){
+								v = v.apply	
+							}
+													
+							if (v instanceof CharSequence){
+								v.toString
+							} else if(v==null) {
+								reportRuleError('''Variable «expr» in "«template»" could not be resolved.''')
+								expr								
+							} else {
+								reportRuleError('''Variable «expr» in "«template»" is no string or not a function that yields a string. Result was: «v».''')
 								expr
-							}						
+							}				
 						} catch(ElVariableError e){
 							//Do not report the error again here.
 							expr

@@ -8,4 +8,7 @@ public class CommonLibrary {
 
 	@Function(expr="#{src.simpleName.toFirstLower}")
 	public class nameFirstLower{}
+	
+	@Function(expr="#{src.simpleName.toFirstUpper}")
+	public class nameFirstUpper{}
 }

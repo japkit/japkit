@@ -25,12 +25,13 @@ import de.japkit.metaannotations.Var;
 import de.japkit.metaannotations.classselectors.ClassSelector;
 import de.japkit.roo.base.web.ControllerUtil;
 import de.japkit.roo.base.web.ResourceBundleNameProvider;
+import de.japkit.roo.japkit.CommonLibrary;
 import de.japkit.roo.japkit.CommonLibrary.nameFirstLower;
 
 @Controller
 @RequestMapping("/$path$")
 @RuntimeMetadata
-@Template(
+@Template(libraries=CommonLibrary.class,
 		templates={@TemplateCall(ControllerMembers.Create.class), @TemplateCall(ControllerMembers.Update.class)})
 public abstract class ControllerMembers {
 	@ClassSelector
@@ -192,8 +193,8 @@ public abstract class ControllerMembers {
 	/**
 	 * @japkit.bodyCode <code>return "#{dateTimeFormatStyle()}";</code>
 	 */
-	@Method(src = "datetimeProperties", nameExpr = "getDateTimeFormat#{src.name.toFirstUpper}")
-	abstract String getDateTimeFormat();
+	@Method(src = "datetimeProperties")
+	abstract String getDateTimeFormat$nameFirstUpper$();
 
 	//TODO: Eigentlich singleValueType.
 	/**
