@@ -25,6 +25,7 @@ import de.japkit.metaannotations.Var;
 import de.japkit.metaannotations.classselectors.ClassSelector;
 import de.japkit.roo.base.web.ControllerUtil;
 import de.japkit.roo.base.web.ResourceBundleNameProvider;
+import de.japkit.roo.japkit.CommonLibrary.nameFirstLower;
 
 @Controller
 @RequestMapping("/$path$")
@@ -43,7 +44,7 @@ public abstract class ControllerMembers {
 		@Var(expr="#{cmdMethod.parameters.get(0).asType()}")
 		class Command{}
 		
-		@Var(expr="#{command.asElement().simpleName.toFirstLower}")
+		@Var(fun={Command.class, nameFirstLower.class})
 		class cmdName{}
 		
 		/**
@@ -129,7 +130,7 @@ public abstract class ControllerMembers {
 	
 	@Template(src="#{updateCommands}", srcVar="cmdMethod", 
 			vars={@Var(name="command", expr="#{cmdMethod.parameters.get(0).asType()}"),
-			@Var(name="cmdNameU", expr="#{command.asElement().simpleName}"),
+			@Var(name="cmdNameU", expr="#{command.simpleName}"),
 			@Var(name="cmdName", expr="#{cmdNameU.toFirstLower}"),
 			@Var(name="cmdMethodName", expr="#{cmdMethod.simpleName.toString()}" )})
 	abstract class Update{
