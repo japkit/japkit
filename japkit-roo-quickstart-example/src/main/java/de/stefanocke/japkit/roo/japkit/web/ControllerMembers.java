@@ -41,7 +41,6 @@ public abstract class ControllerMembers {
 	@Template(src="#{createCommands.get(0)}", srcVar="cmdMethod")
 	abstract class Create{
 		@Var(expr="#{cmdMethod.parameters.get(0).asType()}")
-		@ClassSelector
 		class Command{}
 		
 		@Var(expr="#{command.asElement().simpleName.toFirstLower}")

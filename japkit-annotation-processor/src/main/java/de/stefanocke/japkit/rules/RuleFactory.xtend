@@ -20,6 +20,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import de.stefanocke.japkit.metaannotations.Switch
+import de.stefanocke.japkit.metaannotations.Var
 
 class RuleFactory {
 	
@@ -100,7 +101,8 @@ class RuleFactory {
 			TypeQuery->[am, e | new TypeQueryRule(am, e)],
 			ClassSelector->[am, e | new TypeRule(am, e)],
 			Properties->[am, e | new PropertyFilter(am, e)],
-			Switch->[am, e | new SwitchRule(am, e)]
+			Switch->[am, e | new SwitchRule(am, e)],
+			Var->[am, e | new ELVariableRule(am, e)]
 		]
 	
 	def private createFunctionInternal(Element element){

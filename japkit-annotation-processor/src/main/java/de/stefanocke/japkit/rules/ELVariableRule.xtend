@@ -9,7 +9,7 @@ import javax.lang.model.element.Element
 import de.stefanocke.japkit.services.RuleException
 
 @Data
-class ELVariableRule extends AbstractRule implements Function1<Object, Object>,  Function0<Object> {
+class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<Object> {
 	 
 	String name
 	boolean ifEmpty
@@ -51,13 +51,17 @@ class ELVariableRule extends AbstractRule implements Function1<Object, Object>, 
 			exprOrFunctionCallRule.apply
 		]
 	}
-
-	override apply(Object p) {
-		eval(p)
+	
+	override apply(Object arg0) {
+		throw new UnsupportedOperationException("The src for a VariableRule cannot be changed. ")
 	}
 	
+	//If a variable is referred to as function, it's value is retrieved from the stack.
+	//TODO: We could use the MetaElement as key, to have an "FQN" here.
 	override apply() {
-		eval(currentSrc)
+		valueStack.get(name)
 	}
+
+
 	
 }

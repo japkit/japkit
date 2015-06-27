@@ -219,7 +219,8 @@ class RuleUtils {
 		//if the metaElement is a type element, search for members annotates with @Var and create variable rules for them
 		if(metaElement instanceof TypeElement){
 			rules.addAll(
-				metaElement.enclosedElementsOrdered.filter[isVariable].map[new ELVariableRule(it.annotationMirror(Var), it)]
+				metaElement.enclosedElementsOrdered.filter[isVariable]
+					.map[createFunctionRule(it)].filter[it instanceof ELVariableRule].map[it as ELVariableRule]
 			)
 		}
 		
