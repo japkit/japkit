@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>de.stefanocke.japkit</groupId>
+		<groupId>de.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
@@ -11,7 +11,7 @@
 	<name>Japkit Annotation Processor - Xtend modules parent pom</name>
 	<packaging>pom</packaging>
 	<properties>
-        <xtend.version>2.8.2</xtend.version>
+        <xtend.version>2.8.3</xtend.version>
 	</properties>
 	<build>
 		<plugins>
@@ -48,17 +48,17 @@
 					</filesets>
 				</configuration>
 			</plugin>
-			
+
 		</plugins>
 	</build>
 	<dependencies>
-	
+
 		<dependency>
 			<groupId>org.eclipse.xtend</groupId>
 			<artifactId>org.eclipse.xtend.lib</artifactId>
 			<version>${xtend.version}</version>
 		</dependency>
-		
+
 	</dependencies>
-	
+
 </project>
