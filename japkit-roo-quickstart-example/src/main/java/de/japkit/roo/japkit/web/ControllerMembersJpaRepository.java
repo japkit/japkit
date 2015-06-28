@@ -12,13 +12,14 @@ import de.japkit.metaannotations.Var;
 import de.japkit.metaannotations.classselectors.ClassSelector;
 import de.japkit.roo.base.web.CrudOperations;
 import de.japkit.roo.base.web.RepositoryAdapter;
+import de.japkit.roo.japkit.CommonLibrary;
+import de.japkit.roo.japkit.CommonLibrary.nameFirstLower;
 import de.japkit.roo.japkit.domain.DomainLibrary.findRepository;
+import de.japkit.roo.japkit.web.JapkitWebScaffold.Repository;
 
 @RuntimeMetadata
-@Template
+@Template(libraries=CommonLibrary.class)
 public abstract class ControllerMembersJpaRepository {
-	@ClassSelector
-	class Repository {}
 	
 	/**${this.class.superclass.toString()}*/
 	@Field(commentLang="GStringTemplateInline")
@@ -26,23 +27,25 @@ public abstract class ControllerMembersJpaRepository {
 	private Repository repository;
 
 	
-	@Template(src="#{relatedEntities}", srcCollect="#{src.asType()}", srcVar="relatedEntity", 
-			vars={
-				@Var(name="repository", expr = "#{relatedEntity}", fun=findRepository.class, nullable=true),
-				@Var(name="repositoryFieldName", expr = "#{relatedEntity.simpleName.toFirstLower}Repository")
-			})
+	@Template(src="#{relatedEntities}", srcCollect="#{src.asType()}")
 	abstract class RelatedEntityMembers{
-		@Field(cond="#{repository!=null}")
-		@Autowired
-		private Repository $repositoryFieldName$;
-		
-		@ClassSelector
+		@Var
 		class RelatedEntity {}
+		
+		@Var(fun={RelatedEntity.class, findRepository.class}, nullable=true)
+		class RelatedEntityRepository {}
+		
+		@Var(fun={RelatedEntity.class, nameFirstLower.class})
+		class repositoryFieldName {}
+		
+		@Field(cond="#{relatedEntityRepository !=null}")
+		@Autowired
+		private RelatedEntityRepository  $repositoryFieldName$;
 		
 		/**
 		 * #{src}  #{src.singleValueType} #{repository}
 		 */
-		@Method(cond="#{repository!=null}", src = "#{entityProperties}",  srcFilter="#{src.singleValueType.isSame(relatedEntity)}" , 			
+		@Method(cond="#{relatedEntityRepository!=null}", src = "#{entityProperties}",  srcFilter="#{src.singleValueType.isSame(relatedEntity)}" , 			
 				bodyCode = "return #{repositoryFieldName}.findAll();")
 		protected abstract List<RelatedEntity> get$srcElementName$Choices();
 	}

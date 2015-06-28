@@ -57,7 +57,6 @@ import de.japkit.roo.japkit.web.WebScaffoldLibrary.viewableProperties;
 		@Var(name = "entityProperties", expr = "#{viewProperties}", filterFun = isEntity.class),
 		@Var(name = "relatedEntities", expr = "#{entityProperties}", collect="#{src.singleValueType.asElement()}"),
 				
-		@Var(name = "repository", type = TypeMirror.class, ifEmpty = true, expr="#{fbo}", fun=findRepository.class),		
 		@Var(name = "applicationService", expr="#{fbo}", fun=findApplicationService.class),
 
 		@Var(name="createCommands", expr="#{applicationService}", fun=findCreateCommandMethods.class),
@@ -145,10 +144,13 @@ public @interface JapkitWebScaffold {
 	 *         default, the class name with first lower case.
 	 */
 	String modelAttribute() default "";
-
+		
 	@SuppressWarnings("rawtypes")
 	@SingleValue
 	Class<? extends JpaRepository>[] repository() default {};
+	
+	@Var(type = TypeMirror.class, ifEmpty = true, expr="#{fbo}", fun=findRepository.class)	
+	class Repository{};
 
 	@SingleValue
 	Class<?>[] applicationService() default {};
