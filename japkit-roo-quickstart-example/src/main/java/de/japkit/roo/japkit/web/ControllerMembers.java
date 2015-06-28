@@ -20,7 +20,6 @@ import de.japkit.metaannotations.Clazz;
 import de.japkit.metaannotations.Field;
 import de.japkit.metaannotations.Method;
 import de.japkit.metaannotations.Template;
-import de.japkit.metaannotations.TemplateCall;
 import de.japkit.metaannotations.Var;
 import de.japkit.metaannotations.classselectors.ClassSelector;
 import de.japkit.roo.base.web.ControllerUtil;
@@ -31,8 +30,7 @@ import de.japkit.roo.japkit.CommonLibrary.nameFirstLower;
 @Controller
 @RequestMapping("/$path$")
 @RuntimeMetadata
-@Template(libraries=CommonLibrary.class,
-		templates={@TemplateCall(ControllerMembers.Create.class), @TemplateCall(ControllerMembers.Update.class)})
+@Template(libraries=CommonLibrary.class)
 public abstract class ControllerMembers {
 	@ClassSelector
 	class ApplicationService{}

@@ -35,10 +35,7 @@ import de.japkit.roo.japkit.domain.DomainLibrary.isVO;
 
 @RuntimeMetadata
 @Service
-//TODO: Den Call hier könnte man sich ggf. sparen, wenn (non-static ?) Templates innerhalb von templates immer direkt ausgeführt würden.
-@Template(
-		templates=@TemplateCall(ApplicationServiceTemplate.ApplicationServiceMethodsForAggregate.class)
-) 
+@Template() 
 public class ApplicationServiceTemplate {
 	
 	@Template(src="#{aggregateRoots}", srcVar="aggregate", 
@@ -51,12 +48,9 @@ public class ApplicationServiceTemplate {
 			@Var(name = "repository", expr="#{findRepository()}"),
 			@Var(name="repositoryName", expr="#{aggregateNameLower}Repository"),
 		
-		},
-		templates={
-			@TemplateCall(ApplicationServiceMethodsForAggregate.UpdateCommands.class),
-			@TemplateCall(ApplicationServiceMethodsForAggregate.CreateCommands.class)}
+		}
 	)
-	public static abstract class ApplicationServiceMethodsForAggregate {
+	public abstract class ApplicationServiceMethodsForAggregate {
 		@Matcher(modifiers=PUBLIC, type=void.class)
 		class publicVoid{}
 		
@@ -75,7 +69,7 @@ public class ApplicationServiceTemplate {
 								value="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
 					},
 					code="command.#{findGetter(cmdProperties, src).simpleName}()")
-		static class paramsFromCommand{}
+		class paramsFromCommand{}
 
 		@CodeFragment(vars={
 				@Var(name="dtoGetter", expr="#{findGetter(cmdProperties, src)}"),
@@ -83,13 +77,13 @@ public class ApplicationServiceTemplate {
 				}, 
 				iterator="#{dto.properties}" ,
 				code=".#{src.setter.simpleName}(command.#{dtoGetter.simpleName}().#{src.getter.simpleName}())") //Quick&Dirty
-		static class fluentVOSettersFromDTO{}
+		class fluentVOSettersFromDTO{}
 
 		@ClassSelector
-		public static class Repository{}
+		public class Repository{}
 		
 		@ClassSelector
-		public static class Aggregate{}
+		public class Aggregate{}
 		
 		@Order(0)
 		@Field
@@ -98,7 +92,7 @@ public class ApplicationServiceTemplate {
 		
 		@Order(1)
 		@Template(src="aggregateUpdateMethods", srcVar="method")
-		static class UpdateCommands{
+		class UpdateCommands{
 			@Order(1)
 			@Clazz(nameExpr="#{method.simpleName.toFirstUpper}Command", behaviorClass=BehaviorInnerClassWithGenClassPrefix.class)
 			@ClassSelector(expr="#{command.asType()}")
@@ -131,7 +125,7 @@ public class ApplicationServiceTemplate {
 		
 		@Order(2)
 		@Template(src="aggregateCreateMethods", srcVar="method")
-		static class CreateCommands{
+		class CreateCommands{
 			@Order(1)
 			@Clazz(nameExpr="Create#{aggregateName}Command")
 			@ClassSelector(expr="#{command.asType()}")
@@ -163,37 +157,6 @@ public class ApplicationServiceTemplate {
 		}
 	
 		
-		@Template(
-				vars={@Var(name="fieldType", expr="#{src.asType()}")},
-						fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
-								getter=@Getter, setter=@Setter)
-		)
-		public static class CommandFieldTemplate{
-			
-			@Order(1)
-			@Clazz(condFun=isVO.class,
-					src="#{fieldType.asElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
-					 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
-			@ResultVar("dtoClass")
-			@DTO
-			public class DTOClass{}	
-			
-			@Switch({
-				@Case(condFun=isVO.class, value="#{dtoClass.asType()}"),
-				@Case(cond="#{true}", value = "#{fieldType}" )
-			})
-			class FieldType{}
-			
-			@Order(2)			
-			@Field()
-			private FieldType $srcElementName$;
-			
-				
-			
-		}
-		
-		
-		
 		/**
 		 *  @japkit.bodyCode <pre>
 		 * <code>
@@ -209,5 +172,34 @@ public class ApplicationServiceTemplate {
 		 * </pre>
 		 */
 		public Aggregate find$aggregateName$(long id, Long version){return null;}
+	}
+
+	@Template(
+			vars={@Var(name="fieldType", expr="#{src.asType()}")},
+					fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
+							getter=@Getter, setter=@Setter)
+	)
+	public static class CommandFieldTemplate{
+		
+		@Order(1)
+		@Clazz(condFun=isVO.class,
+				src="#{fieldType.asElement}", srcVar="vo", nameExpr="#{vo.simpleName}DTO",
+				 templates = {@TemplateCall(value=CommandFieldTemplate.class, src="#{vo.properties}")})
+		@ResultVar("dtoClass")
+		@DTO
+		public class DTOClass{}	
+		
+		@Switch({
+			@Case(condFun=isVO.class, value="#{dtoClass.asType()}"),
+			@Case(cond="#{true}", value = "#{fieldType}" )
+		})
+		class FieldType{}
+		
+		@Order(2)			
+		@Field()
+		private FieldType $srcElementName$;
+		
+			
+		
 	}
 }

@@ -20,6 +20,7 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
+import de.japkit.metaannotations.Template
 
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
@@ -84,6 +85,12 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 					cr.generateClass(null, null)
 				]
 		}
+		//immediately execute non-static inner-templates
+		val templateAnnotation = member.annotationMirror(Template)
+		if(templateAnnotation != null && !member.static){
+			return createTemplateRule(member);
+		}
+		
 		return null
 	}
 	

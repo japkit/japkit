@@ -8,7 +8,6 @@ import de.japkit.annotations.RuntimeMetadata;
 import de.japkit.metaannotations.Field;
 import de.japkit.metaannotations.Method;
 import de.japkit.metaannotations.Template;
-import de.japkit.metaannotations.TemplateCall;
 import de.japkit.metaannotations.Var;
 import de.japkit.metaannotations.classselectors.ClassSelector;
 import de.japkit.roo.base.web.CrudOperations;
@@ -16,9 +15,7 @@ import de.japkit.roo.base.web.RepositoryAdapter;
 import de.japkit.roo.japkit.domain.DomainLibrary.findRepository;
 
 @RuntimeMetadata
-@Template(
-		templates=@TemplateCall(value = ControllerMembersJpaRepository.RelatedEntityMembers.class)
-		)
+@Template
 public abstract class ControllerMembersJpaRepository {
 	@ClassSelector
 	class Repository {}
