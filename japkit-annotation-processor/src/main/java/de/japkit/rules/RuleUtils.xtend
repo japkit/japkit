@@ -34,6 +34,8 @@ import static extension de.japkit.rules.JavadocUtil.*
 import de.japkit.services.ReportedException
 import de.japkit.metaannotations.Var
 import org.eclipse.xtext.xbase.lib.Functions.Function0
+import java.util.LinkedHashSet
+import java.util.Collection
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -64,6 +66,7 @@ class RuleUtils {
 		createExpressionOrFunctionCallAndFilterRule(metaAnnotation, null, "src", "srcFun", "srcLang", 
 			"srcFilter", "srcFilterFun", 
 			"srcCollect", "srcCollectFun", 
+			"srcToSet",
 			"srcType", avPrefix, [| currentSrc], false
 		)
 	}
@@ -75,6 +78,7 @@ class RuleUtils {
 		String exprAV, String funAV, String langAV, 
 		String filterExprAV, String filterFunAV, 
 		String collectExprAV, String collectFunAV, 
+		String toSetAV,
 		String typeAV, String avPrefix,
 		()=>Object defaultValue, boolean nullable
 	) {
@@ -96,6 +100,8 @@ class RuleUtils {
 		
 		val srcFilterExprOrFunction = new ExpressionOrFunctionCallRule(metaAnnotation, metaElement, Boolean, 
 			filterExprAV, langAV, filterFunAV, avPrefix, null, false, ExpressionOrFunctionCallRule.AND_COMBINER);
+			
+		val toSet = metaAnnotation?.value(toSetAV, Boolean) ?: false;
 
 		[|
 			var srcElements =  {
@@ -111,19 +117,26 @@ class RuleUtils {
 						elements
 					} 
 				} 
-			if(srcElements instanceof Iterable<?> && !srcFilterExprOrFunction.undefined){
-				srcElements = (srcElements as Iterable<?>).filter[
-					scope(it)[
-						srcFilterExprOrFunction.apply ?: false
+				
+			if(srcElements instanceof Iterable<?>){
+				if(!srcFilterExprOrFunction.undefined){
+					srcElements = srcElements.filter[
+						scope(it)[
+							srcFilterExprOrFunction.apply ?: false
+						]
 					]
-				]
-			}
-			if(srcElements instanceof Iterable<?> && !collectExprOrFunction.undefined){
-				srcElements = (srcElements as Iterable<?>).map[
-					scope(it)[
-						collectExprOrFunction.apply ?: false
+				}
+				if(!collectExprOrFunction.undefined){
+					srcElements = (srcElements as Iterable<?>).map[
+						scope(it)[
+							collectExprOrFunction.apply ?: false
+						]
 					]
-				]
+				}
+				if(toSet){
+					srcElements = (srcElements as Iterable<?>).toSet
+				}
+			
 			}
 			srcElements
 		]

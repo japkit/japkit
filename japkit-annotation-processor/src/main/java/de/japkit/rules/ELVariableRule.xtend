@@ -28,7 +28,7 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 		val nullable = elVarAnnotation.value("nullable", Boolean) ?: false;
 		
 		exprOrFunctionCallRule = createExpressionOrFunctionCallAndFilterRule(metaAnnotation, metaElement,
-			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "type", null,
+			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "toSet", "type", null,
 			[|currentSrc], nullable
 		)
 		

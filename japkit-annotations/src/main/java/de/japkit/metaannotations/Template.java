@@ -75,6 +75,13 @@ public @interface Template {
 	String srcCollect() default "";
 
 	/**
+	 * If true, and src is a collection, it is transformed to a LinkedHashSet to remove duplicates while preserving order.
+	 * 
+	 * @return
+	 */
+	boolean srcToSet() default false;
+
+	/**
 	 * As an alternative or additionally to the collect expression, one or more functions can be called. 
 	 * In case of more than one function, they are called in a "fluent" style. That is each one is applied to the result of the previous one. 
 	 * The first function is always applied to the result of the collect expression or to the current collection element if collect expression is empty.

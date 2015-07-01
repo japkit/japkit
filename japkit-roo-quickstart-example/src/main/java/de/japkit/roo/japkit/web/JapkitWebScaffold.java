@@ -53,9 +53,6 @@ import de.japkit.roo.japkit.web.WebScaffoldLibrary.viewableProperties;
 		
 		@Var(name = "explicitTableProperties", expr = "#{viewProperties}", filterFun = isTableColumn.class),
 		@Var(name = "tableProperties", expr = "#{explicitTableProperties.isEmpty() ? viewProperties : explicitTableProperties}"),
-		
-		@Var(name = "entityProperties", expr = "#{viewProperties}", filterFun = isEntity.class),
-		@Var(name = "relatedEntities", expr = "#{entityProperties}", collect="#{src.singleValueType.asElement()}"),
 				
 		@Var(name = "applicationService", expr="#{fbo}", fun=findApplicationService.class),
 

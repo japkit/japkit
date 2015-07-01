@@ -200,13 +200,6 @@ public abstract class ControllerMembers {
 	 */
 	@Method(imports = Arrays.class, bodyIterator="enumProperties")
 	abstract void addEnumChoices(Model uiModel);
-	
-	//TODO: Eigentlich singleValueType.
-	/**
-	 * @japkit.bodyCode <code>uiModel.addAttribute("${src.name}Choices", get${src.name.toFirstUpper}Choices());</code>
-	 */
-	@Method(bodyIterator="entityProperties")
-	abstract void addEntityChoices(Model uiModel);
 
 	/**
 	 * @japkit.bodyCode <pre>
