@@ -11,6 +11,7 @@ import de.japkit.metaannotations.Method;
 import de.japkit.metaannotations.Template;
 import de.japkit.metaannotations.Var;
 import de.japkit.metaannotations.classselectors.SrcSingleValueType;
+import de.japkit.metaannotations.classselectors.SrcType;
 import de.japkit.roo.base.web.CrudOperations;
 import de.japkit.roo.base.web.RepositoryAdapter;
 import de.japkit.roo.japkit.CommonLibrary;
@@ -36,15 +37,12 @@ public abstract class ControllerMembersJpaRepository {
 	@Template(src="#{relatedEntityRepositories.keySet()}") 
 	abstract class RelatedEntityMembers{
 		
-		@Var(expr="#{src}")
-		class RelatedEntityRepository {}
-		
-		@Var(fun={RelatedEntityRepository.class, nameFirstLower.class})
+		@Var(fun=nameFirstLower.class)
 		class repositoryFieldName {}
 		
 		@Field
 		@Autowired
-		private RelatedEntityRepository  $repositoryFieldName$;
+		private SrcType $repositoryFieldName$;
 		
 		
 		@Method(src="#{relatedEntityRepositories[src]}", 			
