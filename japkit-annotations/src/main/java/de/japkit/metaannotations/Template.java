@@ -80,7 +80,30 @@ public @interface Template {
 	 * @return
 	 */
 	boolean srcToSet() default false;
+	
+	//"srcGroupBy", "srcGroupByFun",
+	
+	/**
+	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set, the collection elements are grouped as a map, where 
+	 * the keys are the results of applying srcGroupBy and / or srcGroupByFun to the collection elements and the values are lists 
+	 * of collection elements with same key. SrcGroupBy is an expression and srcGroupByFun is a list of functions. 
+	 * They are applied in a fluent style (like src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
+	 * 
+	 * @return the expression to derive the key from a collection element. The collection element is provided as "src".
+	 */
+	String srcGroupBy() default "";
+	
 
+	/**
+	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set, the collection elements are grouped as a map, where 
+	 * the keys are the results of applying srcGroupBy and / or srcGroupByFun to the collection elements and the values are lists 
+	 * of collection elements with same key. SrcGroupBy is an expression and srcGroupByFun is a list of functions. 
+	 * They are applied in a fluent style (like src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
+	 * 
+	 * @return function(s) to derive the key from a collection element. The collection element is provided as "src".
+	 */
+	Class<?>[] srcGroupByFun() default {};
+	
 	/**
 	 * As an alternative or additionally to the collect expression, one or more functions can be called. 
 	 * In case of more than one function, they are called in a "fluent" style. That is each one is applied to the result of the previous one. 

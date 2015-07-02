@@ -15,7 +15,7 @@ class FunctionRule extends AbstractFunctionRule<Object> {
 		val nullable = metaAnnotation.value("nullable", Boolean) ?: false;
 		
 		exprOrFunctionCallRule = createExpressionOrFunctionCallAndFilterRule(metaAnnotation, metaElement,
-			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "toSet", "type", null,
+			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "toSet", "groupBy", "groupByFun","type", null,
 			[|currentSrc], nullable
 		)
 		

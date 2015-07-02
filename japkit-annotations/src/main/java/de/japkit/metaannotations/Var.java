@@ -63,6 +63,28 @@ public @interface Var {
 	 */
 	Class<?>[] collectFun() default {};
 	
+	
+	/**
+	 * If src is a collection, and groupBy and / or groupByFun are set, the collection elements are grouped as a map, where 
+	 * the keys are the results of applying groupBy and / or groupByFun to the collection elements and the values are lists 
+	 * of collection elements with same key. groupBy is an expression and groupByFun is a list of functions. 
+	 * They are applied in a fluent style (like src.groupBy().groupByFun[0]().groupByFun[1]()...).
+	 * 
+	 * @return the expression to derive the key from a collection element. The collection element is provided as "src".
+	 */
+	String groupBy() default "";
+	
+
+	/**
+	 * If src is a collection, and groupBy and / or groupByFun are set, the collection elements are grouped as a map, where 
+	 * the keys are the results of applying groupBy and / or groupByFun to the collection elements and the values are lists 
+	 * of collection elements with same key. groupBy is an expression and groupByFun is a list of functions. 
+	 * They are applied in a fluent style (like src.groupBy().groupByFun[0]().groupByFun[1]()...).
+	 * 
+	 * @return function(s) to derive the key from a collection element. The collection element is provided as "src".
+	 */
+	Class<?>[] groupByFun() default {};
+	
 
 	Class<?> type() default Object.class;
 	

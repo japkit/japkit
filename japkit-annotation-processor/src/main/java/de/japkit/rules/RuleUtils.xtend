@@ -67,6 +67,7 @@ class RuleUtils {
 			"srcFilter", "srcFilterFun", 
 			"srcCollect", "srcCollectFun", 
 			"srcToSet",
+			"srcGroupBy", "srcGroupByFun",
 			"srcType", avPrefix, [| currentSrc], false
 		)
 	}
@@ -79,6 +80,7 @@ class RuleUtils {
 		String filterExprAV, String filterFunAV, 
 		String collectExprAV, String collectFunAV, 
 		String toSetAV,
+		String groupByAV, String groupByFunAV,
 		String typeAV, String avPrefix,
 		()=>Object defaultValue, boolean nullable
 	) {
@@ -92,6 +94,9 @@ class RuleUtils {
 		
 		val collectExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, metaElement, Object, 
 			collectExprAV, langAV, collectFunAV, avPrefix, null, nullable, null)
+			
+		val groupByExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, metaElement, Object, 
+			groupByAV, langAV, groupByFunAV, avPrefix, null, false, null)
 			
 		//TODO: Typecheck here does not make sense in case of collect !? 	
 		val srcExprOrFunction = new ExpressionOrFunctionCallRule<Object>(metaAnnotation, metaElement, typeClass, 
@@ -129,12 +134,19 @@ class RuleUtils {
 				if(!collectExprOrFunction.undefined){
 					srcElements = (srcElements as Iterable<?>).map[
 						scope(it)[
-							collectExprOrFunction.apply ?: false
+							collectExprOrFunction.apply 
 						]
 					]
 				}
 				if(toSet){
 					srcElements = (srcElements as Iterable<?>).toSet
+				}
+				if(!groupByExprOrFunction.undefined){
+					srcElements = (srcElements as Iterable<?>).groupBy[
+						scope(it)[
+							groupByExprOrFunction.apply
+						]
+					]
 				}
 			
 			}

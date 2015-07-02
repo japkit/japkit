@@ -10,6 +10,7 @@ import de.japkit.metaannotations.Field;
 import de.japkit.metaannotations.Method;
 import de.japkit.metaannotations.Template;
 import de.japkit.metaannotations.Var;
+import de.japkit.metaannotations.classselectors.SrcSingleValueType;
 import de.japkit.roo.base.web.CrudOperations;
 import de.japkit.roo.base.web.RepositoryAdapter;
 import de.japkit.roo.japkit.CommonLibrary;
@@ -29,12 +30,13 @@ public abstract class ControllerMembersJpaRepository {
 	@Var(expr = "#{viewProperties}", filterFun = isEntity.class)
 	class entityProperties{}
 	
-	@Template(src="#{entityProperties}", srcCollect="#{src.singleValueType.asElement}", srcToSet = true) 
+	@Var(expr="#{entityProperties}", groupBy="#{src.singleValueType}", groupByFun=findRepository.class)
+	class relatedEntityRepositories{}
+	
+	@Template(src="#{relatedEntityRepositories.keySet()}") 
 	abstract class RelatedEntityMembers{
-		@Var(expr="#{src.asType()}")
-		class RelatedEntity {}
 		
-		@Var(fun={RelatedEntity.class, findRepository.class})
+		@Var(expr="#{src}")
 		class RelatedEntityRepository {}
 		
 		@Var(fun={RelatedEntityRepository.class, nameFirstLower.class})
@@ -44,9 +46,10 @@ public abstract class ControllerMembersJpaRepository {
 		@Autowired
 		private RelatedEntityRepository  $repositoryFieldName$;
 		
-		@Method(srcFun=entityProperties.class,  srcFilter="#{src.singleValueType.isSame(relatedEntity)}" , 			
+		
+		@Method(src="#{relatedEntityRepositories[src]}", 			
 				bodyCode = "return #{repositoryFieldName}.findAll();")
-		protected abstract List<RelatedEntity> get$srcElementName$Choices();
+		protected abstract List<SrcSingleValueType> get$srcElementName$Choices();
 	}
 
 	@Method(imports = RepositoryAdapter.class,

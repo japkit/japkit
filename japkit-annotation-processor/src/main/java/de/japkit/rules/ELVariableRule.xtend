@@ -20,7 +20,7 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 		val nameFromAV = elVarAnnotation.value("name", String);
 		name = if(nameFromAV.nullOrEmpty) metaElement?.simpleName?.toString?.toFirstLower else nameFromAV
 		if(name.nullOrEmpty){
-			throw new RuleException("Either the name annotation value mut be set or the @Var annotation must be used at a member of a class.");
+			throw new RuleException("Either the name annotation value must be set or the @Var annotation must be used at a member of a class.");
 		}
 		
 		ifEmpty = elVarAnnotation.value("ifEmpty", Boolean);
@@ -28,7 +28,7 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 		val nullable = elVarAnnotation.value("nullable", Boolean) ?: false;
 		
 		exprOrFunctionCallRule = createExpressionOrFunctionCallAndFilterRule(metaAnnotation, metaElement,
-			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "toSet", "type", null,
+			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "toSet", "groupBy", "groupByFun", "type", null,
 			[|currentSrc], nullable
 		)
 		
