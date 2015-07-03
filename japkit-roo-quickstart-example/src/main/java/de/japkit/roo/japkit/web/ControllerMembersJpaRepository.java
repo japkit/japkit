@@ -11,11 +11,12 @@ import de.japkit.metaannotations.Method;
 import de.japkit.metaannotations.Template;
 import de.japkit.metaannotations.Var;
 import de.japkit.metaannotations.classselectors.SrcSingleValueType;
-import de.japkit.metaannotations.classselectors.SrcType;
 import de.japkit.roo.base.web.CrudOperations;
 import de.japkit.roo.base.web.RepositoryAdapter;
 import de.japkit.roo.japkit.CommonLibrary;
+import de.japkit.roo.japkit.CommonLibrary.key;
 import de.japkit.roo.japkit.CommonLibrary.nameFirstLower;
+import de.japkit.roo.japkit.CommonLibrary.value;
 import de.japkit.roo.japkit.domain.DomainLibrary.findRepository;
 import de.japkit.roo.japkit.domain.DomainLibrary.isEntity;
 import de.japkit.roo.japkit.web.JapkitWebScaffold.Repository;
@@ -31,22 +32,18 @@ public abstract class ControllerMembersJpaRepository {
 	@Var(expr = "#{viewProperties}", filterFun = isEntity.class)
 	class entityProperties{}
 	
-	@Var(expr="#{entityProperties}", groupBy="#{src.singleValueType}", groupByFun=findRepository.class)
-	class relatedEntityRepositories{}
-	
-	@Template(src="#{relatedEntityRepositories.keySet()}") 
+	@Template(srcFun=entityProperties.class, srcGroupBy="#{src.singleValueType}", srcGroupByFun=findRepository.class ) 
 	abstract class RelatedEntityMembers{
 		
-		@Var(fun=nameFirstLower.class)
+		@Var(fun={key.class, nameFirstLower.class})
 		class repositoryFieldName {}
 		
 		@Field
 		@Autowired
-		private SrcType $repositoryFieldName$;
+		private key $repositoryFieldName$;
 		
 		
-		@Method(src="#{relatedEntityRepositories[src]}", 			
-				bodyCode = "return #{repositoryFieldName}.findAll();")
+		@Method(srcFun=value.class, bodyCode = "return #{repositoryFieldName}.findAll();")
 		protected abstract List<SrcSingleValueType> get$srcElementName$Choices();
 	}
 

@@ -36,6 +36,7 @@ import de.japkit.metaannotations.Var
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import java.util.LinkedHashSet
 import java.util.Collection
+import java.util.Map
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -189,13 +190,16 @@ class RuleUtils {
 						
 				val src = srcRule?.apply ?: currentSrc;
 	
-				val iterate = iterateIfIterable && src instanceof Iterable<?>		
+				val iterate = iterateIfIterable && (src instanceof Iterable<?> || src instanceof Map<?,?>)		
 				
-				val result = if(iterate){ (src as Iterable<?>).map [ e |
+				
+				val result = if(iterate){
+					val iterable = if(src instanceof Iterable<?>) src else (src as Map<?,?>).entrySet
+					iterable.map [ e |
 						doInScope(e, srcVarName, libraryRules, selfLibrary, varRules, closure)
 					].toList			
-				}
-				else{ 
+				
+				} else{ 
 					newArrayList(doInScope(src, srcVarName, libraryRules, selfLibrary, varRules, closure))				
 				};	
 				if(resultVarAnnotation!=null && !resultVarName.nullOrEmpty){
