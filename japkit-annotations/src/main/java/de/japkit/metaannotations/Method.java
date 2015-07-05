@@ -77,6 +77,33 @@ public @interface Method {
 	Class<?>[] srcCollectFun() default {};
 	
 	/**
+	 * If true, and src is a collection, it is transformed to a LinkedHashSet to remove duplicates while preserving order.
+	 * 
+	 * @return
+	 */
+	boolean srcToSet() default false;
+	
+	/**
+	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set, the collection elements are grouped as a map, where 
+	 * the keys are the results of applying srcGroupBy and / or srcGroupByFun to the collection elements and the values are lists 
+	 * of collection elements with same key. SrcGroupBy is an expression and srcGroupByFun is a list of functions. 
+	 * They are applied in a fluent style (like src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
+	 * 
+	 * @return the expression to derive the key from a collection element. The collection element is provided as "src".
+	 */
+	String srcGroupBy() default "";
+	
+	/**
+	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set, the collection elements are grouped as a map, where 
+	 * the keys are the results of applying srcGroupBy and / or srcGroupByFun to the collection elements and the values are lists 
+	 * of collection elements with same key. SrcGroupBy is an expression and srcGroupByFun is a list of functions. 
+	 * They are applied in a fluent style (like src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
+	 * 
+	 * @return function(s) to derive the key from a collection element. The collection element is provided as "src".
+	 */
+	Class<?>[] srcGroupByFun() default {};
+		
+	/**
 	 * 
 	 * @return the language of the src expression. Defaults to Java EL.
 	 */

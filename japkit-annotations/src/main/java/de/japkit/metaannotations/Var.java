@@ -63,6 +63,12 @@ public @interface Var {
 	 */
 	Class<?>[] collectFun() default {};
 	
+	/**
+	 * If true, and src is a collection, it is transformed to a LinkedHashSet to remove duplicates while preserving order.
+	 * 
+	 * @return
+	 */
+	boolean toSet() default false;
 	
 	/**
 	 * If src is a collection, and groupBy and / or groupByFun are set, the collection elements are grouped as a map, where 
