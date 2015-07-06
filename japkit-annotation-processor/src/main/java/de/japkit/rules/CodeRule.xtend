@@ -32,16 +32,17 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	String afterExpr
 	String separator
 	String emptyExpr
+	String errorValue
 	(CharSequence)=>CharSequence defaultFragmentsRule
 	boolean linebreak
 	boolean indentAfterLinebreak
 	
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
-		this(metaAnnotation, null, avPrefix)
+		this(metaAnnotation, null, avPrefix, "")
 	}
 	
-	new(AnnotationMirror metaAnnotation, Element template, String avPrefix){
+	new(AnnotationMirror metaAnnotation, Element template, String avPrefix, String errorValue){
 		super(metaAnnotation, template)
 		this.template=template
 		
@@ -63,6 +64,8 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 		afterExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "afterIteratorCode".withPrefix(avPrefix)) 
 		emptyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "emptyIteratorCode".withPrefix(avPrefix)) 
 
+		this.errorValue = errorValue;
+		
 		//body iterator
 		iteratorExpr = metaAnnotation?.value("iterator".withPrefix(avPrefix), String)
 		iteratorLang = metaAnnotation?.value("iteratorLang".withPrefix(avPrefix), String)
@@ -163,9 +166,9 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 					reportRuleError('''Import for «it» not possible since it conflicts with existing import''', 'imports')
 				}
 			]
-			handleTypeElementNotFound(null, '''Code body «bodyExpr» could not be generated''') [
+			handleTypeElementNotFound(null, errorValue) [
 				val result = if (iteratorExpr.nullOrEmpty) {
-						code(bodyCases, bodyExpr, lang, 'throw new UnsupportedOperationException();')
+						code(bodyCases, bodyExpr, lang, errorValue)
 					} else {
 						val bodyIterator = eval(iteratorExpr, iteratorLang, Iterable,
 							'''Error in code body iterator expression.''', emptyList)
@@ -179,8 +182,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 									SEPARATOR separator + if(linebreak) StringConcatenation.DEFAULT_LINE_DELIMITER else ''
 									AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''.indent
 						} else {
-							eval(emptyExpr, lang, CharSequence, '''Error in code body empty expression.''',
-								'throw new UnsupportedOperationException();')
+							eval(emptyExpr, lang, CharSequence, '''Error in code body empty expression.''',	errorValue)
 						}
 					}
 				

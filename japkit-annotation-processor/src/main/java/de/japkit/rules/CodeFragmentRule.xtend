@@ -12,7 +12,7 @@ class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 	((Object)=>CharSequence)=>List<CharSequence> scopeRule
 	
 	new(AnnotationMirror metaAnnotation, Element metaElement) {
-		super(metaAnnotation, metaElement, '')
+		super(metaAnnotation, metaElement, '', '''/**Error in CodeFragement «metaAnnotation» «metaElement»*/''')
 		activation = metaAnnotation.elementMatchers("activation")
 		scopeRule = createScopeRule(metaAnnotation, metaElement, false, null, null, false)  //scopeRule without iteration
 	}

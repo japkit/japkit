@@ -52,7 +52,8 @@ abstract class ExecutableElementRule<G extends GenExecutableElement> extends Mem
 	}
 	
 	def protected (G)=>CodeBody createCodeBodyRule(){
-		val cr = new CodeRule(metaAnnotation, template, "body");
+		val cr = new CodeRule(metaAnnotation, template, "body", 
+			'''throw new UnsupportedOperationException(); /**Error in CodeRule «metaAnnotation» «metaElement»*/''');
 		[genElement | CodeRule.getAsCodeBody(genElement, cr)]
 	}
 	
