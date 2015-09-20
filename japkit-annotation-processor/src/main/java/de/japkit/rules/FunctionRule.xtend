@@ -16,7 +16,7 @@ class FunctionRule extends AbstractFunctionRule<Object> {
 		
 		exprOrFunctionCallRule = createExpressionOrFunctionCallAndFilterRule(metaAnnotation, metaElement,
 			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "toSet", "groupBy", "groupByFun","type", null,
-			[|currentSrc], nullable
+			[|currentSrc], nullable, "unique"
 		)
 		
 	}

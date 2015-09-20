@@ -67,7 +67,7 @@ class GenerateClassContext {
 				ExtensionRegistry.get(MessageCollector).reportRuleError(rule, "Potential infinite recursion.", null)		
 			]
 			
-			throw new RuleStackOverflowError("Potential infinite recursion.")
+			throw new RuleStackOverflowError("Potential infinite recursion. "+currentRules?.map[metaElement+ " " + metaAnnotation ].join("\n"))
 		}
 		currentRules.push(rule)
 	}

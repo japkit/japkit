@@ -13,8 +13,9 @@
      	
     	<field:input field="weight" id="field_createpet_weight" required="true"  z="0"/>
     <field:checkbox field="sendReminders" id="field_createpet_sendreminders"  z="0"/>
-    	<field:select field="owner" id="field_createpet_owner" itemValue="id" items="${ownerChoices}" path="owners" required="false" z="0"/>
-     	
+    	
+    	<field:input field="owner" id="field_createpet_owner" required="false"  z="0"/>
+    
     </form:create>
     
 </div>

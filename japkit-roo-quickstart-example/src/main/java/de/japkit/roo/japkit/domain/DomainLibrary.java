@@ -2,6 +2,7 @@ package de.japkit.roo.japkit.domain;
 
 import java.util.Date;
 
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
@@ -25,6 +26,13 @@ public class DomainLibrary {
 	@Matcher(singleValueTypeAnnotations = ValueObject.class)
 	public class isVO{}
 	
+	@Function(expr="#{src.properties}", filterFun=isId.class, unique=true)
+	public class findIdProperty{}
+	
+	
+	//TODO: Use "business-id" instead of technical. (UUID)
+	@Matcher(annotations=Id.class)
+	public class isId{}
 	
 	// Some matchers for categorizing properties
 	

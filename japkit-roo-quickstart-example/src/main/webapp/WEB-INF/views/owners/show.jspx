@@ -3,7 +3,6 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <page:show id="ps_de_japkit_roo_petclinic_domain_owner" object="${owner}" path="/owners" z="0">
-    <field:display field="pets" id="s_de_japkit_roo_petclinic_domain_owner_pets" object="${owner}"  z="0"/>
     <field:display field="firstName" id="s_de_japkit_roo_petclinic_domain_owner_firstName" object="${owner}"  z="0"/>
     <field:display field="lastName" id="s_de_japkit_roo_petclinic_domain_owner_lastName" object="${owner}"  z="0"/>
     <field:display field="address" id="s_de_japkit_roo_petclinic_domain_owner_address" object="${owner}"  z="0"/>

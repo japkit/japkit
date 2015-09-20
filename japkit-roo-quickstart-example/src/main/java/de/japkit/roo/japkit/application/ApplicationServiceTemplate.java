@@ -30,7 +30,10 @@ import de.japkit.metaannotations.TemplateCall;
 import de.japkit.metaannotations.Var;
 import de.japkit.metaannotations.classselectors.BehaviorInnerClassWithGenClassPrefix;
 import de.japkit.metaannotations.classselectors.ClassSelector;
+import de.japkit.roo.japkit.CommonLibrary.type;
 import de.japkit.roo.japkit.domain.DomainLibrary;
+import de.japkit.roo.japkit.domain.DomainLibrary.findIdProperty;
+import de.japkit.roo.japkit.domain.DomainLibrary.isEntity;
 import de.japkit.roo.japkit.domain.DomainLibrary.isVO;
 
 @RuntimeMetadata
@@ -66,7 +69,9 @@ public class ApplicationServiceTemplate {
 					cases={
 							@Case(cond ="#{findGetter(cmdProperties, src)==null}", value="null"),
 							@Case(cond ="#{src.asType().asElement.ValueObject != null}", 
-								value="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" )
+								value="new #{src.asType().code}.Builder()#{fluentVOSettersFromDTO()}.build()" ),
+							//TODO: Das ist Q&D, da es davon augeht, dass der App-Service alle Aggregate bzw. ihre Repos kennt
+							@Case(condFun = DomainLibrary.isEntity.class, value = "#{src.singleValueType.simpleName.toFirstLower}Repository.findOne(command.#{findGetter(cmdProperties, src).simpleName}())"),
 					},
 					code="command.#{findGetter(cmdProperties, src).simpleName}()")
 		class paramsFromCommand{}
@@ -89,6 +94,23 @@ public class ApplicationServiceTemplate {
 		@Field
 		@Resource
 		private Repository $repositoryName$;
+		
+		/**
+		@Var(expr = "#{aggregate.properties}", filterFun = isEntity.class)
+		class entityProperties{}
+		
+		@Template(srcFun=entityProperties.class, srcGroupByFun={SrcSingleValueType.class, findRepository.class} ) 
+		abstract class RelatedEntityMembers{
+			
+			@Var(fun={SrcKey.class, nameFirstLower.class})
+			class repositoryFieldName {}
+			
+			@Field
+			@Autowired
+			private SrcKey $repositoryFieldName$;
+			
+		}
+		*/
 		
 		@Order(1)
 		@Template(src="aggregateUpdateMethods", srcVar="method")
@@ -135,6 +157,7 @@ public class ApplicationServiceTemplate {
 				})
 			public class CreateCommand{};
 			
+			
 			/**
 			 * 
 			 *  @japkit.bodyCode <pre>
@@ -175,7 +198,7 @@ public class ApplicationServiceTemplate {
 	}
 
 	@Template(
-			vars={@Var(name="fieldType", expr="#{src.asType()}")},
+			vars={@Var(name="fieldType", expr="#{src.singleValueType}")},
 					fieldDefaults=@Field(annotations = @Annotation(copyAnnotationsFromPackages={JSR303, SPRING_FORMAT}), 
 							getter=@Getter, setter=@Setter)
 	)
@@ -191,9 +214,12 @@ public class ApplicationServiceTemplate {
 		
 		@Switch({
 			@Case(condFun=isVO.class, value="#{dtoClass.asType()}"),
+			@Case(condFun=isEntity.class, value="#{fieldType}", valueFun={findIdProperty.class, type.class}),
 			@Case(cond="#{true}", value = "#{fieldType}" )
 		})
 		class FieldType{}
+		
+		
 		
 		@Order(2)			
 		@Field()

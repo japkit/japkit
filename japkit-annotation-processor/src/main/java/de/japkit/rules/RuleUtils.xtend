@@ -37,6 +37,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import java.util.LinkedHashSet
 import java.util.Collection
 import java.util.Map
+import de.japkit.util.MoreCollectionExtensions
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -69,7 +70,7 @@ class RuleUtils {
 			"srcCollect", "srcCollectFun", 
 			"srcToSet",
 			"srcGroupBy", "srcGroupByFun",
-			"srcType", avPrefix, [| currentSrc], false
+			"srcType", avPrefix, [| currentSrc], false, "srcUnique"
 		)
 	}
 	
@@ -83,7 +84,7 @@ class RuleUtils {
 		String toSetAV,
 		String groupByAV, String groupByFunAV,
 		String typeAV, String avPrefix,
-		()=>Object defaultValue, boolean nullable
+		()=>Object defaultValue, boolean nullable, String uniqueAV
 	) {
 		if(metaAnnotation==null) return SINGLE_SRC_ELEMENT
 		
@@ -109,6 +110,8 @@ class RuleUtils {
 			
 		val toSet = metaAnnotation?.value(toSetAV, Boolean) ?: false;
 
+		val unique = metaAnnotation?.value(uniqueAV, Boolean) ?: false;
+	
 		[|
 			var srcElements =  {
 					val elements = srcExprOrFunction.apply()
@@ -142,6 +145,9 @@ class RuleUtils {
 				if(toSet){
 					srcElements = (srcElements as Iterable<?>).toSet
 				}
+				if(unique){
+					srcElements = MoreCollectionExtensions.singleValue(srcElements as Iterable<?>);
+				}
 				if(!groupByExprOrFunction.undefined){
 					srcElements = (srcElements as Iterable<?>).groupBy[
 						scope(it)[
@@ -151,6 +157,7 @@ class RuleUtils {
 				}
 			
 			}
+			
 			srcElements
 		]
 	}

@@ -17,6 +17,9 @@ public class CommonLibrary {
 	@Function(expr="#{src.simpleName.toFirstUpper}")
 	public class nameFirstUpper{}
 	
+	@Function(expr="#{src.asType()}")
+	public class type{}
+	
 	/**If src is a Map entry, this function retrieves its key.*/
 	@Function(expr="#{src.key}")
 	public class SrcKey{}

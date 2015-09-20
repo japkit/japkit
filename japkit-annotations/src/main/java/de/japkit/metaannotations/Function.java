@@ -85,6 +85,13 @@ public @interface Function {
 	 */
 	Class<?>[] groupByFun() default {};
 	
+	/**
+	 * 
+	 * @return true means, that only the first element of the collection is returned and it is an error if there are multiple. 
+	 * If the collection is empty, null is returned (which might result in an error depending on {@link #nullable()}).
+	 */
+	boolean unique() default false;
+	
 
 	Class<?> type() default Object.class;
 	

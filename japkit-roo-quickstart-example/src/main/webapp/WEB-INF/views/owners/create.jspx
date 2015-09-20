@@ -7,8 +7,7 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <form:create id="form_createowner" modelAttribute="createOwnerCommand" path="/owners" render="${empty dependencies}" z="0">
-    <field:select field="pets" id="field_createowner_pets" itemValue="id" items="${petsChoices}" path="petss" required="false" z="0"/>
-     	
+    
     	<field:input field="firstName" id="field_createowner_firstname" required="false"  z="0"/>
     
     	<field:input field="lastName" id="field_createowner_lastname" required="true"  z="0"/>

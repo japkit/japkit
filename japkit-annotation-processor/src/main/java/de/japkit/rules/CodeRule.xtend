@@ -26,7 +26,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	String iteratorExpr
 	String iteratorLang
 	String bodyExpr
-	List<Pair<String, String>> bodyCases
+	List<CaseRule<String>> bodyCases
 	String lang
 	String beforeExpr
 	String afterExpr
@@ -54,10 +54,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 		
 		val bodyCaseAnnotations = metaAnnotation?.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
 		
-		bodyCases = bodyCaseAnnotations?.map[
-			value('cond', String) 
-			-> value('value', String)
-		]?.toList ?: emptyList
+		bodyCases = bodyCaseAnnotations?.map[new CaseRule(it, null, String)]?.toList ?: emptyList
 
 
 		beforeExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "beforeIteratorCode".withPrefix(avPrefix)) 
@@ -200,14 +197,10 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	}
 	
 	
-	private def CharSequence code(List<Pair<String, String>> bodyCases, String bodyExpr, String lang, String errorResult) {
-		val bodyExprToUse = bodyCases.findFirst[
-			val cond = key
-			!cond.nullOrEmpty && eval(cond, lang, Boolean, "Error in condition", false)
-		]?.value ?: bodyExpr
-		
-		
-		eval(bodyExprToUse, lang, CharSequence, "Error in code body expression.",	errorResult)
+	private def CharSequence code(List<CaseRule<String>> bodyCases, String bodyExpr, String lang, String errorResult) {
+		CaseRule.applyFirstMatching(bodyCases) 
+			?: eval(bodyExpr, lang, CharSequence, "Error in code body expression.",	errorResult)
+			//TODO: ErrorResult bei den Cases??
 	}
 	
 	public static def CharSequence withLinebreak(CharSequence cs){
