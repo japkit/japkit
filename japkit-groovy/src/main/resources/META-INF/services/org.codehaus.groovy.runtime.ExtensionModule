@@ -1,0 +1,3 @@
+moduleName=japkit-elextensions-module
+moduleVersion=1.0
+extensionClasses=de.japkit.el.ElExtensions,de.japkit.groovy.Extensions

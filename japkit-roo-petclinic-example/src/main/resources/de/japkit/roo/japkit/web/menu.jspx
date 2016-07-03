@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" id="menu" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <menu:menu id="_menu" z="0">       
+        <%controllers.collect{it.asElement.JapkitWebScaffold}.each{
+        	def path = it.path	
+        	def id = it.fboShortId
+        %>
+        <menu:category id="c_${id}" z="0">
+            <menu:item id="i_${id}_new" messageCode="global_menu_new" url="/${path}?form" z="0"/>
+            <menu:item id="i_${id}_list" messageCode="global_menu_list" url="/${path}?page=1&amp;size=\${empty param.size ? 10 : param.size}" z="0"/>
+        </menu:category>
+        <%} %>
+    </menu:menu>
+</div>

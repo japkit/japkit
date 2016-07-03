@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" 
+	xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" 
+	 xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+	 version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <% 
+    def cmdName = cmdMethod.simpleName.toString()
+    def formId = toHtmlId.eval(cmdName)
+    if(update){ 
+    %><form:update id="form_${formId}" modelAttribute="${modelAttribute}" path="/${path}/${cmdName}" versionField="Version" z="0">
+  	<%} else {
+  	%><form:create id="form_${formId}" modelAttribute="${modelAttribute}" path="/${path}" render="\${empty dependencies}" z="0">
+    <%}
+    def fieldsForProperties
+    fieldsForProperties = {properties, prefix -> properties.each {   	
+    	def required = it.isRequired	
+    	def attrMap = [:]
+    	attrMap.validationRegex = it.regexp
+    	def attr = attrMap.findAll{it.value!=null}.collect{"$it.key=\"$it.value\""}.join(' ')
+    	def field = prefix ? "${prefix}.${it.name}" : it.name
+    	def id =  "field_${formId}_${toHtmlId.eval(field)}" 
+    			
+  		if(it.name=="version" || it.name=="id"){
+  		//do nothing. the hidden fields for id and version are in update.tagx
+  		} else if(it.isBoolean){
+    	%><field:checkbox field="${field}" id="${id}"  z="0"/>
+    	<%} else if(it.isDatetime){
+        def past = it.isPast
+        def dtf = "${it.dtfModelAttr}"
+        %><field:datetime field="${field}" id="${id}" dateTimePattern="\${$dtf}" past="${past}" required="${required}" z="0"/>
+        <%} else if(it.isEnum){
+     	%><field:select field="${field}" id="${id}" items="\${${it.name}s}" path="${it.name}s" required="${required}" z="0"/>
+     	<%} else if(it.isEntity){
+     	%><field:select field="${field}" id="${id}" itemValue="id" items="\${${it.name}Choices}" path="${it.name}s" required="${required}" z="0"/>
+     	<%} else if(it.isDTO){%>
+     	<util:panel id="${id}" title="${field}" openPane="true">
+     	<%	fieldsForProperties(it.asType().asElement.properties, field) %>
+     	</util:panel><br/>	
+     	<%} else {%>
+    	<field:input field="${field}" id="${id}" required="${required}" <%=attr%> z="0"/>
+    <%	}
+    }}
+    fieldsForProperties(viewProperties, null)
+    if(!update){%>
+    </form:create>
+    <%} else {
+    %></form:update>
+    <%}%>
+</div>

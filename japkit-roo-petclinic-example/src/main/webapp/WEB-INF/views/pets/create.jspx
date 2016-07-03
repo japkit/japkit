@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" 
+	xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" 
+	 xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+	 version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <form:create id="form_createpet" modelAttribute="createPetCommand" path="/pets" render="${empty dependencies}" z="0">
+    
+    	<field:input field="name" id="field_createpet_name" required="true"  z="0"/>
+    <field:select field="type" id="field_createpet_type" items="${types}" path="types" required="true" z="0"/>
+     	
+    	<field:input field="weight" id="field_createpet_weight" required="true"  z="0"/>
+    <field:checkbox field="sendReminders" id="field_createpet_sendreminders"  z="0"/>
+    	
+    	<field:input field="owner" id="field_createpet_owner" required="false"  z="0"/>
+    
+    </form:create>
+    
+</div>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:list id="pl_${fboFqnId}" items="\${${modelAttribute}s}" z="0">
+        <table:table data="\${${modelAttribute}s}" id="l_${fboFqnId}" path="/${path}" z="0">
+         <%tableProperties.each {
+        	 //Code duplication with show.jspx!
+        	 def attrMap = [:]	
+    			    if(it.isDatetime){
+    			    	attrMap.dateTimePattern= "\${${it.dtfModelAttr}}"
+    			    	if(it.hasType('java.util.Date')){
+    			    		attrMap.date = true
+    			    	} else if(it.hasType('java.util.Calendar')) {
+    			    		attrMap.calendar = true
+    			    	}
+    			    }
+        	 		attrMap.sort = it.TableColumn?.sortable
+    			    def attr = attrMap.findAll{it.value!=null}.collect{"$it.key=\"$it.value\""}.join(' ')
+    	 %>  <table:column id="c_${fboFqnId}_${it.name}" property="${it.name}" <%=attr%> z="0"/> 
+         <%}%>
+        </table:table>
+    </page:list>
+</div>

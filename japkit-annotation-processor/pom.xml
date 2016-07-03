@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.github.stefanocke.japkit</groupId>
+		<artifactId>japkit-xtend-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../japkit-xtend-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId>japkit-annotation-processor</artifactId>
+	<name>Japkit Annotation Processor</name>
+	<description>Contains the generic annotation processor that is driven by code templates with meta-annotations from japkit-annotations.</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.stefanocke.japkit</groupId>
+			<artifactId>japkit-active-annotations</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.stefanocke.japkit</groupId>
+			<artifactId>japkit-annotations</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+
+	</dependencies>
+</project>
