@@ -9,4 +9,5 @@
 	</parent>
 	<artifactId>japkit-annotations</artifactId>
 	<name>Japkit Annotations</name>
+	<description>Contains the meta annotations that comprise the DSL for writing code templates.</description>
 </project>

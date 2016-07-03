@@ -10,6 +10,7 @@
 	</parent>
 	<artifactId>japkit-juel</artifactId>
 	<name>Japkit Annotation Processor - JUEL EL Provider</name>
+	<description>Include this dependency to use Java EL expressions in your code templates.</description>
 	
 	<dependencies>
 		<dependency>

@@ -9,6 +9,7 @@
 	</parent>
 	<artifactId>japkit-groovy</artifactId>
 	<name>Japkit Annotation Processor - Groovy EL Provider</name>
+	<description>Include this dependency to use Grovy expressions in your code templates.</description>
 
 	<build>
 		<plugins>
