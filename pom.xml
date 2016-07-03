@@ -112,6 +112,8 @@
 						<masterBranchName>releases</masterBranchName>
 						<developBranchName>master</developBranchName>
 					</flowInitContext>
+					<!-- Since we have our own config for sources and javadoc plugin: -->
+					<useReleaseProfile>false</useReleaseProfile>
 				</configuration>
 			</plugin>
 		</plugins>
