@@ -1,25 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.stefanocke.japkit</groupId>
-    <artifactId>japkit-parent</artifactId>
-    <packaging>pom</packaging>
+	<groupId>com.github.stefanocke.japkit</groupId>
+	<artifactId>japkit-parent</artifactId>
+	<packaging>pom</packaging>
 	<version>1.0.0-SNAPSHOT</version>
-    <name>Japkit Parent</name>
+	<name>Japkit Parent</name>
 
-    <modules>
+	<description>A declarative approach to writing Java annotation processors.</description>
+	<url>https://github.com/stefanocke/japkit</url>
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Stefan Ocke</name>
+			<organizationUrl>https://github.com/stefanocke</organizationUrl>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:git:git@github.com:stefanocke/japkit.git</connection>
+		<developerConnection>scm:git:git@github.com:stefanocke/japkit.git</developerConnection>
+		<url>https://github.com/stefanocke/japkit</url>
+	</scm>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
+	<modules>
 		<module>japkit-xtend-parent</module>
-        <module>japkit-active-annotations</module>
-        <module>japkit-annotation-processor</module>
-        <module>japkit-annotations</module>
-        <module>japkit-juel</module>
-        <module>japkit-groovy</module>
-        <module>japkit-roo-petclinic-example</module>
-    </modules>
-    
-    <properties>
+		<module>japkit-active-annotations</module>
+		<module>japkit-annotation-processor</module>
+		<module>japkit-annotations</module>
+		<module>japkit-juel</module>
+		<module>japkit-groovy</module>
+		<module>japkit-roo-petclinic-example</module>
+	</modules>
+
+	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
@@ -44,6 +75,36 @@
 						<phase>verify</phase>
 						<goals>
 							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<configuration>
+					<failOnError>false</failOnError>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
 						</goals>
 					</execution>
 				</executions>
