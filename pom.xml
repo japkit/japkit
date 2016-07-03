@@ -16,8 +16,7 @@
         <module>japkit-annotations</module>
         <module>japkit-juel</module>
         <module>japkit-groovy</module>
-        <!-- <module>japkit-eclipse-libs</module> -->
-        <module>japkit-roo-quickstart-example</module>
+        <module>japkit-roo-petclinic-example</module>
     </modules>
     
     <properties>

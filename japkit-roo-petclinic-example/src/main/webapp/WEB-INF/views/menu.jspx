@@ -9,14 +9,14 @@
             <menu:item id="i_pet_list" messageCode="global_menu_list" url="/pets?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
         </menu:category>
         
-        <menu:category id="c_owner" z="0">
-            <menu:item id="i_owner_new" messageCode="global_menu_new" url="/owners?form" z="0"/>
-            <menu:item id="i_owner_list" messageCode="global_menu_list" url="/owners?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
-        </menu:category>
-        
         <menu:category id="c_vet" z="0">
             <menu:item id="i_vet_new" messageCode="global_menu_new" url="/vets?form" z="0"/>
             <menu:item id="i_vet_list" messageCode="global_menu_list" url="/vets?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
+        </menu:category>
+        
+        <menu:category id="c_owner" z="0">
+            <menu:item id="i_owner_new" messageCode="global_menu_new" url="/owners?form" z="0"/>
+            <menu:item id="i_owner_list" messageCode="global_menu_list" url="/owners?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0"/>
         </menu:category>
         
         <menu:category id="c_visit" z="0">
