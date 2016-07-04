@@ -16,6 +16,43 @@
     <properties>
         <java.version>1.7</java.version>
     </properties>
+    
+    <url>https://github.com/stefanocke/japkit</url>
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Stefan Ocke</name>
+			<organizationUrl>https://github.com/stefanocke</organizationUrl>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:git:git@github.com:stefanocke/japkit.git</connection>
+		<developerConnection>scm:git:git@github.com:stefanocke/japkit.git</developerConnection>
+		<url>https://github.com/stefanocke/japkit</url>
+	</scm>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
+	<issueManagement>
+		<url>https://github.com/stefanocke/japkit/issues</url>
+	</issueManagement>
+
+	<ciManagement>
+		<url>https://travis-ci.org/stefanocke/japkit</url>
+	</ciManagement>
    
     <dependencies>
 
