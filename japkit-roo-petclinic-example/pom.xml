@@ -4,7 +4,7 @@
     <groupId>de.japkit.roo.quickstart</groupId>
     <artifactId>japkit-roo-petclinic-example</artifactId>
     <packaging>war</packaging>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>Japkit Roo Petclinic Example</name>
     <description>Uses Japkit to show how to generate a Petclinic similar to what it looks like with Spring Roo.</description>
     <parent>
@@ -111,7 +111,7 @@
         <dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-annotations</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>1.0.1</version>
 		</dependency>
     </dependencies>
     <build>
@@ -166,17 +166,17 @@
 					<dependency>
 						<groupId>com.github.stefanocke.japkit</groupId>
 						<artifactId>japkit-annotation-processor</artifactId>
-						<version>1.0.2-SNAPSHOT</version>
+						<version>1.0.1</version>
 					</dependency>
 					<dependency>
 						<groupId>com.github.stefanocke.japkit</groupId>
 						<artifactId>japkit-juel</artifactId>
-						<version>1.0.2-SNAPSHOT</version>
+						<version>1.0.1</version>
 					</dependency>
 					<dependency>
 						<groupId>com.github.stefanocke.japkit</groupId>
 						<artifactId>japkit-groovy</artifactId>
-						<version>1.0.2-SNAPSHOT</version>
+						<version>1.0.1</version>
 					</dependency>
 
 				</dependencies>
