@@ -25,5 +25,4 @@
 			<version>1.0.3-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
-	<packaging>pom</packaging>
 </project>
