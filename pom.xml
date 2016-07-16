@@ -55,6 +55,7 @@
 		<module>japkit-juel</module>
 		<module>japkit-groovy</module>
 		<module>japkit-roo-petclinic-example</module>
+		<module>japkit-all</module>
 	</modules>
 
 	<properties>
