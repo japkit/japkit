@@ -111,7 +111,7 @@
         <dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-annotations</artifactId>
-			<version>1.0.3-SNAPSHOT</version>
+			<version>1.0.3</version>
 		</dependency>
     </dependencies>
     <build>
@@ -165,20 +165,10 @@
 				<dependencies>
 					<dependency>
 						<groupId>com.github.stefanocke.japkit</groupId>
-						<artifactId>japkit-annotation-processor</artifactId>
-						<version>1.0.3-SNAPSHOT</version>
+						<artifactId>japkit-all</artifactId>
+						<version>1.0.3</version>
 					</dependency>
-					<dependency>
-						<groupId>com.github.stefanocke.japkit</groupId>
-						<artifactId>japkit-juel</artifactId>
-						<version>1.0.3-SNAPSHOT</version>
-					</dependency>
-					<dependency>
-						<groupId>com.github.stefanocke.japkit</groupId>
-						<artifactId>japkit-groovy</artifactId>
-						<version>1.0.3-SNAPSHOT</version>
-					</dependency>
-
+					
 				</dependencies>
 			</plugin>
 			<plugin>
