@@ -39,8 +39,7 @@ class ELSupport {
 	
 
 	new() {
-		val sw = new Stopwatch
-		sw.start
+		val sw = Stopwatch.createStarted
 		try {
 			printDiagnosticMessage[
 				'''Searching EL-Providers using classloader «ELProvider.classLoader». Context CL: «Thread.currentThread.
