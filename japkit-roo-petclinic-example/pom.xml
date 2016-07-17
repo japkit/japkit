@@ -15,6 +15,7 @@
     </parent>
     <properties>
         <java.version>1.8</java.version>
+        <japkit.version>1.0.3</japkit.version>
     </properties>
     
     <url>https://github.com/stefanocke/japkit</url>
@@ -117,60 +118,38 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgument>-proc:none</compilerArgument>
-                </configuration>
-            </plugin>
-            <plugin>
-				<groupId>org.bsc.maven</groupId>
-				<artifactId>maven-processor-plugin</artifactId>
-				<version>2.2.4</version>
-				
-				<executions>
-					<execution>
-						<id>process</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>process</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/src/main/generated-sources</outputDirectory>
-							<options>							
-								<annotations>de.japkit.roo.japkit.*</annotations>
-								<projectDirectory>${project.basedir}</projectDirectory>
-								<templateDir>${project.basedir}/src/main/resources</templateDir>
-								<diagnosticMessages>false</diagnosticMessages>
-							</options>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>process-test</id>
-						<phase>generate-test-sources</phase>
-						<goals>
-							<goal>process-test</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/src/main/generated-test-sources</outputDirectory>
-							<options>							
-								<annotations>de.japkit.roo.japkit.*</annotations>
-								<diagnosticMessages>true</diagnosticMessages>
-							</options>
-						</configuration>
-					</execution>
-				</executions>
-				
-				<dependencies>
-					<dependency>
-						<groupId>com.github.stefanocke.japkit</groupId>
-						<artifactId>japkit-all</artifactId>
-						<version>1.0.3</version>
-					</dependency>
-					
-				</dependencies>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>com.github.stefanocke.japkit</groupId>
+							<artifactId>japkit-all</artifactId>
+							<version>${japkit.version}</version>
+						</path>
+					</annotationProcessorPaths>
+					<generatedSourcesDirectory>${project.build.directory}/src/main/generated-sources</generatedSourcesDirectory>
+					<generatedTestSourcesDirectory>${project.build.directory}/src/main/generated-test-sources</generatedTestSourcesDirectory>
+					<compilerArgs>
+						<compilerArg>
+							-Aannotations=de.japkit.roo.japkit.*
+						</compilerArg>
+						<compilerArg>
+							-AprojectDirectory=${project.basedir}
+						</compilerArg>
+						<compilerArg>
+							-AtemplateDir=${project.basedir}/src/main/resources
+						</compilerArg>
+						<compilerArg>
+							-AdiagnosticMessages=false
+						</compilerArg>
+					</compilerArgs>
+				</configuration>
 			</plugin>
+			
+           
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
