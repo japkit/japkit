@@ -15,7 +15,7 @@
     </parent>
     <properties>
         <java.version>1.8</java.version>
-        <japkit.version>1.0.3</japkit.version>
+        <japkit.version>1.0.4-SNAPSHOT</japkit.version>
     </properties>
     
     <url>https://github.com/stefanocke/japkit</url>
@@ -112,7 +112,7 @@
         <dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-annotations</artifactId>
-			<version>1.0.3</version>
+			<version>${japkit.version}</version>
 		</dependency>
     </dependencies>
     <build>
@@ -156,13 +156,7 @@
 				<configuration>
 					<mainClass>de.japkit.roo.petclinic.WebApplicationGen</mainClass>
 				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>org.springframework</groupId>
-						<artifactId>springloaded</artifactId>
-						<version>1.2.1.RELEASE</version>
-					</dependency>
-				</dependencies>
+				
 			</plugin>
            
        </plugins>
