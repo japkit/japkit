@@ -1,5 +1,8 @@
 package de.japkit.annotations;
 
+import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
+import static javax.lang.model.element.ElementKind.METHOD;
+
 import de.japkit.annotations.RuntimeMetadata.Element;
 import de.japkit.annotations.RuntimeMetadata.List;
 import de.japkit.metaannotations.AV;
@@ -7,6 +10,7 @@ import de.japkit.metaannotations.AVMode;
 import de.japkit.metaannotations.Annotation;
 import de.japkit.metaannotations.AnnotationMode;
 import de.japkit.metaannotations.Clazz;
+import de.japkit.metaannotations.Matcher;
 import de.japkit.metaannotations.Trigger;
 import de.japkit.metaannotations.Var;
 
@@ -16,13 +20,16 @@ import de.japkit.metaannotations.Var;
 			values={
 				@AV(name="id", expr="#{elements.uniqueNameWithinTopLevelEnclosingTypeElement(src)}"), 
 				@AV(name="comment", expr="#{elements.getDocComment(src)}"),
-				@AV(cond="#{src.kind.name()=='METHOD' || src.kind.name()=='CONSTRUCTOR'}", name="paramNames", expr="#{src.parameters}")
+				@AV(condFun=RuntimeMetadata.methodOrConstructor.class, name="paramNames", expr="#{src.parameters}")
 		}),
 	@Annotation(targetAnnotation=List.class, mode=AnnotationMode.MERGE, 
 		values=@AV(name = "value", expr="#{elements.elementAndAllEnclosedElements(src)}", mode=AVMode.JOIN_LIST, annotationMappingId="elementMetadata"))
 })
 
 public @interface RuntimeMetadata {
+	@Matcher(kind={METHOD, CONSTRUCTOR})
+	class methodOrConstructor{}
+	
 	public static final String CLASS_SUFFIX = "_RuntimeMetadata";
 	
 	boolean shadow() default false;
