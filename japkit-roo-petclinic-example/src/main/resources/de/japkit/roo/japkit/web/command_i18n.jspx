@@ -1,3 +1,0 @@
-label_${toHtmlId.eval(cmdName)}=${cmdName}
-<%cmdPropertyNames.each{%>
-label_${toHtmlId.eval(cmdName)}_${toHtmlId.eval(it)}=${it.toFirstUpper}<%}%>
