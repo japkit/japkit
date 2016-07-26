@@ -437,8 +437,9 @@ class ElementsExtensions {
 		if(v instanceof DeclaredType && !(v instanceof ErrorType) && v.class.canonicalName.startsWith("org.eclipse.jdt")){
 			try{
 				//In Eclipse: zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): 
-				//Arrays mit UnresolvedTypeBindings werden nicht resolved.		
-				if(eclipseGetBindingMethod !=null && eclipseGetBindingMethod.invoke(v).class.canonicalName.contains("Unresolved")){
+				//Arrays mit UnresolvedTypeBindings werden nicht resolved.	
+				//https://bugs.eclipse.org/bugs/show_bug.cgi?id=498022	
+				if(v.class.eclipseGetBindingMethod !=null && v.class.eclipseGetBindingMethod.invoke(v).class.canonicalName.contains("Unresolved")){
 					val te =  (v as DeclaredType).asTypeElement			
 					val char dollar = '$'  //UnresolvedTypeBindings for inner classes have $ in their FQNs.
 					val teFqn = te.qualifiedName.toString.replace(dollar ,'.')
@@ -455,13 +456,13 @@ class ElementsExtensions {
 		v
 	}
 	
-	static val Method eclipseGetBindingMethod = {
+	def Method eclipseGetBindingMethod(Class clazz) {
 		try{
-			val m = ElementsExtensions.classLoader.loadClass("org.eclipse.jdt.internal.compiler.apt.model.TypeMirrorImpl")?.getDeclaredMethod("binding")
+			val m = clazz.getDeclaredMethod("binding")
 			m.accessible = true
 			m
 		} catch (Exception e){
-			null
+			return clazz.superclass?.eclipseGetBindingMethod
 		}
 	}
 	
