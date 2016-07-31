@@ -60,14 +60,13 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 		beforeExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "beforeIteratorCode".withPrefix(avPrefix)) 
 		afterExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "afterIteratorCode".withPrefix(avPrefix)) 
 		emptyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "emptyIteratorCode".withPrefix(avPrefix)) 
+		separator = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "separator".withPrefix(avPrefix)) 
 
 		this.errorValue = errorValue;
 		
 		//body iterator
 		iteratorExpr = metaAnnotation?.value("iterator".withPrefix(avPrefix), String)
 		iteratorLang = metaAnnotation?.value("iteratorLang".withPrefix(avPrefix), String)
-
-		separator = metaAnnotation?.value("separator".withPrefix(avPrefix), String) ?: ''
 
 		imports = metaAnnotation?.value("imports", typeof(DeclaredType[]))?.toList ?: emptyList
 		
