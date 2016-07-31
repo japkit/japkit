@@ -170,13 +170,13 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 							'''Error in code body iterator expression.''', emptyList)
 						if (!bodyIterator.nullOrEmpty) {
 							val before = eval(beforeExpr, lang, CharSequence,
-								'''Error in code body before expression.''', '').withLinebreak(linebreak)
+								'''Error in code body before expression.''', '').withLinebreak(linebreak) + if(linebreak && indentAfterLinebreak) '\t' else ''
 							val after = eval(afterExpr, lang, CharSequence,
 								'''Error in code body after expression.''', '').withLinebreak(linebreak)
 							'''«FOR e : bodyIterator 
 									BEFORE before 
-									SEPARATOR separator + if(linebreak) StringConcatenation.DEFAULT_LINE_DELIMITER else ''
-									AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''.indent
+									SEPARATOR separator + if(linebreak) StringConcatenation.DEFAULT_LINE_DELIMITER + (if(indentAfterLinebreak)'\t' else '') else ''
+									AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''
 						} else {
 							eval(emptyExpr, lang, CharSequence, '''Error in code body empty expression.''',	errorValue)
 						}
@@ -187,12 +187,6 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 			]
 		
 		] 
-	}
-	
-	def private StringConcatenation indent(CharSequence sequence){
-		val sc = new StringConcatenation
-		sc.append(sequence, if(indentAfterLinebreak) '\t' else '')
-		sc
 	}
 	
 	
