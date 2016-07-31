@@ -24,6 +24,8 @@ import net.bytebuddy.modifier.MethodArguments
 import net.bytebuddy.modifier.Ownership
 import net.bytebuddy.modifier.Visibility
 import org.eclipse.xtend.lib.annotations.Data
+import javax.el.ELContext
+import javax.el.PropertyNotFoundException
 
 class JuelELProvider implements ELProvider {
 	val ExpressionFactory ef = ExtensionRegistry.get(ExpressionFactory, [|new ExpressionFactoryImpl])
@@ -119,7 +121,22 @@ class JuelELProvider implements ELProvider {
 	}
 
 	def private createElContext(ValueStack contextMap, ElExtensionPropertiesAndMethods elExtensions) {
-		val resolver = new CompositeELResolver();
+		val resolver = new CompositeELResolver() {
+			
+			override getValue(ELContext context, Object base, Object property) {
+				try {
+					return super.getValue(context, base, property)
+				} catch (PropertyNotFoundException pnfe) {
+					if(base!=null) throw pnfe;
+					//The RootPropertyResolver of JUEL throws PNFE if it cannot find a root property.
+					//we retry in this case by prepending "src."
+					val src = getValue(context, null, "src");
+					context.setPropertyResolved(false)
+					return getValue(context, src, property)
+				}
+			}
+			
+		};
 		
 		//TODO: Ggf zu einem Resolver zusammenfassen.
 		resolver.add(new MapRootResolver(contextMap))

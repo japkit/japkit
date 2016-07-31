@@ -7,6 +7,7 @@ import de.japkit.el.ElExtensionPropertiesAndMethods
 import de.japkit.el.ElExtensions
 import java.util.Map
 import javax.el.ELContext
+import javax.el.PropertyNotFoundException
 
 class ELResolver extends SimpleResolver {
 
@@ -44,8 +45,8 @@ class ELResolver extends SimpleResolver {
 			context.setPropertyResolved(false)
 			//TODO: We have a different order here compared to Groovy. In Groovy the default resolver seems to be called first !?
 		}
-
-		super.getValue(context, base, property)
+		
+		return super.getValue(context, base, property)
 	}
 
 	override invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
