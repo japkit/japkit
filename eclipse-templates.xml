@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<templates>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.bodyAfterIteratorCode">@japkit.bodyAfterIteratorCode
+	</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.bodyAfterIteratorCode multiline">@japkit.bodyAfterIteratorCode &lt;pre&gt;&lt;/pre&gt;</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.bodyBeforeIteratorCode">@japkit.bodyBeforeIteratorCode
+	</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.bodyBeforeIteratorCode multiline">@japkit.bodyBeforeIteratorCode &lt;pre&gt;&lt;/pre&gt;</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.bodyCode">@japkit.bodyCode</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.bodyCode multiline">@japkit.bodyCode &lt;pre&gt;&lt;/pre&gt;</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.bodySeparator">@japkit.bodySeparator</template>
+	
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.afterIteratorCode">@japkit.afterIteratorCode
+	</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.afterIteratorCode multiline">@japkit.afterIteratorCode &lt;pre&gt;&lt;/pre&gt;</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.beforeIteratorCode">@japkit.beforeIteratorCode
+	</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.beforeIteratorCode multiline">@japkit.beforeIteratorCode &lt;pre&gt;&lt;/pre&gt;</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.code">@japkit.code</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.code multiline">@japkit.code &lt;pre&gt;&lt;/pre&gt;</template>
+	<template autoinsert="true" context="javadoc" deleted="false"
+		description="" enabled="true" name="@japkit.separator">@japkit.separator</template>
+</templates>
