@@ -14,8 +14,8 @@ class JavadocUtil {
 	static val codePattern2 = Pattern.compile('''@japkit\.(\S+)\s*<pre>\s*<code>\s*([\s\S]*?)</code>\s*</pre>''')
 	static val codePattern3 = Pattern.compile('''@japkit\.(\S+)\s*<code>\s*([\s\S]*?)</code>''')
 	static val codePattern4 = Pattern.compile('''@japkit\.(\S+)\s*<pre>\s*([\s\S]*?)</pre>''')
-	//single line code (everything till newline or end of string)
-	static val codePattern5 = Pattern.compile('''@japkit\.(\S+)\s*([\s\S]*?)(?:$|[\r\n])''')
+	//single line code (everything on the same line till newline or end of string)
+	static val codePattern5 = Pattern.compile('''@japkit\.(\S+)[\t\f ]*([\s\S]*?)(?:$|[\r\n])''')
 	
 	
 	
