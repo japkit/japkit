@@ -163,88 +163,37 @@ class RuleUtils {
 	}
 	
 	/**Scope rule that gets the source element from "src" AV */
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
-		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcRule(metaAnnotation, avPrefix), true)
+	public def <T> ScopeRule<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, true)
 	}
 	
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, String avPrefix) {
-		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, createSrcRule(metaAnnotation, avPrefix), true)
+	public def <T> ScopeRule<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, String avPrefix) {
+		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, true)
 	}
 	
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Object srcRule) {
-		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcRule(metaAnnotation, avPrefix), true)	
+	public def <T> ScopeRule<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Object srcRule) {
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, true)	
 	}
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
 	 */
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, 
-		String avPrefix, ()=>Object srcRule, boolean iterateIfIterable
+	public def <T> ScopeRule<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, 
+		String avPrefix, boolean createSrcRule
 	) {
-			
-		val srcVarName = metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
-		val varRules = createELVariableRules(metaAnnotation, metaElement, avPrefix)
-		val libraryRules = createLibraryRules(metaAnnotation, avPrefix)
-		val selfLibrary = if(isLibrary) new LibraryRule(metaAnnotation, metaElement as TypeElement)
-		
-		val resultVarAnnotation = metaElement?.annotationMirror(ResultVar)		
-		val resultVarAV =  resultVarAnnotation?.value("value".withPrefix(avPrefix), String);	
-		val resultVarName = if(resultVarAV.nullOrEmpty) metaElement?.simpleName?.toString else resultVarAV;
-			
-		
-
-		[(Object)=>T closure |
-			try {
-						
-				val src = srcRule?.apply ?: currentSrc;
-	
-				val iterate = iterateIfIterable && (src instanceof Iterable<?> || src instanceof Map<?,?>)		
-				
-				
-				val result = if(iterate){
-					val iterable = if(src instanceof Iterable<?>) src else (src as Map<?,?>).entrySet
-					iterable.map [ e |
-						doInScope(e, srcVarName, libraryRules, selfLibrary, varRules, closure)
-					].toList			
-				
-				} else{ 
-					newArrayList(doInScope(src, srcVarName, libraryRules, selfLibrary, varRules, closure))				
-				};	
-				if(resultVarAnnotation!=null && !resultVarName.nullOrEmpty){
-					valueStack.put(resultVarName, if(iterate) result else result.head)
-				}
-				
-				result
-			
-			} catch (Exception e){
-				//To avoid error flooding or misleading errors
-				//TODO: Reconsider resultVar. Better use some functional approach + "mapping cache" instead
-				if(resultVarAnnotation!=null && !resultVarName.nullOrEmpty){
-					valueStack.put(resultVarName, new ElVariableError(resultVarName))
-				}
-				throw e
-			}
-		]
-	}
-	
-	private def <T> T doInScope(Object src, String srcVarName, List<LibraryRule> libraryRules, LibraryRule selfLibrary, List<ELVariableRule> varRules, (Object)=>T closure) {
-		scope(src) [
-			if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, src)}
-			libraryRules.forEach[apply]
-			selfLibrary?.apply
-			valueStack.put("currentRule", currentRule)
-			varRules?.forEach[it.putELVariable]
-			closure.apply(src)
-		]
+		return new ScopeRule<T>(metaAnnotation, metaElement, isLibrary, avPrefix, createSrcRule)			
 	}
 	
 	def createLibraryRules(AnnotationMirror metaAnnotation, String avPrefix) {
 		metaAnnotation?.value("libraries".withPrefix(avPrefix), typeof(TypeMirror[]))?.map[createLibraryRule(it.asElement)] ?: emptyList
 	}
 	
-	val SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null, null)
+	ScopeRule<Object> SCOPE_WITH_CURRENT_SRC
 	
-	public def <T> ((Object)=>T)=>Iterable<T> scopeWithCurrentSrc(){		
-		SCOPE_WITH_CURRENT_SRC	as ((Object)=>T)=>Iterable<T>
+	public def ScopeRule scopeWithCurrentSrc(){	
+		if(SCOPE_WITH_CURRENT_SRC==null) {
+			SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null, null)
+		}	
+		SCOPE_WITH_CURRENT_SRC	
 	}
 	
 	

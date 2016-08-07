@@ -45,4 +45,10 @@ public @interface Trigger {
 	 * @return
 	 */
 	int layer() default 0;
+	
+	/**
+	 * The Template for the top level class to be generated. The template must have the @Clazz annotation.
+	 * @return
+	 */
+	Class<?>[] template() default {};
 }

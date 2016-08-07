@@ -14,7 +14,7 @@ class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 	new(AnnotationMirror metaAnnotation, Element metaElement) {
 		super(metaAnnotation, metaElement, '', '''/**Error in CodeFragement «metaAnnotation» «metaElement»*/''')
 		activation = metaAnnotation.elementMatchers("activation")
-		scopeRule = createScopeRule(metaAnnotation, metaElement, false, null, null, false)  //scopeRule without iteration
+		scopeRule = createScopeRule(metaAnnotation, metaElement, false, null, false)  //scopeRule without own src rule and without iteration
 	}
 	
 	
