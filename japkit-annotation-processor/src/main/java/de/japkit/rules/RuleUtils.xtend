@@ -237,46 +237,25 @@ class RuleUtils {
 	public static val NO_NAME = [|null as String]
 	
 	//There are some places in templates besides the meta-annotations where expressions or EL variables can be used:
-	//- Names of elements (methods, fields, params, ...).  (only variables)
+	//- Names of elements (methods, fields, params, ...).  
 	//- String annotation values
 	//They have to be enclosed in $...$ there.
+	//In element names, "." is not allowed, so "_" can be used instead and is replaced by "."
 	static val expressionInTemplate = Pattern.compile('''\$(.+?)\$''')
 	
-	public def replaceExpressionInTemplate(CharSequence template, boolean canBeExpression, String lang, boolean autoCamelCase) {
+	public def replaceExpressionInTemplate(CharSequence template, boolean noSyntaxRestrictions, String lang, boolean autoCamelCase) {
 		
 		val vs = ExtensionRegistry.get(ELSupport).valueStack
 		val matcher = expressionInTemplate.matcher(template)
 		val sb = new StringBuffer();
 		while (matcher.find()) {
 			val expr = matcher.group(1)
-			val value = if (!canBeExpression) {
-
-					//only variable names allowed, no expression
-					if (expr == "srcElementName")
-						currentSrcElement.simpleName.toString
-					else {
-						try{
-							var v = vs.get(expr);
-							if(v instanceof Function0<?>){
-								v = v.apply	
-							}
-													
-							if (v instanceof CharSequence){
-								v.toString
-							} else if(v==null) {
-								reportRuleError('''Variable «expr» in "«template»" could not be resolved.''')
-								expr								
-							} else {
-								reportRuleError('''Variable «expr» in "«template»" is no string or not a function that yields a string. Result was: «v».''')
-								expr
-							}				
-						} catch(ElVariableError e){
-							//Do not report the error again here.
-							expr
-						}
-					}
-				} else {
-					eval(expr, lang, String, '''Expression «expr» in "«template»"" could not be resolved.''', expr)
+			val value = if (expr == "srcElementName")
+					//For backward compatibility
+					currentSrcElement.simpleName.toString
+				else {
+					val exprToEvaluate ='''#{«if(noSyntaxRestrictions) expr else expr.replace('_','.')»}''' 
+					eval(exprToEvaluate, lang, CharSequence, '''Expression «expr» in "«template»"" could not be resolved.''', expr)?.toString
 				}
 			matcher.appendReplacement(sb, if(autoCamelCase && matcher.start>0) value.toFirstUpper else value);
 		}
