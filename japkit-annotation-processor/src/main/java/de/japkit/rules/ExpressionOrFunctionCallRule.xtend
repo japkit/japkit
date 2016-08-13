@@ -33,7 +33,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 		this.expr = if(!exprFromAv.nullOrEmpty) exprFromAv else JavadocUtil.getCode(metaElement?.getDocCommentUsingRuntimeMetadata)?.get(exprAvName)
 		
 		this.lang = metaAnnotation?.value(langAvName.withPrefix(avPrefix), String)
-		this.functionClasses = metaAnnotation?.value(this.functionAvName, typeof(TypeElement[]))	
+		this.functionClasses = metaAnnotation?.value(this.functionAvName, typeof(TypeElement[])) 		 
 		this.defaultValue = defaultValue
 		this.nullable = nullable
 		this.combiner = combiner ?: FLUENT_COMBINER
@@ -57,12 +57,12 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 	
 	//true if neither an expression nor a function is set and if no default value has been provided
 	def boolean isUndefined() {
-		expr.nullOrEmpty && functionClasses.nullOrEmpty && defaultValue == null
+		expr.nullOrEmpty && functionClasses.nullOrEmpty && defaultValue == null 
 	}
 	
 	override apply(){ 
 		inRule[
-			if(isUndefined){
+			if(isUndefined && metaElement?.createFunctionRule == null){
 				throw new RuleException('''Either «exprAvName» or «functionAvName» must be set or «metaElement» must be a function.''')	
 			}
 			
@@ -75,23 +75,31 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 			} else UNDEFINED
 			
 			if(exprResult==null) return null;
-					
-			val result = if (!functionClasses.nullOrEmpty) handleException(null, functionAvName) [
-				var r = exprResult
-				for (functionClass : functionClasses) {
-					val function = functionClass?.createFunctionRule ?: metaElement?.createFunctionRule
-					if (function == null) {
-						throw new RuleException('''«functionClass» is not a function.''');
+			
+			val functionRuleFromMetaElement = if(isUndefined) metaElement?.createFunctionRule
+			
+			val functionRules = if (!functionClasses.nullOrEmpty) functionClasses.map[
+				val function = createFunctionRule
+				if (function == null) {
+						throw new RuleException('''«it» is not a function.''');
 					}
+				function
+			] 
+			else if(functionRuleFromMetaElement != null) newArrayList(functionRuleFromMetaElement) 
+			else emptyList
+					
+			val result = if (!functionRules.nullOrEmpty) handleException(null, functionAvName) [
+				var r = exprResult
+				for (function : functionRules) {
 					try{
 						r = checkNotNull(combiner.apply(r == UNDEFINED, r, function))	
 						if(r==null) return null; //Don't call further functions		
 					} catch (Exception e){
-						throw new RuleException('''Error when calling function «functionClass»: «e.message»''');
+						throw new RuleException('''Error when calling function «function?.metaElement?.simpleName»: «e.message»''');
 					}
 				}
 				if(!type.isInstance(r)) {
-					throw new RuleException('''The function «functionClasses.last» returned «r» of type «r?.class», but the required type is «type»''')
+					throw new RuleException('''The function «functionRules.last?.metaElement?.simpleName» returned «r» of type «r?.class», but the required type is «type»''')
 				}
 				r
 			] else exprResult

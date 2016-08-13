@@ -8,7 +8,7 @@ import javax.lang.model.element.TypeElement
 import de.japkit.metaannotations.Case
 
 @Data
-class SwitchRule<T> extends AbstractFunctionRule<T>{
+class SwitchRule<T> extends AbstractFunctionRule<T> implements ICodeFragmentRule{
 	
 	List<CaseRule<T>> caseRules
 	
@@ -31,6 +31,20 @@ class SwitchRule<T> extends AbstractFunctionRule<T>{
 	
 	override protected evalInternal() {
 		CaseRule.applyFirstMatching(caseRules)
+	}
+	
+	//TODO  This is a quite quick hack to support Switch for CodeFragments
+	override code() {
+		apply() as CharSequence
+	}
+	
+	//TODO  This is a quite quick hack to support Switch for CodeFragments
+	override surround(CharSequence surrounded) {
+		scope [
+			valueStack.put("surrounded", surrounded)
+			val result = code()
+			if(result == null || result.length == 0) surrounded else result
+		]
 	}
 		
 

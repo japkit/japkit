@@ -8,5 +8,6 @@ import org.eclipse.xtend.lib.annotations.Data
 class RuleException extends RuntimeException {
 	new(String message){
 		super(message)
-	}		
+	}
+			
 }
