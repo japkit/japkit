@@ -19,7 +19,8 @@ import org.eclipse.xtend2.lib.StringConcatenation
 @Data
 class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSequence> {
 
-	val protected transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+	val protected transient extension AnnotationExtensions annotationExtensions = ExtensionRegistry.get(
+		AnnotationExtensions)
 
 	Element template
 	List<DeclaredType> imports
@@ -36,69 +37,66 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	(CharSequence)=>CharSequence defaultFragmentsRule
 	boolean linebreak
 	boolean indentAfterLinebreak
-	
-	
-	new(AnnotationMirror metaAnnotation, String avPrefix){
+
+	new(AnnotationMirror metaAnnotation, String avPrefix) {
 		this(metaAnnotation, null, avPrefix, "")
 	}
-	
-	new(AnnotationMirror metaAnnotation, Element template, String avPrefix, String errorValue){
+
+	new(AnnotationMirror metaAnnotation, Element template, String avPrefix, String errorValue) {
 		super(metaAnnotation, template)
-		this.template=template
-		
+		this.template = template
+
 		val codeFromJavadoc = JavadocUtil.getCode(template?.getDocCommentUsingRuntimeMetadata)
-		
+
 		bodyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "code".withPrefix(avPrefix))
-		
+
 		lang = metaAnnotation?.value("lang".withPrefix(avPrefix), String)
-		
-		val bodyCaseAnnotations = metaAnnotation?.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[])) 
-		
+
+		val bodyCaseAnnotations = metaAnnotation?.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[]))
+
 		bodyCases = bodyCaseAnnotations?.map[new CaseRule(it, null, String)]?.toList ?: emptyList
 
-
-		beforeExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "beforeIteratorCode".withPrefix(avPrefix)) 
-		afterExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "afterIteratorCode".withPrefix(avPrefix)) 
-		emptyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "emptyIteratorCode".withPrefix(avPrefix)) 
-		separator = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "separator".withPrefix(avPrefix)) 
+		beforeExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc,
+			"beforeIteratorCode".withPrefix(avPrefix))
+		afterExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "afterIteratorCode".withPrefix(avPrefix))
+		emptyExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "emptyIteratorCode".withPrefix(avPrefix))
+		separator = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc, "separator".withPrefix(avPrefix))
 
 		this.errorValue = errorValue;
-		
-		//body iterator
+
+		// body iterator
 		iteratorExpr = metaAnnotation?.value("iterator".withPrefix(avPrefix), String)
 		iteratorLang = metaAnnotation?.value("iteratorLang".withPrefix(avPrefix), String)
 
 		imports = metaAnnotation?.value("imports", typeof(DeclaredType[]))?.toList ?: emptyList
-		
-		
+
 		linebreak = metaAnnotation?.value("linebreak".withPrefix(avPrefix), boolean) ?: false
 		indentAfterLinebreak = metaAnnotation?.value("indentAfterLinebreak".withPrefix(avPrefix), boolean) ?: false
-		
+
 		defaultFragmentsRule = CodeFragmentRules.createDefaultFragmentsRule(metaAnnotation, avPrefix)
 	}
-	
-	private def stringFromAnnotationOrMap(AnnotationMirror metaAnnotation, Map<String, String> map, String name){
-		 val av = metaAnnotation?.value(name, String)
-		 (if(av.nullOrEmpty) map?.get(name) else av) ?: ""
+
+	private def stringFromAnnotationOrMap(AnnotationMirror metaAnnotation, Map<String, String> map, String name) {
+		val av = metaAnnotation?.value(name, String)
+		(if(av.nullOrEmpty) map?.get(name) else av) ?: ""
 	}
-	
-	private static def withPrefix(String name, String prefix){
+
+	private static def withPrefix(String name, String prefix) {
 		if(prefix.nullOrEmpty) name else '''«prefix»«name.toFirstUpper»'''.toString
 	}
-	
-	
+
 	/**
 	 * Gets the code as a closure usable in generated methods, constructors and fields.
 	 */
 	def static CodeBody getAsCodeBody(GenElement genElement, CodeRule cr) {
 		if(cr == null) return null
-		
+
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
-		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
+		// deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
 		val vs = new ValueStack(valueStack);
 		[ EmitterContext ec |
-			withValueStack(vs) [ |
+			withValueStack(vs) [|
 				scope [
 					it.put("ec", ec)
 					it.put("genElement", genElement)
@@ -106,116 +104,120 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 				]
 			]
 		]
-		
+
 	}
-	
-	def static CodeBody getAsCodeBody(GenElement genElement, (GenElement)=>CharSequence cr, (CharSequence)=>CharSequence defaultFragments) {
+
+	def static CodeBody getAsCodeBody(GenElement genElement, (GenElement)=>CharSequence cr,
+		(CharSequence)=>CharSequence defaultFragments) {
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
-		//deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
+		// deep copy current state of value stack, since the closure is evaluated later (in JavaEmitter)
 		val vs = new ValueStack(valueStack);
 		[ EmitterContext ec |
-			
-			withValueStack(vs)[|
+
+			withValueStack(vs) [|
 				scope [
-					try{
+					try {
 						it.put("ec", ec)
 						it.put("genElement", genElement)
 						val result = cr.apply(genElement)
 						defaultFragments?.apply(result) ?: result
-					
-					} catch(TypeElementNotFoundException e){
+
+					} catch (TypeElementNotFoundException e) {
 						throw e
-					} catch(Exception e){
+					} catch (Exception e) {
 						ExtensionRegistry.get(MessageCollector).reportRuleError(e.message);
 						''''''
 					}
-				]		
+				]
 			]
 		]
 
-		
 	}
-	
-	def static (GenElement)=>CodeBody createCodeBodyRule((GenElement)=>CharSequence codeRule, (CharSequence)=>CharSequence defaultFragments){
-		[genElement| 
+
+	def static (GenElement)=>CodeBody createCodeBodyRule((GenElement)=>CharSequence codeRule,
+		(CharSequence)=>CharSequence defaultFragments) {
+		[ genElement |
 			CodeRule.getAsCodeBody(genElement, codeRule, defaultFragments)
 		]
 	}
 
-	
 	/**
 	 * Gets the code as CharSequence. The EmitterContext an the context element must be available on the thread local value stack.
 	 * This method is aimed to be used to include reusable code fragments into other code expressions.
 	 */
-	public def code(){	
+	public def code() {
 		code(valueStack.getRequired("ec") as EmitterContext)
 	}
-	
+
 	private def CharSequence code(EmitterContext ec) {
-		
+
 		inRule[
-			if(bodyExpr.nullOrEmpty && bodyCases.empty) return null //Really?
-	
-			imports.forEach [
-				if (!ec.importIfPossible(it)) {
-					reportRuleError('''Import for «it» not possible since it conflicts with existing import''', 'imports')
-				}
-			]
-			handleTypeElementNotFound(null, errorValue) [
-				val result = if (iteratorExpr.nullOrEmpty) {
-						code(bodyCases, bodyExpr, lang, errorValue)
-					} else {
-						val bodyIterator = eval(iteratorExpr, iteratorLang, Iterable,
-							'''Error in code body iterator expression.''', emptyList)
-						if (!bodyIterator.nullOrEmpty) {
-							val before = eval(beforeExpr, lang, CharSequence,
-								'''Error in code body before expression.''', '').withLinebreak(linebreak) + if(linebreak && indentAfterLinebreak) '\t' else ''
-							val after = eval(afterExpr, lang, CharSequence,
-								'''Error in code body after expression.''', '').withLinebreak(linebreak)
-							'''«FOR e : bodyIterator 
-									BEFORE before 
-									SEPARATOR separator + if(linebreak) StringConcatenation.DEFAULT_LINE_DELIMITER + (if(indentAfterLinebreak)'\t' else '') else ''
-									AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''
-						} else {
-							eval(emptyExpr, lang, CharSequence, '''Error in code body empty expression.''',	errorValue)
-						}
+			handleException([|errorValue], null) [
+				if(bodyExpr.nullOrEmpty && bodyCases.empty) return null // Really?
+				imports.forEach [
+					if (!ec.importIfPossible(it)) {
+						reportRuleError('''Import for «it» not possible since it conflicts with existing import''',
+							'imports')
 					}
-				
-				defaultFragmentsRule.apply(result)
-				
+				]
+				handleTypeElementNotFound(null, errorValue) [
+					val result = if (iteratorExpr.nullOrEmpty) {
+							code(bodyCases, bodyExpr, lang, errorValue)
+						} else {
+							val bodyIterator = eval(iteratorExpr, iteratorLang,
+								Iterable, '''Error in code body iterator expression.''', emptyList)
+							if (!bodyIterator.nullOrEmpty) {
+								val before = eval(beforeExpr, lang,
+									CharSequence, '''Error in code body before expression.''', '').
+									withLinebreak(linebreak) + if(linebreak && indentAfterLinebreak) '\t' else ''
+								val after = eval(afterExpr, lang,
+									CharSequence, '''Error in code body after expression.''', '').withLinebreak(
+									linebreak)
+								'''«FOR e : bodyIterator BEFORE before SEPARATOR separator + if(linebreak) StringConcatenation.DEFAULT_LINE_DELIMITER + (if(indentAfterLinebreak)'\t' else '') else '' AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''
+							} else {
+								eval(emptyExpr, lang, CharSequence, '''Error in code body empty expression.''',
+									errorValue)
+							}
+						}
+
+					try{
+						defaultFragmentsRule.apply(result)					
+					} catch(Exception e) {
+						reportRuleError(e)
+						result
+					}
+
+				]
 			]
-		
-		] 
+		]
+
 	}
-	
-	
+
 	private def CharSequence code(List<CaseRule<String>> bodyCases, String bodyExpr, String lang, String errorResult) {
-		CaseRule.applyFirstMatching(bodyCases) 
-			?: eval(bodyExpr, lang, CharSequence, "Error in code body expression.",	errorResult)
-			//TODO: ErrorResult bei den Cases??
+		CaseRule.findFirstMatching(bodyCases)?.apply ?:
+			eval(bodyExpr, lang, CharSequence, "Error in code body expression.", errorResult)
+	// TODO: ErrorResult bei den Cases??
 	}
-	
-	public static def CharSequence withLinebreak(CharSequence cs){
+
+	public static def CharSequence withLinebreak(CharSequence cs) {
 		withLinebreak(cs, true)
 	}
-	
-	public static def CharSequence withLinebreak(CharSequence cs, boolean linebreak){
-		if(linebreak && cs !=null && cs.length>0) 
-		'''«cs»
-		'''
-		else cs
+
+	public static def CharSequence withLinebreak(CharSequence cs, boolean linebreak) {
+		if (linebreak && cs != null && cs.length > 0) '''«cs»
+		''' else
+			cs
 	}
-	
+
 	override apply() {
 		code()
 	}
-	
+
 	override apply(Object p) {
-		scope(p)[
+		scope(p) [
 			code()
 		]
 	}
-	
+
 }
-	

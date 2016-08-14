@@ -1,11 +1,11 @@
 package de.japkit.rules
 
+import de.japkit.metaannotations.Case
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import org.eclipse.xtend.lib.annotations.Data
 import javax.lang.model.element.TypeElement
-import de.japkit.metaannotations.Case
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class SwitchRule<T> extends AbstractFunctionRule<T> implements ICodeFragmentRule{
@@ -30,21 +30,17 @@ class SwitchRule<T> extends AbstractFunctionRule<T> implements ICodeFragmentRule
 	}
 	
 	override protected evalInternal() {
-		CaseRule.applyFirstMatching(caseRules)
+		CaseRule.findFirstMatching(caseRules)?.apply
 	}
 	
-	//TODO  This is a quite quick hack to support Switch for CodeFragments
+	
 	override code() {
-		apply() as CharSequence
+		CaseRule.findFirstMatching(caseRules)?.code
 	}
 	
-	//TODO  This is a quite quick hack to support Switch for CodeFragments
 	override surround(CharSequence surrounded) {
-		scope [
-			valueStack.put("surrounded", surrounded)
-			val result = code()
-			if(result == null || result.length == 0) surrounded else result
-		]
+		//Apply first matching rule or leave the surrounded code unchanged if no rule applies
+		CaseRule.findFirstMatching(caseRules)?.surround(surrounded) ?: surrounded
 	}
 		
 

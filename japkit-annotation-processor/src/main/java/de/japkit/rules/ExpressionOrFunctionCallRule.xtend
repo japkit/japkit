@@ -62,8 +62,8 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 	
 	override apply(){ 
 		inRule[
-			if(isUndefined && metaElement?.createFunctionRule == null){
-				throw new RuleException('''Either «exprAvName» or «functionAvName» must be set or «metaElement» must be a function.''')	
+			if(isUndefined){
+				throw new RuleException('''Either «exprAvName» or «functionAvName» must be set.''')	
 			}
 			
 			val UNDEFINED = new Object()
@@ -76,8 +76,6 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 			
 			if(exprResult==null) return null;
 			
-			val functionRuleFromMetaElement = if(isUndefined) metaElement?.createFunctionRule
-			
 			val functionRules = if (!functionClasses.nullOrEmpty) functionClasses.map[
 				val function = createFunctionRule
 				if (function == null) {
@@ -85,7 +83,6 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 					}
 				function
 			] 
-			else if(functionRuleFromMetaElement != null) newArrayList(functionRuleFromMetaElement) 
 			else emptyList
 					
 			val result = if (!functionRules.nullOrEmpty) handleException(null, functionAvName) [

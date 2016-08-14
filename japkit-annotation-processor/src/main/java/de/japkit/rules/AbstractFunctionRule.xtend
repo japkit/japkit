@@ -1,6 +1,6 @@
 package de.japkit.rules
 
-import de.japkit.services.TypeElementNotFoundException
+import de.japkit.services.RuleException
 import java.lang.reflect.Array
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
@@ -12,7 +12,6 @@ import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
-import de.japkit.services.RuleException
 
 @Data
 abstract class AbstractFunctionRule<T> extends AbstractRule implements IParameterlessFunctionRule<T>{
