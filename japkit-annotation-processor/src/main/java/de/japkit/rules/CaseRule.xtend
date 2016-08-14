@@ -7,6 +7,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtend.lib.annotations.Data
 import java.util.List
 import de.japkit.services.RuleException
+import javax.lang.model.element.TypeElement
 
 /** A case rule at first checks, if the condition matches. 
  * If so, it evaluates the value expression or function and returns the result.
@@ -14,8 +15,9 @@ import de.japkit.services.RuleException
 @Data
 class CaseRule<T> extends AbstractRule implements Function0<T>, ICodeFragmentRule {
 
-	()=>boolean conditionRule
+	ExpressionOrFunctionCallRule<Boolean> conditionRule
 	ExpressionOrFunctionCallRule<T> valueRule
+	List<TypeElement> otherAnnotationTypes
 
 	new(AnnotationMirror metaAnnotation, Element metaElement, Class<? extends T> type) {
 		super(metaAnnotation, metaElement)
@@ -25,6 +27,8 @@ class CaseRule<T> extends AbstractRule implements Function0<T>, ICodeFragmentRul
 
 		this.valueRule = new ExpressionOrFunctionCallRule<T>(metaAnnotation, metaElement, type, "value", "valueLang",
 			"valueFun", null, null, false, null);
+			
+		this.otherAnnotationTypes =  metaElement?.annotationMirrors?.filter[it!=metaAnnotation]?.map[annotationType.asTypeElement]?.toList
 
 	}
 
@@ -33,7 +37,23 @@ class CaseRule<T> extends AbstractRule implements Function0<T>, ICodeFragmentRul
 	 */
 	def shallBeApplied() {
 		inRule[
-			return conditionRule.apply ?: false
+			handleException([false], null) [
+				val condition = if(!conditionRule.undefined) conditionRule.apply 
+					
+					else  {
+						//If the condition of the case annotion is "empty", look for the first annotation that represent a funtion and call it as a boolean function
+						//This is done here, since createFunctionRule within constructor creates some cyclic dependedencies and/or stackoverflow in Xtend
+						var Pair<TypeElement, IParameterlessFunctionRule<?>> typeAndFunction
+						try {
+							typeAndFunction = otherAnnotationTypes.map[it -> createFunctionRule].findFirst[it.value != null] 	
+							typeAndFunction?.value?.apply as Boolean			
+						} catch(Exception e) {
+							throw new RuleException('''Error when evaluating condition function «typeAndFunction?.key.simpleName» : '''+e.message)
+						}
+						
+					}
+				return condition ?: false			
+			]
 		]
 	}
 

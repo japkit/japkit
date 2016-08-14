@@ -23,8 +23,7 @@ class SwitchRule<T> extends AbstractFunctionRule<T> implements ICodeFragmentRule
 		
 		caseRules = if(caseRulesFromAnnotation.nullOrEmpty && metaElement instanceof TypeElement) {
 			(metaElement as TypeElement).enclosedElements
-				.map[ it -> it.annotationMirror(Case)]
-				.filter[value != null].map[ new  CaseRule<T>(value, key, type)]
+				.map[ new CaseRule<T>(it.annotationMirror(Case), it, type)]
 				.toList
 		} else caseRulesFromAnnotation
 	}
