@@ -163,88 +163,37 @@ class RuleUtils {
 	}
 	
 	/**Scope rule that gets the source element from "src" AV */
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
-		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcRule(metaAnnotation, avPrefix), true)
+	public def <T> ScopeRule<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, true)
 	}
 	
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, String avPrefix) {
-		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, createSrcRule(metaAnnotation, avPrefix), true)
+	public def <T> ScopeRule<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, String avPrefix) {
+		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, true)
 	}
 	
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Object srcRule) {
-		createScopeRule(metaAnnotation, metaElement, false, avPrefix, createSrcRule(metaAnnotation, avPrefix), true)	
+	public def <T> ScopeRule<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix, ()=>Object srcRule) {
+		createScopeRule(metaAnnotation, metaElement, false, avPrefix, true)	
 	}
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
 	 */
-	public def <T> ((Object)=>T)=>List<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, 
-		String avPrefix, ()=>Object srcRule, boolean iterateIfIterable
+	public def <T> ScopeRule<T>  createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary, 
+		String avPrefix, boolean createSrcRule
 	) {
-			
-		val srcVarName = metaAnnotation?.value("srcVar".withPrefix(avPrefix), String)
-		val varRules = createELVariableRules(metaAnnotation, metaElement, avPrefix)
-		val libraryRules = createLibraryRules(metaAnnotation, avPrefix)
-		val selfLibrary = if(isLibrary) new LibraryRule(metaAnnotation, metaElement as TypeElement)
-		
-		val resultVarAnnotation = metaElement?.annotationMirror(ResultVar)		
-		val resultVarAV =  resultVarAnnotation?.value("value".withPrefix(avPrefix), String);	
-		val resultVarName = if(resultVarAV.nullOrEmpty) metaElement?.simpleName?.toString else resultVarAV;
-			
-		
-
-		[(Object)=>T closure |
-			try {
-						
-				val src = srcRule?.apply ?: currentSrc;
-	
-				val iterate = iterateIfIterable && (src instanceof Iterable<?> || src instanceof Map<?,?>)		
-				
-				
-				val result = if(iterate){
-					val iterable = if(src instanceof Iterable<?>) src else (src as Map<?,?>).entrySet
-					iterable.map [ e |
-						doInScope(e, srcVarName, libraryRules, selfLibrary, varRules, closure)
-					].toList			
-				
-				} else{ 
-					newArrayList(doInScope(src, srcVarName, libraryRules, selfLibrary, varRules, closure))				
-				};	
-				if(resultVarAnnotation!=null && !resultVarName.nullOrEmpty){
-					valueStack.put(resultVarName, if(iterate) result else result.head)
-				}
-				
-				result
-			
-			} catch (Exception e){
-				//To avoid error flooding or misleading errors
-				//TODO: Reconsider resultVar. Better use some functional approach + "mapping cache" instead
-				if(resultVarAnnotation!=null && !resultVarName.nullOrEmpty){
-					valueStack.put(resultVarName, new ElVariableError(resultVarName))
-				}
-				throw e
-			}
-		]
-	}
-	
-	private def <T> T doInScope(Object src, String srcVarName, List<LibraryRule> libraryRules, LibraryRule selfLibrary, List<ELVariableRule> varRules, (Object)=>T closure) {
-		scope(src) [
-			if(!srcVarName.nullOrEmpty){valueStack.put(srcVarName, src)}
-			libraryRules.forEach[apply]
-			selfLibrary?.apply
-			valueStack.put("currentRule", currentRule)
-			varRules?.forEach[it.putELVariable]
-			closure.apply(src)
-		]
+		return new ScopeRule<T>(metaAnnotation, metaElement, isLibrary, avPrefix, createSrcRule)			
 	}
 	
 	def createLibraryRules(AnnotationMirror metaAnnotation, String avPrefix) {
 		metaAnnotation?.value("libraries".withPrefix(avPrefix), typeof(TypeMirror[]))?.map[createLibraryRule(it.asElement)] ?: emptyList
 	}
 	
-	val SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null, null)
+	ScopeRule<Object> SCOPE_WITH_CURRENT_SRC
 	
-	public def <T> ((Object)=>T)=>Iterable<T> scopeWithCurrentSrc(){		
-		SCOPE_WITH_CURRENT_SRC	as ((Object)=>T)=>Iterable<T>
+	public def ScopeRule scopeWithCurrentSrc(){	
+		if(SCOPE_WITH_CURRENT_SRC==null) {
+			SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null, null)
+		}	
+		SCOPE_WITH_CURRENT_SRC	
 	}
 	
 	
@@ -288,46 +237,25 @@ class RuleUtils {
 	public static val NO_NAME = [|null as String]
 	
 	//There are some places in templates besides the meta-annotations where expressions or EL variables can be used:
-	//- Names of elements (methods, fields, params, ...).  (only variables)
+	//- Names of elements (methods, fields, params, ...).  
 	//- String annotation values
 	//They have to be enclosed in $...$ there.
+	//In element names, "." is not allowed, so "_" can be used instead and is replaced by "."
 	static val expressionInTemplate = Pattern.compile('''\$(.+?)\$''')
 	
-	public def replaceExpressionInTemplate(CharSequence template, boolean canBeExpression, String lang, boolean autoCamelCase) {
+	public def replaceExpressionInTemplate(CharSequence template, boolean noSyntaxRestrictions, String lang, boolean autoCamelCase) {
 		
 		val vs = ExtensionRegistry.get(ELSupport).valueStack
 		val matcher = expressionInTemplate.matcher(template)
 		val sb = new StringBuffer();
 		while (matcher.find()) {
 			val expr = matcher.group(1)
-			val value = if (!canBeExpression) {
-
-					//only variable names allowed, no expression
-					if (expr == "srcElementName")
-						currentSrcElement.simpleName.toString
-					else {
-						try{
-							var v = vs.get(expr);
-							if(v instanceof Function0<?>){
-								v = v.apply	
-							}
-													
-							if (v instanceof CharSequence){
-								v.toString
-							} else if(v==null) {
-								reportRuleError('''Variable «expr» in "«template»" could not be resolved.''')
-								expr								
-							} else {
-								reportRuleError('''Variable «expr» in "«template»" is no string or not a function that yields a string. Result was: «v».''')
-								expr
-							}				
-						} catch(ElVariableError e){
-							//Do not report the error again here.
-							expr
-						}
-					}
-				} else {
-					eval(expr, lang, String, '''Expression «expr» in "«template»"" could not be resolved.''', expr)
+			val value = if (expr == "srcElementName")
+					//For backward compatibility
+					currentSrcElement.simpleName.toString
+				else {
+					val exprToEvaluate ='''#{«if(noSyntaxRestrictions) expr else expr.replace('_','.')»}''' 
+					eval(exprToEvaluate, lang, CharSequence, '''Expression «expr» in "«template»"" could not be resolved.''', expr)?.toString
 				}
 			matcher.appendReplacement(sb, if(autoCamelCase && matcher.start>0) value.toFirstUpper else value);
 		}

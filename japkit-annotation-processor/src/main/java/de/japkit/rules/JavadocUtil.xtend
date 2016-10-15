@@ -8,9 +8,17 @@ class JavadocUtil {
 	static val returnPattern = Pattern.compile('''@return\s*([^@]*)''')
 	
 	//code within javadoc. 1st group is the name of the according AV. second group is the code
+	//the patterns are sorted from the the most to the leasr specific ones. The first one that matches, will be applied.
+
 	static val codePattern1 = Pattern.compile('''@japkit\.(\S+)\s*<pre>\s*\{@code\s*([\s\S]*?)\}\s*</pre>''')
 	static val codePattern2 = Pattern.compile('''@japkit\.(\S+)\s*<pre>\s*<code>\s*([\s\S]*?)</code>\s*</pre>''')
 	static val codePattern3 = Pattern.compile('''@japkit\.(\S+)\s*<code>\s*([\s\S]*?)</code>''')
+	static val codePattern4 = Pattern.compile('''@japkit\.(\S+)\s*<pre>\s*([\s\S]*?)</pre>''')
+	//single line code (everything on the same line till newline or end of string)
+	static val codePattern5 = Pattern.compile('''@japkit\.(\S+)[\t\f ]*([\s\S]*?)(?:$|[\r\n])''')
+	
+	
+	
 	
 	static val leadingWhiteSpaceAfterLinebreak = Pattern.compile('''\n ''')
 	
@@ -38,13 +46,13 @@ class JavadocUtil {
 	}
 	
 	def static getCode(CharSequence javadoc){
-		getMapFromTwoGroups(javadoc, codePattern1, codePattern2, codePattern3).mapValues[
+		getMapFromTwoGroups(javadoc, codePattern1, codePattern2, codePattern3, codePattern4, codePattern5).mapValues[
 			leadingWhiteSpaceAfterLinebreak.matcher(it).replaceAll('\n')
 		]	
 	}
 	
 	def static removeCode(CharSequence javadoc){
-		remove(javadoc, codePattern1, codePattern2, codePattern3)	
+		remove(javadoc, codePattern1, codePattern2, codePattern3, codePattern4, codePattern5)	
 	}
 	
 	
@@ -56,7 +64,12 @@ class JavadocUtil {
 			val map = newHashMap
 			patterns.forEach[
 				val matcher = it.matcher(javadoc)		
-				matcher => [while(find){map.put(group(1), group(2)?.trim)}]				
+				matcher => [while(find){
+					if(!map.containsKey(group(1))) {
+						//Only put into map, if there was no match for a more specific pattern
+						map.put(group(1), group(2)?.trim)
+					}
+				}]				
 			]
 			map
 		}

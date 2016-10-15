@@ -27,8 +27,15 @@ class TriggerAnnotationRule extends AbstractRule{
 
 		varRules=createELVariableRules(metaAnnotation, triggerAnnotationTypeElement, null)
 		
+		//As a (more concise) alternative to using @Clazz at trigger annotations, @Clazz can be used at the template class.
+		//The template class can then be referred directly by the trigger annotation.
+		var classTemplates = metaAnnotation?.value("template", typeof(TypeElement[]));
+		
 		//@Clazz
-		classRules=triggerAnnotationTypeElement.annotationMirrors(Clazz).map[new ClassRule(it, null ,true)].toList
+		classRules= if(!classTemplates.empty) 
+			classTemplates.map[new ClassRule(it.annotationMirror(Clazz), it, true)]
+			else 
+			triggerAnnotationTypeElement.annotationMirrors(Clazz).map[new ClassRule(it, null, true)].toList
 		
 		//@ResourceTemplate
 		val resourcePackage = triggerAnnotationTypeElement.package
