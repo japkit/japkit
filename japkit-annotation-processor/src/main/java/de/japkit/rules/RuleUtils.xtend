@@ -257,7 +257,7 @@ class RuleUtils {
 					val exprToEvaluate ='''#{«if(noSyntaxRestrictions) expr else expr.replace('_','.')»}''' 
 					eval(exprToEvaluate, lang, CharSequence, '''Expression «expr» in "«template»"" could not be resolved.''', expr)?.toString
 				}
-			matcher.appendReplacement(sb, if(autoCamelCase && matcher.start>0) value.toFirstUpper else value);
+			matcher.appendReplacement(sb, if(autoCamelCase && matcher.start>0 && Character.isLowerCase(template.charAt(matcher.start -1))) value.toFirstUpper else value);
 		}
 		matcher.appendTail(sb);
 	}
