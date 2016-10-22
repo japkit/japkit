@@ -406,7 +406,7 @@ class RuleUtils {
 		val copyFromSrc =  metaAnnotation?.value("commentFromSrc".withPrefix(avPrefix), Boolean) ?: false
 		val commentExpr = metaAnnotation?.value("commentExpr".withPrefix(avPrefix), String)
 		val commentLang = metaAnnotation?.value("commentLang".withPrefix(avPrefix), String);
-		val commentFromTemplate = template?.docComment.removeCode
+		val commentFromTemplate = template?.getDocCommentUsingRuntimeMetadata.removeCode
 		val expr = if(commentExpr.nullOrEmpty) commentFromTemplate else commentExpr;
 
 		[ |
