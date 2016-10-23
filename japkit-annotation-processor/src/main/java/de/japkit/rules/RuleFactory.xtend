@@ -26,7 +26,6 @@ class RuleFactory {
 	
 	def clearCaches(){
 		matcherCache.clear
-		annoRuleCache.clear
 		templateCache.clear
 		libraryCache.clear
 		functionCache.clear
@@ -41,17 +40,6 @@ class RuleFactory {
 		getOrCreate(matcherCache, am, matcherFactory)
 	}
 
-	//TODO: Bringt das hier überhaupt etwas, wenn der AnnotationMirror ohnehin jedes mal unterschiedlich ist?
-	//Reicht das Template caching nicht bereits aus?
-	val annoRuleCache = new IdentityHashMap<AnnotationMirror, AnnotationMappingRule>
-	
-	def annoRuleFactory(Map<String, AnnotationMappingRule> mappingsWithId){
-		[AnnotationMirror am, (AnnotationMappingRule)=>void registrationCallBack |new AnnotationMappingRule(am, mappingsWithId)]
-	} 
-
-	def createAnnotationMappingRule(AnnotationMirror am, Map<String, AnnotationMappingRule> mappingsWithId) {
-		getOrCreate(annoRuleCache, am, annoRuleFactory(mappingsWithId))
-	}
 
 	val templateCache = new HashMap<String, TemplateRule>
 	

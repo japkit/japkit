@@ -124,7 +124,7 @@ class AnnotationExtensions {
 				// this map is passed through to the annotation value rules, so they can lazily get the annotation mappings
 				val annotationMappingsById = newHashMap();
 				annotation.value(avName, typeof(AnnotationMirror[]))?.forEach [
-					val amr = createAnnotationMappingRule(it, annotationMappingsById)
+					val amr = new AnnotationMappingRule(it, annotationMappingsById)
 					if (amr.id.nullOrEmpty) {
 						//Only add "top-level" annotation mappings
 						result.add(amr)
