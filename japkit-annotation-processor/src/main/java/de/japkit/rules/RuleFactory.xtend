@@ -44,10 +44,13 @@ class RuleFactory {
 	//TODO: Bringt das hier überhaupt etwas, wenn der AnnotationMirror ohnehin jedes mal unterschiedlich ist?
 	//Reicht das Template caching nicht bereits aus?
 	val annoRuleCache = new IdentityHashMap<AnnotationMirror, AnnotationMappingRule>
-	val annoRuleFactory = [AnnotationMirror am, (AnnotationMappingRule)=>void registrationCallBack |new AnnotationMappingRule(am)]
+	
+	def annoRuleFactory(Map<String, AnnotationMappingRule> mappingsWithId){
+		[AnnotationMirror am, (AnnotationMappingRule)=>void registrationCallBack |new AnnotationMappingRule(am, mappingsWithId)]
+	} 
 
-	def createAnnotationMappingRule(AnnotationMirror am) {
-		getOrCreate(annoRuleCache, am, annoRuleFactory)
+	def createAnnotationMappingRule(AnnotationMirror am, Map<String, AnnotationMappingRule> mappingsWithId) {
+		getOrCreate(annoRuleCache, am, annoRuleFactory(mappingsWithId))
 	}
 
 	val templateCache = new HashMap<String, TemplateRule>

@@ -20,11 +20,11 @@ class AnnotationValueMappingRule extends AbstractRule{
 	String value
 	String expr
 	String lang
-	String annotationMappingId
+	()=>AnnotationMappingRule lazyAnnotationMapping
 	AVMode mode
 
 
-	def GenAnnotationValue mapAnnotationValue(GenAnnotationMirror annotation, TypeMirror avType, Map<String, AnnotationMappingRule> mappingsWithId) {
+	def GenAnnotationValue mapAnnotationValue(GenAnnotationMirror annotation, TypeMirror avType) {
 		inRule[
 			//existing value (without considering defaults!)
 			val existingValue = annotation?.getValueWithoutDefault(name)
@@ -55,15 +55,12 @@ class AnnotationValueMappingRule extends AbstractRule{
 			val v = 
 				if (!value.nullOrEmpty) {
 					coerceAnnotationValue(value, avType)
-				} else if (!annotationMappingId.nullOrEmpty){
-					val annotationMapping = mappingsWithId?.get(annotationMappingId)
-					if(annotationMapping==null){
-						throw new IllegalArgumentException('''Annotation rule with id «annotationMappingId» not found.''')
-					}
-					if(expr.nullOrEmpty){
-						
+				} else if (lazyAnnotationMapping!=null){
+					val annotationMapping = lazyAnnotationMapping.apply
+					
+					if(expr.nullOrEmpty){						
 							val annotations = newArrayList 
-							annotationMapping.mapOrCopyAnnotations(annotations, mappingsWithId)
+							annotationMapping.mapOrCopyAnnotations(annotations)
 							if(!annotations.empty){
 								coerceAnnotationValue(annotations.head, avType)
 							} else {
@@ -75,7 +72,7 @@ class AnnotationValueMappingRule extends AbstractRule{
 						val annotations = newArrayList 
 						elements.forEach[
 							scope(it)[
-								annotationMapping.mapOrCopyAnnotations(annotations, mappingsWithId)
+								annotationMapping.mapOrCopyAnnotations(annotations)
 								null
 							]
 						]
@@ -118,14 +115,21 @@ class AnnotationValueMappingRule extends AbstractRule{
 	}
 
 
-	new(AnnotationMirror a) {
+	new(AnnotationMirror a,  Map<String, AnnotationMappingRule> mappingsWithId) {
 		super(a, null)
 		name = a.value(null, "name", String)
 		value = a.value(null, "value", String)
 		expr = a.value(null, "expr", String)
 		lang = a.value(null, "lang", String)
 		mode = a.value(null, "mode", AVMode)
-		annotationMappingId = a.value(null, "annotationMappingId", String)
+		val annotationMappingId = a.value(null, "annotationMappingId", String)
+		lazyAnnotationMapping = if(annotationMappingId.nullOrEmpty) null else [| 
+			val amr = mappingsWithId.get(annotationMappingId)
+			if(amr==null){
+				throw new IllegalArgumentException("Annotation Mapping with id "+annotationMappingId+" not found");
+			}
+			amr
+		]
 		activationRule = createActivationRule(a, null)
 
 	}

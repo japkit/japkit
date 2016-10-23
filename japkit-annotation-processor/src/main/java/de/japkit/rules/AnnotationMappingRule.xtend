@@ -39,7 +39,7 @@ class AnnotationMappingRule extends AbstractRule{
 	 * @param annotations the annotations generated so far for the element
 	 * @param srcElement the source element
 	 */
-	def void mapOrCopyAnnotations(List<GenAnnotationMirror> annotations, Map<String, AnnotationMappingRule> mappingsWithId) {
+	def void mapOrCopyAnnotations(List<GenAnnotationMirror> annotations) {
 		inRule[
 			if (!activationRule.apply) {
 				return null
@@ -50,7 +50,7 @@ class AnnotationMappingRule extends AbstractRule{
 				
 		
 				if(!DefaultAnnotation.name.equals(targetAnnotation?.qualifiedName)){
-					mapAnnotation(annotations, mappingsWithId)	
+					mapAnnotation(annotations)	
 				}
 				null //TODO.
 			]
@@ -96,7 +96,7 @@ class AnnotationMappingRule extends AbstractRule{
 		})
 	}
 	
-	def private void mapAnnotation(List<GenAnnotationMirror> annotations, Map<String, AnnotationMappingRule> mappingsWithId) {
+	def private void mapAnnotation(List<GenAnnotationMirror> annotations) {
 		
 		
 		var am = annotations.findFirst[hasFqn(targetAnnotation.qualifiedName)]
@@ -150,7 +150,7 @@ class AnnotationMappingRule extends AbstractRule{
 				try {
 					setValue(vm.name,
 						[ avType |
-							vm.mapAnnotationValue(anno, avType, mappingsWithId)
+							vm.mapAnnotationValue(anno, avType)
 						])
 		
 				} catch (RuntimeException e) {
@@ -167,13 +167,13 @@ class AnnotationMappingRule extends AbstractRule{
 	
 
 
-	new(AnnotationMirror am) {
+	new(AnnotationMirror am,  Map<String, AnnotationMappingRule> annotationMappingsById) {
 		super(am, null)
 		id = am.value("id", String)
 		activationRule = createActivationRule(am, null)
 		targetAnnotation = am.value("targetAnnotation", DeclaredType)
 		valueMappings = am.value("values", typeof(AnnotationMirror[])).map[
-			new AnnotationValueMappingRule(it)]
+			new AnnotationValueMappingRule(it, annotationMappingsById)]
 		mode = am.value("mode", AnnotationMode)
 		
 		copyAnnotationsFqns = am.value("copyAnnotations", typeof(DeclaredType[])).map[qualifiedName].toSet
