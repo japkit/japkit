@@ -103,12 +103,24 @@ class AnnotationExtensions {
 			}
 
 			def isTriggerAnnotation(AnnotationMirror am) {
-				am.hasMetaAnnotation(Trigger.name)
+				try {
+					am.hasMetaAnnotation(Trigger.name)
+				} catch (TypeElementNotFoundException e) {
+					// If the annotation type cannot be found, we assume it is no trigger annotation. 
+					// That is: We do not support to generate new trigger annotations (which would be strange anyway.)
+					// This error handling is necessary, since some annotations ARE generated, especially annotation templates.
+					return false;
+				}
 			}
 
 			def isTriggerAnnotation(TypeElement te) {
 				te.annotationMirror(Trigger.name) != null
 			}
+			
+			def List<? extends AnnotationMirror> getTriggerAnnotations(TypeElement annotatedClass) {
+				annotatedClass.annotationMirrors.filter[isTriggerAnnotation].toList
+			}
+
 
 			/**
 			 * Gets a list of element matchers from an annotation.

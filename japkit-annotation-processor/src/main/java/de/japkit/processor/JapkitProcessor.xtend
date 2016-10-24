@@ -137,7 +137,7 @@ class JapkitProcessor extends AbstractProcessor {
 		val classesToProcess = new HashSet(classesToProcessUnfiltered)
 
 		//Search for trigger annotations
-		val annotatedClassesAndTriggerAnnotations = classesToProcess.toInvertedMap[triggerAnnotations].filter[ac, t|
+		val annotatedClassesAndTriggerAnnotations = classesToProcess.toInvertedMap[triggerAnnotationsAndShadowFlag].filter[ac, t|
 			!t.empty]
 			
 		//type elements that ARE trigger annotations
@@ -212,7 +212,7 @@ class JapkitProcessor extends AbstractProcessor {
 	}
 	
 	def getLayer(TypeElement annotatedClass){
-		val layers = annotatedClass.annotationMirrors.map[metaAnnotation(Trigger)].filter[it!=null].map[value('layer', Integer)].toSet
+		val layers = annotatedClass.triggerAnnotations.map[metaAnnotation(Trigger)].map[value('layer', Integer)].toSet
 				
 		Collections.max(layers)
 		
@@ -468,7 +468,7 @@ class JapkitProcessor extends AbstractProcessor {
 						//TODO: Hier wirklich nochmal classesToProcess?
 						classesToProcess.exists [ otherAc |
 							typesRegistry.
-								hasGenericDependencyOnTriggerShadowAnnotation(ac, otherAc.triggerAnnotations.map[key])
+								hasGenericDependencyOnTriggerShadowAnnotation(ac, otherAc.triggerAnnotationsAndShadowFlag.map[key])
 						]
 					]
 				)
@@ -489,7 +489,7 @@ class JapkitProcessor extends AbstractProcessor {
 			finishedAnnotatedClasses.removeAll(annotatedClassesToDefer)
 
 			//Wake up or defer classes, that genrically depended on trigger annotations of processed classes
-			val processedTriggerAnnotations = finishedAnnotatedClasses.map[triggerAnnotations].flatten.toSet.map[key]
+			val processedTriggerAnnotations = finishedAnnotatedClasses.map[triggerAnnotationsAndShadowFlag].flatten.toSet.map[key]
 			val annotatedClassesDependingGenericallyOnProcessedTriggerAnnotations = typesRegistry.
 				getAnnotatedClassesDependingGenericallyOnThatTriggerAnnotations(processedTriggerAnnotations)
 			annotatedClassesToDefer.addAll(annotatedClassesDependingGenericallyOnProcessedTriggerAnnotations)
@@ -575,7 +575,7 @@ class JapkitProcessor extends AbstractProcessor {
 
 	def private Set<GenTypeElement> processTriggerAnnotations(TypeElement annotatedClass) {
 		
-		val triggerAnnotations = getTriggerAnnotations(annotatedClass)
+		val triggerAnnotations = getTriggerAnnotationsAndShadowFlag(annotatedClass)
 
 		triggerAnnotations.filter[!value].map [ 
 			val triggerAnnotationRule = createTriggerAnnotationRule(it.key.annotationAsTypeElement)
@@ -586,8 +586,8 @@ class JapkitProcessor extends AbstractProcessor {
 	
 	
 	//TODO: Some Caching.
-	def List<Pair<AnnotationMirror, Boolean>> getTriggerAnnotations(TypeElement annotatedClass) {
-		annotatedClass.annotationsWithMetaAnnotation(Trigger).map[it -> it.shadowAnnotation].toList
+	def List<Pair<AnnotationMirror, Boolean>> getTriggerAnnotationsAndShadowFlag(TypeElement annotatedClass) {
+		annotatedClass.triggerAnnotations.map[it -> it.shadowAnnotation].toList
 	}
 
 	val Set<String> writtenTypeElements = newHashSet

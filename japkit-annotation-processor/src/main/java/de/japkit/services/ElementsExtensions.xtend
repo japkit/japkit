@@ -308,54 +308,23 @@ class ElementsExtensions {
 		return if(singleAnnotation == null) emptyList else Collections.singletonList(singleAnnotation)
 	}
 
-	def annotationsWithMetaAnnotation(Element annotatedElement, CharSequence metaAnnotationFqn) {
-		annotatedElement.annotationMirrors.filter[hasMetaAnnotation(metaAnnotationFqn)]
-	}
-
-	def boolean hasMetaAnnotation(AnnotationMirror am, CharSequence metaAnnotationFqn) {
-		
-			am.metaAnnotations.exists[hasFqn(metaAnnotationFqn)]		
-		
-	}
-
-	def annotationsWithMetaAnnotation(Element annotatedElement, Class<? extends Annotation> annotationClass) {
-		annotationsWithMetaAnnotation(annotatedElement, annotationClass.name)
+	def boolean hasMetaAnnotation(AnnotationMirror am, CharSequence metaAnnotationFqn) {	
+		am.metaAnnotations.exists[hasFqn(metaAnnotationFqn)]			
 	}
 
 	def metaAnnotations(AnnotationMirror annotationMirror) {
-		try {
-			annotationMirror.annotationAsTypeElement.annotationMirrors
-		} catch(TypeElementNotFoundException e) {
-			// If the annotation type cannot be found, we assume it has no relevant meta annotations. 
-			// That is: We do not support to generate new trigger annotations (which would be strange anyway.)
-			// This error handling is necessary, since some annotations ARE generated, especially annotation templates.
-			return emptyList;
-		}
+		annotationMirror.annotationAsTypeElement.annotationMirrors		
 	}
 
 	//TODO: Java 8
 	def AnnotationMirror metaAnnotation(AnnotationMirror annotationMirror, CharSequence metaAnnotationFqn) {
-		try {
-			annotationMirror.annotationAsTypeElement.annotationMirror(metaAnnotationFqn)
-		} catch(TypeElementNotFoundException e) {
-			// If the annotation type cannot be found, we assume it has no relevant meta annotations. 
-			// That is: We do not support to generate new trigger annotations (which would be strange anyway.)
-			// This error handling is necessary, since some annotations ARE generated, especially annotation templates.
-			return null;
-		}		
+		annotationMirror.annotationAsTypeElement.annotationMirror(metaAnnotationFqn)			
 	}
 
 	//Annotation.List support 
 	//TODO: Java 8
 	def List<AnnotationMirror> metaAnnotations(AnnotationMirror annotationMirror, CharSequence metaAnnotationFqn) {
-		try {
-			annotationMirror.annotationAsTypeElement.annotationMirrors(metaAnnotationFqn)
-		} catch (TypeElementNotFoundException e) {
-			// If the annotation type cannot be found, we assume it has no relevant meta annotations. 
-			// That is: We do not support to generate new trigger annotations (which would be strange anyway.)
-			// This error handling is necessary, since some annotations ARE generated, especially annotation templates.
-			return emptyList;
-		}
+		annotationMirror.annotationAsTypeElement.annotationMirrors(metaAnnotationFqn)
 	}
 
 	def AnnotationMirror metaAnnotation(AnnotationMirror annotationMirror, Class<? extends Annotation> annotationClass) {
