@@ -313,7 +313,9 @@ class ElementsExtensions {
 	}
 
 	def boolean hasMetaAnnotation(AnnotationMirror am, CharSequence metaAnnotationFqn) {
-		am.metaAnnotations.exists[hasFqn(metaAnnotationFqn)]
+		
+			am.metaAnnotations.exists[hasFqn(metaAnnotationFqn)]		
+		
 	}
 
 	def annotationsWithMetaAnnotation(Element annotatedElement, Class<? extends Annotation> annotationClass) {
@@ -321,18 +323,39 @@ class ElementsExtensions {
 	}
 
 	def metaAnnotations(AnnotationMirror annotationMirror) {
-		annotationMirror.annotationAsTypeElement.annotationMirrors
+		try {
+			annotationMirror.annotationAsTypeElement.annotationMirrors
+		} catch(TypeElementNotFoundException e) {
+			// If the annotation type cannot be found, we assume it has no relevant meta annotations. 
+			// That is: We do not support to generate new trigger annotations (which would be strange anyway.)
+			// This error handling is necessary, since some annotations ARE generated, especially annotation templates.
+			return emptyList;
+		}
 	}
 
 	//TODO: Java 8
 	def AnnotationMirror metaAnnotation(AnnotationMirror annotationMirror, CharSequence metaAnnotationFqn) {
-		annotationMirror.annotationAsTypeElement.annotationMirror(metaAnnotationFqn)
+		try {
+			annotationMirror.annotationAsTypeElement.annotationMirror(metaAnnotationFqn)
+		} catch(TypeElementNotFoundException e) {
+			// If the annotation type cannot be found, we assume it has no relevant meta annotations. 
+			// That is: We do not support to generate new trigger annotations (which would be strange anyway.)
+			// This error handling is necessary, since some annotations ARE generated, especially annotation templates.
+			return null;
+		}		
 	}
 
 	//Annotation.List support 
 	//TODO: Java 8
 	def List<AnnotationMirror> metaAnnotations(AnnotationMirror annotationMirror, CharSequence metaAnnotationFqn) {
-		annotationMirror.annotationAsTypeElement.annotationMirrors(metaAnnotationFqn)
+		try {
+			annotationMirror.annotationAsTypeElement.annotationMirrors(metaAnnotationFqn)
+		} catch (TypeElementNotFoundException e) {
+			// If the annotation type cannot be found, we assume it has no relevant meta annotations. 
+			// That is: We do not support to generate new trigger annotations (which would be strange anyway.)
+			// This error handling is necessary, since some annotations ARE generated, especially annotation templates.
+			return emptyList;
+		}
 	}
 
 	def AnnotationMirror metaAnnotation(AnnotationMirror annotationMirror, Class<? extends Annotation> annotationClass) {

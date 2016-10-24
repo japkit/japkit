@@ -652,13 +652,14 @@ class TypesRegistry {
 	}
 	
 	def handleTypeElementNotFound(CharSequence msg, String typeFqnOrShortname, TypeElement annotatedClass) {
-
-		val errorMsg = '''«msg» Missing type: «typeFqnOrShortname»'''
-
-		registerTypeDependencyForAnnotatedClassByFqn(annotatedClass.qualifiedName.toString, typeFqnOrShortname, msg)
-
-		//Report the error. This might be remover later, when the class is generated again
-		messageCollector.reportRuleError(errorMsg)
+		if(annotatedClass != null) { //Null check is for corner cases where annotation types are missing, since they are to be generated (f.e. annotation templates).
+			val errorMsg = '''«msg» Missing type: «typeFqnOrShortname»'''		
+			registerTypeDependencyForAnnotatedClassByFqn(annotatedClass.qualifiedName.toString, typeFqnOrShortname, msg)		
+	
+			//Report the error. This might be remover later, when the class is generated again
+			messageCollector.reportRuleError(errorMsg)
+		
+		}
 	}
 
 	//Whether asTypeElement shall return generated types, if "real" type is not found (yet).

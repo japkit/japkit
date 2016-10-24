@@ -22,7 +22,7 @@ public class AnnotationTemplatesTemplate {
 			nameExpr = "#{src.asElement().simpleName}_",
 			kind = ElementKind.ANNOTATION_TYPE,
 			templates = @TemplateCall(AnnotationTemplateAVMembers.class))
-	@de.japkit.metaannotations.AnnotationTemplate(targetAnnotation = SrcType.class)
+	@de.japkit.annotations.AnnotationTemplate(targetAnnotation = SrcType.class)
 	public @interface AnnotationName_ {
 		
 		/**

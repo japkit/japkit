@@ -1,4 +1,4 @@
-package de.japkit.metaannotations;
+package de.japkit.annotations;
 
 import java.lang.annotation.Annotation;
 
