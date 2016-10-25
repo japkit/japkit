@@ -18,6 +18,7 @@ import org.eclipse.xtend.lib.annotations.Data
 import static de.japkit.metaannotations.AnnotationMode.*
 import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.ReportedException
+import de.japkit.annotations.AnnotationTemplate
 
 @Data
 class AnnotationMappingRule extends AbstractRule {
@@ -119,8 +120,8 @@ class AnnotationMappingRule extends AbstractRule {
 				annotations.add(am)
 			}
 		} else {
-			if (id.
-				nullOrEmpty) {
+			//TODO Neu machen. Funktioniert mit AnnotationTemplates nicht, da dort keine ids verwendet werden.
+			if (id.nullOrEmpty) {
 				switch (mode) {
 					case ERROR_IF_EXISTS:
 						throw new ProcessingException(
@@ -183,11 +184,33 @@ class AnnotationMappingRule extends AbstractRule {
 			new AnnotationValueMappingRule(it, annotationMappingsById)
 		]
 		mode = am.value("mode", AnnotationMode)
+		
+		scopeRule = createScopeRule(am, null, null)
 
+		//TODO: Das sollte nicht Teil der AMR sein, denn diese bezieht sich immer auf genau einen Annotation-Typ
 		copyAnnotationsFqns = am.value("copyAnnotations", typeof(DeclaredType[])).map[qualifiedName].toSet
 		copyAnnotationsFromPackages = am.value("copyAnnotationsFromPackages", typeof(String[]))
-		setShadowOnTriggerAnnotations = am.value("setShadowOnTriggerAnnotations", Boolean)
-		scopeRule = createScopeRule(am, null, null)
+		
+		//TODO: Wann ist das relevant? nur für copyAnnotations?
+		setShadowOnTriggerAnnotations = am.value("setShadowOnTriggerAnnotations", Boolean)		
 	}
+	
+	new(AnnotationMirror annotationTemplate, Element templateElement){
+		super(annotationTemplate, templateElement)
+		id = null;
+		setShadowOnTriggerAnnotations = false;
+		activationRule = createActivationRule(annotationTemplate, "_")
+		targetAnnotation = annotationTemplate.metaAnnotation(AnnotationTemplate).value("targetAnnotation", DeclaredType)
+		//TODO
+		valueMappings = emptyList
+		//TODO: Ziemlich sinnlos, da es scopeRule entgegensteht bei Collections.
+		mode = AnnotationMode.ERROR_IF_EXISTS
+		scopeRule = createScopeRule(annotationTemplate, null, "_")
+		
+		//TODO: Das sollte nicht Teil der AMR sein, denn diese bezieht sich immer auf genau einen Annotation-Typ
+		copyAnnotationsFqns = emptySet
+		copyAnnotationsFromPackages = emptyList
+	}	
+	
 
 }

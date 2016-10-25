@@ -329,33 +329,37 @@ class RuleUtils {
 	public def (GenElement)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
 		AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 
-		val mappings = metaAnnotation?.annotationMappingRules("annotations".withPrefix(avPrefix));
+		val mappings = metaAnnotation?.annotationMappingRulesFromMetaAnnotation("annotations".withPrefix(avPrefix)) ?: newArrayList();
+		mappings.addAll(annotationMappingRulesFromAnnotationTemplates(template));
 
 		[ genElement |
-			val existingAnnotationsAndTemplateAnnotations = new ArrayList(genElement.annotationMirrors.map [
+			val annotations = new ArrayList(genElement.annotationMirrors.map [
 				it as GenAnnotationMirror
 			])
-			// Copy all annotations from template that are no japkit annotations and no AnnotationTemplate
-			existingAnnotationsAndTemplateAnnotations.addAll(
+			// Copy all annotations from template element that are no japkit annotations and no AnnotationTemplate
+			annotations.addAll(
 				template?.copyAnnotations(
 					[am|!am.isJapkitAnnotation && !am.hasMetaAnnotation(AnnotationTemplate.name)],
 					templateAnnotationValueTransformer
 				) ?: emptyList
 			)
 
-			if(mappings.nullOrEmpty) return existingAnnotationsAndTemplateAnnotations
-
-			// Apply the annotation mappings
-			mapAnnotations(mappings, existingAnnotationsAndTemplateAnnotations)
+			//apply the annotation mapping rules. Modifies the annotations list passed in!
+			mappings?.forEach[mapOrCopyAnnotations(annotations)]
+			annotations
 		]
 	}
 
-	private def List<AnnotationMappingRule> annotationMappingRules(AnnotationMirror annotation, CharSequence avName) {
+	private def List<AnnotationMappingRule> annotationMappingRulesFromAnnotationTemplates(Element templateElement) {
+		templateElement?.annotationMirrors?.filter[hasMetaAnnotation(AnnotationTemplate.name)]?.map[new AnnotationMappingRule(it, templateElement)]?.toList ?: emptyList
+	}
+
+	private def List<AnnotationMappingRule> annotationMappingRulesFromMetaAnnotation(AnnotationMirror metaAnnotation, CharSequence avName) {
 		val result = newArrayList();
 		// To refer to annotation rules from annotation value rules, the annotation rules are collected by id here and 
 		// this map is passed through to the annotation value rules, so they can lazily get the annotation mappings
 		val annotationMappingsById = newHashMap();
-		annotation.value(avName, typeof(AnnotationMirror[]))?.forEach [
+		metaAnnotation.value(avName, typeof(AnnotationMirror[]))?.forEach [
 			val amr = new AnnotationMappingRule(it, annotationMappingsById)
 			if (amr.id.nullOrEmpty) {
 				// Only add "top-level" annotation mappings
