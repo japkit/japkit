@@ -4,8 +4,11 @@ import static de.japkit.metaannotations.classselectors.ClassSelectorKind.INNER_C
 
 import javax.lang.model.element.ElementKind;
 
+import de.japkit.annotations.AnnotationTemplate;
 import de.japkit.annotations.RuntimeMetadata;
 import de.japkit.annotationtemplates.AnnotationTemplatesTemplate.AnnotationName_.AnnotationTemplateAVMembers;
+import de.japkit.metaannotations.AV;
+import de.japkit.metaannotations.Annotation;
 import de.japkit.metaannotations.Clazz;
 import de.japkit.metaannotations.Matcher;
 import de.japkit.metaannotations.Method;
@@ -13,7 +16,6 @@ import de.japkit.metaannotations.Template;
 import de.japkit.metaannotations.TemplateCall;
 import de.japkit.metaannotations.classselectors.ClassSelector;
 import de.japkit.metaannotations.classselectors.SrcSingleValueType;
-import de.japkit.metaannotations.classselectors.SrcType;
 
 @RuntimeMetadata
 @Clazz()
@@ -21,8 +23,10 @@ public class AnnotationTemplatesTemplate {
 	@de.japkit.metaannotations.InnerClass(src = "#{triggerAnnotation.targetAnnotations}",
 			nameExpr = "#{src.asElement().simpleName}_",
 			kind = ElementKind.ANNOTATION_TYPE,
-			templates = @TemplateCall(AnnotationTemplateAVMembers.class))
-	@de.japkit.annotations.AnnotationTemplate(targetAnnotation = SrcType.class)
+			templates = @TemplateCall(AnnotationTemplateAVMembers.class),
+			annotations = @Annotation(targetAnnotation=AnnotationTemplate.class, values = @AV(name = "targetAnnotation", expr="#{src}")))
+	//Does not work, since japkit annotations are not copied:
+	//@de.japkit.annotations.AnnotationTemplate(targetAnnotation = SrcType.class)
 	public @interface AnnotationName_ {
 		
 		/**

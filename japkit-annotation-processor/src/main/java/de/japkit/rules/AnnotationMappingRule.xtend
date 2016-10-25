@@ -16,9 +16,11 @@ import javax.lang.model.type.DeclaredType
 import org.eclipse.xtend.lib.annotations.Data
 
 import static de.japkit.metaannotations.AnnotationMode.*
+import de.japkit.services.TypeElementNotFoundException
+import de.japkit.services.ReportedException
 
 @Data
-class AnnotationMappingRule extends AbstractRule{	
+class AnnotationMappingRule extends AbstractRule {
 	val transient extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 
 	String id
@@ -32,7 +34,6 @@ class AnnotationMappingRule extends AbstractRule{
 	boolean setShadowOnTriggerAnnotations
 	((Object)=>Object)=>Iterable<Object> scopeRule
 
-
 	/**
 	 * Adds the annotation mapped by this rule.
 	 * 
@@ -41,66 +42,75 @@ class AnnotationMappingRule extends AbstractRule{
 	 */
 	def void mapOrCopyAnnotations(List<GenAnnotationMirror> annotations) {
 		inRule[
-			if (!activationRule.apply) {
-				return null
-			}
-			
-			scopeRule.apply[
-				copyAnnotations(annotations)
-				
-		
-				if(!DefaultAnnotation.name.equals(targetAnnotation?.qualifiedName)){
-					mapAnnotation(annotations)	
+			try {
+				if (!activationRule.apply) {
+					return null
 				}
-				null //TODO.
-			]
-		
+
+				scopeRule.apply [
+					copyAnnotations(annotations)
+
+					if (!DefaultAnnotation.name.equals(targetAnnotation?.qualifiedName)) {
+						mapAnnotation(annotations)
+					}
+					null // TODO. For now, we mutate the input list.
+				]
+
+			} catch (TypeElementNotFoundException tenfe) {
+				//If there is a tenfe, no members are generated and the dependency to the unknown type is registered
+				handleTypeElementNotFound(tenfe, currentAnnotatedClass)
+				null
+			} catch (ReportedException re){
+				null
+			} catch (RuntimeException re) {
+				reportRuleError("Error during annotation mapping." + re)
+				null
+			}
+
 		]
 
 	}
-	
+
 	def private copyAnnotations(List<GenAnnotationMirror> annotations) {
-		if(!copyAnnotationsFqns.empty || !copyAnnotationsFromPackages.empty){
-			currentSrcElement.annotationMirrors.filter[shallCopyAnnotation].forEach[
-				try{
-					annotations.add(copyAnnotation)			
-				} catch(ProcessingException e){
+		if (!copyAnnotationsFqns.empty || !copyAnnotationsFromPackages.empty) {
+			currentSrcElement.annotationMirrors.filter[shallCopyAnnotation].forEach [
+				try {
+					annotations.add(copyAnnotation)
+				} catch (ProcessingException e) {
 					reportError(e)
 				}
 			]
 		}
 	}
-	
+
 	private def copyAnnotation(AnnotationMirror am) {
 		val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 		GenExtensions.copy(am) => [
-				if(it.annotationType.qualifiedName==currentTriggerAnnotation.annotationType.qualifiedName){
-					putShadowAnnotation(it)
-				}
-			//TODO: Ist this still necessary here? 
-				if(setShadowOnTriggerAnnotations){setShadowIfAppropriate}
-			]
+			if (it.annotationType.qualifiedName == currentTriggerAnnotation.annotationType.qualifiedName) {
+				putShadowAnnotation(it)
+			}
+			// TODO: Ist this still necessary here? 
+			if (setShadowOnTriggerAnnotations) {
+				setShadowIfAppropriate
+			}
+		]
 	}
-	
-	def private boolean shallCopyAnnotation(AnnotationMirror am){
+
+	def private boolean shallCopyAnnotation(AnnotationMirror am) {
 		!ExtensionRegistry.get(GenExtensions).isJapkitAnnotation(am) && (
-		copyAnnotationsFqns.contains(am.annotationType.qualifiedName) 
-		|| {
+		copyAnnotationsFqns.contains(am.annotationType.qualifiedName) || {
 			val packageFqn = am.annotationType.asElement.package.qualifiedName.toString
-			copyAnnotationsFromPackages.exists[
-				equals(packageFqn) ||
-				equals("*") || 
-				endsWith(".*") && packageFqn.equals(substring(0, it.length-2)) || 
-				endsWith(".**") && packageFqn.startsWith(substring(0, it.length-3))
+			copyAnnotationsFromPackages.exists [
+				equals(packageFqn) || equals("*") || endsWith(".*") && packageFqn.equals(substring(0, it.length - 2)) ||
+					endsWith(".**") && packageFqn.startsWith(substring(0, it.length - 3))
 			]
 		})
 	}
-	
+
 	def private void mapAnnotation(List<GenAnnotationMirror> annotations) {
-		
-		
+
 		var am = annotations.findFirst[hasFqn(targetAnnotation.qualifiedName)]
-		
+
 		if (am == null) {
 			if (mode == REMOVE) {
 				return
@@ -109,7 +119,8 @@ class AnnotationMappingRule extends AbstractRule{
 				annotations.add(am)
 			}
 		} else {
-			if(id.nullOrEmpty){
+			if (id.
+				nullOrEmpty) {
 				switch (mode) {
 					case ERROR_IF_EXISTS:
 						throw new ProcessingException(
@@ -129,59 +140,54 @@ class AnnotationMappingRule extends AbstractRule{
 					case IGNORE:
 						return
 					default:
-						throw new ProcessingException('''Annotation mapping mode «mode» is not supported.''', if(currentSrc instanceof Element) currentSrcElement)
+						throw new ProcessingException('''Annotation mapping mode «mode» is not supported.''',
+							if(currentSrc instanceof Element) currentSrcElement)
 				}
-			
+
 			} else {
-				//The AnnotationMapping is used from an annotation value mapping. Just ignore the mapping mode and create a new annotation.
+				// The AnnotationMapping is used from an annotation value mapping. Just ignore the mapping mode and create a new annotation.
 				am = new GenAnnotationMirror(targetAnnotation)
 				annotations.add(am)
 			}
-		
+
 		}
-		
+
 		val anno = am
-		
-		
+
 		valueStack.put("targetAnnotation", anno)
-	
+
 		anno => [
 			valueMappings.forEach [ vm |
 				try {
-					setValue(vm.name,
-						[ avType |
-							vm.mapAnnotationValue(anno, avType)
-						])
-		
+					setValue(vm.name, [ avType |
+						vm.mapAnnotationValue(anno, avType)
+					])
+
 				} catch (RuntimeException e) {
-		
+
 					reportRuleError('''
-							Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
-							Cause: «e.message»''')
+					Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
+					Cause: «e.message»''')
 				}
 			]
 		]
-		
-		
+
 	}
-	
 
-
-	new(AnnotationMirror am,  Map<String, AnnotationMappingRule> annotationMappingsById) {
+	new(AnnotationMirror am, Map<String, AnnotationMappingRule> annotationMappingsById) {
 		super(am, null)
 		id = am.value("id", String)
 		activationRule = createActivationRule(am, null)
 		targetAnnotation = am.value("targetAnnotation", DeclaredType)
-		valueMappings = am.value("values", typeof(AnnotationMirror[])).map[
-			new AnnotationValueMappingRule(it, annotationMappingsById)]
+		valueMappings = am.value("values", typeof(AnnotationMirror[])).map [
+			new AnnotationValueMappingRule(it, annotationMappingsById)
+		]
 		mode = am.value("mode", AnnotationMode)
-		
+
 		copyAnnotationsFqns = am.value("copyAnnotations", typeof(DeclaredType[])).map[qualifiedName].toSet
 		copyAnnotationsFromPackages = am.value("copyAnnotationsFromPackages", typeof(String[]))
 		setShadowOnTriggerAnnotations = am.value("setShadowOnTriggerAnnotations", Boolean)
 		scopeRule = createScopeRule(am, null, null)
 	}
-	
-	
-	
+
 }
