@@ -56,7 +56,11 @@ class RuleUtils {
 	val protected transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 
 	public static def withPrefix(CharSequence name, String prefix) {
-		(if(prefix.nullOrEmpty) name else '''«prefix»«name.toString.toFirstUpper»''').toString
+		(if(prefix.nullOrEmpty) name else { 
+			if(Character.isLowerCase(prefix.charAt(prefix.length -1))) 
+				'''«prefix»«name.toString.toFirstUpper»'''
+				else '''«prefix»«name»'''
+		}).toString
 	}
 
 	public static val ()=>Iterable<? extends Object> SINGLE_SRC_ELEMENT = [|
