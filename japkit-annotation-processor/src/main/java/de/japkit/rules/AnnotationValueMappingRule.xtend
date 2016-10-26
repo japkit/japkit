@@ -12,12 +12,14 @@ import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
+import static extension de.japkit.rules.RuleUtils.withPrefix
+
 @Data
 class AnnotationValueMappingRule extends AbstractRule{
 
 	()=>boolean activationRule
 	String name
-	String value
+	Object value
 	String expr
 	String lang
 	()=>AnnotationMappingRule lazyAnnotationMapping
@@ -53,7 +55,7 @@ class AnnotationValueMappingRule extends AbstractRule{
 			}
 	
 			val v = 
-				if (!value.nullOrEmpty) {
+				if (value !=null) {
 					coerceAnnotationValue(value, avType)
 				} else if (lazyAnnotationMapping!=null){
 					val annotationMapping = lazyAnnotationMapping.apply
@@ -84,8 +86,8 @@ class AnnotationValueMappingRule extends AbstractRule{
 				} else {
 	
 					//messager.printMessage(Kind.ERROR, '''Either 'value' or 'expr' must be set.''', am)
-					throw new IllegalArgumentException(
-						"Error in annotation value mapping: Either 'value' or 'expr' or 'annotationMappingId'must be set.")
+					//throw new IllegalArgumentException(
+					//	"Error in annotation value mapping: Either 'value' or 'expr' or 'annotationMappingId'must be set.")
 				}
 	
 			if(v==null){
@@ -131,6 +133,29 @@ class AnnotationValueMappingRule extends AbstractRule{
 			amr
 		]
 		activationRule = createActivationRule(a, null)
+
+	}
+	
+	new(AnnotationMirror a,  Element templateElement, String avName) {
+		super(a, templateElement)
+		name = avName
+		value = a.value(avName, Object)
+		
+		val avPrefix = '_'+avName
+		expr = a.value("expr".withPrefix(avPrefix), String)
+		lang = a.value("lang".withPrefix(avPrefix), String)
+		mode = AVMode.JOIN_LIST
+//		val annotationMappingId = a.value(null, "annotationMappingId", String)
+//		lazyAnnotationMapping = if(annotationMappingId.nullOrEmpty) null else [| 
+//			val amr = mappingsWithId.get(annotationMappingId)
+//			if(amr==null){
+//				throw new IllegalArgumentException("Annotation Mapping with id "+annotationMappingId+" not found");
+//			}
+//			amr
+//		]
+		//TODO
+		lazyAnnotationMapping = null;
+		activationRule = createActivationRule(a, avPrefix)
 
 	}
 }

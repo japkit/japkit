@@ -201,8 +201,11 @@ class AnnotationMappingRule extends AbstractRule {
 		setShadowOnTriggerAnnotations = false;
 		activationRule = createActivationRule(annotationTemplate, "_")
 		targetAnnotation = annotationTemplate.metaAnnotation(AnnotationTemplate).value("targetAnnotation", DeclaredType)
-		//TODO
-		valueMappings = emptyList
+
+		valueMappings = targetAnnotation.asTypeElement.declaredMethods
+			.map[simpleName]
+			.map[name | new AnnotationValueMappingRule(annotationTemplate, templateElement, name.toString)]
+		
 		//TODO: Ziemlich sinnlos, da es scopeRule entgegensteht bei Collections.
 		mode = AnnotationMode.ERROR_IF_EXISTS
 		scopeRule = createScopeRule(annotationTemplate, null, "_")
