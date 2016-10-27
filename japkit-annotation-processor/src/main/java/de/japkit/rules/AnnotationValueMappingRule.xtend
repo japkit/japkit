@@ -70,6 +70,7 @@ class AnnotationValueMappingRule extends AbstractRule{
 							}
 						
 					} else {
+						//TODO: Warum wird hier über expr iteriert? Für soetwas sollte src verwendet werden...
 						val elements = eval(expr, lang, Iterable) as Iterable<Element>  //TODO: Check if instanceof element
 						val annotations = newArrayList 
 						elements.forEach[
@@ -145,16 +146,15 @@ class AnnotationValueMappingRule extends AbstractRule{
 		expr = a.value("expr".withPrefix(avPrefix), String)
 		lang = a.value("lang".withPrefix(avPrefix), String)
 		mode = AVMode.JOIN_LIST
-//		val annotationMappingId = a.value(null, "annotationMappingId", String)
-//		lazyAnnotationMapping = if(annotationMappingId.nullOrEmpty) null else [| 
-//			val amr = mappingsWithId.get(annotationMappingId)
-//			if(amr==null){
-//				throw new IllegalArgumentException("Annotation Mapping with id "+annotationMappingId+" not found");
-//			}
-//			amr
-//		]
-		//TODO
-		lazyAnnotationMapping = null;
+		
+		
+		val annotationMappingAnnotation =  a.value(avPrefix, AnnotationMirror)
+		
+		lazyAnnotationMapping = if (annotationMappingAnnotation == null) null else {
+			val amr = new AnnotationMappingRule(annotationMappingAnnotation, templateElement);
+			[| amr]
+		}
+		
 		activationRule = createActivationRule(a, avPrefix)
 
 	}
