@@ -60,7 +60,7 @@ public class AnnotationTemplatesTemplate {
 			 * #{src.singleValueType.kind == 'DECLARED' && src.singleValueType.asElement.kind == 'ANNOTATION_TYPE'}
 			 * */
 			@Method(condFun = isAnnotationType.class)
-			AnnotationTemplateType[] _$srcElementName$() default {}; 
+			AnnotationTemplateType[] $srcElementName$_() default {}; 
 			
 			//TODOs: 
 			//UnresolvedType per Flag ermöglichen, damit Abhängigkeiten zwischen inner classes "von Hand" aufgelöst werden können.
@@ -74,22 +74,22 @@ public class AnnotationTemplatesTemplate {
 			/**
 			 * @return expression to determine if the annotation value shall be generated. Default is true.
 			 */
-			String _$srcElementName$Cond() default "";
+			String $srcElementName$_cond() default "";
 			
 			/** 
 			 * @return the expression language for the condition expression.
 			 */
-			String _$srcElementName$CondLang() default "";
+			String $srcElementName$_condLang() default "";
 			
 			/** 
 			 * @return as an alternative to the cond expression, a boolean function can be called.
 			 */
-			Class<?>[] _$srcElementName$CondFun() default {};
+			Class<?>[] $srcElementName$_condFun() default {};
 
 			///??? Was macht das bei einfachen annotation values???
-			String _$srcElementName$Src() default "";
+			String $srcElementName$_src() default "";
 
-			String _$srcElementName$Expr() default "";
+			String $srcElementName$_expr() default "";
 
 		}
 

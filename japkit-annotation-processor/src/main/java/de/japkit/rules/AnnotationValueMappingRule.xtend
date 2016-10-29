@@ -142,7 +142,7 @@ class AnnotationValueMappingRule extends AbstractRule{
 		name = avName
 		value = a.value(avName, Object)
 		
-		val avPrefix = '_'+avName
+		val avPrefix = avName+'_'
 		expr = a.value("expr".withPrefix(avPrefix), String)
 		lang = a.value("lang".withPrefix(avPrefix), String)
 		mode = AVMode.JOIN_LIST
