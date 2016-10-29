@@ -901,7 +901,8 @@ class ElementsExtensions {
 			}
 			registerTypeDependencyForCurrentAnnotatedClass(runtimeMetadataTypeElement.asType)
 		} else {
-			throw new TypeElementNotFoundException(runtimemetadataFqn, "Access to parameter names or comments required.")
+			// TODO: Exception immer werfen ist zu hart hier. Ggf nur dann werfen, wenn erkennbar ist, dass es sich um ein "BinaryTypeBinding" handelt.
+			//throw new TypeElementNotFoundException(runtimemetadataFqn, "Access to parameter names or comments required.")
 		}		
 			
 	}
