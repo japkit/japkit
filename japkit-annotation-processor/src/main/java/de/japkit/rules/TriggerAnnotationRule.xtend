@@ -10,6 +10,7 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
+import java.util.ArrayList
 
 @Data
 class TriggerAnnotationRule extends AbstractRule{
@@ -32,14 +33,14 @@ class TriggerAnnotationRule extends AbstractRule{
 		var classTemplates = metaAnnotation?.value("template", typeof(TypeElement[]));
 		
 		//@Clazz
-		classRules= if(!classTemplates.empty) 
-			classTemplates.map[new ClassRule(it.annotationMirror(Clazz), it, true)]
+		classRules= new ArrayList( if(!classTemplates.empty) 
+			classTemplates.map[new ClassRule(it.annotationMirror(Clazz), it, true)].toList
 			else 
-			triggerAnnotationTypeElement.annotationMirrors(Clazz).map[new ClassRule(it, null, true)].toList
+			triggerAnnotationTypeElement.annotationMirrors(Clazz).map[new ClassRule(it, null, true)].toList)
 		
 		//@ResourceTemplate
 		val resourcePackage = triggerAnnotationTypeElement.package
-		resourceRules = triggerAnnotationTypeElement.annotationMirrors(ResourceTemplate).map[new ResourceRule(it, resourcePackage)]		
+		resourceRules = new ArrayList(triggerAnnotationTypeElement.annotationMirrors(ResourceTemplate).map[new ResourceRule(it, resourcePackage)])		
 		selfLibraryRule = new LibraryRule(triggerMetaAnnotation, triggerAnnotationTypeElement)
 		libraryRules = createLibraryRules(triggerMetaAnnotation, null)
 	}

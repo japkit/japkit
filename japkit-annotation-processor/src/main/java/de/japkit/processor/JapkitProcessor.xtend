@@ -33,6 +33,7 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
+import de.japkit.rules.TriggerAnnotationRule
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -555,31 +556,43 @@ class JapkitProcessor extends AbstractProcessor {
 	}
 
 	def Map<GenTypeElement, TypeElement> processAnnotatedClass(TypeElement annotatedClass) {
-		val Map<GenTypeElement, TypeElement> generatedTopLevelClasses = newHashMap;
-
-		//Whatever messages we had so far - they will be re-created if the reason still exists
-		removeMessagesForAnnotatedClass(annotatedClass.qualifiedName.toString)
-
-		//Whatever type dependecies we had so far - they will be re-created. Especially UNKNOWN_TYPE dependencies might be replaced by normal ones
-		removeDependenciesForAnnotatedClass(annotatedClass.qualifiedName.toString)
-
+		try {
+			setCurrentAnnotatedClass(annotatedClass)
+			val Map<GenTypeElement, TypeElement> generatedTopLevelClasses = newHashMap;
+	
+			//Whatever messages we had so far - they will be re-created if the reason still exists
+			removeMessagesForAnnotatedClass(annotatedClass.qualifiedName.toString)
+	
+			//Whatever type dependecies we had so far - they will be re-created. Especially UNKNOWN_TYPE dependencies might be replaced by normal ones
+			removeDependenciesForAnnotatedClass(annotatedClass.qualifiedName.toString)
+	
+			
+			processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]		
+			
+	
+			//TODO: Reconsider. Is @Behavior considered as Trigger Annotation or as something else?
+			//generatedTopLevelClasses.putAll(processBehaviorAnnotation(annotatedClass))
+			generatedTopLevelClasses
 		
-		processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]		
-		
-
-		//TODO: Reconsider. Is @Behavior considered as Trigger Annotation or as something else?
-		//generatedTopLevelClasses.putAll(processBehaviorAnnotation(annotatedClass))
-		generatedTopLevelClasses
+		} finally {
+			setCurrentAnnotatedClass(null)
+		}
 	}
 
 
 	def private Set<GenTypeElement> processTriggerAnnotations(TypeElement annotatedClass) {
-		
+
 		val triggerAnnotations = getTriggerAnnotationsAndShadowFlag(annotatedClass)
 
-		triggerAnnotations.filter[!value].map [ 
-			val triggerAnnotationRule = createTriggerAnnotationRule(it.key.annotationAsTypeElement)
-			triggerAnnotationRule.processTriggerAnnotation(annotatedClass, it.key)		
+		triggerAnnotations.filter[!value].map [
+			var TriggerAnnotationRule triggerAnnotationRule
+			try {
+				triggerAnnotationRule = createTriggerAnnotationRule(it.key.annotationAsTypeElement)
+			} catch (TypeElementNotFoundException tenfe) {
+				handleTypeElementNotFound('''Type «tenfe.fqn» not found when creating trigger annotation rule «it.key.annotationType.qualifiedName»''',
+					tenfe.fqn)
+			}
+			triggerAnnotationRule?.processTriggerAnnotation(annotatedClass, it.key) ?: emptySet
 		].flatten.toSet
 
 	}

@@ -217,9 +217,9 @@ class RuleUtils {
 	}
 
 	def createLibraryRules(AnnotationMirror metaAnnotation, String avPrefix) {
-		metaAnnotation?.value("libraries".withPrefix(avPrefix), typeof(TypeMirror[]))?.map [
+		new ArrayList(metaAnnotation?.value("libraries".withPrefix(avPrefix), typeof(TypeMirror[]))?.map [
 			createLibraryRule(it.asElement)
-		] ?: emptyList
+		] ?: emptyList)
 	}
 
 	ScopeRule<Object> SCOPE_WITH_CURRENT_SRC
