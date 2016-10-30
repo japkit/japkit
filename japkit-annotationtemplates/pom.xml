@@ -29,8 +29,12 @@
 					</annotationProcessorPaths>
 					<compilerArgs>
 						<compilerArg>
-							-Aannotations=de.japkit.annotations.*
+							-Aannotations=de.japkit.annotationtemplates.*
 						</compilerArg>
+						<compilerArg>
+							-AdiagnosticMessages=false
+						</compilerArg>
+
 					</compilerArgs>
 				</configuration>
 			</plugin>
@@ -44,5 +48,22 @@
 			<artifactId>japkit-annotations</artifactId>
 			<version>${japkit.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>19.0</version>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.1-api</artifactId>
+			<version>1.0.0.Final</version>
+			<optional>true</optional>
+		</dependency>
+
 	</dependencies>
+
+
 </project>

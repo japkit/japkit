@@ -15,6 +15,7 @@ import de.japkit.metaannotations.Method;
 import de.japkit.metaannotations.Template;
 import de.japkit.metaannotations.TemplateCall;
 import de.japkit.metaannotations.classselectors.ClassSelector;
+import de.japkit.metaannotations.classselectors.ClassSelectorKind;
 import de.japkit.metaannotations.classselectors.SrcSingleValueType;
 
 @RuntimeMetadata
@@ -53,18 +54,9 @@ public class AnnotationTemplatesTemplate {
 			@Matcher(condition="#{src.singleValueType.kind == 'DECLARED' && src.singleValueType.asElement.kind == 'ANNOTATION_TYPE'}")
 			class isAnnotationType{};
 			
-			/**
-			 * #{src}
-			 * #{src.returnType}
-			 * #{src.singleValueType.asElement.simpleName}
-			 * #{src.singleValueType.kind == 'DECLARED' && src.singleValueType.asElement.kind == 'ANNOTATION_TYPE'}
-			 * */
 			@Method(condFun = isAnnotationType.class)
 			AnnotationTemplateType[] $srcElementName$_() default {}; 
 			
-			//TODOs: 
-			//UnresolvedType per Flag ermöglichen, damit Abhängigkeiten zwischen inner classes "von Hand" aufgelöst werden können.
-			//Activation ergänzen: Nur generieren , wenn der Typ in der Trigger Annotation auftaucht.
 			@ClassSelector(kind=INNER_CLASS_NAME, expr="#{src.singleValueType.asElement.simpleName}_", enclosing=GenClassEnclosingClass.class)
 			@interface AnnotationTemplateType{}
 			
