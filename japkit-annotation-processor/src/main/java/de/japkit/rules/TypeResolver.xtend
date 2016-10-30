@@ -26,14 +26,14 @@ class TypeResolver {
 	val transient extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	
-	def TypeMirror resolveType(
+	def TypeMirror resolveTypeFromAnnotationValues(
 		AnnotationMirror metaAnnotation,
 		String typeAvName,
 		String typeArgsAvName
 	) {
 		createTypeIfNecessary(
-			resolveType( metaAnnotation, typeAvName),
-			resolveTypes(metaAnnotation, typeArgsAvName)
+			resolveTypeFromAnnotationValues( metaAnnotation, typeAvName),
+			resolveTypesFromAnnotationValues(metaAnnotation, typeArgsAvName)
 		)
 	}
 	
@@ -45,14 +45,14 @@ class TypeResolver {
 		}
 	}
 
-	def TypeMirror resolveType(AnnotationMirror metaAnnotation, String typeAvName) { 
+	def TypeMirror resolveTypeFromAnnotationValues(AnnotationMirror metaAnnotation, String typeAvName) { 
 
 		val selector = metaAnnotation.value(typeAvName, TypeMirror)
 		selector.resolveType
 
 	}
 
-	def List<? extends TypeMirror> resolveTypes(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
+	def List<? extends TypeMirror> resolveTypesFromAnnotationValues(AnnotationMirror metaAnnotation, String typeArgsAvName)  {
 
 		val selectors =  metaAnnotation.value(typeArgsAvName, typeof(TypeMirror[]))
 		selectors.map(s|s.resolveType)
@@ -63,38 +63,45 @@ class TypeResolver {
 		resolveType(selector, true)
 	}
 
-	def TypeMirror resolveType(TypeMirror selector, boolean required) {
-		if(selector instanceof ArrayType){
-			new GenArrayType(selector.componentType.resolveType(required))
-		} else {
-			selector.resolveType_(required)
-		}
+	def dispatch TypeMirror resolveType(ArrayType selector, boolean required) {
+		new GenArrayType(selector.componentType.resolveType(required))
 	}
 	
-	def private TypeMirror resolveType_(TypeMirror selector, boolean required) {
+	def dispatch TypeMirror resolveType(DeclaredType selector, boolean required) {
+		val typeFunctionResult = resolveTypeFunctionIfNecessary(selector)
+		
+		if(typeFunctionResult instanceof DeclaredType)  typeFunctionResult.resolveType_(required) else typeFunctionResult?.resolveType(required)
+	}
+	
+	def dispatch TypeMirror resolveType(TypeMirror selector, boolean required) {
+		selector
+	}
+	
+	
+	def private TypeMirror resolveType_(DeclaredType selector, boolean required) {
 
 		
 		try {			
-			var type = resolveTypeFunctionIfNecessary(selector)
+			var type = selector
 			
 			//Always try to resolve error type if the type is required
-			type = if(type instanceof ErrorType && required) type.asTypeElement.asType else type
+			type = if(type instanceof ErrorType && required) type.asTypeElement.asType as DeclaredType else type
 			
 			//TODO: Wird das hier wirklich noch benötigt oder ist das redundant zu anderen Mechanismen (tenfe)?
 			if (type != null && required) {
 				currentAnnotatedClass.registerTypeDependencyForAnnotatedClass(type)
 			}
 			
-			//If the selector has type arguments, map them as well
-			if(type == null || !(type instanceof DeclaredType) || !(selector instanceof DeclaredType)){
+			
+			if(type == null) {
 				type
 			} else {
-				val selDecl =  selector as DeclaredType 
-				if(selDecl.typeArguments.nullOrEmpty){
+				//If there are type arguments, map them as well
+				if(selector.typeArguments.nullOrEmpty){
 					type
 				} else {
-					getDeclaredType(type.asElement, selDecl.typeArguments.map[
-						resolveType()
+					getDeclaredType(type.asElement as TypeElement, selector.typeArguments.map[
+						resolveType(required)
 					])				
 				}	
 			}
@@ -110,9 +117,9 @@ class TypeResolver {
 	/**
 	 * Checks it the type refers to a function. If so, the function is called and the resulting type mirror is returned.
 	 */
-	def private TypeMirror resolveTypeFunctionIfNecessary(TypeMirror type) {
+	def private TypeMirror resolveTypeFunctionIfNecessary(DeclaredType type) {
 
-			if (type instanceof DeclaredType && !(type instanceof ErrorType)) {
+			if (!(type instanceof ErrorType)) {
 				//zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): Arrays mit UnresolvedTypeBindings werden nicht resolved.
 				//TODO: Ist das schon in ElementsExtensions geregelt?
 				var TypeElement te = type.asTypeElement

@@ -429,8 +429,7 @@ class RuleUtils {
 
 		[|
 			try {
-				val type = metaAnnotation?.resolveType(avName.withPrefix(avPrefix),
-					'''«avName»Args'''.withPrefix(avPrefix))
+				val type = metaAnnotation?.resolveTypeFromAnnotationValues(avName.withPrefix(avPrefix), '''«avName»Args'''.withPrefix(avPrefix))
 				if (!type.isVoid) {
 					type
 				} else {

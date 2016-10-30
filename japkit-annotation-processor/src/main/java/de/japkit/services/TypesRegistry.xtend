@@ -30,6 +30,7 @@ import org.jgrapht.graph.DefaultEdge
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 import de.japkit.model.GenUnresolvedTypeElement
+import de.japkit.model.GenClass
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -853,6 +854,10 @@ class TypesRegistry {
 			val innerClassPath = typeFqnOrShortname.substring(genClassFqn.length+1).split("\\.")
 			val innerClass = genClass.findNestedElement(innerClassPath)
 			if(innerClass instanceof TypeElement) return innerClass
+		}
+		//If we are currently generating an inner class, also consider enclosing class
+		if(genClass.enclosingElement instanceof GenTypeElement) {
+			return findTypeInGeneratedClass(genClass.enclosingElement as GenTypeElement, typeFqnOrShortname);
 		}
 	}
 	
