@@ -29,6 +29,7 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
+import de.japkit.model.GenUnresolvedTypeElement
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -684,7 +685,9 @@ class TypesRegistry {
 		//May be it exists now. Try to find it.
 		val te = findTypeElement(genDeclType.qualifiedName) 
 		if(te!=null) return te
-		throw new TypeElementNotFoundException(genDeclType.qualifiedName)
+		//The TENFE is delayed until any properties of the type element are requested.
+		//This makes it for example easier to generate inner classes that depend on each other.
+		return new GenUnresolvedTypeElement(genDeclType)
 	}
 	
 	def dispatch TypeElement asTypeElement(GenDeclaredType genDeclType) {

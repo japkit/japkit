@@ -254,7 +254,7 @@ class BehaviorDelegationRule extends AbstractRule {
 					null
 				}
 			
-			if(te!=null){
+			if(te!=null && !(tm instanceof GenUnresolvedType)){
 				//The class has already been created by the user.
 				// Nevertheless create a proxy to provide a place to add expected interfaces and superclasses. 
 				val proxy = new GenClass(te.simpleName)
