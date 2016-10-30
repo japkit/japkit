@@ -90,7 +90,7 @@ class RuleFactory {
 			Function->[am, e | new FunctionRule(am, e)],
 			Matcher->[am, e | new ElementMatcher(am, e)],
 			TypeQuery->[am, e | new TypeQueryRule(am, e)],
-			ClassSelector->[am, e | new TypeRule(am, e)],
+			ClassSelector->[am, e | new ClassSelectorRule(am, e)],
 			Properties->[am, e | new PropertyFilter(am, e)],
 			Switch->[am, e | new SwitchRule(am, e)],
 			Var->[am, e | new ELVariableRule(am, e)]

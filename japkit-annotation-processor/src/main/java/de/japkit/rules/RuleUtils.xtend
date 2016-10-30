@@ -39,6 +39,7 @@ import java.util.Collection
 import java.util.Map
 import de.japkit.util.MoreCollectionExtensions
 import de.japkit.annotations.AnnotationTemplate
+import de.japkit.services.TypesRegistry
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -54,6 +55,7 @@ class RuleUtils {
 	val protected transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val protected transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	val protected transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
+	val protected transient extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
 
 	public static def withPrefix(CharSequence name, String prefix) {
 		(if(prefix.nullOrEmpty) name else { 
@@ -426,13 +428,20 @@ class RuleUtils {
 		String avPrefix, ()=>TypeMirror defaultValue) {
 
 		[|
-			val type = metaAnnotation?.resolveType(avName.withPrefix(avPrefix), '''«avName»Args'''.withPrefix(avPrefix))
-			if (!type.isVoid) {
-				type
-			} else {
-				if (template != null) {
-					template.resolveType ?: getNoType(TypeKind.NONE)
-				} else defaultValue?.apply
+			try {
+				val type = metaAnnotation?.resolveType(avName.withPrefix(avPrefix),
+					'''«avName»Args'''.withPrefix(avPrefix))
+				if (!type.isVoid) {
+					type
+				} else {
+					if (template != null) {
+						template.resolveType ?: getNoType(TypeKind.NONE)
+					} else
+						defaultValue?.apply
+				}
+			} catch (TypeElementNotFoundException tenfe) {
+				handleTypeElementNotFound('''TypeElement not found for «template?.simpleName ?: avName».''', tenfe.fqn);
+				null
 			}
 		]
 	}

@@ -293,6 +293,11 @@ class TypesExtensions /**implements Types*/{
 			declType.erasure.simpleName
 		}
 	}
+	
+	def dispatch String simpleName(ArrayType type) {
+		'''«type.componentType.simpleName»[]'''
+	}
+	
 
 	def dispatch String simpleName(PrimitiveType type) {
 		type.toString
