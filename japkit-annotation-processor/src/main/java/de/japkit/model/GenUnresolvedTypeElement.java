@@ -58,7 +58,7 @@ public class GenUnresolvedTypeElement implements TypeElement {
 		throw typeElementNotFoundException();
 	}
 
-	@Override
+	
 	public <A extends Annotation> A[] getAnnotationsByType(Class<A> annotationType) {
 		throw typeElementNotFoundException();
 	}
