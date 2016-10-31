@@ -54,6 +54,16 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 			} 
 			r as Boolean}
 		]
+		
+	//Combiner for boolean functions. Applies a logical OR. 	
+	public static val (boolean, Object, IParameterlessFunctionRule<?>)=>Object OR_COMBINER 
+		= [isFirst, previous, function | (if(isFirst) false else previous as Boolean) || {
+			val r = function.apply
+			if(!(r instanceof Boolean)){
+				throw new RuleException('''The function returned «r» of type «r?.class», but the required type is Boolean''');
+			} 
+			r as Boolean}
+		]
 	
 	//true if neither an expression nor a function is set and if no default value has been provided
 	def boolean isUndefined() {

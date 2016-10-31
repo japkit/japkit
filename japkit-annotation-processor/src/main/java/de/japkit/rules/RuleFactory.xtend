@@ -21,6 +21,9 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import de.japkit.metaannotations.Switch
 import de.japkit.metaannotations.Var
+import de.japkit.metaannotations.And
+import de.japkit.metaannotations.Or
+import de.japkit.metaannotations.Not
 
 class RuleFactory {
 	
@@ -93,7 +96,10 @@ class RuleFactory {
 			ClassSelector->[am, e | new ClassSelectorRule(am, e)],
 			Properties->[am, e | new PropertyFilter(am, e)],
 			Switch->[am, e | new SwitchRule(am, e)],
-			Var->[am, e | new ELVariableRule(am, e)]
+			Var->[am, e | new ELVariableRule(am, e)],
+			And->[am, e | new BooleanOperatorRule(am, e, false, false)],
+			Or->[am, e | new BooleanOperatorRule(am, e, false, true)],
+			Not->[am, e | new BooleanOperatorRule(am, e, true, true)]
 		]
 	
 	def private createFunctionInternal(Element element){
