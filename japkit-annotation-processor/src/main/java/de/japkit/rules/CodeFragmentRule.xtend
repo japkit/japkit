@@ -8,12 +8,12 @@ import org.eclipse.xtend.lib.annotations.Data
 @Data
 class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 	
-	ElementMatcher[] activation
+	()=>boolean activationRule
 	((Object)=>CharSequence)=>List<CharSequence> scopeRule
 	
 	new(AnnotationMirror metaAnnotation, Element metaElement) {
 		super(metaAnnotation, metaElement, '', '''/**Error in CodeFragement «metaAnnotation» «metaElement»*/''')
-		activation = metaAnnotation.elementMatchers("activation")
+		activationRule = createActivationRule(metaAnnotation, null)
 		scopeRule = createScopeRule(metaAnnotation, metaElement, false, null, false)  //scopeRule without own src rule and without iteration
 	}
 	
@@ -21,10 +21,8 @@ class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 	override CharSequence code(){
 		//val indentation = (valueStack.get("indentation") as CharSequence ?: '') + '\t'
 		scopeRule.apply[
-			if(activation.nullOrEmpty || activation.exists[matches(currentSrcElement)]){	
-				
-				super.code()
-				
+			if(activationRule.apply){				
+				super.code()		
 			} else ''		
 		].head    //TODO: use scope for iteration instead of "bodyIterator" ? 
 	}
