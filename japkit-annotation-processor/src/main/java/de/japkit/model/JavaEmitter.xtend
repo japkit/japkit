@@ -189,11 +189,11 @@ class JavaEmitter implements EmitterContext{
 		}
 		
 		val type = asType
-		val constantExpr = field.constantExpressionCode
+		val constantExpr = field.constantExpressionCode?.toString
 		'''
 		«field.docCommentCode»
 		«field.annotationsCode»
-		«field.modifiersCode»«type.typeRef» «simpleName»«IF constantExpr!=null» = «constantExpr»«ENDIF»;
+		«field.modifiersCode»«type.typeRef» «simpleName»«IF !constantExpr.nullOrEmpty» = «constantExpr»«ENDIF»;
 		'''
 		
 	}
