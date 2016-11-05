@@ -16,6 +16,7 @@ import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
+	val protected transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	
 	ClassSelectorKind kind
 	Set<TypeMirror> requiredTriggerAnnotation
@@ -83,6 +84,9 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 				if(resolvedSelector.type == null){
 					resolvedSelector.type = new GenUnresolvedType(fqn, false)
 				}
+			}
+			case ClassSelectorKind.TEMPLATE : {
+				resolvedSelector.type = metaElement?.asType()?.resolveType
 			}
 			default: {
 				resolvedSelector.type = null

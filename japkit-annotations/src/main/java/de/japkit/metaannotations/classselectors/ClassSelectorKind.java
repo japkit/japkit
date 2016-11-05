@@ -41,5 +41,10 @@ public enum ClassSelectorKind{
 	/**
 	 * The expr is the FQN of the type.
 	 */
-	FQN
+	FQN,
+	
+	/**
+	 * The type of the template element where the annotation is located
+	 */
+	TEMPLATE
 }
