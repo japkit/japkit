@@ -72,7 +72,7 @@ class JavaEmitter implements EmitterContext{
 	
 	def importStatements(TypeElement rootTypeElement){
 		val fqnsToImport = imports.filter[shortName, fqn | 
-			!fqn.startsWith("java.lang") &&
+			!fqn.isImplicitelyImported &&
 			!fqn.equals('''«rootTypeElement.qualifiedName».«shortName»'''.toString) //No import statements for inner types
 		].values
 		
@@ -83,6 +83,11 @@ class JavaEmitter implements EmitterContext{
 		import «i»;
 		«ENDFOR»
 		'''
+	}
+	
+	def boolean isImplicitelyImported(String fqn) {
+		//java.lang.*
+		fqn.startsWith("java.lang.") && !fqn.substring("java.lang.".length).contains('.')
 	}
 	
 	//TODO: Make configurable
