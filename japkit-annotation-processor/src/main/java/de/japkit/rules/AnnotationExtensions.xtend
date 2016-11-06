@@ -88,13 +88,5 @@ class AnnotationExtensions {
 		annotatedClass.annotationMirrors.filter[isTriggerAnnotation].toList
 	}
 
-	/**
-	 * Gets a list of element matchers from an annotation.
-	 */
-	def elementMatchers(AnnotationMirror annotation, CharSequence avName) {
-		val av = (annotation.value(avName, typeof(AnnotationMirror[])))
-		if(av != null) av.map[createElementMatcher(it)] else emptyList
-	}
-
 
 }

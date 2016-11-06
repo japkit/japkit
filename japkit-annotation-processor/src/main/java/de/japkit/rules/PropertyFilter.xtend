@@ -31,8 +31,8 @@ class PropertyFilter extends AbstractFunctionRule<List>{
 	String includeNamesLang
 	String includeNamesPrefix 
 	String includeNamesSuffix 
-	List<ElementMatcher> includeRules
-	List<ElementMatcher> excludeRules
+	List<MatcherRule> includeRules
+	List<MatcherRule> excludeRules
 	Properties.RuleSource ruleSource
 
 	boolean fromFields;
@@ -113,9 +113,9 @@ class PropertyFilter extends AbstractFunctionRule<List>{
 		includeNamesPrefix =  metaAnnotation.value("includeNamesPrefix", String) ?: ""
 		includeNamesSuffix = metaAnnotation.value("includeNamesSuffix", String) ?: ""
 		includeRules = metaAnnotation.value("includeRules", typeof(AnnotationMirror[])).map[
-			createElementMatcher(it)]
+			createMatcherRule(it)]
 		excludeRules = metaAnnotation.value("excludeRules", typeof(AnnotationMirror[])).map[
-			createElementMatcher(it)]
+			createMatcherRule(it)]
 		ruleSource = metaAnnotation.value("ruleSource", Properties.RuleSource)
 		fromFields = metaAnnotation.value("fromFields", Boolean)
 	}

@@ -517,13 +517,12 @@ class RuleUtils {
 	}
 
 	// A predicate that checks whether a given name is amongst a set of names given by an expression
-	def (CharSequence)=>boolean createNameInSetRule(AnnotationMirror metaAnnotation, String avName,
-		boolean defaultResult) {
+	def (CharSequence)=>boolean createNameInSetRule(AnnotationMirror metaAnnotation, String avName) {
 		val expr = metaAnnotation?.value(avName, String)
 		val lang = metaAnnotation?.value('''«avName»Lang''', String);
 
 		if (expr.nullOrEmpty)
-			[defaultResult]
+			null
 		else
 			[
 				val nameSet = eval(expr, lang, Iterable, '''Name set expression could not be evaluated.''', emptySet).
@@ -538,6 +537,14 @@ class RuleUtils {
 				nameSet.contains(it.toString)
 
 			]
+	}
+
+	/**
+	 * Gets a list of element matchers from an annotation.
+	 */
+	def createMatcherRules(AnnotationMirror annotation, CharSequence avName) {
+		val av = (annotation.value(avName, typeof(AnnotationMirror[])))
+		if(av != null) av.map[createMatcherRule(it)] else emptyList
 	}
 
 	// Catches Exceptions and reports them as errors for the current meta annotation.

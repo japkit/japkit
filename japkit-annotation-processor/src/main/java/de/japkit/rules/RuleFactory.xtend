@@ -36,10 +36,10 @@ class RuleFactory {
 
 	//TODO: Bringt das hier überhaupt etwas, wenn der AnnotationMirror ohnehin jedes mal unterschiedlich ist?
 	//Reicht das Template caching nicht bereits aus?
-	val matcherCache = new IdentityHashMap<AnnotationMirror, ElementMatcher>
-	val matcherFactory = [AnnotationMirror am, (ElementMatcher)=>void registrationCallBack |new ElementMatcher(am)]
+	val matcherCache = new IdentityHashMap<AnnotationMirror, MatcherRule>
+	val matcherFactory = [AnnotationMirror am, (MatcherRule)=>void registrationCallBack |new MatcherRule(am)]
 
-	def createElementMatcher(AnnotationMirror am) {
+	def createMatcherRule(AnnotationMirror am) {
 		getOrCreate(matcherCache, am, matcherFactory)
 	}
 
@@ -91,7 +91,7 @@ class RuleFactory {
 		functionFactories = #[
 			CodeFragment->[am, e | new CodeFragmentRule(am, e)],
 			Function->[am, e | new FunctionRule(am, e)],
-			Matcher->[am, e | new ElementMatcher(am, e)],
+			Matcher->[am, e | new MatcherRule(am, e)],
 			TypeQuery->[am, e | new TypeQueryRule(am, e)],
 			ClassSelector->[am, e | new ClassSelectorRule(am, e)],
 			Properties->[am, e | new PropertyFilter(am, e)],

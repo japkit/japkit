@@ -67,10 +67,10 @@ class TypeResolver {
 		new GenArrayType(selector.componentType.resolveType(required))
 	}
 	
-	def dispatch TypeMirror resolveType(DeclaredType selector, boolean required) {
-		val typeFunctionResult = resolveTypeFunctionIfNecessary(selector)
+	def dispatch TypeMirror resolveType(DeclaredType typeOrTypeFunction, boolean required) {
+		val typeFunctionResult = resolveTypeFunctionIfNecessary(typeOrTypeFunction)
 		
-		if(typeFunctionResult instanceof DeclaredType)  typeFunctionResult.resolveType_(required) else typeFunctionResult?.resolveType(required)
+		if(typeFunctionResult instanceof DeclaredType)  typeFunctionResult.resolveType_(typeOrTypeFunction, required) else typeFunctionResult?.resolveType(required)
 	}
 	
 	def dispatch TypeMirror resolveType(TypeMirror selector, boolean required) {
@@ -78,11 +78,11 @@ class TypeResolver {
 	}
 	
 	
-	def private TypeMirror resolveType_(DeclaredType selector, boolean required) {
+	def private TypeMirror resolveType_(DeclaredType typeFunctionResult, DeclaredType typeFunction, boolean required) {
 
 		
 		try {			
-			var type = selector
+			var type = typeFunctionResult
 			
 			//Always try to resolve error type if the type is required
 			type = if(type instanceof ErrorType && required) type.asTypeElement.asType as DeclaredType else type
@@ -96,11 +96,14 @@ class TypeResolver {
 			if(type == null) {
 				type
 			} else {
-				//If there are type arguments, map them as well
-				if(selector.typeArguments.nullOrEmpty){
+				//If there are type arguments, map them as well. If the type function has type arguments, they have priority. That is, only the erasure of the type function result ist used.
+				val typeArgs = if(!typeFunction.typeArguments.nullOrEmpty) typeFunction.typeArguments else typeFunctionResult.typeArguments
+				
+				if(typeArgs.nullOrEmpty){
 					type
 				} else {
-					getDeclaredType(type.asElement as TypeElement, selector.typeArguments.map[
+					
+					getDeclaredType(type.asElement as TypeElement, typeArgs.map[
 						resolveType(required)
 					])				
 				}	

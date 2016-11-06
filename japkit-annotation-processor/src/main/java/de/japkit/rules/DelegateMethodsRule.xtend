@@ -9,14 +9,13 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 
 class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod> {
-	val transient extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 
 	new(AnnotationMirror metaAnnotation, ExecutableElement template) {
 		super(metaAnnotation, template)
 	}
 
 	override protected createSrcRule() {
-		val methodFilter = metaAnnotation.elementMatchers("methodFilter");
+		val methodFilter = metaAnnotation.createMatcherRules("methodFilter");
 		
 		[ |
 			val srcElement = currentSrcElement
