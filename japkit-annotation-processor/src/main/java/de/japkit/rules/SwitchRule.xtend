@@ -6,6 +6,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
+import javax.lang.model.element.ElementKind
 
 @Data
 class SwitchRule<T> extends AbstractFunctionRule<T> implements ICodeFragmentRule{
@@ -22,7 +23,8 @@ class SwitchRule<T> extends AbstractFunctionRule<T> implements ICodeFragmentRule
 		]
 		
 		caseRules = if(caseRulesFromAnnotation.nullOrEmpty && metaElement instanceof TypeElement) {
-			(metaElement as TypeElement).enclosedElements
+			(metaElement as TypeElement).enclosedElementsOrdered
+				.filter[ it.kind != ElementKind.CONSTRUCTOR ] //don't create Case-Rule for default constructor
 				.map[ new CaseRule<T>(it.annotationMirror(Case), it, type)]
 				.toList
 		} else caseRulesFromAnnotation
