@@ -47,6 +47,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 
 import static javax.lang.model.util.ElementFilter.*
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 class ElementsExtensions {
 	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -103,10 +104,16 @@ class ElementsExtensions {
 	 */
 	def enclosedElementsOrdered(TypeElement type) {
 		val elements = type.enclosedElements
-		if(elements.exists[annotationMirror(ORDER_ANNOTATION_NAME)!=null]){
+
+		if (elements.exists[annotationMirror(ORDER_ANNOTATION_NAME) != null]) {
 			elements.sortBy[ordinalNumber]
 		} else {
-			elements
+			val orderFromRuntimeMetadata = getOrderFromRuntimeMetadata(type);
+
+			if (orderFromRuntimeMetadata != null) {
+				elements.sortBy(orderFromRuntimeMetadata)
+			} else
+				elements
 		}
 	}
 
@@ -862,11 +869,10 @@ class ElementsExtensions {
 	}
 	
 	
-	////////////////////////////////
-	//TODO: Move to separate class
-	//Unique element name -> comment
+
 	Map<String, String> commentsFromRuntimeMetadata = newHashMap()
 	Map<String, List<String>> paramNamesFromRuntimeMetadata = newHashMap()
+	Map<String, Integer> orderFromRuntimeMetadata = newHashMap()
 	
 	//FQNs RuntimeMetadata. Used to detect if it has been re-generated and thus must be reloaded
 	Map<String, TypeElement> runtimeMetadataByFqn = new HashMap
@@ -882,14 +888,20 @@ class ElementsExtensions {
 		paramNamesFromRuntimeMetadata.get(uniqueNameWithinTopLevelEnclosingTypeElement(element))
 	}
 	
+	//Order within TopLevelEnclosingTypeElement
+	def (Element)=> Integer getOrderFromRuntimeMetadata(Element someParent) {
+		if(!loadRuntimeMetadata(someParent)) return null;
+		[element | orderFromRuntimeMetadata.get(uniqueNameWithinTopLevelEnclosingTypeElement(element)) ?: 0]
+	}
 	
-	def loadRuntimeMetadata(Element element) {
+	
+	def boolean loadRuntimeMetadata(Element element) {
 		val topLevelEnclosingTypeElement = element.getTopLevelEnclosingTypeElement
 		val typeElementFqn = topLevelEnclosingTypeElement.qualifiedName.toString
 		if (topLevelEnclosingTypeElement.annotationMirror(RuntimeMetadata) == null) {
 			//shortcut: If there is no according trigger annoatation there won't be runtime metadata at all
 			//TODO: Exception, since we know at this point that we NEED comments or param names?
-			return
+			return false
 		}
 		
 		val runtimemetadataFqn = typeElementFqn + "_RuntimeMetadata"
@@ -900,23 +912,26 @@ class ElementsExtensions {
 				runtimeMetadataByFqn.put(runtimemetadataFqn, runtimeMetadataTypeElement)	
 			}
 			registerTypeDependencyForCurrentAnnotatedClass(runtimeMetadataTypeElement.asType)
+			return true;
 		} else {
 			// TODO: Exception immer werfen ist zu hart hier. Ggf nur dann werfen, wenn erkennbar ist, dass es sich um ein "BinaryTypeBinding" handelt.
 			//throw new TypeElementNotFoundException(runtimemetadataFqn, "Access to parameter names or comments required.")
+			return false;
 		}		
 			
 	}
 	
 	def loadCommentsAndParamNames(TypeElement runtimeMetadataTypeElement) {
-		runtimeMetadataTypeElement.annotationMirror(RuntimeMetadata.List)?.value("value",
-			typeof(AnnotationMirror[]))?.forEach [
-			val uniqueName = value("id", String)
-			val comment = value("comment", String)
-			val paramNames = value("paramNames", typeof(String[]))
-			
-			commentsFromRuntimeMetadata.put(uniqueName, comment)
-			paramNamesFromRuntimeMetadata.put(uniqueName, paramNames)
-		]
+		runtimeMetadataTypeElement.annotationMirror(RuntimeMetadata.List)?.value("value", typeof(AnnotationMirror[]))?.
+			forEach [am , index |
+				val uniqueName = am.value("id", String)
+				val comment = am.value("comment", String)
+				val paramNames = am.value("paramNames", typeof(String[]))
+
+				commentsFromRuntimeMetadata.put(uniqueName, comment)
+				paramNamesFromRuntimeMetadata.put(uniqueName, paramNames)
+				orderFromRuntimeMetadata.put(uniqueName, index)
+			]
 	}
 	
 	/////////////////////////////////
