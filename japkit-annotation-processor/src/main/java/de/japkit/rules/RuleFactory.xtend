@@ -24,8 +24,11 @@ import de.japkit.metaannotations.Var
 import de.japkit.metaannotations.And
 import de.japkit.metaannotations.Or
 import de.japkit.metaannotations.Not
+import de.japkit.services.MessageCollector
 
 class RuleFactory {
+	
+	val MessageCollector mc = ExtensionRegistry.get(MessageCollector)
 	
 	def clearCaches(){
 		matcherCache.clear
@@ -47,6 +50,7 @@ class RuleFactory {
 	val templateCache = new HashMap<String, TemplateRule>
 	
 	def templateFactory(TypeElement templateClass, AnnotationMirror templateAnnotation) {
+		mc.printDiagnosticMessage['''Create TemplateRule from «templateClass»''']
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
 		[String templateClassFqn,(TemplateRule)=>void registrationCallBack |
 			new TemplateRule(templateClass, templateAnnotation ?: templateClass.annotationMirror(Template), registrationCallBack)
@@ -65,6 +69,7 @@ class RuleFactory {
 	val triggerAnnotationCache = new IdentityHashMap<TypeElement, TriggerAnnotationRule>
 	
 	def createTriggerAnnotationRule(TypeElement triggerAnnotationClass){
+		mc.printDiagnosticMessage['''Create TriggerAnnotationRule from «triggerAnnotationClass»''']
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
 		getOrCreate(triggerAnnotationCache, triggerAnnotationClass, [new TriggerAnnotationRule(triggerAnnotationClass.annotationMirror(Trigger), triggerAnnotationClass)])
 	}
@@ -73,6 +78,7 @@ class RuleFactory {
 	val libraryCache = new HashMap<TypeElement, LibraryRule>
 	
 	def createLibraryRule(TypeElement libraryClass){
+		mc.printDiagnosticMessage['''Create LibraryRule from «libraryClass»''']
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
 		getOrCreate(libraryCache, libraryClass, [new LibraryRule(libraryClass.annotationMirror(Library), libraryClass)])
 	}
