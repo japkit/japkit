@@ -1,12 +1,10 @@
 package de.japkit.rules
 
 import de.japkit.el.ElVariableError
-import javax.lang.model.element.AnnotationMirror
-import org.eclipse.xtend.lib.annotations.Data
-import org.eclipse.xtext.xbase.lib.Functions.Function0
-import org.eclipse.xtext.xbase.lib.Functions.Function1
-import javax.lang.model.element.Element
 import de.japkit.services.RuleException
+import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Element
+import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<Object> {

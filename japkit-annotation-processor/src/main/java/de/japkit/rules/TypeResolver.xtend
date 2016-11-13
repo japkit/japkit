@@ -1,6 +1,8 @@
 package de.japkit.rules
 
+import de.japkit.el.ELSupport
 import de.japkit.model.GenArrayType
+import de.japkit.model.GenDeclaredType
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.GenerateClassContext
@@ -15,7 +17,8 @@ import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
-import de.japkit.model.GenDeclaredType
+import javax.lang.model.type.TypeVariable
+import javax.lang.model.element.TypeParameterElement
 
 /**Resolves type references / class selectors from templates and annotations.*/
 class TypeResolver {
@@ -25,6 +28,7 @@ class TypeResolver {
 	val transient extension GenerateClassContext =  ExtensionRegistry.get(GenerateClassContext)
 	val transient extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
 	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
+	val transient extension ELSupport = ExtensionRegistry.get(ELSupport)
 	
 	def TypeMirror resolveTypeFromAnnotationValues(
 		AnnotationMirror metaAnnotation,
@@ -70,7 +74,17 @@ class TypeResolver {
 	def dispatch TypeMirror resolveType(DeclaredType typeOrTypeFunction, boolean required) {
 		val typeFunctionResult = resolveTypeFunctionIfNecessary(typeOrTypeFunction)
 		
-		if(typeFunctionResult instanceof DeclaredType)  typeFunctionResult.resolveType_(typeOrTypeFunction, required) else typeFunctionResult?.resolveType(required)
+		if(typeFunctionResult instanceof DeclaredType)  typeFunctionResult.resolveType_(required) else typeFunctionResult?.resolveType(required)
+	}
+	
+	//TypeVars can be used to pass parameters to type functions. Resolve them from value stack if possible.	
+	def dispatch TypeMirror resolveType(TypeVariable typeVariable, boolean required) {
+
+		val param = typeVariable.asElement as TypeParameterElement
+		valueStack.get(
+			'''«(param.enclosingElement as TypeElement).qualifiedName».«param.simpleName»'''.toString) as TypeMirror ?:
+			typeVariable
+
 	}
 	
 	def dispatch TypeMirror resolveType(TypeMirror selector, boolean required) {
@@ -78,7 +92,7 @@ class TypeResolver {
 	}
 	
 	
-	def private TypeMirror resolveType_(DeclaredType typeFunctionResult, DeclaredType typeFunction, boolean required) {
+	def private TypeMirror resolveType_(DeclaredType typeFunctionResult, boolean required) {
 
 		
 		try {			
@@ -96,15 +110,16 @@ class TypeResolver {
 			if(type == null) {
 				type
 			} else {
-				//If there are type arguments, map them as well. If the type function has type arguments, they have priority. That is, only the erasure of the type function result ist used.
-				val typeArgs = if(!typeFunction.typeArguments.nullOrEmpty) typeFunction.typeArguments else typeFunctionResult.typeArguments
+				//If there are type arguments, map them as well. 
+				val typeArgs = typeFunctionResult.typeArguments
 				
 				if(typeArgs.nullOrEmpty){
 					type
 				} else {
 					
-					getDeclaredType(type.asElement as TypeElement, typeArgs.map[
-						resolveType(required)
+					getDeclaredType(type.asElement as TypeElement, typeArgs.map[typeArg |
+						
+						typeArg.resolveType(required)
 					])				
 				}	
 			}
@@ -122,34 +137,49 @@ class TypeResolver {
 	 */
 	def private TypeMirror resolveTypeFunctionIfNecessary(DeclaredType type) {
 
-			if (!(type instanceof ErrorType)) {
-				//zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): Arrays mit UnresolvedTypeBindings werden nicht resolved.
-				//TODO: Ist das schon in ElementsExtensions geregelt?
-				var TypeElement te = type.asTypeElement
-				if(!(type instanceof GenDeclaredType)){
-					te =  getTypeElement(te.qualifiedName)		
-					if(te==null){
-						throw new TypeElementNotFoundException(te.qualifiedName.toString)
-					}		
-				}
-		
-				//if it is a function, call it and return the resulting type
-				val function = createFunctionRule(te);
-				
-				if(function!=null){
-					
-					val result = function.apply
-					if(result == null || result instanceof TypeMirror){
-						return result as TypeMirror
-					} else {
-						reportRuleError('''«te.qualifiedName» cannot be used as type since it's result is not a TypeMirror but «result».''')
-					}
-					
+		if (!(type instanceof ErrorType)) {
+			// zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): Arrays mit UnresolvedTypeBindings werden nicht resolved.
+			// TODO: Ist das schon in ElementsExtensions geregelt?
+			var TypeElement te = type.asTypeElement
+			if (!(type instanceof GenDeclaredType)) {
+				te = getTypeElement(te.qualifiedName)
+				if (te == null) {
+					throw new TypeElementNotFoundException(te.qualifiedName.toString)
 				}
 			}
-		
-		
-		
+			val teFinal = te
+
+			// if it is a function, call it and return the resulting type
+			val function = createFunctionRule(te);
+
+			if (function != null) {
+				return scope[
+					//if the type function has type arguments, resolve them and put them on the value stack. They can be retrieved by the simpleName of the type parameter. 
+					if (!type.typeArguments.nullOrEmpty) {
+						teFinal.typeParameters?.forEach [ param, index |
+							if (index < type.typeArguments.length) {
+								val resolvedArg = type.typeArguments.get(index)?.resolveType(true)
+								valueStack.put(param.simpleName.toString, resolvedArg);
+								//put it also under unique name
+								valueStack.put('''«teFinal.qualifiedName».«param.simpleName»''' , resolvedArg);
+							}
+						]
+					}
+
+					val result = function.apply
+					if (result == null ||
+						result instanceof TypeMirror) {
+						result as TypeMirror
+					} else {
+						reportRuleError('''«teFinal.qualifiedName» cannot be used as type since it's result is not a TypeMirror but «result».''')
+						null
+					}
+
+				]
+
+			}
+		}
+
 		type
 	}
 
