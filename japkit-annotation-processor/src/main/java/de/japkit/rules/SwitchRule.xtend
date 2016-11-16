@@ -7,6 +7,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
 import javax.lang.model.element.ElementKind
+import de.japkit.metaannotations.DefaultCase
 
 @Data
 class SwitchRule extends AbstractFunctionRule<Object> implements ICodeFragmentRule{
@@ -22,13 +23,13 @@ class SwitchRule extends AbstractFunctionRule<Object> implements ICodeFragmentRu
 		//The case rules are either in the Switch annotation or the Switch annotation is a class and its members
 		//are annotated with Case annotations. 
 		val caseRulesFromAnnotation = switchAnnotation.value("value", typeof(AnnotationMirror[])).map[ caseAm |
-			new CaseRule<Object>(caseAm, null, type)
+			new CaseRule<Object>(caseAm, null, type, false)
 		]
 		
 		caseRules = if(caseRulesFromAnnotation.nullOrEmpty && metaElement instanceof TypeElement) {
 			(metaElement as TypeElement).enclosedElementsOrdered
 				.filter[ it.kind != ElementKind.CONSTRUCTOR ] //don't create Case-Rule for default constructor
-				.map[ new CaseRule<Object>(it.annotationMirror(Case), it, type)]
+				.map[ new CaseRule<Object>(it.annotationMirror(Case) ?: it.annotationMirror(DefaultCase), it, type, it.annotationMirror(DefaultCase) != null)]
 				.toList
 		} else caseRulesFromAnnotation
 	}

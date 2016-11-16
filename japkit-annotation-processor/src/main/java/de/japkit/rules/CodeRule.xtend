@@ -54,7 +54,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 
 		val bodyCaseAnnotations = metaAnnotation?.value("cases".withPrefix(avPrefix), typeof(AnnotationMirror[]))
 
-		bodyCases = bodyCaseAnnotations?.map[new CaseRule(it, null, String)]?.toList ?: emptyList
+		bodyCases = bodyCaseAnnotations?.map[new CaseRule(it, null, String, false)]?.toList ?: emptyList
 
 		beforeExpr = stringFromAnnotationOrMap(metaAnnotation, codeFromJavadoc,
 			"beforeIteratorCode".withPrefix(avPrefix))
