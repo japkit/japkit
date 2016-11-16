@@ -1,6 +1,5 @@
 package de.japkit.model
 
-import de.japkit.metaannotations.Properties
 import java.lang.annotation.Annotation
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementVisitor
@@ -101,15 +100,6 @@ class Property extends GenAnnotatedConstruct implements VariableElement {
 	
 	override getConstantValue() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
-	
-	
-	def getSourceElement(Properties.RuleSource ruleSource) {
-		switch (ruleSource) {
-			case Properties.RuleSource.PROPERTY: this
-			case Properties.RuleSource.FIELD: field
-			case Properties.RuleSource.GETTER: getter
-		}
 	}
 	
 	override String toString(){

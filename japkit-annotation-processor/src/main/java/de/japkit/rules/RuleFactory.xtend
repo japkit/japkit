@@ -4,7 +4,6 @@ import de.japkit.metaannotations.CodeFragment
 import de.japkit.metaannotations.Function
 import de.japkit.metaannotations.Library
 import de.japkit.metaannotations.Matcher
-import de.japkit.metaannotations.Properties
 import de.japkit.metaannotations.Template
 import de.japkit.metaannotations.Trigger
 import de.japkit.metaannotations.TypeQuery
@@ -100,7 +99,6 @@ class RuleFactory {
 			Matcher->[am, e | new MatcherRule(am, e)],
 			TypeQuery->[am, e | new TypeQueryRule(am, e)],
 			ClassSelector->[am, e | new ClassSelectorRule(am, e)],
-			Properties->[am, e | new PropertyFilter(am, e)],
 			Switch->[am, e | new SwitchRule(am, e)],
 			Var->[am, e | new ELVariableRule(am, e)],
 			And->[am, e | new BooleanOperatorRule(am, e, false, false)],
