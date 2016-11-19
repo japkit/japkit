@@ -607,9 +607,9 @@ class JapkitProcessor extends AbstractProcessor {
 		printDiagnosticMessage['''Try to write source file: «typeElement.qualifiedName»''']
 
 		if (!writtenTypeElements.contains(typeElement.qualifiedName.toString)) {
-			val emitter = new JavaEmitter()
+			val emitter = new JavaEmitter(typeElement)
 
-			var code = emitter.compilationUnit(typeElement);
+			var code = emitter.compilationUnit();
 
 			//code = formatCode(code)
 			val file = filer.createSourceFile(typeElement.qualifiedName, orgClass);

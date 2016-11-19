@@ -47,27 +47,50 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 	}
 	
 	def importIfPossible(String shortName, String fqn) {
-		if(!imports.containsKey(shortName)){
+		if(!imports.containsKey(shortName) && !isShadowedOrDeclared(currentTypeElement.get, shortName)){
 			imports.put(shortName, fqn)
 		}
-		fqn.equals(imports.get(shortName))	
+		fqn.equals(imports.get(shortName)) || isDeclaredAndVisible(currentTypeElement.get, shortName, fqn);
+	}
+	
+	//Is there any type with the same short name declared in the namespace or in enclosing namespaces? 
+	//If so, there should be no import statement.
+	def boolean isShadowedOrDeclared(TypeElement namespace, String shortName) {
+		namespace.declaredTypes.exists[simpleName.toString.equals(shortName)] || 
+			namespace.enclosingElement instanceof TypeElement &&  isShadowedOrDeclared(namespace.enclosingElement as TypeElement, shortName)
+	}
+	
+	//Is the type defined in the namespace or in enclosing namespaces and it is not shadowed? If so, the short name can be used to refer to the type.
+	def boolean isDeclaredAndVisible(TypeElement namespace, String shortName, String fqn) {
+		val candidate = namespace.declaredTypes.findFirst[simpleName.toString.equals(shortName)] 
+		
+		if(candidate == null){
+			namespace.enclosingElement instanceof TypeElement &&  isDeclaredAndVisible(namespace.enclosingElement as TypeElement, shortName, fqn)
+		} else if(candidate.qualifiedName.toString.equals(fqn))	{
+			true;
+		} else false;
+						
 	}
 	
 	
 	//key is short name, value is fqn
 	public val Map<String, String> imports = newHashMap()
 	
+	private TypeElement rootTypeElement;
 	
+	new(TypeElement rootTypeElement){
+		this.rootTypeElement = rootTypeElement;
+	}
 	/**
 	 * creates the code for the compilation unit for one type element.
 	 */
-	def compilationUnit(TypeElement typeElement){
-		val packageName = typeElement.enclosingPackageName
+	def compilationUnit(){
+		val packageName = rootTypeElement.enclosingPackageName
 		
-		val typeDecl = code(typeElement)  //Instead of importsPlaceholder, we could let the methods register their type fqns...
+		val typeDecl = code(rootTypeElement)  //Note: This registers the required imports
 		'''
 		package «packageName»;
-		«importStatements(typeElement)»
+		«importStatements(rootTypeElement)»
 
 		«typeDecl»
 		'''
@@ -107,7 +130,10 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 		importOrder.map[fqnsToImportByGroup.get(it) ?: emptySet].flatten.toList
 	}
 	
+	ThreadLocal<TypeElement> currentTypeElement = new ThreadLocal<TypeElement>();
+	
 	def dispatch CharSequence code(TypeElement typeElement){
+		currentTypeElement.set(typeElement)
 		switch typeElement.kind {
 			case ElementKind.CLASS: codeForClass(typeElement)
 			case ElementKind.INTERFACE: codeForInterface(typeElement)

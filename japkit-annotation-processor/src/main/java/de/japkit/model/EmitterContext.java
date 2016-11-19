@@ -10,8 +10,6 @@ import javax.lang.model.type.TypeMirror;
 public interface EmitterContext {
 	
 	CharSequence staticTypeRef(TypeMirror type);
-			
-	CharSequence staticTypeRef(Class<?> clazz);
 	
 	CharSequence typeRef(TypeMirror type);
 	
