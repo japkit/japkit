@@ -29,15 +29,18 @@ import static extension de.japkit.util.MoreCollectionExtensions.*
 
 class JavaEmitter implements de.japkit.model.EmitterContext{
 
-	//TODO: Refactoring
 	extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions) 
 	
 	
-	def importIfPossibleAndGetNameForCode(String shortName, String fqn) {
-		if(importIfPossible(shortName, fqn)){
+	def CharSequence importIfPossibleAndGetNameForCode(TypeElement te, String shortName, String fqn) {
+		if (importIfPossible(shortName, fqn)) {
 			shortName
+		} else if (te != null && te.enclosingElement instanceof TypeElement) {
+			//If it is an inner class that cannot be imported, try to import the enclosing class
+			val enclosing = te.enclosingElement as TypeElement;
+			importIfPossibleAndGetNameForCode(enclosing, enclosing.simpleName.toString, enclosing.qualifiedName.toString)+"."+shortName;
 		} else {
 			fqn
 		}
@@ -292,7 +295,8 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 		"Object"
 	}
 	
-	def dispatch CharSequence typeRef(DeclaredType type){
+	def dispatch CharSequence typeRef(DeclaredType type){	
+		
 		val rawType = if(type.erasure instanceof ErrorType){
 			//The type itself is an error type
 			val simpleName =  type.erasure.simpleNameForErrorType   
@@ -300,11 +304,12 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 //				throw new IllegalArgumentException('''Error type name «simpleName» is unexpectedly qualified.''');
 //			}
 			val fqn =  typesRegistry.tryToGetFqnForErrorType(type.erasure)
-			importIfPossibleAndGetNameForCode(simpleName, fqn)
+			importIfPossibleAndGetNameForCode(null, simpleName, fqn)
 		} else {
 			//One of the type args is an error type
 			val te = type.erasure.asTypeElement
-			importIfPossibleAndGetNameForCode(te.simpleName.toString, te.qualifiedName.toString)
+			
+			importIfPossibleAndGetNameForCode(te, te.simpleName.toString, te.qualifiedName.toString)
 		}
 		val result = '''«rawType»«FOR a : type.typeArguments BEFORE '<' SEPARATOR ', '  AFTER '>'»«a.typeRef»«ENDFOR»'''  //TODO: ? extends ... usw
 		
@@ -334,7 +339,8 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 		if (type == null) {
 			"void"
 		} else {
-			staticTypeRef(type.simpleName.toString, type.qualifiedName.toString)
+			val te =  if(type instanceof DeclaredType &&!(type instanceof ErrorType)) type.asTypeElement else null;
+			importIfPossibleAndGetNameForCode(te, type.simpleName.toString, type.qualifiedName.toString)
 		}
 	}
 	
@@ -342,16 +348,8 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 		importIfPossible(type.simpleName.toString, type.qualifiedName.toString)
 	}
 	
-	override staticTypeRef(Class<?> clazz){
-		staticTypeRef(clazz.simpleName, clazz.name)
-	}
-	
-	def staticTypeRef(String shortName, String fqn){
-		importIfPossibleAndGetNameForCode(shortName, fqn)
-	}
-	
 	def staticTypeRef(TypeElement type){
-		staticTypeRef(type.simpleName.toString, type.qualifiedName.toString)
+		importIfPossibleAndGetNameForCode(type, type.simpleName.toString, type.qualifiedName.toString)
 	}
 	
 	def private enclosedElementsCode(Element element){
