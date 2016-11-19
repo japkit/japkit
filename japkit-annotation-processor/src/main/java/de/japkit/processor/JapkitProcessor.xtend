@@ -4,10 +4,9 @@ import de.japkit.annotations.Behavior
 import de.japkit.el.ELSupport
 import de.japkit.metaannotations.Trigger
 import de.japkit.model.GenTypeElement
-import de.japkit.model.JavaEmitter
 import de.japkit.rules.AnnotationExtensions
 import de.japkit.rules.RuleFactory
-import de.japkit.rules.TypeResolver
+import de.japkit.rules.TriggerAnnotationRule
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.GenerateClassContext
@@ -33,7 +32,6 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import de.japkit.rules.TriggerAnnotationRule
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**

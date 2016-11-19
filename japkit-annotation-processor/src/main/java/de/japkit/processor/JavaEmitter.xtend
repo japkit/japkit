@@ -1,4 +1,4 @@
-package de.japkit.model
+package de.japkit.processor
 
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
@@ -27,7 +27,7 @@ import org.eclipse.xtend2.lib.StringConcatenation
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 
-class JavaEmitter implements EmitterContext{
+class JavaEmitter implements de.japkit.model.EmitterContext{
 
 	//TODO: Refactoring
 	extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
@@ -165,7 +165,7 @@ class JavaEmitter implements EmitterContext{
 		'''
 	}
 	
-	def dispatch docCommentCode(GenElement element){
+	def dispatch docCommentCode(de.japkit.model.GenElement element){
 		if(element.comment == null) '''''' else '''/** «element.comment» */'''
 	}
 	
@@ -202,7 +202,7 @@ class JavaEmitter implements EmitterContext{
 		field.constantValue?.constantExpression
 	}
 	
-	def dispatch constantExpressionCode(GenField field){
+	def dispatch constantExpressionCode(de.japkit.model.GenField field){
 		field.constantExpr?.code(this)
 	}
 	
@@ -255,7 +255,7 @@ class JavaEmitter implements EmitterContext{
 	
 	
 	
-	def dispatch codeForBody(GenExecutableElement e){
+	def dispatch codeForBody(de.japkit.model.GenExecutableElement e){
 		if (e.body != null){ 
 			e.body.code(this)
 		} else {
