@@ -116,7 +116,7 @@ abstract class GenElement extends GenAnnotatedConstruct implements Element{
  	}
  	
  	def setSimpleName(CharSequence name){
- 		simpleName= new GenName(name)
+ 		simpleName= new GenName(name.toString)
  	}
  	
  	new(){

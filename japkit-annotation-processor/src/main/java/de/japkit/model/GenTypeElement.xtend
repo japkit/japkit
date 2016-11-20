@@ -44,9 +44,11 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 		result
 	}	
 
+	private Name qualifiedName
+	
 	@Derived
 	override getQualifiedName(){
-		new GenName('''«(enclosingElement as QualifiedNameable)?.qualifiedName».«simpleName»''')
+		qualifiedName
 	}
 	
 	new(String name, String packageName) {
@@ -56,6 +58,7 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	new(String name, Element enclosingElement) {
 		super(name)
 		setEnclosingElement(enclosingElement)
+		qualifiedName = new GenName('''«(enclosingElement as QualifiedNameable)?.qualifiedName».«simpleName»''')
 		if (enclosingElement instanceof PackageElement) {
 			setNestingKind(NestingKind.TOP_LEVEL)
 		} else if (enclosingElement instanceof TypeElement) {
@@ -63,6 +66,11 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 		} else
 			throw new IllegalArgumentException(
 				"Enclosing element of a class must be a PackageElement or a TypeElement, but not " + enclosingElement)
+	}
+	
+	override setEnclosingElement(Element e){
+		super.setEnclosingElement(e)
+		qualifiedName = new GenName('''«(enclosingElement as QualifiedNameable)?.qualifiedName».«simpleName»''')
 	}
 
 	/**
