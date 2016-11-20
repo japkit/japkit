@@ -30,6 +30,29 @@ public class AnnotationTemplatesTemplate {
 	//@de.japkit.annotations.AnnotationTemplate(targetAnnotation = SrcType.class)
 	public @interface AnnotationName_ {
 		
+
+		/**
+		 * An expression to determine the source object for generating this annotation(s).
+		 * The source element is available as "src" in expressions and is used in
+		 * matchers and other rules. If the src expression is not set, the src
+		 * element of the element hosting the annotation is used.
+		 * @return
+		 */
+		String _src() default "";
+
+		/**
+		 * 
+		 * @return the language of the src expression. Defaults to Java EL.
+		 */
+		String _srcLang() default "";
+				
+		/**
+		 * As an alternative to the src expression, a function can be called to determine the source object.
+		 * 
+		 * @return
+		 */
+		Class<?>[] _srcFun() default {};
+
 		/**
 		 * @return expression to determine if the annotation shall be generated. Default is true.
 		 */
