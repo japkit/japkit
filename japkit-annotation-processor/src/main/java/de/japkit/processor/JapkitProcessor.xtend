@@ -241,6 +241,7 @@ class JapkitProcessor extends AbstractProcessor {
 		
 		
 		do {
+			printDiagnosticMessage(['''Loop begins'''])
 			writtenTypeElementsInCurrentLoop.clear
 		
 			//Add all deferred classes without unresolved dependencies
@@ -268,13 +269,15 @@ class JapkitProcessor extends AbstractProcessor {
 		
 			classesToProcess = annotatedClassesToDefer.filterLayer(layer)
 
-			if (writtenTypeElementsInCurrentRound.empty && !classesToProcess.empty) {
+			if (writtenTypeElementsInCurrentLoop.empty && writtenTypeElementsInCurrentRound.empty && !classesToProcess.empty) {
 				// We had no progress up to now, since no source file has been written successfully wuthin the round.
 				// Thus, write the classes with permanent type errors now.
 				writeClassesWithPermanentTypeErrors(classesToProcess, generatedTypeElementsInCurrentRound,
 					annotatedClassesToDefer, writtenTypeElementsInCurrentLoop, false)
 
 			}
+
+			printDiagnosticMessage(['''Loop ends. Written: «writtenTypeElementsInCurrentLoop.map[qualifiedName]»'''])
 
 			writtenTypeElementsInCurrentRound.addAll(writtenTypeElementsInCurrentLoop)
 
