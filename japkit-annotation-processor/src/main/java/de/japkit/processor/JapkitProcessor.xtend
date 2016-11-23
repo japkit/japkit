@@ -239,16 +239,22 @@ class JapkitProcessor extends AbstractProcessor {
 		
 		annotatedClassesToDefer.addAll(higherLayerClassesInCurrentRound)
 		
+		
 		do {
 			writtenTypeElementsInCurrentLoop.clear
 		
 			//Add all deferred classes without unresolved dependencies
-			val annotatedClassesFromPreviousRoundWithNoDependencies = annotatedClassesToDefer.filter[
-				!hasUnresolvedTypeDependencies(it.qualifiedName.toString, emptySet)].filterLayer(layer)
+			//During first iteration of the round (no classes written yet), all deferred classes are considered,
+			// since there type problems could have been resolved by the compilation of the newly generated type after previous round.
+			val annotatedClassesFromPreviousIterationWithNoDependencies = annotatedClassesToDefer.filter[				
+				writtenTypeElementsInCurrentRound.isEmpty ||!hasUnresolvedTypeDependencies(it.qualifiedName.toString, emptySet)
+			].filterLayer(layer)
+			
+			
 			printDiagnosticMessage(
 				[
-					'''Annotated classes from previous rounds / iterations with no type dependencies: «annotatedClassesFromPreviousRoundWithNoDependencies»'''])
-			classesToProcess.addAll(annotatedClassesFromPreviousRoundWithNoDependencies)
+					'''Annotated classes from previous rounds / iterations with no type dependencies: «annotatedClassesFromPreviousIterationWithNoDependencies»'''])
+			classesToProcess.addAll( annotatedClassesFromPreviousIterationWithNoDependencies)
 			
 		
 			processClassesAndWriteTypeElements(classesToProcess, false, generatedTypeElementsInCurrentRound,
