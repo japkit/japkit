@@ -66,12 +66,12 @@ class RuleFactory {
 		getOrCreate(templateCache, templateClass.qualifiedName.toString, templateFactory(templateClass, templateAnnotation))
 	}
 	
-	val triggerAnnotationCache = new IdentityHashMap<TypeElement, TriggerAnnotationRule>
+	val triggerAnnotationCache = new HashMap<String, TriggerAnnotationRule>
 	
 	def createTriggerAnnotationRule(TypeElement triggerAnnotationClass){
 		
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
-		getOrCreate(triggerAnnotationCache, triggerAnnotationClass, [
+		getOrCreate(triggerAnnotationCache, triggerAnnotationClass.qualifiedName.toString, [
 			mc.printDiagnosticMessage['''Create TriggerAnnotationRule from «triggerAnnotationClass»'''];
 			new TriggerAnnotationRule(triggerAnnotationClass.annotationMirror(Trigger), triggerAnnotationClass)
 		])
