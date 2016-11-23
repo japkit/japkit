@@ -49,9 +49,10 @@ class RuleFactory {
 	val templateCache = new HashMap<String, TemplateRule>
 	
 	def templateFactory(TypeElement templateClass, AnnotationMirror templateAnnotation) {
-		mc.printDiagnosticMessage['''Create TemplateRule from «templateClass»''']
+		
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
 		[String templateClassFqn,(TemplateRule)=>void registrationCallBack |
+			mc.printDiagnosticMessage['''Create TemplateRule from «templateClass»'''];
 			new TemplateRule(templateClass, templateAnnotation ?: templateClass.annotationMirror(Template), registrationCallBack)
 		]
 	}
@@ -68,18 +69,24 @@ class RuleFactory {
 	val triggerAnnotationCache = new IdentityHashMap<TypeElement, TriggerAnnotationRule>
 	
 	def createTriggerAnnotationRule(TypeElement triggerAnnotationClass){
-		mc.printDiagnosticMessage['''Create TriggerAnnotationRule from «triggerAnnotationClass»''']
+		
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
-		getOrCreate(triggerAnnotationCache, triggerAnnotationClass, [new TriggerAnnotationRule(triggerAnnotationClass.annotationMirror(Trigger), triggerAnnotationClass)])
+		getOrCreate(triggerAnnotationCache, triggerAnnotationClass, [
+			mc.printDiagnosticMessage['''Create TriggerAnnotationRule from «triggerAnnotationClass»'''];
+			new TriggerAnnotationRule(triggerAnnotationClass.annotationMirror(Trigger), triggerAnnotationClass)
+		])
 	}
 	
 	
 	val libraryCache = new HashMap<TypeElement, LibraryRule>
 	
 	def createLibraryRule(TypeElement libraryClass){
-		mc.printDiagnosticMessage['''Create LibraryRule from «libraryClass»''']
+		
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
-		getOrCreate(libraryCache, libraryClass, [new LibraryRule(libraryClass.annotationMirror(Library), libraryClass)])
+		getOrCreate(libraryCache, libraryClass, [
+			mc.printDiagnosticMessage['''Create LibraryRule from «libraryClass»'''];
+			new LibraryRule(libraryClass.annotationMirror(Library), libraryClass)
+		])
 	}
 	
 	
