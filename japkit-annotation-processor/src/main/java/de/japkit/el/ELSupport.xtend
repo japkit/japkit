@@ -34,7 +34,7 @@ class ELSupport {
 
 	//The tread local value stack.
 	def getValueStack() {
-		ExtensionRegistry.get(ValueStack, [|new ValueStack(#{"elements" -> elements, "types" -> types}, null)])
+		ExtensionRegistry.get(ValueStack, [|new ValueStack(newHashMap("elements" -> elements, "types" -> types), null)])
 	}
 	
 

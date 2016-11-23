@@ -5,9 +5,8 @@ import java.util.HashSet
 import java.util.Map
 
 /**
- * Holds EL-Varaibles.
+ * Holds EL-Variables.
  * 
- * TODO: Make it a stack of scopes. Allow access to parent scope. Move all "EL root properties" to value stack. 
  */
 class ValueStack implements Map<String, Object> {
 	
@@ -19,8 +18,8 @@ class ValueStack implements Map<String, Object> {
 	}
 	
 	
-	public new(Map<String,  ? extends Object> values, ValueStack parent){
-		this.current = new HashMap(values)
+	public new(Map<String,  Object> values, ValueStack parent){
+		this.current = values
 		this.parent = parent
 	}
 	
