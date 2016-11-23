@@ -121,11 +121,19 @@ class RuleFactory {
 	
 
 	def static <K, V> V getOrCreate(Map<K, V> cache, K key, (K,(V)=>void)=>V factory) {
-		cache.get(key) ?: {
-			if(cache.containsKey(key)) return null; //support caching null values
-			val v = factory.apply(key, [V v | cache.put(key, v)])
-			cache.put(key, v)
-			v
+		val v = cache.get(key) ?: {
+			try {
+				if(cache.containsKey(key)) return null; //support caching null values
+				val v = factory.apply(key, [V v | cache.put(key, v)])
+				cache.put(key, v)
+				v 
+			} catch (Exception e) {
+				ExtensionRegistry.get(MessageCollector).printDiagnosticMessage['''Exception whe creating Rule for «key»: «e»'''];
+				//Delete potential early registration if there was an exception during creation
+				cache.remove(key);
+				throw e
+			}
 		}
+		v
 	}
 }
