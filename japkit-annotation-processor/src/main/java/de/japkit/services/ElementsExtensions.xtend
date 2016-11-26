@@ -368,11 +368,32 @@ class ElementsExtensions {
 
 	def clearCaches() {
 		annotationValuesCache.clear
+		annotationValueMethodsCache.clear
 	}
 
-	//Ist das legal? GGf. auf eine Runde beschränken...
-	//static val annotationValuesCache = CacheBuilder.newBuilder.maximumSize(1000).weakKeys.<AnnotationMirror, Map<String, AnnotationValue>>build
+	//FQN of AnnotationTypeElement to (name of annotation value to mehtod)
+	static val annotationValueMethodsCache = new HashMap<String, Map<String, ExecutableElement>>
 	
+	def ExecutableElement getAVMethod(AnnotationMirror annotationMirror, String name){
+		val annotationTypeElement = annotationMirror.annotationType.asElement as TypeElement
+		val annotationTypeElementFqn = (annotationTypeElement).qualifiedName.toString;
+		
+		annotationValueMethodsCache.get(annotationTypeElementFqn)?.get(name) ?: {
+		
+			val map = newHashMap
+			
+			annotationTypeElement.enclosedElements.filter[kind==ElementKind.METHOD]
+				.map[it as ExecutableElement].forEach[e | map.put(e.simpleName.toString, e)]
+			
+			annotationValueMethodsCache.put(annotationTypeElementFqn, map)
+			
+			map.get(name)
+		
+		}
+		
+	}
+
+
 	static val annotationValuesCache = new IdentityHashMap<AnnotationMirror, Map<String, AnnotationValue>>
 
 	def private AnnotationValue value(AnnotationMirror annotationMirror, CharSequence name) {

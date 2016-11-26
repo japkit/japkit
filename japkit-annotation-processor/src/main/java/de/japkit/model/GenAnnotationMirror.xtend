@@ -3,7 +3,6 @@ package de.japkit.model
 import de.japkit.activeannotations.FieldsFromInterface
 import de.japkit.activeannotations.Required
 import de.japkit.services.ExtensionRegistry
-import de.japkit.services.TypesExtensions
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.AnnotationValue
@@ -12,11 +11,12 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
+import de.japkit.services.ElementsExtensions
 
 @FieldsFromInterface
 class GenAnnotationMirror implements AnnotationMirror {
 	
-	protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
+	protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	
 	@Required
 	DeclaredType annotationType
@@ -49,17 +49,16 @@ class GenAnnotationMirror implements AnnotationMirror {
 		elementValues.get(exEl)
 	}
 	
-	def ExecutableElement getAVMethod(String name, boolean required){
-		val exEl = (annotationType.asElement as TypeElement).enclosedElements.filter[kind==ElementKind.METHOD]
-			.map[it as ExecutableElement].findFirst[simpleName.contentEquals(name)]  //TODO: Caching!
-		if(exEl==null && required){
-			throw new IllegalArgumentException('''Annotation value '«name»' is not defined in annotation type «annotationType.qualifiedName»''')
-		}
-		exEl
+	
+	
+	def ExecutableElement getAVMethod(String name, boolean required) {
+		getAVMethod(this, name) ?:
+			if (required) {
+				throw new IllegalArgumentException('''Annotation value '«name»' is not defined in annotation type «this.annotationAsTypeElement.qualifiedName»''')
+			} else
+				null
 	}
-	
-	
-	
+		
 	def setElementValues(Map<? extends ExecutableElement,? extends AnnotationValue> elementValues) {
 		throw new UnsupportedOperationException("Please use setValue instead")
 	}
