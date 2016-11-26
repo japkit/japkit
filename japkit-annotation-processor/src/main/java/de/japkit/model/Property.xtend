@@ -7,6 +7,8 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
+import de.japkit.services.ExtensionRegistry
+import de.japkit.rules.JavaBeansExtensions
 
 @Data
 class Property extends GenAnnotatedConstruct implements VariableElement {
@@ -104,6 +106,14 @@ class Property extends GenAnnotatedConstruct implements VariableElement {
 	
 	override String toString(){
 		name.toString
+	}
+	
+	def String getGetterName() {
+		ExtensionRegistry.get(JavaBeansExtensions).getterName(this);
+	}
+	
+	def String getSetterName() {
+		ExtensionRegistry.get(JavaBeansExtensions).setterName(this);
 	}
 
 }
