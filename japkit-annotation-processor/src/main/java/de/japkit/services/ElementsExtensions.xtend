@@ -45,9 +45,9 @@ import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static javax.lang.model.util.ElementFilter.*
-import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 class ElementsExtensions {
 	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
@@ -455,7 +455,18 @@ class ElementsExtensions {
 		v
 	}
 	
-	def Method eclipseGetBindingMethod(Class clazz) {
+	static Map<Class<?>, Method> bindingMethod = newHashMap;
+	
+	def Method eclipseGetBindingMethod(Class<?> clazz) {
+		bindingMethod.get(clazz) ?: { 
+			val m = searchEclipseBindingMethod(clazz); 
+			bindingMethod.put(clazz, m);
+			m
+		}
+		
+	}
+	
+	protected def Method searchEclipseBindingMethod(Class<?> clazz) {
 		try{
 			val m = clazz.getDeclaredMethod("binding")
 			m.accessible = true
