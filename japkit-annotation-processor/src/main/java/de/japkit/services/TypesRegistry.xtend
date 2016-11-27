@@ -3,10 +3,12 @@ package de.japkit.services
 import de.japkit.annotations.Generated
 import de.japkit.model.GenAnnotationMirror
 import de.japkit.model.GenAnnotationValue
+import de.japkit.model.GenClass
 import de.japkit.model.GenDeclaredType
 import de.japkit.model.GenTypeElement
 import de.japkit.model.GenTypeMirror
 import de.japkit.model.GenUnresolvedType
+import de.japkit.model.GenUnresolvedTypeElement
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.util.Collections
@@ -29,8 +31,6 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import de.japkit.model.GenUnresolvedTypeElement
-import de.japkit.model.GenClass
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -825,21 +825,18 @@ class TypesRegistry {
 
 	def TypeElement findGenTypeElementIfAllowed(String typeFqnOrShortname) {
 		val fqn = typeElementSimpleNameToFqn.get(typeFqnOrShortname) ?: typeFqnOrShortname.toString
-		
-		//Always resolve a self cycle and dependency to aux classes immediately.
+
+		return findTypeInCurrentGeneratedClass(fqn) ?: if (returnUncommitedGenTypes || isCommitted(fqn)) {
+			genTypeElementInCurrentRoundByFqn.get(fqn)
+		}
+	}
+	
+	//Always resolve a self cycle and dependency to aux classes immediately.
+	protected def TypeElement findTypeInCurrentGeneratedClass(String typeFqnOrShortname) {
 		if (currentGeneratedClass != null){ 
-			val foundType = findTypeInGeneratedClass(currentGeneratedClass, fqn) 
-				?: (currentPrimaryGenClass ?: currentGeneratedClass).auxTopLevelClasses?.map[findTypeInGeneratedClass(fqn)]?.findFirst[it!=null]
-			if(foundType!=null) return foundType
+			 findTypeInGeneratedClass(currentGeneratedClass, typeFqnOrShortname) 
+				?: (currentPrimaryGenClass ?: currentGeneratedClass).auxTopLevelClasses?.map[findTypeInGeneratedClass(typeFqnOrShortname)]?.findFirst[it!=null]		
 		}
-		
-		if (returnUncommitedGenTypes || isCommitted(fqn)) {
-			val genType = genTypeElementInCurrentRoundByFqn.get(fqn)
-			if (genType != null) {
-				return genType
-			}
-		}
-		null
 	}
 	
 	
