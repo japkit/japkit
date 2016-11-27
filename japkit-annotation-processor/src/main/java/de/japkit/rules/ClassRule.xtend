@@ -107,7 +107,7 @@ class ClassRule extends AbstractRule {
 					null
 			if (!isTopLevelClass && (enclosingClass == null)) {
 				throw new IllegalArgumentException(
-					"currentGeneratedClass must be available when it is a rule for an inner class.")
+					"enclosingClass must be available when it is a rule for an inner class.")
 			}
 
 			if (isAuxClass) {
@@ -115,10 +115,10 @@ class ClassRule extends AbstractRule {
 					throw new IllegalArgumentException(
 						"currentGeneratedClass must be available when it is a rule for an aux class.")
 				}
-				if (currentPrimaryGenClass == null) {
-					currentPrimaryGenClass = currentGeneratedClass
-				}
+				
 			}
+			
+			
 
 
 			scopeRule.apply([
@@ -132,6 +132,10 @@ class ClassRule extends AbstractRule {
 				registerGeneratedTypeElement(generatedClass, currentAnnotatedClass,
 					if(isTopLevelClass && !isAuxClass) currentTriggerAnnotation else null)
 				setCurrentGeneratedClass(generatedClass)
+				
+				if (isTopLevelClass && !isAuxClass) {
+					currentPrimaryGenClass = generatedClass
+				}
 			], [
 				val generatedClass = currentGeneratedClass
 				try {

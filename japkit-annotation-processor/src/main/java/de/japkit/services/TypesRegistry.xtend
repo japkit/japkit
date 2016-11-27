@@ -829,7 +829,7 @@ class TypesRegistry {
 		//Always resolve a self cycle and dependency to aux classes immediately.
 		if (currentGeneratedClass != null){ 
 			val foundType = findTypeInGeneratedClass(currentGeneratedClass, fqn) 
-				?: (currentPrimaryGenClass ?: currentGeneratedClass).allAuxTopLevelClasses?.map[findTypeInGeneratedClass(fqn)]?.findFirst[it!=null]
+				?: (currentPrimaryGenClass ?: currentGeneratedClass).auxTopLevelClasses?.map[findTypeInGeneratedClass(fqn)]?.findFirst[it!=null]
 			if(foundType!=null) return foundType
 		}
 		

@@ -112,7 +112,7 @@ class BehaviorDelegationRule extends AbstractRule {
 					new GenInterface(c.simpleName + internalInterfaceName, c.package) => [
 						//remember that we have created a new top level class so that it can be found
 						//and rendered later.
-						c.auxTopLevelClasses.add(it)
+						currentPrimaryGenClass.auxTopLevelClasses.add(it)
 						registerGeneratedTypeElement(it, currentAnnotatedClass, null)
 					]
 				}
