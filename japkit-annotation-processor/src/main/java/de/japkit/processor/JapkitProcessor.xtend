@@ -191,7 +191,7 @@ class JapkitProcessor extends AbstractProcessor {
 		//defer remaining annotated classes to next round
 		annotatedClassesToDefer.forEach[deferredClasses.put(qualifiedName.toString, null)]
 
-		typesRegistry.cleanUpGenTypesAtEndOfRound //They refer types of current round and thus should not be used in next round, but re-generated. TODO: Really?
+		typesRegistry.cleanUpTypesAtEndOfRound //They refer types of current round and thus should not be used in next round, but re-generated. 
 
 		printDiagnosticMessage[
 			'''

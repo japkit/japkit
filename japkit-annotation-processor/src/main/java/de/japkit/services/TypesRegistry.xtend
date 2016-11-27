@@ -12,6 +12,7 @@ import de.japkit.model.GenUnresolvedTypeElement
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.util.Collections
+import java.util.IdentityHashMap
 import java.util.List
 import java.util.Map
 import java.util.Set
@@ -31,6 +32,10 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
+import com.google.common.collect.Multimap
+import com.google.common.collect.SetMultimap
+import com.google.common.collect.TreeMultimap
+import com.google.common.collect.HashMultimap
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -677,8 +682,8 @@ class TypesRegistry {
 		this.returnUncommitedGenTypes = false
 	}
 
-	/**Removes all generated type elements from cache. */
-	def cleanUpGenTypesAtEndOfRound() {
+	/**Removes all type elements from cache. */
+	def cleanUpTypesAtEndOfRound() {
 		genTypeElementInCurrentRoundByFqn.clear
 	}
 
@@ -703,7 +708,7 @@ class TypesRegistry {
 		if (e instanceof TypeElement) {
 			//Even if we find the type element, we prefer the generated one, since it is newer.
 			//This is relevant during incremental build.
-			findGenTypeElementIfAllowed(e.qualifiedName.toString) ?: e
+			findGenTypeElementForFqn(e.qualifiedName.toString) ?: e
 		} else {
 			//should not happen
 			throw new TypeElementNotFoundException(declType.erasure.toString)
@@ -716,7 +721,7 @@ class TypesRegistry {
 		if (!declType.typeArguments.nullOrEmpty) {
 			return declType.erasure.asTypeElement
 		}
-		val e = findGenTypeElementIfAllowed(declType.simpleNameForErrorType)
+		val e = findGenTypeElementForShortName(declType.simpleNameForErrorType)
 		if (e != null) {
 			e
 		} else {
@@ -813,29 +818,43 @@ class TypesRegistry {
 		elements
 	}
 
-	//Finding type element by name. If returnGenTypes is set, the generated types of the current round are considered too.
-	def TypeElement findTypeElement(String typeFqnOrShortname) {
-		var TypeElement te = findGenTypeElementIfAllowed(typeFqnOrShortname)
 
-		if (te == null) {
-			te = elementUtils.getTypeElement(typeFqnOrShortname)
-		}
-		te
+	//Finding type element by FQN. 
+	def TypeElement findTypeElement(String typeFqn) {
+			findGenTypeElementForFqn(typeFqn) ?: elementUtils.getTypeElement(typeFqn)
+	}
+	
+	def TypeElement findGenTypeElementForShortName(String shortname){
+		return  typeElementSimpleNameToFqn.get(shortname)?.findGenTypeElementForFqn ?: findTypeInCurrentGeneratedClass(shortname)
 	}
 
-	def TypeElement findGenTypeElementIfAllowed(String typeFqnOrShortname) {
-		val fqn = typeElementSimpleNameToFqn.get(typeFqnOrShortname) ?: typeFqnOrShortname.toString
-
-		return findTypeInCurrentGeneratedClass(fqn) ?: if (returnUncommitedGenTypes || isCommitted(fqn)) {
+	def TypeElement findGenTypeElementForFqn(String fqn) {
+		findTypeInCurrentGeneratedClass(fqn) ?: if (returnUncommitedGenTypes || isCommitted(fqn)) {
 			genTypeElementInCurrentRoundByFqn.get(fqn)
 		}
 	}
 	
-	//Always resolve a self cycle and dependency to aux classes immediately.
+	
+	
+	static Multimap<GenTypeElement, String> typesNotFoundInGenClass = HashMultimap.create()
+	
+	//Always resolve a self cycle and dependency to aux classes immediately. 
 	protected def TypeElement findTypeInCurrentGeneratedClass(String typeFqnOrShortname) {
-		if (currentGeneratedClass != null){ 
-			 findTypeInGeneratedClass(currentGeneratedClass, typeFqnOrShortname) 
-				?: (currentPrimaryGenClass ?: currentGeneratedClass).auxTopLevelClasses?.map[findTypeInGeneratedClass(typeFqnOrShortname)]?.findFirst[it!=null]		
+		val currGenClass = currentGeneratedClass
+		if (currGenClass != null){
+			//If it has not been found the first time, there is no good reason to try again and again.
+			//If the user wants to resolve inner types within the generate class, he must generate them in the proper order...
+			if(typesNotFoundInGenClass.get(currGenClass).contains(typeFqnOrShortname)) return null;
+			
+			val found =  findTypeInGeneratedClass(currGenClass, typeFqnOrShortname) 
+				?: currentPrimaryGenClass.auxTopLevelClasses?.map[
+					findTypeInGeneratedClass(typeFqnOrShortname)
+				]?.findFirst[it!=null]		
+				
+			if(found == null) {
+				typesNotFoundInGenClass.put(currGenClass, typeFqnOrShortname)
+			}	
+			return found
 		}
 	}
 	
@@ -843,7 +862,7 @@ class TypesRegistry {
 	
 	def private TypeElement findTypeInGeneratedClass(GenTypeElement genClass, String typeFqnOrShortname){
 		val genClassFqn = genClass.qualifiedName.toString
-		if(typeFqnOrShortname == genClassFqn || typeFqnOrShortname == currentGeneratedClass.simpleName.toString) {			
+		if(typeFqnOrShortname == genClassFqn || typeFqnOrShortname == genClass.simpleName.toString) {			
 			return genClass
 		}
 		if(typeFqnOrShortname.startsWith(genClassFqn+".")){
