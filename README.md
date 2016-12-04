@@ -46,9 +46,9 @@ public class DTOTemplate implements SrcInterface {
 }
 ```
 
-- The annotation @Class tells the annotation processor that this is a template for generating a new class. 
-- The nameSuffixToAppend describes the name of the generated class. It shall consist of the name of the source class (which is Person in our case) plus "DTO". So we get PersonDTO.
-- @RuntimeMetadata should be on every template class. It is again some ceremony of japkit.
+- The annotation `@Class` tells the annotation processor that this is a template for generating a new class. 
+- The `nameSuffixToAppend` describes the name of the generated class. It shall consist of the name of the source class (which is Person in our case) plus "DTO". So we get PersonDTO.
+- `@RuntimeMetadata` should be on every template class. It is again some ceremony of japkit.
 - The template implements the interface SrcInterface. This is a so called type function that means "use the type of the source here". The source is again Person in our example. So, the generated PersonDTO will implement the Person interface.
 - @Field tells to generate a field
 - src is a JavaEL expression that defines from which source the field is generated from. Src is the current source element (the class Person), so `#{src.properties}` means "all properties of class Person". Since this is a collection, a field will be generated for every element in the collection, that is for every property of class Person.
@@ -86,8 +86,8 @@ public class PersonDTO implements Person {
 	}	
 }
 ```
-- The trigger annoation @DTO is copied onto the generated class (since it might provide metadata of use in subsequent code generators). 
-- The annoation value "shadow" is set to true. This tells japkit to not trigger code generation again (this time with PersonDTO as source class).
+- The trigger annotation @DTO is copied onto the generated class (since it might provide metadata of use in subsequent code generators). 
+- The annotation value "shadow" is set to true. This tells japkit to not trigger code generation again (this time with PersonDTO as source class).
 - An @Generated annotation is added that tells the source class for code generation.
 - The PersonDTO implements Person and has all expected fields and accessors.
 
