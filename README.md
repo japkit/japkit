@@ -30,9 +30,9 @@ public @interface DTO {
 	boolean shadow() default false;
 }
 ```
-- The annotation @Trigger tells the annotation processor, that @DTO is an annotation to trigger code generation. 
-- The template class DTOTemplate (that we will see in a moment) tells what to generate. 
-- The annotation value shadow is some ceremony required by japkit that you can ignore for the moment. 
+- The annotation `@Trigger` tells the annotation processor, that @DTO is an annotation to trigger code generation. 
+- The template class `DTOTemplate` (that we will see in a moment) tells what to generate. 
+- The annotation value `shadow` is some ceremony required by japkit that you can ignore for the moment. 
 - We could define some more annotation values here to make the code generator configurable, but we don't need that yet.
 
 Let's look at the most interesting part, the DTOTemplate:
@@ -49,13 +49,13 @@ public class DTOTemplate implements SrcInterface {
 - The annotation `@Class` tells the annotation processor that this is a template for generating a new class. 
 - The `nameSuffixToAppend` describes the name of the generated class. It shall consist of the name of the source class (which is Person in our case) plus "DTO". So we get PersonDTO.
 - `@RuntimeMetadata` should be on every template class. It is again some ceremony of japkit.
-- The template implements the interface SrcInterface. This is a so called type function that means "use the type of the source here". The source is again Person in our example. So, the generated PersonDTO will implement the Person interface.
-- @Field tells to generate a field
-- src is a JavaEL expression that defines from which source the field is generated from. Src is the current source element (the class Person), so `#{src.properties}` means "all properties of class Person". Since this is a collection, a field will be generated for every element in the collection, that is for every property of class Person.
+- The template implements the interface `SrcInterface`. This is a so called type function that means "use the type of the source here". The source is again Person in our example. So, the generated PersonDTO will implement the Person interface.
+- `@Field` tells to generate a field
+- `src` is a JavaEL expression that defines from which source the field is generated from. Src is the current source element (the class Person), so `#{src.properties}` means "all properties of class Person". Since this is a collection, a field will be generated for every element in the collection, that is for every property of class Person.
  - The src is a [TypeElement](https://docs.oracle.com/javase/8/docs/api/javax/lang/model/element/TypeElement.html) here. TypeElement does not have any property with the name "properties". However, "properties" is some convinience property that japkit provides for TypeElements in EL expressions.
-- You can generate arbitrary methods with japkit, but getters and setters are so common, that there are convinient @Getter and @Setter annotations to generate the accessor methods for a field. They allow for some customization, for example fluent setters. But we don't us this feature here.
+- You can generate arbitrary methods with japkit, but getters and setters are so common, that there are convinient `@Getter` and `@Setter` annotations to generate the accessor methods for a field. They allow for some customization, for example fluent setters. But we don't us this feature here.
 - Next you see, how the generated field should look like. It is private and it shall have the type and name of the source element (the property of Person).
- - SrcType is a type function similar to SrcInterface and means to use the type of the source element
+ - `SrcType` is a type function similar to `SrcInterface` and means to use the type of the source element
  - The $...$ syntax tells japkit to insert the result of an expression evaluation here. `$name$` really means `#{src.name}`. So the name of a property of the class Person is inserted here.
 
 That's it. Besides some setup in the Maven POM of the project, nothing more needs to be done.
@@ -87,8 +87,8 @@ public class PersonDTO implements Person {
 }
 ```
 - The trigger annotation @DTO is copied onto the generated class (since it might provide metadata of use in subsequent code generators). 
-- The annotation value "shadow" is set to true. This tells japkit to not trigger code generation again (this time with PersonDTO as source class).
-- An @Generated annotation is added that tells the source class for code generation.
+- The annotation value `shadow` is set to true. This tells japkit to not trigger code generation again (this time with PersonDTO as source class).
+- An `@Generated` annotation is added that tells the source class for code generation.
 - The PersonDTO implements Person and has all expected fields and accessors.
 
 
