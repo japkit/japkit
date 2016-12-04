@@ -1,6 +1,8 @@
 package de.japkit.metaannotations.classselectors;
 
-@ClassSelector(kind=ClassSelectorKind.SRC_SINGLE_VALUE_TYPE)
+import de.japkit.metaannotations.Function;
+
+@Function(expr="#{src.singleValueType}")
 public @interface SrcSingleValueType {
 
 }

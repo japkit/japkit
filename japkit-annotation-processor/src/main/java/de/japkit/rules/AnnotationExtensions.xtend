@@ -19,52 +19,21 @@ import javax.lang.model.element.TypeElement
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	val transient extension RuleFactory =  ExtensionRegistry.get(RuleFactory)
+	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 
-	/**
-	 * Maps annotations from a source element.
-	 * 
-	 * @param srcElement the source element
-	 * @param annotatedClass the annotated class
-	 * @param annotation the annotation that triggered the annotation processor
-	 * @param the meta annotation that contains a value "annotations" which is an array of @_Annotation annotations that specify how to map the annotations.
-	 *
-	 * @return the list of generated annotations to be put on the target element. 
-	 */
-	def List<GenAnnotationMirror> mapAnnotations(Iterable<? extends AnnotationMappingRule> mappings) {
-		mapAnnotations(mappings, newArrayList)
-	}
-	def List<GenAnnotationMirror> mapAnnotations(Iterable<? extends AnnotationMappingRule> mappings, List<GenAnnotationMirror> existingAnnotations) {
-		
-		try {
-
-			val mappingsWithId = mappings.filter[!id.nullOrEmpty].toMap[id]
-
-			val annotations = existingAnnotations
-			mappings.filter[id.nullOrEmpty].forEach[mapOrCopyAnnotations(annotations, mappingsWithId)]
-			annotations
-
-		} catch (TypeElementNotFoundException tenfe) {
-			throw tenfe;
-		} catch (RuntimeException re) {
-			messageCollector.reportRuleError("Error during annotation mapping." + re)
-			emptyList
-		}
-
-	}
-	
-
-	
-	def List<GenAnnotationMirror> overrideAnnotations(Element overrideElement, List<GenAnnotationMirror> existingAnnotations) {
-		if(overrideElement==null){
+	def List<GenAnnotationMirror> overrideAnnotations(Element overrideElement,
+		List<GenAnnotationMirror> existingAnnotations) {
+		if (overrideElement == null) {
 			return new ArrayList(existingAnnotations)
 		}
-		
-		val result = new ArrayList(existingAnnotations.filter[am | !overrideElement.annotationMirrors.exists[fqn.equals(am.fqn)]].toList)
-		
+
+		val result = new ArrayList(existingAnnotations.filter [ am |
+			!overrideElement.annotationMirrors.exists[fqn.equals(am.fqn)]
+		].toList)
+
 		result.addAll(ExtensionRegistry.get(GenExtensions).copyAnnotations(overrideElement))
-		
+
 		result
 	}
 
@@ -82,42 +51,42 @@ class AnnotationExtensions {
 
 	def private boolean shallSetShadow(GenAnnotationMirror am) {
 
-		//set the "shadow" annotation value if the annotation triggers code generation for a class
+		// set the "shadow" annotation value if the annotation triggers code generation for a class
 		// and if the annotation type declares a boolean shadow AV
-		isTriggerAnnotation(am) && {
-			val avMethod = am.getAVMethod(SHADOW_AV, false)
+		isTriggerAnnotation(am) &&
+			{
+				val avMethod = am.getAVMethod(SHADOW_AV, false)
 
-			if (avMethod == null || !avMethod.returnType.boolean) {
-				throw new ProcessingException(
+				if (avMethod == null || !avMethod.returnType.
+					boolean) {
+					throw new ProcessingException(
 					'''The annotation value '«SHADOW_AV»' could not be set on annotation «am.annotationType», since it is not declared in the annotation type or is not boolean.''',
-					null)
+						null)
+				}
+
+				true
 			}
 
-			true
-		}
-
 	}
-	
 
 	def isTriggerAnnotation(AnnotationMirror am) {
-		am.hasMetaAnnotation(Trigger.name)
+		try {
+			am.hasMetaAnnotation(Trigger.name)
+		} catch (TypeElementNotFoundException e) {
+			// If the annotation type cannot be found, we assume it is no trigger annotation. 
+			// That is: We do not support to generate new trigger annotations (which would be strange anyway.)
+			// This error handling is necessary, since some annotations ARE generated, especially annotation templates.
+			return false;
+		}
 	}
-	
+
 	def isTriggerAnnotation(TypeElement te) {
 		te.annotationMirror(Trigger.name) != null
 	}
-	
-	/**
-	 * Gets a list of element matchers from an annotation.
-	 */
-	 def elementMatchers(AnnotationMirror annotation, CharSequence avName){
-	 	 val av =(annotation.value(avName, typeof(AnnotationMirror[])))
-	 	 if(av!=null) av.map[createElementMatcher(it)] else emptyList
-	 }
-	 
-	 def annotationMappings(AnnotationMirror annotation, CharSequence avName){
-	 	 annotation.value(avName, typeof(AnnotationMirror[]))?.map[createAnnotationMappingRule(it)] ?: emptyList
-	 }
-	 
-	
+
+	def List<? extends AnnotationMirror> getTriggerAnnotations(TypeElement annotatedClass) {
+		annotatedClass.annotationMirrors.filter[isTriggerAnnotation].toList
+	}
+
+
 }

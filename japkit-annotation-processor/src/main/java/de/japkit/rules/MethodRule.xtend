@@ -50,10 +50,10 @@ class MethodRule extends ExecutableElementRule<GenMethod> {
 	
 	def (GenMethod)=>AnnotationValue createDefaultAnnotationValueRule() {
 		val avFromTemplate = template?.defaultValue
-		val avMapping = metaAnnotation?.value("defaultAnnotationValue", typeof(AnnotationMirror[]))?.map[new AnnotationValueMappingRule(it)]?.singleValue;
+		val avMapping = metaAnnotation?.value("defaultAnnotationValue", typeof(AnnotationMirror[]))?.map[new AnnotationValueMappingRule(it, emptyMap)]?.singleValue;
 		[m|
 			if (avMapping != null) {
-				avMapping.mapAnnotationValue(null, m.returnType, null)
+				avMapping.mapAnnotationValue(null, m.returnType)
 			} else if(avFromTemplate!=null) {
 				GenExtensions.copy(avFromTemplate, RuleUtils.templateAnnotationValueTransformer)
 			} else {

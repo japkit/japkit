@@ -40,6 +40,16 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 		this.type = type
 	}
 	
+	def static <T> ExpressionOrFunctionCallRule<T> ruleOrNullIfUndefined(AnnotationMirror metaAnnotation,
+		Element metaElement, Class<? extends T> type, String exprAvName, String langAvName, String functionAvName,
+		String avPrefix, ()=>T defaultValue, boolean nullable,
+		(boolean, Object, IParameterlessFunctionRule<?>)=>Object combiner ) {
+			val rule = new ExpressionOrFunctionCallRule<T>(metaAnnotation, metaElement, type, exprAvName, langAvName,
+				functionAvName, avPrefix, defaultValue, nullable, combiner)
+			return if(rule.undefined) null else rule
+
+		}
+	
 	//Combiner that concatenates the function calls in a fluent way. At first, the expression is evaluated (if not empty). 
 	//For the result, the first function is applied. For its result, the second function is applied. And so on.
 	public static val (boolean, Object, IParameterlessFunctionRule<?>)=>Object FLUENT_COMBINER 
@@ -48,6 +58,16 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 	//Combiner for boolean functions. Applies a logical AND. 	
 	public static val (boolean, Object, IParameterlessFunctionRule<?>)=>Object AND_COMBINER 
 		= [isFirst, previous, function | (if(isFirst) true else previous as Boolean) && {
+			val r = function.apply
+			if(!(r instanceof Boolean)){
+				throw new RuleException('''The function returned «r» of type «r?.class», but the required type is Boolean''');
+			} 
+			r as Boolean}
+		]
+		
+	//Combiner for boolean functions. Applies a logical OR. 	
+	public static val (boolean, Object, IParameterlessFunctionRule<?>)=>Object OR_COMBINER 
+		= [isFirst, previous, function | (if(isFirst) false else previous as Boolean) || {
 			val r = function.apply
 			if(!(r instanceof Boolean)){
 				throw new RuleException('''The function returned «r» of type «r?.class», but the required type is Boolean''');

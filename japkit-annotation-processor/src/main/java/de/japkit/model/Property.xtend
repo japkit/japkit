@@ -1,6 +1,5 @@
 package de.japkit.model
 
-import de.japkit.metaannotations.Properties
 import java.lang.annotation.Annotation
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementVisitor
@@ -8,6 +7,8 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
+import de.japkit.services.ExtensionRegistry
+import de.japkit.rules.JavaBeansExtensions
 
 @Data
 class Property extends GenAnnotatedConstruct implements VariableElement {
@@ -103,17 +104,16 @@ class Property extends GenAnnotatedConstruct implements VariableElement {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 	
-	
-	def getSourceElement(Properties.RuleSource ruleSource) {
-		switch (ruleSource) {
-			case Properties.RuleSource.PROPERTY: this
-			case Properties.RuleSource.FIELD: field
-			case Properties.RuleSource.GETTER: getter
-		}
-	}
-	
 	override String toString(){
 		name.toString
+	}
+	
+	def String getGetterName() {
+		ExtensionRegistry.get(JavaBeansExtensions).getterName(this);
+	}
+	
+	def String getSetterName() {
+		ExtensionRegistry.get(JavaBeansExtensions).setterName(this);
 	}
 
 }

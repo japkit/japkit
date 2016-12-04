@@ -15,7 +15,8 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
-class TypeRule extends AbstractFunctionRule<TypeMirror> {
+class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
+	val protected transient extension TypeResolver typesResolver = ExtensionRegistry.get(TypeResolver)
 	
 	ClassSelectorKind kind
 	Set<TypeMirror> requiredTriggerAnnotation
@@ -83,6 +84,9 @@ class TypeRule extends AbstractFunctionRule<TypeMirror> {
 				if(resolvedSelector.type == null){
 					resolvedSelector.type = new GenUnresolvedType(fqn, false)
 				}
+			}
+			case ClassSelectorKind.TEMPLATE : {
+				resolvedSelector.type = metaElement?.asType()?.resolveType
 			}
 			default: {
 				resolvedSelector.type = null
@@ -162,7 +166,10 @@ class TypeRule extends AbstractFunctionRule<TypeMirror> {
 		}
 		
 		val extension AnnotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-		if(typeElement.annotationMirrors.filter[isTriggerAnnotation].empty){
+		
+		val triggerAnnotations = typeElement.annotationMirrors.filter[isTriggerAnnotation]
+		
+		if(triggerAnnotations.empty){
 			//If the type element has no trigger annotations at all we assume it is a "hand-written" class and leave it as it is.
 			//TODO: This could be configurable...
 			return typeElement
@@ -190,7 +197,7 @@ class TypeRule extends AbstractFunctionRule<TypeMirror> {
 				 Thus, the generated type to use is not unique.''');
 			null
 		}
-		else if(!typeElement.generated) {  
+		else if(!typeElement.generated && !annotations.head.isShadowAnnotation) {  
 		
 			//Only apply the transformation if it is not a generated class 
 				

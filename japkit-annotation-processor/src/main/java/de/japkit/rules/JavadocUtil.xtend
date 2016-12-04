@@ -10,12 +10,12 @@ class JavadocUtil {
 	//code within javadoc. 1st group is the name of the according AV. second group is the code
 	//the patterns are sorted from the the most to the leasr specific ones. The first one that matches, will be applied.
 
-	static val codePattern1 = Pattern.compile('''@japkit\.(\S+)\s*<pre>\s*\{@code\s*([\s\S]*?)\}\s*</pre>''')
-	static val codePattern2 = Pattern.compile('''@japkit\.(\S+)\s*<pre>\s*<code>\s*([\s\S]*?)</code>\s*</pre>''')
-	static val codePattern3 = Pattern.compile('''@japkit\.(\S+)\s*<code>\s*([\s\S]*?)</code>''')
-	static val codePattern4 = Pattern.compile('''@japkit\.(\S+)\s*<pre>\s*([\s\S]*?)</pre>''')
+	static val codePattern1 = Pattern.compile('''(?:@|<li>)japkit\.(\S+)\s*<pre>\s*\{@code\s*([\s\S]*?)\}\s*</pre>''')
+	static val codePattern2 = Pattern.compile('''(?:@|<li>)japkit\.(\S+)\s*<pre>\s*<code>\s*([\s\S]*?)</code>\s*</pre>''')
+	static val codePattern3 = Pattern.compile('''(?:@|<li>)japkit\.(\S+)\s*<code>\s*([\s\S]*?)</code>''')
+	static val codePattern4 = Pattern.compile('''(?:@|<li>)japkit\.(\S+)\s*<pre>\s*([\s\S]*?)</pre>''')
 	//single line code (everything on the same line till newline or end of string)
-	static val codePattern5 = Pattern.compile('''@japkit\.(\S+)[\t\f ]*([\s\S]*?)(?:$|[\r\n])''')
+	static val codePattern5 = Pattern.compile('''(?:@|<li>)japkit\.(\S+)[\t\f ]*([\s\S]*?)(?:$|[\r\n])''')
 	
 	
 	

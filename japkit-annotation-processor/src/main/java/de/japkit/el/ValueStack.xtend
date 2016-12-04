@@ -5,13 +5,12 @@ import java.util.HashSet
 import java.util.Map
 
 /**
- * Holds EL-Varaibles.
+ * Holds EL-Variables.
  * 
- * TODO: Make it a stack of scopes. Allow access to parent scope. Move all "EL root properties" to value stack. 
  */
 class ValueStack implements Map<String, Object> {
 	
-	Map<String, Object> current = newHashMap
+	Map<String, Object> current = emptyMap
 	
 	ValueStack parent
 	
@@ -19,8 +18,8 @@ class ValueStack implements Map<String, Object> {
 	}
 	
 	
-	public new(Map<String,  ? extends Object> values, ValueStack parent){
-		this.current = new HashMap(values)
+	public new(Map<String,  Object> values, ValueStack parent){
+		this.current = values
 		this.parent = parent
 	}
 	
@@ -40,7 +39,13 @@ class ValueStack implements Map<String, Object> {
 	
 	def void push(){
 		parent = new ValueStack(current, parent)
-		current = new HashMap
+		current = emptyMap
+	}
+	
+	private def createOnDemand(){
+		if(current==emptyMap){
+			current = newHashMap()
+		}
 	}
 	
 	def void pushAndPutAll(Map<String, ? extends Object> values){
@@ -109,16 +114,19 @@ class ValueStack implements Map<String, Object> {
 	
 	override put(String key, Object value) {
 		if("parent" == key) throw new IllegalArgumentException("parent is a reserved key for accessing parent value stack")
+		createOnDemand()
 		current.put(key, value)
 	}
 	
 	override putAll(Map<? extends String, ?> m) {
 		if(m.containsKey("parent")) throw new IllegalArgumentException("parent is a reserved key for accessing parent value stack")
+		createOnDemand()
 		current.putAll(m)
 	}
 	
 	override remove(Object key) {
 		if("parent" == key) throw new IllegalArgumentException("parent is a reserved key for accessing parent value stack")
+		createOnDemand()
 		current.remove(key)
 	}
 	

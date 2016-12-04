@@ -29,7 +29,7 @@ class ManualOverrideRule {
 	
 	new(AnnotationMirror metaAnnotation){
 		manualOverrides = metaAnnotation?.value("manualOverrides", TypeMirror)
-		manualOverridesMatcher = metaAnnotation?.value("manualOverridesMatcher", AnnotationMirror)?.createElementMatcher
+		manualOverridesMatcher = metaAnnotation?.value("manualOverridesMatcher", AnnotationMirror)?.createMatcherRule
 	}
 	
 	def apply(Iterable<? extends GenElement> elementsToOverride){

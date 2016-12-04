@@ -6,7 +6,6 @@ import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.TypesExtensions
 import java.util.Comparator
-import java.util.HashSet
 import java.util.List
 import java.util.Map
 import java.util.Set
@@ -38,15 +37,12 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	@Accessors
 	boolean auxClass
 
-	def Set<GenTypeElement> allAuxTopLevelClasses(){
-		val result = new HashSet(auxTopLevelClasses)
-		auxTopLevelClasses.forEach[result.addAll(it.allAuxTopLevelClasses)]
-		result
-	}	
-
+	
+	private Name qualifiedName
+	
 	@Derived
 	override getQualifiedName(){
-		new GenName('''«(enclosingElement as QualifiedNameable)?.qualifiedName».«simpleName»''')
+		qualifiedName
 	}
 	
 	new(String name, String packageName) {
@@ -56,6 +52,7 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	new(String name, Element enclosingElement) {
 		super(name)
 		setEnclosingElement(enclosingElement)
+		qualifiedName = new GenName('''«(enclosingElement as QualifiedNameable)?.qualifiedName».«simpleName»''')
 		if (enclosingElement instanceof PackageElement) {
 			setNestingKind(NestingKind.TOP_LEVEL)
 		} else if (enclosingElement instanceof TypeElement) {
@@ -63,6 +60,11 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 		} else
 			throw new IllegalArgumentException(
 				"Enclosing element of a class must be a PackageElement or a TypeElement, but not " + enclosingElement)
+	}
+	
+	override setEnclosingElement(Element e){
+		super.setEnclosingElement(e)
+		qualifiedName = new GenName('''«(enclosingElement as QualifiedNameable)?.qualifiedName».«simpleName»''')
 	}
 
 	/**

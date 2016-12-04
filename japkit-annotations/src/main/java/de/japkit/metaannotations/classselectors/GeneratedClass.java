@@ -1,6 +1,8 @@
 package de.japkit.metaannotations.classselectors;
 
-@ClassSelector(kind=ClassSelectorKind.GENERATED_CLASS)
+import de.japkit.metaannotations.Function;
+
+@Function(expr="#{genClass.asType()}")
 public @interface GeneratedClass {
 
 }

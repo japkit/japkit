@@ -4,10 +4,9 @@ import de.japkit.annotations.Behavior
 import de.japkit.el.ELSupport
 import de.japkit.metaannotations.Trigger
 import de.japkit.model.GenTypeElement
-import de.japkit.model.JavaEmitter
 import de.japkit.rules.AnnotationExtensions
 import de.japkit.rules.RuleFactory
-import de.japkit.rules.TypeResolver
+import de.japkit.rules.TriggerAnnotationRule
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.GenerateClassContext
@@ -137,7 +136,7 @@ class JapkitProcessor extends AbstractProcessor {
 		val classesToProcess = new HashSet(classesToProcessUnfiltered)
 
 		//Search for trigger annotations
-		val annotatedClassesAndTriggerAnnotations = classesToProcess.toInvertedMap[triggerAnnotations].filter[ac, t|
+		val annotatedClassesAndTriggerAnnotations = classesToProcess.toInvertedMap[triggerAnnotationsAndShadowFlag].filter[ac, t|
 			!t.empty]
 			
 		//type elements that ARE trigger annotations
@@ -192,7 +191,7 @@ class JapkitProcessor extends AbstractProcessor {
 		//defer remaining annotated classes to next round
 		annotatedClassesToDefer.forEach[deferredClasses.put(qualifiedName.toString, null)]
 
-		typesRegistry.cleanUpGenTypesAtEndOfRound //They refer types of current round and thus should not be used in next round, but re-generated. TODO: Really?
+		typesRegistry.cleanUpTypesAtEndOfRound //They refer types of current round and thus should not be used in next round, but re-generated. 
 
 		printDiagnosticMessage[
 			'''
@@ -212,7 +211,7 @@ class JapkitProcessor extends AbstractProcessor {
 	}
 	
 	def getLayer(TypeElement annotatedClass){
-		val layers = annotatedClass.annotationMirrors.map[metaAnnotation(Trigger)].filter[it!=null].map[value('layer', Integer)].toSet
+		val layers = annotatedClass.triggerAnnotations.map[metaAnnotation(Trigger)].map[value('layer', Integer)].toSet
 				
 		Collections.max(layers)
 		
@@ -240,16 +239,23 @@ class JapkitProcessor extends AbstractProcessor {
 		
 		annotatedClassesToDefer.addAll(higherLayerClassesInCurrentRound)
 		
+		
 		do {
+			printDiagnosticMessage(['''Loop begins'''])
 			writtenTypeElementsInCurrentLoop.clear
 		
 			//Add all deferred classes without unresolved dependencies
-			val annotatedClassesFromPreviousRoundWithNoDependencies = annotatedClassesToDefer.filter[
-				!hasUnresolvedTypeDependencies(it.qualifiedName.toString, emptySet)].filterLayer(layer)
+			//During first iteration of the round (no classes written yet), all deferred classes are considered,
+			// since there type problems could have been resolved by the compilation of the newly generated type after previous round.
+			val annotatedClassesFromPreviousIterationWithNoDependencies = annotatedClassesToDefer.filter[				
+				writtenTypeElementsInCurrentRound.isEmpty ||!hasUnresolvedTypeDependencies(it.qualifiedName.toString, emptySet)
+			].filterLayer(layer)
+			
+			
 			printDiagnosticMessage(
 				[
-					'''Annotated classes from previous rounds / iterations with no type dependencies: «annotatedClassesFromPreviousRoundWithNoDependencies»'''])
-			classesToProcess.addAll(annotatedClassesFromPreviousRoundWithNoDependencies)
+					'''Annotated classes from previous rounds / iterations with no type dependencies: «annotatedClassesFromPreviousIterationWithNoDependencies»'''])
+			classesToProcess.addAll( annotatedClassesFromPreviousIterationWithNoDependencies)
 			
 		
 			processClassesAndWriteTypeElements(classesToProcess, false, generatedTypeElementsInCurrentRound,
@@ -262,14 +268,19 @@ class JapkitProcessor extends AbstractProcessor {
 				writtenTypeElementsInCurrentLoop)
 		
 			classesToProcess = annotatedClassesToDefer.filterLayer(layer)
-			
-			//We had no progress up to now, since no source file has been written successfully.
-			//Thus, write the classes with permanent type errors now.
-			writeClassesWithPermanentTypeErrors(classesToProcess, generatedTypeElementsInCurrentRound, annotatedClassesToDefer,
-				writtenTypeElementsInCurrentLoop, false)
-		
+
+			if (writtenTypeElementsInCurrentLoop.empty && writtenTypeElementsInCurrentRound.empty && !classesToProcess.empty) {
+				// We had no progress up to now, since no source file has been written successfully wuthin the round.
+				// Thus, write the classes with permanent type errors now.
+				writeClassesWithPermanentTypeErrors(classesToProcess, generatedTypeElementsInCurrentRound,
+					annotatedClassesToDefer, writtenTypeElementsInCurrentLoop, false)
+
+			}
+
+			printDiagnosticMessage(['''Loop ends. Written: «writtenTypeElementsInCurrentLoop.map[qualifiedName]»'''])
+
 			writtenTypeElementsInCurrentRound.addAll(writtenTypeElementsInCurrentLoop)
-		
+
 			classesToProcess = new HashSet
 		
 		} while (!writtenTypeElementsInCurrentLoop.empty)
@@ -322,57 +333,61 @@ class JapkitProcessor extends AbstractProcessor {
 	
 
 	def writeClassesWithPermanentTypeErrors(
-		Set<TypeElement> classesToProcess,
-		Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
-		HashSet<TypeElement> annotatedClassesToDefer,
-		HashSet<GenTypeElement> writtenTypeElementsInCurrentRound,
-		boolean alsoWriteClassesThatDependOnUnknownTypes
-	) {
-		if (writtenTypeElementsInCurrentRound.empty && !classesToProcess.empty) {
+			Set<TypeElement> classesToProcess,
+			Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
+			HashSet<TypeElement> annotatedClassesToDefer,
+			HashSet<GenTypeElement> writtenTypeElementsInCurrentRound,
+			boolean alsoWriteClassesThatDependOnUnknownTypes
+		) {
 
-			//Those annotated classes have no dependency to other annotated classes. Thus, they have permanent type errors, that cannot be resolved by generating other classes. 
-			//Note: classes from cycles that have been resolved in the previous step are included here, since 
-			//the dependencies to the other annotated classes of the cycle have been removed.
+			// Those annotated classes have no dependency to other annotated classes. Thus, they have permanent type errors, that cannot be resolved by generating other classes. 
+			// Note: classes from cycles that have been resolved in the previous step are included here, since 
+			// the dependencies to the other annotated classes of the cycle have been removed.
 			val annotatedClassesWithUnresolvableTypeErrors = classesToProcess.filter [
-				!dependsOnOtherAnnotatedClasses(qualifiedName.toString) 
+				!dependsOnOtherAnnotatedClasses(qualifiedName.toString)
 			].toSet
 
 			if (!annotatedClassesWithUnresolvableTypeErrors.empty) {
-				messageCollector.printDiagnosticMessage[
+				messageCollector.printDiagnosticMessage [
 					'''
 						Consider classes with unresolvable type errors (alsoWriteClassesThatDependOnUnknownTypes = «alsoWriteClassesThatDependOnUnknownTypes»): 
 						«annotatedClassesWithUnresolvableTypeErrors.map[
 							'''«it» depends on: «unresolvableTypesOnWhichThatAnnotatedClassDependsOn(qualifiedName.toString, false)»'''].
 							join('\n')»
-					''']
-
-				val stillToGenerate = annotatedClassesWithUnresolvableTypeErrors.filter[
-					generatedTypeElementsInCurrentRound.get(it).nullOrEmpty]
-
-				stillToGenerate.forEach [
-					processAnnotatedClass.forEach[gen, org|
-						generatedTypeElementsInCurrentRound.getOrCreateSet(org).add(gen)]
+					'''
 				]
 
-				//Write the classes with permanent type errors, so we can continue (in next round) with classes that depend on them.
+				val stillToGenerate = annotatedClassesWithUnresolvableTypeErrors.filter [
+					generatedTypeElementsInCurrentRound.get(it).nullOrEmpty
+				]
+
+				stillToGenerate.forEach [
+					processAnnotatedClass.forEach [gen, org|
+						generatedTypeElementsInCurrentRound.getOrCreateSet(org).add(gen)
+					]
+				]
+
+				// Write the classes with permanent type errors, so we can continue (in next round) with classes that depend on them.
 				typesRegistry.throwTypeElementNotFoundExceptionWhenResolvingSimpleTypeNames = false
 
-				generatedTypeElementsInCurrentRound.filter[annotatedClass, genTypeElements|
-					annotatedClassesWithUnresolvableTypeErrors.contains(annotatedClass)].forEach [ annotatedClass, genTypeElements |
-					
+				generatedTypeElementsInCurrentRound.filter [annotatedClass, genTypeElements|
+					annotatedClassesWithUnresolvableTypeErrors.contains(annotatedClass)
+				].forEach [ annotatedClass, genTypeElements |
+
 					val genClassesNotWritten = newHashSet()
 					genTypeElements.forEach [
-						//If alsoWriteClassesThatDependOnUnknownTypes is false, we try to write as much of the generated classes as possible
-						//since there is still the chance that those classes will resolve the uknown dependency.
-						//For example, an AV might refer to an auxiliary class and the primary class uses this AV.
-						if(alsoWriteClassesThatDependOnUnknownTypes || !dependsOnUnknownTypes(annotatedClass.qualifiedName.toString, it.qualifiedName.toString)){
-							writeSourceFileAndCommitTypeElement(it, annotatedClass, writtenTypeElementsInCurrentRound)					
+						// If alsoWriteClassesThatDependOnUnknownTypes is false, we try to write as much of the generated classes as possible
+						// since there is still the chance that those classes will resolve the uknown dependency.
+						// For example, an AV might refer to an auxiliary class and the primary class uses this AV.
+						if (alsoWriteClassesThatDependOnUnknownTypes ||
+							!dependsOnUnknownTypes(annotatedClass.qualifiedName.toString, it.qualifiedName.toString)) {
+							writeSourceFileAndCommitTypeElement(it, annotatedClass, writtenTypeElementsInCurrentRound)
 						} else {
 							genClassesNotWritten.add(it)
-						}				
+						}
 					]
-					if(genClassesNotWritten.empty) {	
-				 		annotatedClassesToDefer.remove(annotatedClass)
+					if (genClassesNotWritten.empty) {
+						annotatedClassesToDefer.remove(annotatedClass)
 					}
 				]
 
@@ -381,7 +396,6 @@ class JapkitProcessor extends AbstractProcessor {
 			}
 
 		}
-	}
 
 	def processClassesWithCycles(Set<TypeElement> classesToProcess, Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
 		Set<TypeElement> annotatedClassesToDefer, HashSet<GenTypeElement> writtenTypeElementsInCurrentRound) {
@@ -462,7 +476,7 @@ class JapkitProcessor extends AbstractProcessor {
 						//TODO: Hier wirklich nochmal classesToProcess?
 						classesToProcess.exists [ otherAc |
 							typesRegistry.
-								hasGenericDependencyOnTriggerShadowAnnotation(ac, otherAc.triggerAnnotations.map[key])
+								hasGenericDependencyOnTriggerShadowAnnotation(ac, otherAc.triggerAnnotationsAndShadowFlag.map[key])
 						]
 					]
 				)
@@ -483,7 +497,7 @@ class JapkitProcessor extends AbstractProcessor {
 			finishedAnnotatedClasses.removeAll(annotatedClassesToDefer)
 
 			//Wake up or defer classes, that genrically depended on trigger annotations of processed classes
-			val processedTriggerAnnotations = finishedAnnotatedClasses.map[triggerAnnotations].flatten.toSet.map[key]
+			val processedTriggerAnnotations = finishedAnnotatedClasses.map[triggerAnnotationsAndShadowFlag].flatten.toSet.map[key]
 			val annotatedClassesDependingGenericallyOnProcessedTriggerAnnotations = typesRegistry.
 				getAnnotatedClassesDependingGenericallyOnThatTriggerAnnotations(processedTriggerAnnotations)
 			annotatedClassesToDefer.addAll(annotatedClassesDependingGenericallyOnProcessedTriggerAnnotations)
@@ -549,39 +563,51 @@ class JapkitProcessor extends AbstractProcessor {
 	}
 
 	def Map<GenTypeElement, TypeElement> processAnnotatedClass(TypeElement annotatedClass) {
-		val Map<GenTypeElement, TypeElement> generatedTopLevelClasses = newHashMap;
-
-		//Whatever messages we had so far - they will be re-created if the reason still exists
-		removeMessagesForAnnotatedClass(annotatedClass.qualifiedName.toString)
-
-		//Whatever type dependecies we had so far - they will be re-created. Especially UNKNOWN_TYPE dependencies might be replaced by normal ones
-		removeDependenciesForAnnotatedClass(annotatedClass.qualifiedName.toString)
-
+		try {
+			setCurrentAnnotatedClass(annotatedClass)
+			val Map<GenTypeElement, TypeElement> generatedTopLevelClasses = newHashMap;
+	
+			//Whatever messages we had so far - they will be re-created if the reason still exists
+			removeMessagesForAnnotatedClass(annotatedClass.qualifiedName.toString)
+	
+			//Whatever type dependecies we had so far - they will be re-created. Especially UNKNOWN_TYPE dependencies might be replaced by normal ones
+			removeDependenciesForAnnotatedClass(annotatedClass.qualifiedName.toString)
+	
+			
+			processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]		
+			
+	
+			//TODO: Reconsider. Is @Behavior considered as Trigger Annotation or as something else?
+			//generatedTopLevelClasses.putAll(processBehaviorAnnotation(annotatedClass))
+			generatedTopLevelClasses
 		
-		processTriggerAnnotations(annotatedClass).forEach[generatedTopLevelClasses.put(it, annotatedClass)]		
-		
-
-		//TODO: Reconsider. Is @Behavior considered as Trigger Annotation or as something else?
-		//generatedTopLevelClasses.putAll(processBehaviorAnnotation(annotatedClass))
-		generatedTopLevelClasses
+		} finally {
+			setCurrentAnnotatedClass(null)
+		}
 	}
 
 
 	def private Set<GenTypeElement> processTriggerAnnotations(TypeElement annotatedClass) {
-		
-		val triggerAnnotations = getTriggerAnnotations(annotatedClass)
 
-		triggerAnnotations.filter[!value].map [ 
-			val triggerAnnotationRule = createTriggerAnnotationRule(it.key.annotationAsTypeElement)
-			triggerAnnotationRule.processTriggerAnnotation(annotatedClass, it.key)		
+		val triggerAnnotations = getTriggerAnnotationsAndShadowFlag(annotatedClass)
+
+		triggerAnnotations.filter[!value].map [
+			var TriggerAnnotationRule triggerAnnotationRule
+			try {
+				triggerAnnotationRule = createTriggerAnnotationRule(it.key.annotationAsTypeElement)
+			} catch (TypeElementNotFoundException tenfe) {
+				handleTypeElementNotFound('''Type «tenfe.fqn» not found when creating trigger annotation rule «it.key.annotationType.qualifiedName»''',
+					tenfe.fqn)
+			}
+			triggerAnnotationRule?.processTriggerAnnotation(annotatedClass, it.key) ?: emptySet
 		].flatten.toSet
 
 	}
 	
 	
 	//TODO: Some Caching.
-	def List<Pair<AnnotationMirror, Boolean>> getTriggerAnnotations(TypeElement annotatedClass) {
-		annotatedClass.annotationsWithMetaAnnotation(Trigger).map[it -> it.shadowAnnotation].toList
+	def List<Pair<AnnotationMirror, Boolean>> getTriggerAnnotationsAndShadowFlag(TypeElement annotatedClass) {
+		annotatedClass.triggerAnnotations.map[it -> it.shadowAnnotation].toList
 	}
 
 	val Set<String> writtenTypeElements = newHashSet
@@ -590,9 +616,9 @@ class JapkitProcessor extends AbstractProcessor {
 		printDiagnosticMessage['''Try to write source file: «typeElement.qualifiedName»''']
 
 		if (!writtenTypeElements.contains(typeElement.qualifiedName.toString)) {
-			val emitter = new JavaEmitter()
+			val emitter = new JavaEmitter(typeElement)
 
-			var code = emitter.compilationUnit(typeElement);
+			var code = emitter.compilationUnit();
 
 			//code = formatCode(code)
 			val file = filer.createSourceFile(typeElement.qualifiedName, orgClass);

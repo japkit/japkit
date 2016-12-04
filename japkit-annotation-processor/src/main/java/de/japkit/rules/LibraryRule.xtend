@@ -30,7 +30,7 @@ class LibraryRule extends AbstractRule implements Procedure0 {
 	}
 	
 	def boolean mayBePutOntoValueStack(Rule rule){
-		if(rule instanceof TypeRule){  //TODO: This is kind of deprecated since @Var can be used instead. Mabe for corner cases, an "empty" @Var might be required to refer to an existing Var
+		if(rule instanceof ClassSelectorRule){  //TODO: This is kind of deprecated since @Var can be used instead. Mabe for corner cases, an "empty" @Var might be required to refer to an existing Var
 			!rule.isVarRef
 		} 
 		else !(rule instanceof ELVariableRule) //VarRules are not put as functions onto ValueStack, but their actual value is explicitely put onto value stack.

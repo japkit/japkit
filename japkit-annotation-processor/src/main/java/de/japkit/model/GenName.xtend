@@ -5,25 +5,25 @@ import org.eclipse.xtend.lib.annotations.Data
 
 @Data
 class GenName implements Name {
-	CharSequence charSequence
+	String name
 	
 	override contentEquals(CharSequence cs) {
-		charSequence.toString == cs.toString
+		name == cs.toString
 	}
 	
 	override charAt(int index) {
-		charSequence.charAt(index)
+		name.charAt(index)
 	}
 	
 	override length() {
-		charSequence.length
+		name.length
 	}
 	
 	override subSequence(int start, int end) {
-		charSequence.subSequence(start, end)
+		name.subSequence(start, end)
 	}
 
 	override toString(){
-		charSequence.toString
+		name
 	}	
 }

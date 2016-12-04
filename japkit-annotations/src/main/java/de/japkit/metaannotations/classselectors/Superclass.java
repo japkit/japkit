@@ -1,11 +1,13 @@
 package de.japkit.metaannotations.classselectors;
 
+import de.japkit.metaannotations.Function;
+
 /**
  * To use variable "superclass" on valueStack as type.
  * @author stefan
  *
  */
-@ClassSelector(kind=ClassSelectorKind.EXPR, expr="#{superclass}" )
+@Function(expr="#{superclass}" )
 public @interface Superclass {
 
 }

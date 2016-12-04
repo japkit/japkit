@@ -112,7 +112,7 @@ class BehaviorDelegationRule extends AbstractRule {
 					new GenInterface(c.simpleName + internalInterfaceName, c.package) => [
 						//remember that we have created a new top level class so that it can be found
 						//and rendered later.
-						c.auxTopLevelClasses.add(it)
+						currentPrimaryGenClass.auxTopLevelClasses.add(it)
 						registerGeneratedTypeElement(it, currentAnnotatedClass, null)
 					]
 				}
@@ -254,7 +254,7 @@ class BehaviorDelegationRule extends AbstractRule {
 					null
 				}
 			
-			if(te!=null){
+			if(te!=null && !(tm instanceof GenUnresolvedType)){
 				//The class has already been created by the user.
 				// Nevertheless create a proxy to provide a place to add expected interfaces and superclasses. 
 				val proxy = new GenClass(te.simpleName)

@@ -12,19 +12,21 @@ import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
+import static extension de.japkit.rules.RuleUtils.withPrefix
+
 @Data
 class AnnotationValueMappingRule extends AbstractRule{
 
 	()=>boolean activationRule
 	String name
-	String value
+	Object value
 	String expr
 	String lang
-	String annotationMappingId
+	()=>AnnotationMappingRule lazyAnnotationMapping
 	AVMode mode
 
 
-	def GenAnnotationValue mapAnnotationValue(GenAnnotationMirror annotation, TypeMirror avType, Map<String, AnnotationMappingRule> mappingsWithId) {
+	def GenAnnotationValue mapAnnotationValue(GenAnnotationMirror annotation, TypeMirror avType) {
 		inRule[
 			//existing value (without considering defaults!)
 			val existingValue = annotation?.getValueWithoutDefault(name)
@@ -53,17 +55,14 @@ class AnnotationValueMappingRule extends AbstractRule{
 			}
 	
 			val v = 
-				if (!value.nullOrEmpty) {
+				if (value !=null) {
 					coerceAnnotationValue(value, avType)
-				} else if (!annotationMappingId.nullOrEmpty){
-					val annotationMapping = mappingsWithId?.get(annotationMappingId)
-					if(annotationMapping==null){
-						throw new IllegalArgumentException('''Annotation rule with id «annotationMappingId» not found.''')
-					}
-					if(expr.nullOrEmpty){
-						
+				} else if (lazyAnnotationMapping!=null){
+					val annotationMapping = lazyAnnotationMapping.apply
+					
+					if(expr.nullOrEmpty){						
 							val annotations = newArrayList 
-							annotationMapping.mapOrCopyAnnotations(annotations, mappingsWithId)
+							annotationMapping.mapOrCopyAnnotations(annotations)
 							if(!annotations.empty){
 								coerceAnnotationValue(annotations.head, avType)
 							} else {
@@ -71,11 +70,12 @@ class AnnotationValueMappingRule extends AbstractRule{
 							}
 						
 					} else {
+						//TODO: Warum wird hier über expr iteriert? Für soetwas sollte src verwendet werden...
 						val elements = eval(expr, lang, Iterable) as Iterable<Element>  //TODO: Check if instanceof element
 						val annotations = newArrayList 
 						elements.forEach[
 							scope(it)[
-								annotationMapping.mapOrCopyAnnotations(annotations, mappingsWithId)
+								annotationMapping.mapOrCopyAnnotations(annotations)
 								null
 							]
 						]
@@ -87,8 +87,8 @@ class AnnotationValueMappingRule extends AbstractRule{
 				} else {
 	
 					//messager.printMessage(Kind.ERROR, '''Either 'value' or 'expr' must be set.''', am)
-					throw new IllegalArgumentException(
-						"Error in annotation value mapping: Either 'value' or 'expr' or 'annotationMappingId'must be set.")
+					//throw new IllegalArgumentException(
+					//	"Error in annotation value mapping: Either 'value' or 'expr' or 'annotationMappingId'must be set.")
 				}
 	
 			if(v==null){
@@ -118,15 +118,44 @@ class AnnotationValueMappingRule extends AbstractRule{
 	}
 
 
-	new(AnnotationMirror a) {
+	new(AnnotationMirror a,  Map<String, AnnotationMappingRule> mappingsWithId) {
 		super(a, null)
 		name = a.value(null, "name", String)
 		value = a.value(null, "value", String)
 		expr = a.value(null, "expr", String)
 		lang = a.value(null, "lang", String)
 		mode = a.value(null, "mode", AVMode)
-		annotationMappingId = a.value(null, "annotationMappingId", String)
+		val annotationMappingId = a.value(null, "annotationMappingId", String)
+		lazyAnnotationMapping = if(annotationMappingId.nullOrEmpty) null else [| 
+			val amr = mappingsWithId.get(annotationMappingId)
+			if(amr==null){
+				throw new IllegalArgumentException("Annotation Mapping with id "+annotationMappingId+" not found");
+			}
+			amr
+		]
 		activationRule = createActivationRule(a, null)
+
+	}
+	
+	new(AnnotationMirror a,  Element templateElement, String avName) {
+		super(a, templateElement)
+		name = avName
+		value = a.value(avName, Object)
+		
+		val avPrefix = avName+'_'
+		expr = a.value("expr".withPrefix(avPrefix), String)
+		lang = a.value("lang".withPrefix(avPrefix), String)
+		mode = AVMode.JOIN_LIST
+		
+		
+		val annotationMappingAnnotation =  a.value(avPrefix, AnnotationMirror)
+		
+		lazyAnnotationMapping = if (annotationMappingAnnotation == null) null else {
+			val amr = new AnnotationMappingRule(annotationMappingAnnotation, templateElement);
+			[| amr]
+		}
+		
+		activationRule = createActivationRule(a, avPrefix)
 
 	}
 }

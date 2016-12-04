@@ -15,15 +15,16 @@ import javax.lang.model.element.TypeElement
 @Data
 class CaseRule<T> extends AbstractRule implements Function0<T>, ICodeFragmentRule {
 
-	ExpressionOrFunctionCallRule<Boolean> conditionRule
+	()=>Boolean conditionRule
 	ExpressionOrFunctionCallRule<T> valueRule
 	List<TypeElement> otherAnnotationTypes
 
-	new(AnnotationMirror metaAnnotation, Element metaElement, Class<? extends T> type) {
+	new(AnnotationMirror metaAnnotation, Element metaElement, Class<? extends T> type, boolean isDefaultCase) {
 		super(metaAnnotation, metaElement)
 
-		conditionRule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, "cond", "condLang",
+		conditionRule = if(isDefaultCase) [true] else ExpressionOrFunctionCallRule.ruleOrNullIfUndefined(metaAnnotation, null, Boolean, "cond", "condLang",
 			"condFun", null, null, false, ExpressionOrFunctionCallRule.AND_COMBINER)
+		
 
 		this.valueRule = new ExpressionOrFunctionCallRule<T>(metaAnnotation, metaElement, type, "value", "valueLang",
 			"valueFun", null, null, false, null);
@@ -38,10 +39,10 @@ class CaseRule<T> extends AbstractRule implements Function0<T>, ICodeFragmentRul
 	def shallBeApplied() {
 		inRule[
 			handleException([false], null) [
-				val condition = if(!conditionRule.undefined) conditionRule.apply 
+				val condition = conditionRule?.apply ?: 
 					
-					else  {
-						//If the condition of the case annotion is "empty", look for the first annotation that represent a funtion and call it as a boolean function
+					{
+						//If the condition of the case annotation is "empty", look for the first annotation that represent a funtion and call it as a boolean function
 						//This is done here, since createFunctionRule within constructor creates some cyclic dependedencies and/or stackoverflow in Xtend
 						var Pair<TypeElement, IParameterlessFunctionRule<?>> typeAndFunction
 						try {

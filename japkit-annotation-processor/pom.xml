@@ -4,23 +4,35 @@
 	<parent>
 		<groupId>com.github.stefanocke.japkit</groupId>
 		<artifactId>japkit-xtend-parent</artifactId>
-		<version>1.0.5</version>
+		<version>1.1.0</version>
 		<relativePath>../japkit-xtend-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>japkit-annotation-processor</artifactId>
 	<name>Japkit Annotation Processor</name>
 	<description>Contains the generic annotation processor that is driven by code templates with meta-annotations from japkit-annotations.</description>
 
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<!-- Prevent the processor from running -->
+					<compilerArgument>-proc:none</compilerArgument>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-active-annotations</artifactId>
-			<version>1.0.5</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-annotations</artifactId>
-			<version>1.0.5</version>
+			<version>1.1.0</version>
 		</dependency>
 
 		<dependency>

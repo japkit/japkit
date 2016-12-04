@@ -1,4 +1,4 @@
-package de.japkit.model
+package de.japkit.processor
 
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
@@ -27,44 +27,70 @@ import org.eclipse.xtend2.lib.StringConcatenation
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 
-class JavaEmitter implements EmitterContext{
+class JavaEmitter implements de.japkit.model.EmitterContext{
 
-	//TODO: Refactoring
 	extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
 	extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions) 
 	
 	
-	def importIfPossibleAndGetNameForCode(String shortName, String fqn) {
-		if(importIfPossible(shortName, fqn)){
+	def CharSequence importIfPossibleAndGetNameForCode(TypeElement te, String shortName, String fqn) {
+		if (importIfPossible(shortName, fqn)) {
 			shortName
+		} else if (te != null && te.enclosingElement instanceof TypeElement) {
+			//If it is an inner class that cannot be imported, try to import the enclosing class
+			val enclosing = te.enclosingElement as TypeElement;
+			importIfPossibleAndGetNameForCode(enclosing, enclosing.simpleName.toString, enclosing.qualifiedName.toString)+"."+shortName;
 		} else {
 			fqn
 		}
 	}
 	
 	def importIfPossible(String shortName, String fqn) {
-		if(!imports.containsKey(shortName)){
+		if(!imports.containsKey(shortName) && !isShadowedOrDeclared(currentTypeElement.get, shortName)){
 			imports.put(shortName, fqn)
 		}
-		fqn.equals(imports.get(shortName))	
+		fqn.equals(imports.get(shortName)) || isDeclaredAndVisible(currentTypeElement.get, shortName, fqn);
+	}
+	
+	//Is there any type with the same short name declared in the namespace or in enclosing namespaces? 
+	//If so, there should be no import statement.
+	def boolean isShadowedOrDeclared(TypeElement namespace, String shortName) {
+		namespace.declaredTypes.exists[simpleName.toString.equals(shortName)] || 
+			namespace.enclosingElement instanceof TypeElement &&  isShadowedOrDeclared(namespace.enclosingElement as TypeElement, shortName)
+	}
+	
+	//Is the type defined in the namespace or in enclosing namespaces and it is not shadowed? If so, the short name can be used to refer to the type.
+	def boolean isDeclaredAndVisible(TypeElement namespace, String shortName, String fqn) {
+		val candidate = namespace.declaredTypes.findFirst[simpleName.toString.equals(shortName)] 
+		
+		if(candidate == null){
+			namespace.enclosingElement instanceof TypeElement &&  isDeclaredAndVisible(namespace.enclosingElement as TypeElement, shortName, fqn)
+		} else if(candidate.qualifiedName.toString.equals(fqn))	{
+			true;
+		} else false;
+						
 	}
 	
 	
 	//key is short name, value is fqn
 	public val Map<String, String> imports = newHashMap()
 	
+	private TypeElement rootTypeElement;
 	
+	new(TypeElement rootTypeElement){
+		this.rootTypeElement = rootTypeElement;
+	}
 	/**
 	 * creates the code for the compilation unit for one type element.
 	 */
-	def compilationUnit(TypeElement typeElement){
-		val packageName = typeElement.enclosingPackageName
+	def compilationUnit(){
+		val packageName = rootTypeElement.enclosingPackageName
 		
-		val typeDecl = code(typeElement)  //Instead of importsPlaceholder, we could let the methods register their type fqns...
+		val typeDecl = code(rootTypeElement)  //Note: This registers the required imports
 		'''
 		package «packageName»;
-		«importStatements(typeElement)»
+		«importStatements(rootTypeElement)»
 
 		«typeDecl»
 		'''
@@ -72,7 +98,7 @@ class JavaEmitter implements EmitterContext{
 	
 	def importStatements(TypeElement rootTypeElement){
 		val fqnsToImport = imports.filter[shortName, fqn | 
-			!fqn.startsWith("java.lang") &&
+			!fqn.isImplicitelyImported &&
 			!fqn.equals('''«rootTypeElement.qualifiedName».«shortName»'''.toString) //No import statements for inner types
 		].values
 		
@@ -83,6 +109,11 @@ class JavaEmitter implements EmitterContext{
 		import «i»;
 		«ENDFOR»
 		'''
+	}
+	
+	def boolean isImplicitelyImported(String fqn) {
+		//java.lang.*
+		fqn.startsWith("java.lang.") && !fqn.substring("java.lang.".length).contains('.')
 	}
 	
 	//TODO: Make configurable
@@ -99,7 +130,10 @@ class JavaEmitter implements EmitterContext{
 		importOrder.map[fqnsToImportByGroup.get(it) ?: emptySet].flatten.toList
 	}
 	
+	ThreadLocal<TypeElement> currentTypeElement = new ThreadLocal<TypeElement>();
+	
 	def dispatch CharSequence code(TypeElement typeElement){
+		currentTypeElement.set(typeElement)
 		switch typeElement.kind {
 			case ElementKind.CLASS: codeForClass(typeElement)
 			case ElementKind.INTERFACE: codeForInterface(typeElement)
@@ -160,7 +194,7 @@ class JavaEmitter implements EmitterContext{
 		'''
 	}
 	
-	def dispatch docCommentCode(GenElement element){
+	def dispatch docCommentCode(de.japkit.model.GenElement element){
 		if(element.comment == null) '''''' else '''/** «element.comment» */'''
 	}
 	
@@ -184,11 +218,11 @@ class JavaEmitter implements EmitterContext{
 		}
 		
 		val type = asType
-		val constantExpr = field.constantExpressionCode
+		val constantExpr = field.constantExpressionCode?.toString
 		'''
 		«field.docCommentCode»
 		«field.annotationsCode»
-		«field.modifiersCode»«type.typeRef» «simpleName»«IF constantExpr!=null» = «constantExpr»«ENDIF»;
+		«field.modifiersCode»«type.typeRef» «simpleName»«IF !constantExpr.nullOrEmpty» = «constantExpr»«ENDIF»;
 		'''
 		
 	}
@@ -197,7 +231,7 @@ class JavaEmitter implements EmitterContext{
 		field.constantValue?.constantExpression
 	}
 	
-	def dispatch constantExpressionCode(GenField field){
+	def dispatch constantExpressionCode(de.japkit.model.GenField field){
 		field.constantExpr?.code(this)
 	}
 	
@@ -250,7 +284,7 @@ class JavaEmitter implements EmitterContext{
 	
 	
 	
-	def dispatch codeForBody(GenExecutableElement e){
+	def dispatch codeForBody(de.japkit.model.GenExecutableElement e){
 		if (e.body != null){ 
 			e.body.code(this)
 		} else {
@@ -287,7 +321,8 @@ class JavaEmitter implements EmitterContext{
 		"Object"
 	}
 	
-	def dispatch CharSequence typeRef(DeclaredType type){
+	def dispatch CharSequence typeRef(DeclaredType type){	
+		
 		val rawType = if(type.erasure instanceof ErrorType){
 			//The type itself is an error type
 			val simpleName =  type.erasure.simpleNameForErrorType   
@@ -295,11 +330,12 @@ class JavaEmitter implements EmitterContext{
 //				throw new IllegalArgumentException('''Error type name «simpleName» is unexpectedly qualified.''');
 //			}
 			val fqn =  typesRegistry.tryToGetFqnForErrorType(type.erasure)
-			importIfPossibleAndGetNameForCode(simpleName, fqn)
+			importIfPossibleAndGetNameForCode(null, simpleName, fqn)
 		} else {
 			//One of the type args is an error type
 			val te = type.erasure.asTypeElement
-			importIfPossibleAndGetNameForCode(te.simpleName.toString, te.qualifiedName.toString)
+			
+			importIfPossibleAndGetNameForCode(te, te.simpleName.toString, te.qualifiedName.toString)
 		}
 		val result = '''«rawType»«FOR a : type.typeArguments BEFORE '<' SEPARATOR ', '  AFTER '>'»«a.typeRef»«ENDFOR»'''  //TODO: ? extends ... usw
 		
@@ -329,7 +365,8 @@ class JavaEmitter implements EmitterContext{
 		if (type == null) {
 			"void"
 		} else {
-			staticTypeRef(type.simpleName.toString, type.qualifiedName.toString)
+			val te =  if(type instanceof DeclaredType &&!(type instanceof ErrorType)) type.asTypeElement else null;
+			importIfPossibleAndGetNameForCode(te, type.simpleName.toString, type.qualifiedName.toString)
 		}
 	}
 	
@@ -337,16 +374,8 @@ class JavaEmitter implements EmitterContext{
 		importIfPossible(type.simpleName.toString, type.qualifiedName.toString)
 	}
 	
-	override staticTypeRef(Class<?> clazz){
-		staticTypeRef(clazz.simpleName, clazz.name)
-	}
-	
-	def staticTypeRef(String shortName, String fqn){
-		importIfPossibleAndGetNameForCode(shortName, fqn)
-	}
-	
 	def staticTypeRef(TypeElement type){
-		staticTypeRef(type.simpleName.toString, type.qualifiedName.toString)
+		importIfPossibleAndGetNameForCode(type, type.simpleName.toString, type.qualifiedName.toString)
 	}
 	
 	def private enclosedElementsCode(Element element){

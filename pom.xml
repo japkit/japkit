@@ -6,7 +6,7 @@
 	<groupId>com.github.stefanocke.japkit</groupId>
 	<artifactId>japkit-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0.5</version>
+	<version>1.1.0</version>
 	<name>Japkit Parent</name>
 
 	<description>A declarative approach to writing Java annotation processors.</description>
@@ -55,6 +55,7 @@
 		<module>japkit-juel</module>
 		<module>japkit-groovy</module>
 		<module>japkit-all</module>
+		<module>japkit-annotationtemplates</module>
 	</modules>
 
 	<properties>
@@ -64,12 +65,12 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.5.1</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
-					<!-- We always use maven-processor-plugin to run the anntoation processor. -->
-					<compilerArgument>-proc:none</compilerArgument>
+					<generatedSourcesDirectory>${project.build.directory}/src/main/generated-sources</generatedSourcesDirectory>
+					<generatedTestSourcesDirectory>${project.build.directory}/src/main/generated-test-sources</generatedTestSourcesDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
