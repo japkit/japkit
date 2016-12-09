@@ -159,6 +159,47 @@ As you can see, the code template is easier to read. Even the `@Method` annotati
 
 To make this work it is important not to forget the `@RuntimeMetadata` annotation: JavaDoc comments are not available in class files. `@RuntimeMetadata` triggers the generation of additional metadata files that provide comments for a template class at runtime (that is, when the source code of the template class is not available to japkit).
 
+Our `toString()` is not satisfying yet. Instead of just returning "A Person." we want to concatenate the properties of the DTO. 
+This can be done the following way:
+
+```Java
+@Clazz(nameSuffixToAppend = "DTO")
+@RuntimeMetadata
+public class DTOTemplate implements SrcInterface {
+	//...
+	
+	/**
+	 * @japkit.bodyBeforeIteratorCode return "#{src.simpleName} {"+
+	 * @japkit.bodyCode "#{name}=" + #{name} +
+	 * @japkit.bodySeparator ", " +
+	 * @japkit.bodyAfterIteratorCode "}";
+	 */
+	@Method(bodyIterator = "#{properties}", bodyIndentAfterLinebreak=true)
+	@Override
+	public String toString() {
+		return null;
+	}
+}
+```
+
+- The `bodyIterator` says we eant to iterate over the properties of the source class when generating the method body.
+- The `bodyBeforeIteratorCode` and `bodyAfterIteratorCode` is the code to be generate before and after we iterate.
+- The `bodyCode` is the one to be generates for each element in the iteration. So we get `"#{name}=" + #{name} +` for each property of the source class.
+- The `bodySeparator` is the code to generate between the iterations, but not before the first one and after the last one.
+
+With the template above we get the following in PersonDTO:
+
+```Java
+@Override
+public String toString(){
+	return "Person {"+
+		"age=" + age +", " +
+		"name=" + name +"}";
+	}
+```
+
+There is a bunch of other ways to generate more complex method body code in japkit. For example, you can define reusable CodeFragments or you can even use Groovy templates.
+
 
 What next?
 ----------
