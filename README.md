@@ -112,7 +112,7 @@ public class DTOTemplate implements SrcInterface {
 ```
 
 With this, a `toString()` method is generated in PersonDTO (if not immediately, try a clean build). However, there is a compiler error, since the generated method has no body, yet. 
-Why? Annoation processors cannot access the statements in a method body. So the `return null;` above is just a dummy. Even if Japkit could access the method bodies of the template classes, it would be of little use, since it is nearly impposible to write valid Java statements that contain template expressions.
+Why? Annoation processors cannot access the statements in a method body. So the `return null;` above is just a dummy. Even if japkit could access the method bodies of the template classes, it would be of little use, since it is nearly impossible to write valid Java statements that contain template expressions.
 
 One way to go is to write the code template as annotation value:
 
