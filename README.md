@@ -10,7 +10,7 @@ Japkit is an annotation processor that allows to develop Java code generators by
 Huh?
 Okay, an example will help... We will develop a code generator for a simple DTO. The full example can be found [here](https://github.com/stefanocke/japkit-examples/tree/master/japkit-examples-simpledto).
 
-Consider the following class:
+Consider the following interface:
 
 ```Java
 @DTO
@@ -51,7 +51,7 @@ public class DTOTemplate implements SrcInterface {
 - `@RuntimeMetadata` should be on every template class. It is again some ceremony of japkit.
 - The template implements the interface `SrcInterface`. This is a so called type function that means "use the type of the source here". The source is again Person in our example. So, the generated PersonDTO will implement the Person interface.
 - `@Field` tells to generate a field
-- `src` is a JavaEL expression that defines from which source the field is generated from. Src is the current source element (the class Person), so `#{src.properties}` means "all properties of class Person". Since this is a collection, a field will be generated for every element in the collection, that is for every property of class Person.
+- `src` is a JavaEL expression that defines the source the field is generated from. Src is the current source element (the class Person), so `#{src.properties}` means "all properties of class Person". Since this is a collection, a field will be generated for every element in the collection, that is for every property of class Person.
  - The src is a [TypeElement](https://docs.oracle.com/javase/8/docs/api/javax/lang/model/element/TypeElement.html) here. TypeElement does not have any property with the name "properties". However, "properties" is some convinience property that japkit provides for TypeElements in EL expressions.
 - You can generate arbitrary methods with japkit, but getters and setters are so common, that there are convinient `@Getter` and `@Setter` annotations to generate the accessor methods for a field. They allow for some customization, for example fluent setters. But we don't us this feature here.
 - Next you see, how the generated field should look like. It is private and it shall have the type and name of the source element (the property of Person).
