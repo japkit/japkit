@@ -182,7 +182,7 @@ public class DTOTemplate implements SrcInterface {
 }
 ```
 
-- The `bodyIterator` says we eant to iterate over the properties of the source class when generating the method body.
+- The `bodyIterator` says we want to iterate over the properties of the source class when generating the method body.
 - The `bodyBeforeIteratorCode` and `bodyAfterIteratorCode` is the code to be generate before and after we iterate.
 - The `bodyCode` is the one to be generates for each element in the iteration. So we get `"#{name}=" + #{name} +` for each property of the source class.
 - The `bodySeparator` is the code to generate between the iterations, but not before the first one and after the last one.
