@@ -195,7 +195,7 @@ public String toString(){
 	return "Person {"+
 		"age=" + age +", " +
 		"name=" + name +"}";
-	}
+}
 ```
 
 There is a bunch of other ways to generate more complex method body code in japkit. For example, you can define reusable CodeFragments or you can even use Groovy templates.
