@@ -1,9 +1,9 @@
 package de.japkit.rules
 
 import de.japkit.el.ElVariableError
-import de.japkit.services.RuleException
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data
@@ -12,13 +12,15 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 	String name
 	boolean ifEmpty
 	()=>Object exprOrFunctionCallRule
+	Class<?> beanClass
+	boolean createBeanInstance
 
 	new(AnnotationMirror elVarAnnotation, Element metaElement) {
 		super(elVarAnnotation, null)
 		val nameFromAV = elVarAnnotation.value("name", String);
 		name = if(nameFromAV.nullOrEmpty) metaElement?.simpleName?.toString?.toFirstLower else nameFromAV
 		if(name.nullOrEmpty){
-			throw new RuleException("Either the name annotation value must be set or the @Var annotation must be used at a member of a class.");
+			throwRuleCreationException("Either the name annotation value must be set or the @Var annotation must be used at a member of a class.");
 		}
 		
 		ifEmpty = elVarAnnotation.value("ifEmpty", Boolean);
@@ -29,6 +31,18 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 			"expr", "fun", "lang", "filter", "filterFun", "collect", "collectFun", "toSet", "groupBy", "groupByFun", "type", null,
 			[|currentSrc], nullable, "unique"
 		)
+		
+		
+		var beanType = elVarAnnotation.value("bean", TypeElement)		
+		createBeanInstance = beanType != null;	
+		beanType = beanType?: elVarAnnotation.value("beanClass", TypeElement)	
+			
+		beanClass = try{	
+			if(beanType != null) ELVariableRule.classLoader.loadClass(beanType.qualifiedName.toString) else null;		
+		} catch (ClassNotFoundException cnfe) {
+			throwRuleCreationException("The class could not be loaded from annotation processor's classpath:" + cnfe.message);	
+			null
+		}
 		
 	}
 
@@ -46,7 +60,10 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 	
 	def Object eval(Object src) {
 		inRule[
-			exprOrFunctionCallRule.apply
+			if (beanClass != null) {
+				if(createBeanInstance) beanClass.newInstance else beanClass;
+			} else
+				exprOrFunctionCallRule.apply
 		]
 	}
 	

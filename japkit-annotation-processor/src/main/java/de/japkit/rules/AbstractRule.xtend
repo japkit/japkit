@@ -11,6 +11,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
+import de.japkit.services.RuleException
 
 @Data
 class AbstractRule implements Rule {
@@ -25,18 +26,27 @@ class AbstractRule implements Rule {
 	
 	AnnotationMirror metaAnnotation
 	Element metaElement
+	RuleException[] ruleCreationException = #[null]; 
 	
 	
 	def protected <T> T inRule((Object)=>T closure){
 		
 		pushCurrentRule(this)
 		try{
+			//Throw Exceptions during rule creation here to get proper error reporting
+			if(ruleCreationException.get(0)!=null){
+				throw ruleCreationException.get(0);
+			}
 			metaElement?.registerMetaTypeElement
 			
 			closure.apply(null)			
 		} finally{
 			popCurrentRule
 		}
+	}
+	
+	def protected void throwRuleCreationException(String msg) {
+		ruleCreationException.set(0, new RuleException(msg));		
 	}
 	
 	//registers the dependency from the rule's meta type element to the current trigger annotation.
