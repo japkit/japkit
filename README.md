@@ -35,7 +35,7 @@ public @interface DTO {
 - The annotation value `shadow` is some ceremony required by japkit that you can ignore for the moment. 
 - We could define some more annotation values here to make the code generator configurable, but we don't need that yet.
 
-Generate Fields an Accessors
+Generate Fields and Accessors
 ----------------------------
 
 Let's look at the most interesting part, the DTOTemplate:
