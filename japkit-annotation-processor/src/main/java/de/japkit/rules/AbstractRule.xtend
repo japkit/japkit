@@ -33,13 +33,15 @@ class AbstractRule implements Rule {
 		
 		pushCurrentRule(this)
 		try{
-			//Throw Exceptions during rule creation here to get proper error reporting
-			if(ruleCreationException.get(0)!=null){
-				throw ruleCreationException.get(0);
-			}
-			metaElement?.registerMetaTypeElement
-			
-			closure.apply(null)			
+			handleException(null, null) [
+				//Throw Exceptions during rule creation here to get proper error reporting
+				if(ruleCreationException.get(0)!=null){
+					throw ruleCreationException.get(0);
+				}
+				metaElement?.registerMetaTypeElement
+				
+				closure.apply(null)				
+			]	
 		} finally{
 			popCurrentRule
 		}
