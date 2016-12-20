@@ -32,18 +32,21 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 			[|currentSrc], nullable, "unique"
 		)
 		
-		
-		var beanType = elVarAnnotation.value("bean", TypeElement)		
+		var beanType = elVarAnnotation.loadClassFromAV("bean")		
 		createBeanInstance = beanType != null;	
-		beanType = beanType?: elVarAnnotation.value("beanClass", TypeElement)	
-			
-		beanClass = try{	
-			if(beanType != null) ELVariableRule.classLoader.loadClass(beanType.qualifiedName.toString) else null;		
+		beanType = beanType?: elVarAnnotation.loadClassFromAV("beanClass")
+		beanClass = beanType
+		
+	}
+	
+	def private Class<?> loadClassFromAV(AnnotationMirror am, String avName) {
+		val fqn = am.value(avName, TypeElement)?.qualifiedName?.toString
+		try{	
+			if(fqn != null) ELVariableRule.classLoader.loadClass(fqn) else null;		
 		} catch (ClassNotFoundException cnfe) {
-			throwRuleCreationException("The class could not be loaded from annotation processor's classpath:" + cnfe.message);	
+			throwRuleCreationException("The class could not be loaded from annotation processor's classpath:" + cnfe.message, avName);	
 			null
 		}
-		
 	}
 
 	def void putELVariable() {

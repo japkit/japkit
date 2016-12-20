@@ -51,6 +51,10 @@ class AbstractRule implements Rule {
 		ruleCreationException.set(0, new RuleException(msg));		
 	}
 	
+	def protected void throwRuleCreationException(String msg, String avName) {
+		ruleCreationException.set(0, new RuleException(msg, avName));		
+	}
+	
 	//registers the dependency from the rule's meta type element to the current trigger annotation.
 	//This is necessary to determine the classes to re-generate, when a meta type element.
 	//A more appropriate place for this registration would be at construction time, but due to rule caching and reuse,
