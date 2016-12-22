@@ -1,6 +1,7 @@
 package de.japkit.el
 
 import de.japkit.model.EmitterContext
+import de.japkit.rules.AbstractFunctionRule
 import de.japkit.rules.JavaBeansExtensions
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
@@ -12,14 +13,13 @@ import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
+import org.apache.commons.lang3.reflect.FieldUtils
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.japkit.services.ExtensionRegistry.*
-import javax.lang.model.type.DeclaredType
-import de.japkit.rules.AbstractFunctionRule
-import java.util.ArrayList
 
 class ElExtensions {
 
@@ -53,6 +53,12 @@ class ElExtensions {
 		e.srcType.singleValueType
 	}
 	
+	/**
+	 * name as alias for getSimpleName().toString().
+	 */
+	def static getName(Element e) {
+		e.simpleName.toString
+	}
 	
 
 	/** The annotations of the element as Function from annotation class name to annotation, where annotation is again a function from
@@ -73,24 +79,9 @@ class ElExtensions {
 		MoreCollectionExtensions.singleValue(values)
 	}
 	
-	//Ein Workaround. Irgendwo in den AV-Mappings wird noch nicht korrekt in eine Collection eingepackt, dadurch tauchen in genrierten
-	//Annotation Values manchmal Einzelwerte auf, obwohl der Typ des AV ein Array ist... 
 	def static dispatch getSingleValue(Object value){
 		value
 	}
-	
-//	def static findAllTypeElementsWithTrigger(String triggerFqn, boolean shadow) {
-//		findAllTypeElementsWithTrigger(triggerFqn, shadow, context)
-//	}
-//	
-//	def static findAllTypeElementsWithTrigger(String triggerFqn, boolean shadow, Map<String, Object> context) {
-//		val TypesRegistry tr = get(TypesRegistry)
-//		val annotatedClass = context.get("currentAnnotatedClass")
-//		if(annotatedClass==null){
-//			throw new IllegalArgumentException("No current annotated class.")
-//		}
-//		tr.findAllTypeElementsWithTriggerAnnotation(annotatedClass as TypeElement, triggerFqn, shadow);
-//	}
 
 	/**
 	 * An Xtend closure with one (String) parameter can be used like "closure.fooBar". In this case, the closure is called with "foobar" as param.
@@ -286,6 +277,8 @@ class ElExtensions {
 
 		elExtensions.registerProperty(Element, "at", [context, e| e.getAt(context)])
 		
+		elExtensions.registerProperty(Element, "name", [context, e| e.name])
+		
 		elExtensions.registerProperty(Object, "singleValue", [context, values| values.getSingleValue])
 
 		elExtensions.registerGetProperty(Function1, [context, closure, propertyName|closure.get(propertyName)])
@@ -293,9 +286,13 @@ class ElExtensions {
 		elExtensions.registerGetProperty(AnnotationMirror, [context, am, avName|am.get(avName)])
 		
 		elExtensions.registerGetProperty(Element, [context, e, functionName|e.get(functionName, context)])
+		
+		//Allow access to static fields of "beanClasses" 
+		elExtensions.registerGetProperty(Class, [context, c, staticFieldName| FieldUtils.readStaticField(c, staticFieldName)])
 
 		elExtensions.registerProperty(String, "asType", [context, qualName| qualName.getAsType(context)])
 		
+		//TODO: Deprecate that in favor of code?  But this one is used in a static sense...
 		elExtensions.registerProperty(TypeMirror, "name", [context, type| type.getName(context)])
 		
 		elExtensions.registerProperty(TypeMirror, "code", [context, type| type.getCode(context)])
