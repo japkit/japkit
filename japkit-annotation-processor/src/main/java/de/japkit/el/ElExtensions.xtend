@@ -110,7 +110,6 @@ class ElExtensions {
 		if(function != null && function instanceof Function1<?,?>){
 			(function as Function1<Element,?>).apply(e)
 		} else {
-			//TODO: Prop Not Found Exception to allow default resolving?
 			//Mit Groovy scheint das zu funktionieren, da die get Methode anscheinden die letzte ist, die aufgerufen wird
 			throw new ELPropertyNotFoundException('''No function with name «functionName» is on value stack and there is also no other property of element «e.simpleName» with this name.''')
 		}
@@ -220,17 +219,30 @@ class ElExtensions {
 	
 	
 	def static invokeMethod(Object base, String name, Object params){
+		val Object[] paramList = if(params instanceof Object[]) params else #[params] 
 		
-		invokeMethod(base, name, if(params instanceof Object[]) params else #[params] , valueStack)
+		invokeMethod(base, name, null , paramList, valueStack)
 	}
 	
-	def static invokeMethod(Object base, String name, Object[] params, Map<String, Object> contextMap){
-		val function =  contextMap.get(name)
-		if(function == null)
-		throw new ELMethodException('''No function with name «name» is on value stack and there is also no other property of element «base» with this name.''')	
+	def static invokeMethod(Object base, String name, Class<?>[] paramTypes, Object[] params,
+		Map<String, Object> contextMap) {
+
+		val invokeMethodClosure = registry.findInvokeMethodClosure(base)
+
+		try {
+			if (invokeMethodClosure != null) {
+				return invokeMethodClosure.apply(contextMap, base, name, paramTypes, params)
+			}
+
+		} catch (ELMethodException e) {
+		}
+
+		val function = contextMap.get(name)
+		if (function == null)
+			throw new ELMethodException('''No function with name «name» is on value stack and there is also no other property of element «base» with this name.''')
 
 		invoke(function, base, params)
-				
+
 	}
 	
 	def static invoke(Object functionObject, Object base, Object[] params) {
@@ -288,8 +300,14 @@ class ElExtensions {
 		
 		registry.registerGetProperty(Element, [context, e, functionName|e.get(functionName, context)])
 		
-		//Allow access to static fields of "beanClasses" 
-		registry.registerGetProperty(Class, [context, c, staticFieldName| FieldUtils.readStaticField(c, staticFieldName)])
+		// Allow access to static fields of "beanClasses" 
+		registry.registerGetProperty(Class, [ context, c, staticFieldName |
+			try {
+				FieldUtils.readStaticField(c, staticFieldName)
+			} catch (IllegalArgumentException e) {
+				throw new ELPropertyNotFoundException(e.message);
+			}
+		])
 
 		registry.registerProperty(String, "asType", [context, qualName| qualName.getAsType(context)])
 		
@@ -336,7 +354,13 @@ class ElExtensions {
 		
 		registry.registerMethod(Iterable, "findByName", [context, elements, paramTypes, params|elements.findByName(params.get(0) as CharSequence)])
 		
-		registry.registerInvokeMethod(Class, [context, clazz, methodName, paramTypes, params| MethodUtils.invokeStaticMethod(clazz, methodName, params, paramTypes)])
+		registry.registerInvokeMethod(Class, [context, clazz, methodName, paramTypes, params| 
+			try {
+				if(paramTypes == null) MethodUtils.invokeStaticMethod(clazz, methodName, params) else MethodUtils.invokeStaticMethod(clazz, methodName, params, paramTypes)
+			} catch (NoSuchMethodException e) {
+				throw new ELMethodException(e.message)
+			}
+		])
 		
 	}
 	
@@ -376,7 +400,7 @@ class ElExtensions {
 		} else {
 
 			try {
-				return true -> ElExtensions.invokeMethod(base, methodName, params, rootProperties)
+				return true -> ElExtensions.invokeMethod(base, methodName, paramTypes, params, rootProperties)
 			} catch (ELMethodException e) {
 			}		
 		}

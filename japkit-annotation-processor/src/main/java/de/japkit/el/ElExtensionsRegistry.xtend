@@ -43,7 +43,7 @@ class ElExtensionsRegistry {
 		findClosure(methodNameToClosureByClass, base, methodName)
 	}
 	
-	def findInvokeMethodClosure(Object base, String methodName){
+	def findInvokeMethodClosure(Object base){
 		base?.class?.findForClassOrSuperclass(invokeMethodClosureByClass)
 	}
 	
