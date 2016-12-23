@@ -1,22 +1,24 @@
 package de.japkit.el.juel
 
-import de.odysseus.el.ExpressionFactoryImpl
-import de.odysseus.el.util.SimpleContext
 import de.japkit.el.ELProvider
 import de.japkit.el.ELProviderException
-import de.japkit.el.ElExtensionPropertiesAndMethods
 import de.japkit.el.ElExtensions
 import de.japkit.el.ValueStack
+import de.japkit.el.juel.JuelELProvider.ElContext
 import de.japkit.services.ExtensionRegistry
+import de.odysseus.el.ExpressionFactoryImpl
+import de.odysseus.el.util.SimpleContext
 import java.io.Writer
 import java.lang.reflect.Method
 import java.net.URL
 import java.util.ArrayList
 import java.util.WeakHashMap
 import javax.el.CompositeELResolver
+import javax.el.ELContext
 import javax.el.ELException
 import javax.el.ExpressionFactory
 import javax.el.FunctionMapper
+import javax.el.PropertyNotFoundException
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.dynamic.ClassLoadingStrategy
 import net.bytebuddy.instrumentation.MethodDelegation
@@ -24,8 +26,6 @@ import net.bytebuddy.modifier.MethodArguments
 import net.bytebuddy.modifier.Ownership
 import net.bytebuddy.modifier.Visibility
 import org.eclipse.xtend.lib.annotations.Data
-import javax.el.ELContext
-import javax.el.PropertyNotFoundException
 
 class JuelELProvider implements ELProvider {
 	val ExpressionFactory ef = ExtensionRegistry.get(ExpressionFactory, [|new ExpressionFactoryImpl])
@@ -113,14 +113,14 @@ class JuelELProvider implements ELProvider {
 
 	override eval(ValueStack contextMap, String expr, Class<?> expectedType, String language) {
 		try {
-			val context = createElContext(contextMap, ElExtensions.extensions)
+			val context = createElContext(contextMap)
 			eval(context, expr, expectedType)
 		} catch (ELException e) {
 			throw new ELProviderException(e)
 		}
 	}
 
-	def private createElContext(ValueStack contextMap, ElExtensionPropertiesAndMethods elExtensions) {
+	def private createElContext(ValueStack contextMap) {
 		val resolver = new CompositeELResolver() {
 			
 			override getValue(ELContext context, Object base, Object property) {
@@ -140,7 +140,7 @@ class JuelELProvider implements ELProvider {
 		
 		//TODO: Ggf zu einem Resolver zusammenfassen.
 		resolver.add(new MapRootResolver(contextMap))
-		resolver.add(new ELResolver(ElExtensions.extensions, contextMap));
+		resolver.add(new ELResolver(contextMap));
 		
 		val context = new ElContext(resolver, contextMap)
 
