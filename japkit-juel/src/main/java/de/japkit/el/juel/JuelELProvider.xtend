@@ -5,7 +5,6 @@ import de.japkit.el.ELProviderException
 import de.japkit.el.ValueStack
 import de.japkit.el.juel.JuelELProvider.ElContext
 import de.japkit.services.ExtensionRegistry
-import de.odysseus.el.ExpressionFactoryImpl
 import de.odysseus.el.util.SimpleContext
 import java.io.Writer
 import java.net.URL
@@ -17,7 +16,7 @@ import javax.el.FunctionMapper
 import javax.el.PropertyNotFoundException
 
 class JuelELProvider implements ELProvider {
-	val ExpressionFactory ef = ExtensionRegistry.get(ExpressionFactory, [|new ExpressionFactoryImpl])
+	val ExpressionFactory ef = ExtensionRegistry.get(ExpressionFactory, [| ExpressionFactory.newInstance])
 	
 	static class ElContext extends SimpleContext {
 		val FunctionMapper functionMapper 
