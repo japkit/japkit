@@ -16,7 +16,19 @@ import javax.el.FunctionMapper
 import javax.el.PropertyNotFoundException
 
 class JuelELProvider implements ELProvider {
-	val ExpressionFactory ef = ExtensionRegistry.get(ExpressionFactory, [| ExpressionFactory.newInstance])
+	val ExpressionFactory ef = ExtensionRegistry.get(ExpressionFactory, [| 
+		val oldCCL =  Thread.currentThread().contextClassLoader
+		try {
+			//ExpressionFactory.newInstance	uses ContextClassLoader to load the ExpressionFactoryImpl
+			//In case of Javac, the CCL does not contain the annotation processor class path but something like the compiler classpath (?) instead.
+			//See also  https://community.oracle.com/thread/1184129 
+			//So, we temporary set the CCL to something useful.
+			Thread.currentThread().contextClassLoader = JuelELProvider.classLoader
+			ExpressionFactory.newInstance		
+		} finally { 
+			Thread.currentThread().contextClassLoader = oldCCL		
+		}
+	])
 	
 	static class ElContext extends SimpleContext {
 		val FunctionMapper functionMapper 
