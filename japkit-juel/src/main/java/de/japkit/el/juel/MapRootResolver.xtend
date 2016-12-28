@@ -4,6 +4,9 @@ import java.util.Map
 import javax.el.ELContext
 import javax.el.PropertyNotFoundException
 
+/**
+ * Resolves root properties (base == null) from a map. 
+ */
 class MapRootResolver extends javax.el.ELResolver {
 	Map<String, ? extends Object> map;
 	

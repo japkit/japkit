@@ -1,9 +1,9 @@
 package de.japkit.el.juel
 
 import de.japkit.el.ElExtensions
-import de.japkit.el.ValueStack
 import java.lang.reflect.Method
 import java.util.ArrayList
+import java.util.Map
 import java.util.WeakHashMap
 import javax.el.FunctionMapper
 import net.bytebuddy.ByteBuddy
@@ -19,7 +19,7 @@ import org.eclipse.xtend.lib.annotations.Data
  */
 @Data
 class DynamicFunctionMapper extends FunctionMapper {
-	val ValueStack contextMap
+	val Map<String, ? extends Object> contextMap
 	static transient val methodCache = new WeakHashMap<Object, Method>()
 
 	static class Invoker {
