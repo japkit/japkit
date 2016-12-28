@@ -60,7 +60,7 @@ class JuelELProvider implements ELProvider {
 					return super.getValue(context, base, property)
 				} catch (PropertyNotFoundException pnfe) {
 					if(base!=null) throw pnfe;
-					//The RootPropertyResolver of JUEL throws PNFE if it cannot find a root property.
+					//The MapRootResolver throws PNFE if it cannot find a root property.
 					//we retry in this case by prepending "src."
 					val src = getValue(context, null, "src");
 					context.setPropertyResolved(false)
