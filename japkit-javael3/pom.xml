@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<relativePath>../japkit-xtend-parent/pom.xml</relativePath>
+		<groupId>com.github.stefanocke.japkit</groupId>
+		<artifactId>japkit-xtend-parent</artifactId>
+		<version>1.2.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>japkit-javael3</artifactId>
+	<name>Japkit Annotation Processor - Java EL Version 3 Provider</name>
+	<description>Include this dependency to use Java EL Version 3 expressions in your code templates. Additionally, you will need a Java EL 3 implementation as dependency.</description>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<!-- Prevent the processor from running. TODO: Move EL-Provider API 
+						out of japkit-annotation-processor. -->
+					<compilerArgument>-proc:none</compilerArgument>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.stefanocke.japkit</groupId>
+			<artifactId>japkit-annotation-processor</artifactId>
+			<version>1.2.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>3.0.1-b04</version>
+			<!-- The API comes with the EL implementation and usually has a hardwired default impl set in ExpressionFactory. -->
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy</artifactId>
+			<version>0.4.1</version>
+		</dependency>
+	</dependencies>
+</project>

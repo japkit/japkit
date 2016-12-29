@@ -53,8 +53,10 @@
 		<module>japkit-annotation-processor</module>
 		<module>japkit-annotations</module>
 		<module>japkit-juel</module>
+		<module>japkit-javael3</module>
 		<module>japkit-groovy</module>
 		<module>japkit-all</module>
+		<module>japkit-all-javael3</module>
 		<module>japkit-annotationtemplates</module>
 	</modules>
 
