@@ -181,7 +181,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 				//TODO: Should we move this to scope rule?
 				
 				//don't let one member rule screw up the whole class
-				reportRuleError('''Error in member rule: «re»''')
+				reportRuleError(re)
 				emptyList
 			} 
 		

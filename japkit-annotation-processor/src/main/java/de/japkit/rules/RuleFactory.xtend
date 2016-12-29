@@ -34,6 +34,7 @@ class RuleFactory {
 		templateCache.clear
 		libraryCache.clear
 		functionCache.clear
+		triggerAnnotationCache.clear
 	}
 
 	//TODO: Bringt das hier überhaupt etwas, wenn der AnnotationMirror ohnehin jedes mal unterschiedlich ist?
