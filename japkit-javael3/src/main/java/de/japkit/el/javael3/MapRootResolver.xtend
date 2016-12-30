@@ -14,9 +14,8 @@ class MapRootResolver extends javax.el.ELResolver {
 		return base == null;
 	}
 	
-	def private boolean resolve(ELContext context, Object base, Object property) {
-		context.setPropertyResolved(isResolvable(base) && property instanceof String);
-		return context.isPropertyResolved();
+	def private boolean isResolvable(ELContext context, Object base, Object property) {
+		isResolvable(base) && property instanceof String;
 	}
 	
 	override getCommonPropertyType(ELContext context, Object base) {
@@ -28,14 +27,15 @@ class MapRootResolver extends javax.el.ELResolver {
 	}
 	
 	override getType(ELContext context, Object base, Object property) {
-		return if(resolve(context, base, property)) Object else null;
+		return if(isResolvable(context, base, property)) { 
+			context.propertyResolved = true
+			Object
+		} else null;
 	}
 	
 	override getValue(ELContext context, Object base, Object property) {
-		if (resolve(context, base, property)) {
-			if (!map.containsKey(property)) {
-				throw new PropertyNotFoundException("Cannot find property " + property);
-			}
+		if (isResolvable(context, base, property) && map.containsKey(property)) {
+			context.propertyResolved = true
 			return map.get(property);
 		}
 		return null;

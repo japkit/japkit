@@ -63,16 +63,21 @@ class JapkitELResolver extends ELResolver {
 		}
 
 		// TODO: We have a different order here compared to Groovy. In Groovy the default resolver seems to be called first !?
-		try {
-			return delegate.getValue(context, base, property)
-		} catch (PropertyNotFoundException pnfe) {
-			if(base != null) throw pnfe;
-			// The MapRootResolver throws PNFE if it cannot find a root property.
-			// we retry in this case by prepending "src."
-			val src = getValue(context, null, "src");
-			context.setPropertyResolved(false)
-			return getValue(context, src, property)
+		val value =  delegate.getValue(context, base, property)
+		
+		if(base == null && !context.propertyResolved) {
+			// For root properties, we retry  by prepending "src."			
+			try{
+				val src = getValue(context, null, "src");
+				context.setPropertyResolved(false)
+				return getValue(context, src, property)	
+			} catch (Exception e) {
+				//If we failed, catch any exception to give static imports a chance
+				context.setPropertyResolved(false)
+			}
 		}
+			
+		value
 	}
 
 	override invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
