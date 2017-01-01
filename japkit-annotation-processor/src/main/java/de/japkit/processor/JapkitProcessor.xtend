@@ -32,6 +32,7 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
+import de.japkit.annotations.RuntimeMetadata
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -155,17 +156,25 @@ class JapkitProcessor extends AbstractProcessor {
 
 		printDiagnosticMessage(['''Annotated classes in root TypeElements: «classesToProcess»'''])
 
-		//For incremental build... If the compiler re-compiles a generated class, we should also re-generate it to spread the changes.
-		val annotatedClassesForUncommitedGenClasses = classesToProcessUnfiltered.filter[!committed].map[
+		//For incremental build... If the compiler re-compiles a generated class (due to a dependency to some re-generated class), 
+		//we also re-generate it to spread the changes.
+		//NOTE: This approach is at least questionable, since the annotated classes we get here are BinaryTypeBindings (without comments, parameter names and member order).
+		//However, there is no much better way to spread the changes. 
+		//For _RuntimeMetadata this can be deadly, since re-generating it based on BinaryTypeBindings would be against there purpose to preserve informtaion about
+		//comments, parameter names and member order. Thus, we filter them here. The filtering is kept simple, assuming @RuntimeMetadata is only used on templates
+		//but not on "real" application classes.
+		val annotatedClassesForUncommitedGenClasses = classesToProcessUnfiltered.filter[!committed && !qualifiedName.toString.endsWith("_RuntimeMetadata")].map[
 			annotatedClassForGenClassOnDisk].filter[it != null].toSet
 
 		printDiagnosticMessage(
 			['''Annotated classes for uncommited gen classes: «annotatedClassesForUncommitedGenClasses»'''])
 		classesToProcess.addAll(annotatedClassesForUncommitedGenClasses)
 		
+		//For incremental build: If a trigger annotation has changed, add all classes we know to have this trigger
+		//NOTE: This approach is at least questionable, since the annotated classes we get here are BinaryTypeBindings (without comments, parameter names and member order).
+		//But we cannot do much better here.
 		printDiagnosticMessage(
 			['''Annotated classes for triggers found in root TypeElements: «classesWithTrigger»'''])
-		//For incremental build: If a trigger annotation has changed, add all classes we know to have this trigger
 		classesToProcess.addAll(classesWithTrigger)
 
 		var boolean roundDone = false
