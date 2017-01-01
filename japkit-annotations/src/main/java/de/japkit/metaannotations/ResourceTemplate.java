@@ -106,7 +106,7 @@ public @interface ResourceTemplate {
 	
 	/**
 	 * 
-	 * @return the template language
+	 * @return the template language. See {@link TemplateLang}.
 	 */
 	String templateLang();
 
