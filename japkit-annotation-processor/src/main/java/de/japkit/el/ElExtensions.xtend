@@ -1,6 +1,7 @@
 package de.japkit.el
 
 import de.japkit.model.EmitterContext
+import de.japkit.rules.AbstractFunctionRule
 import de.japkit.rules.JavaBeansExtensions
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
@@ -12,14 +13,14 @@ import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
+import org.apache.commons.lang3.reflect.FieldUtils
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static de.japkit.services.ExtensionRegistry.*
-import javax.lang.model.type.DeclaredType
-import de.japkit.rules.AbstractFunctionRule
-import java.util.ArrayList
+import org.apache.commons.lang3.reflect.MethodUtils
 
 class ElExtensions {
 
@@ -53,6 +54,12 @@ class ElExtensions {
 		e.srcType.singleValueType
 	}
 	
+	/**
+	 * name as alias for getSimpleName().toString().
+	 */
+	def static getName(Element e) {
+		e.simpleName.toString
+	}
 	
 
 	/** The annotations of the element as Function from annotation class name to annotation, where annotation is again a function from
@@ -73,24 +80,9 @@ class ElExtensions {
 		MoreCollectionExtensions.singleValue(values)
 	}
 	
-	//Ein Workaround. Irgendwo in den AV-Mappings wird noch nicht korrekt in eine Collection eingepackt, dadurch tauchen in genrierten
-	//Annotation Values manchmal Einzelwerte auf, obwohl der Typ des AV ein Array ist... 
 	def static dispatch getSingleValue(Object value){
 		value
 	}
-	
-//	def static findAllTypeElementsWithTrigger(String triggerFqn, boolean shadow) {
-//		findAllTypeElementsWithTrigger(triggerFqn, shadow, context)
-//	}
-//	
-//	def static findAllTypeElementsWithTrigger(String triggerFqn, boolean shadow, Map<String, Object> context) {
-//		val TypesRegistry tr = get(TypesRegistry)
-//		val annotatedClass = context.get("currentAnnotatedClass")
-//		if(annotatedClass==null){
-//			throw new IllegalArgumentException("No current annotated class.")
-//		}
-//		tr.findAllTypeElementsWithTriggerAnnotation(annotatedClass as TypeElement, triggerFqn, shadow);
-//	}
 
 	/**
 	 * An Xtend closure with one (String) parameter can be used like "closure.fooBar". In this case, the closure is called with "foobar" as param.
@@ -118,7 +110,6 @@ class ElExtensions {
 		if(function != null && function instanceof Function1<?,?>){
 			(function as Function1<Element,?>).apply(e)
 		} else {
-			//TODO: Prop Not Found Exception to allow default resolving?
 			//Mit Groovy scheint das zu funktionieren, da die get Methode anscheinden die letzte ist, die aufgerufen wird
 			throw new ELPropertyNotFoundException('''No function with name «functionName» is on value stack and there is also no other property of element «e.simpleName» with this name.''')
 		}
@@ -228,17 +219,30 @@ class ElExtensions {
 	
 	
 	def static invokeMethod(Object base, String name, Object params){
+		val Object[] paramList = if(params instanceof Object[]) params else #[params] 
 		
-		invokeMethod(base, name, if(params instanceof Object[]) params else #[params] , valueStack)
+		invokeMethod(base, name, null , paramList, valueStack)
 	}
 	
-	def static invokeMethod(Object base, String name, Object[] params, Map<String, Object> contextMap){
-		val function =  contextMap.get(name)
-		if(function == null)
-		throw new ELMethodException('''No function with name «name» is on value stack and there is also no other property of element «base» with this name.''')	
+	def static invokeMethod(Object base, String name, Class<?>[] paramTypes, Object[] params,
+		Map<String, Object> contextMap) {
+
+		val invokeMethodClosure = registry.findInvokeMethodClosure(base)
+
+		try {
+			if (invokeMethodClosure != null) {
+				return invokeMethodClosure.apply(contextMap, base, name, paramTypes, params)
+			}
+
+		} catch (ELMethodException e) {
+		}
+
+		val function = contextMap.get(name)
+		if (function == null)
+			throw new ELMethodException('''No function with name «name» is on value stack and there is also no other property of element «base» with this name.''')
 
 		invoke(function, base, params)
-				
+
 	}
 	
 	def static invoke(Object functionObject, Object base, Object[] params) {
@@ -272,75 +276,135 @@ class ElExtensions {
 	
 	
 	//Provide the extensions as Collections of closures...
-	public static val ElExtensionPropertiesAndMethods extensions  = new ElExtensionPropertiesAndMethods() => [
+	public static val ElExtensionsRegistry registry  = new ElExtensionsRegistry() => [
 		registerExtensionProperties
 		registerExtensionMethods
 	]
 	
 
 	//TODO: Das kann man bestimmt auch fein generieren... :)
-	def static registerExtensionProperties(ElExtensionPropertiesAndMethods elExtensions) {
-		elExtensions.registerProperty(TypeMirror, "asElement", [context, type|type.asElement()])
+	def static registerExtensionProperties(ElExtensionsRegistry registry) {
+		registry.registerProperty(TypeMirror, "asElement", [context, type|type.asElement()])
 
-		elExtensions.registerProperty(Element, "singleValueType", [context, e|e.singleValueType])
+		registry.registerProperty(Element, "singleValueType", [context, e|e.singleValueType])
 
-		elExtensions.registerProperty(Element, "at", [context, e| e.getAt(context)])
+		registry.registerProperty(Element, "at", [context, e| e.getAt(context)])
 		
-		elExtensions.registerProperty(Object, "singleValue", [context, values| values.getSingleValue])
+		registry.registerProperty(Element, "name", [context, e| e.name])
+		
+		registry.registerProperty(Object, "singleValue", [context, values| values.getSingleValue])
 
-		elExtensions.registerGetProperty(Function1, [context, closure, propertyName|closure.get(propertyName)])
+		registry.registerGetProperty(Function1, [context, closure, propertyName|closure.get(propertyName)])
 
-		elExtensions.registerGetProperty(AnnotationMirror, [context, am, avName|am.get(avName)])
+		registry.registerGetProperty(AnnotationMirror, [context, am, avName|am.get(avName)])
 		
-		elExtensions.registerGetProperty(Element, [context, e, functionName|e.get(functionName, context)])
+		registry.registerGetProperty(Element, [context, e, functionName|e.get(functionName, context)])
+		
+		// Allow access to static fields of "beanClasses" 
+		registry.registerGetProperty(Class, [ context, c, staticFieldName |
+			try {
+				FieldUtils.readStaticField(c, staticFieldName)
+			} catch (IllegalArgumentException e) {
+				throw new ELPropertyNotFoundException(e.message);
+			}
+		])
 
-		elExtensions.registerProperty(String, "asType", [context, qualName| qualName.getAsType(context)])
+		registry.registerProperty(String, "asType", [context, qualName| qualName.getAsType(context)])
 		
-		elExtensions.registerProperty(TypeMirror, "name", [context, type| type.getName(context)])
+		//TODO: Deprecate that in favor of code?  But this one is used in a static sense...
+		registry.registerProperty(TypeMirror, "name", [context, type| type.getName(context)])
 		
-		elExtensions.registerProperty(TypeMirror, "code", [context, type| type.getCode(context)])
+		registry.registerProperty(TypeMirror, "code", [context, type| type.getCode(context)])
 
-		elExtensions.registerProperty(CharSequence, "toFirstUpper", [context, s|s.toFirstUpper])
+		registry.registerProperty(CharSequence, "toFirstUpper", [context, s|s.toFirstUpper])
 
-		elExtensions.registerProperty(CharSequence, "toFirstLower", [context, s|s.toFirstLower])
+		registry.registerProperty(CharSequence, "toFirstLower", [context, s|s.toFirstLower])
 		
-		elExtensions.registerProperty(TypeElement, "properties", [context, t|t.properties])
+		registry.registerProperty(TypeElement, "properties", [context, t|t.properties])
 		
-		elExtensions.registerProperty(DeclaredType, "properties", [context, t|t.properties])
+		registry.registerProperty(DeclaredType, "properties", [context, t|t.properties])
 		
-		elExtensions.registerProperty(TypeElement, "declaredFields", [context, t|t.declaredFields])
+		registry.registerProperty(TypeElement, "declaredFields", [context, t|t.declaredFields])
 		
-		elExtensions.registerProperty(TypeElement, "declaredConstructors", [context, t|t.declaredConstructors])
+		registry.registerProperty(TypeElement, "declaredConstructors", [context, t|t.declaredConstructors])
 		
-		elExtensions.registerProperty(TypeElement, "declaredTypes", [context, t|t.declaredTypes])
+		registry.registerProperty(TypeElement, "declaredTypes", [context, t|t.declaredTypes])
 		
-		elExtensions.registerProperty(TypeElement, "declaredMethods", [context, t|t.declaredMethods])
+		registry.registerProperty(TypeElement, "declaredMethods", [context, t|t.declaredMethods])
 		
-		elExtensions.registerProperty(DeclaredType, "declaredFields", [context, t|t.declaredFields])
+		registry.registerProperty(DeclaredType, "declaredFields", [context, t|t.declaredFields])
 		
-		elExtensions.registerProperty(DeclaredType, "declaredConstructors", [context, t|t.declaredConstructors])
+		registry.registerProperty(DeclaredType, "declaredConstructors", [context, t|t.declaredConstructors])
 		
-		elExtensions.registerProperty(DeclaredType, "declaredTypes", [context, t|t.declaredTypes])
+		registry.registerProperty(DeclaredType, "declaredTypes", [context, t|t.declaredTypes])
 		
-		elExtensions.registerProperty(DeclaredType, "declaredMethods", [context, t|t.declaredMethods])
+		registry.registerProperty(DeclaredType, "declaredMethods", [context, t|t.declaredMethods])
 		
-		elExtensions.registerProperty(DeclaredType, "simpleName", [context, t|t.simpleName])
+		registry.registerProperty(DeclaredType, "simpleName", [context, t|t.simpleName])
 		
-		elExtensions.registerProperty(DeclaredType, "qualifiedName", [context, t|t.qualifiedName])
+		registry.registerProperty(DeclaredType, "qualifiedName", [context, t|t.qualifiedName])
 	}
 
-	def static registerExtensionMethods(ElExtensionPropertiesAndMethods elExtensions) {
-		elExtensions.registerMethod(TypeMirror, "asElement", [context, type, paramTypes, params|type.asElement()])
+	def static registerExtensionMethods(ElExtensionsRegistry registry) {
+		registry.registerMethod(TypeMirror, "asElement", [context, type, paramTypes, params|type.asElement()])
 		
-		elExtensions.registerMethod(TypeMirror, "isSame", [context, type, paramTypes, params|type.isSame(params.get(0) as TypeMirror)])
+		registry.registerMethod(TypeMirror, "isSame", [context, type, paramTypes, params|type.isSame(params.get(0) as TypeMirror)])
 		
-		elExtensions.registerMethod(Element, "hasType", [context, e, paramTypes, params|e.hasType(params.get(0) as CharSequence)])
+		registry.registerMethod(Element, "hasType", [context, e, paramTypes, params|e.hasType(params.get(0) as CharSequence)])
 		
-		elExtensions.registerMethod(Iterable, "findByName", [context, elements, paramTypes, params|elements.findByName(params.get(0) as CharSequence)])
+		registry.registerMethod(Iterable, "findByName", [context, elements, paramTypes, params|elements.findByName(params.get(0) as CharSequence)])
 		
-//		elExtensions.registerMethod(String, "findAllTypeElementsWithTrigger", [context, triggerFqn, paramTypes, params|
-//			findAllTypeElementsWithTrigger(triggerFqn, (params as Object[]).get(0) as Boolean, context)
-//		])
+		registry.registerInvokeMethod(Class, [context, clazz, methodName, paramTypes, params| 
+			try {
+				if(paramTypes == null) MethodUtils.invokeStaticMethod(clazz, methodName, params) else MethodUtils.invokeStaticMethod(clazz, methodName, params, paramTypes)
+			} catch (NoSuchMethodException e) {
+				throw new ELMethodException(e.message)
+			}
+		])
+		
+	}
+	
+	
+	/**
+	 * Der Key sagt, ob die Property gefunden wurde. Der Value ist der Wert der Property (kann null sein).
+	 */
+	def static Pair<Boolean, Object> getPropertyFromExtensions(Map<String, Object> rootProperties, Object base, String propertyName) {
+		{
+			val closure = registry.findPropertyClosure(base, propertyName)
+		
+			if (closure != null) {
+				return true -> closure.apply(rootProperties, base) 
+			} else {
+		
+				try {
+					val getPropertyClosure = de.japkit.el.ElExtensions.registry.findGetPropertyClosure(base)
+					if (getPropertyClosure != null) {						
+						return true -> getPropertyClosure.apply(rootProperties, base, propertyName)
+					} 		
+				} catch (ELPropertyNotFoundException e) {
+					
+				}
+				
+			}
+			false -> null
+		
+		}
+	}
+	
+	def static Pair<Boolean, Object> invokeMethodFromExtensions(Map<String, Object> rootProperties, Object base,
+		String methodName, Class<?>[] paramTypes, Object[] params) {
+		val closure = registry.findMethodClosure(base, methodName)
+
+		if (closure != null) {
+			return true -> closure.apply(rootProperties, base, paramTypes, params)
+		} else {
+
+			try {
+				return true -> ElExtensions.invokeMethod(base, methodName, paramTypes, params, rootProperties)
+			} catch (ELMethodException e) {
+			}		
+		}
+		false -> null
 	}
 
 }

@@ -150,7 +150,7 @@ class ELSupport {
 			errorResult
 		} catch (Exception e) {
 			reportRuleError(e)
-			errorResult
+			if(errorResult != null) return errorResult else throw new ReportedException(e)
 		}
 	}
 	

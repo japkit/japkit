@@ -5,7 +5,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 
-class ElExtensionPropertiesAndMethods {
+class ElExtensionsRegistry {
 
 	// baseClass -> ( propertyName -> ((rootProperties, base)=>resultValue) ) 
 	@Accessors
@@ -15,9 +15,13 @@ class ElExtensionPropertiesAndMethods {
 	@Accessors
 	val Map<Class<?>, (Map<String, Object>, Object, String)=>Object> getPropertyClosureByClass = newHashMap
 	
-	// baseClass -> ( methodName -> ((rootProperties, base, params)=>resultValue) ) 
+	// baseClass -> ( methodName -> ((rootProperties, base, paramTypes, params)=>resultValue) ) 
 	@Accessors
 	val Map<Class<?>, Map<String, (Map<String, Object>, Object, Class<?>[], Object[])=>Object>> methodNameToClosureByClass = newHashMap
+	
+	// baseClass -> ((rootProperties, base, methodName, paramTypes, params)=>resultValue) 
+	@Accessors
+	val Map<Class<?>, (Map<String, Object>, Object, String, Class<?>[], Object[])=>Object> invokeMethodClosureByClass = newHashMap
 	
 	def <T> void  registerProperty(Class<T> baseClass, String propertyName, (Map<String, Object>, T)=>Object getterClosure){
 		propertyNameToGetterClosureByClass.getOrCreateMap(baseClass).put(propertyName, getterClosure as (Map<String, Object>, Object)=>Object)
@@ -31,8 +35,16 @@ class ElExtensionPropertiesAndMethods {
 		methodNameToClosureByClass.getOrCreateMap(baseClass).put(methodName, closure as (Map<String, Object>, Object, Class<?>[], Object[])=>Object)
 	}
 	
+	def <T>  void registerInvokeMethod(Class<T> baseClass, (Map<String, Object>, T, String, Class<?>[], Object[])=>Object closure){
+		invokeMethodClosureByClass.put(baseClass, closure as (Map<String, Object>, Object, String, Class<?>[], Object[])=>Object)
+	}
+	
 	def findMethodClosure(Object base, String methodName){
 		findClosure(methodNameToClosureByClass, base, methodName)
+	}
+	
+	def findInvokeMethodClosure(Object base){
+		base?.class?.findForClassOrSuperclass(invokeMethodClosureByClass)
 	}
 	
 	def findPropertyClosure(Object base, String propertyName){

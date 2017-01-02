@@ -91,6 +91,19 @@ public @interface Var {
 	 */
 	Class<?>[] groupByFun() default {};
 	
+	
+	/**
+	 * Allows to instantiate an arbitrary bean and assign it to the variable. The class must be on the annotation processors classpath and must have a no-arg constructor.
+	 * @return
+	 */
+	Class<?>[] bean() default {};
+	
+	/**
+	 * Allows to instantiate an arbitrary class to the variable, for example to access their static members. The class must be on the annotation processors classpath.
+	 * @return
+	 */
+	Class<?>[] beanClass() default {};
+	
 
 	Class<?> type() default Object.class;
 	

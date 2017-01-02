@@ -40,6 +40,7 @@ import java.util.Map
 import de.japkit.util.MoreCollectionExtensions
 import de.japkit.annotations.AnnotationTemplate
 import de.japkit.services.TypesRegistry
+import de.japkit.services.RuleException
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -559,7 +560,10 @@ class RuleUtils {
 		} catch (ReportedException e) {
 			// Do not report the error again to avoid error flooding
 			if(errorResult != null) return errorResult.apply() else throw e
-		} catch (Exception e) {
+		} catch (RuleException e) {
+			reportRuleError(e, avName ?: e.avName)
+			if(errorResult != null) return errorResult.apply() else throw new ReportedException(e)
+		}catch (Exception e) {
 			reportRuleError(e, avName)
 			if(errorResult != null) return errorResult.apply() else throw new ReportedException(e)
 		}

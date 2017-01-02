@@ -1,30 +1,55 @@
 package de.japkit.el.juel
 
-import de.odysseus.el.util.RootPropertyResolver
 import java.util.Map
+import javax.el.ELContext
+import javax.el.PropertyNotFoundException
 
-class MapRootResolver extends RootPropertyResolver {
-	//TODO: ValueStack?
+/**
+ * Resolves root properties (base == null) from a map. 
+ */
+class MapRootResolver extends javax.el.ELResolver {
 	Map<String, ? extends Object> map;
 	
-	override getProperty(String property) {
-		map.get(property)
+	def private boolean isResolvable(Object base) {
+		return base == null;
 	}
 	
-	override isProperty(String property) {
-		map.containsKey(property);
+	def private boolean resolve(ELContext context, Object base, Object property) {
+		context.setPropertyResolved(isResolvable(base) && property instanceof String);
+		return context.isPropertyResolved();
 	}
 	
-	override setProperty(String property, Object value) {
+	override getCommonPropertyType(ELContext context, Object base) {
+		return if(isResolvable(context)) String else null;
+	}
+	
+	override getFeatureDescriptors(ELContext context, Object base) {
+		return null;
+	}
+	
+	override getType(ELContext context, Object base, Object property) {
+		return if(resolve(context, base, property)) Object else null;
+	}
+	
+	override getValue(ELContext context, Object base, Object property) {
+		if (resolve(context, base, property)) {
+			if (!map.containsKey(property)) {
+				throw new PropertyNotFoundException("Cannot find property " + property);
+			}
+			return map.get(property);
+		}
+		return null;
+	}
+	
+	override isReadOnly(ELContext context, Object base, Object property) {
+		return true;
+	}
+	
+	override setValue(ELContext context, Object base, Object property, Object value) {
 		throw new UnsupportedOperationException("Not allowed to set root properties.")
-	}
+	}	
 	
-	override properties() {
-		throw new UnsupportedOperationException("Not allowed to iterate over root properties.")
-	}
-	
-	new(Map<String, ? extends Object> map){
-		
+	new(Map<String, ? extends Object> map){	
 		this.map=map
 	}
 	

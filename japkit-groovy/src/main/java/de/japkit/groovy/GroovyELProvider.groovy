@@ -1,29 +1,15 @@
 package de.japkit.groovy
 
-import groovy.lang.GroovyShell;
-import groovy.text.GStringTemplateEngine;
-import groovy.text.GStringTemplateEngine.GStringTemplate;
-import groovy.text.Template;
-import groovy.text.XmlTemplateEngine;
+import groovy.text.GStringTemplateEngine
+import groovy.text.Template
+import groovy.text.XmlTemplateEngine
 
-import java.io.Writer;
-import java.net.URL;
-import java.util.Map
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.tools.Diagnostic;
-
-import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.eclipse.xtext.xbase.lib.Pair
 
-import com.google.common.base.Stopwatch;
-
-import de.japkit.el.ELProvider;
-import de.japkit.el.ELProviderException;
-import de.japkit.el.ElExtensionPropertiesAndMethods;
-import de.japkit.el.ElExtensions;
+import de.japkit.el.ELProvider
+import de.japkit.el.ELProviderException
 import de.japkit.el.ValueStack
 
 class GroovyELProvider implements ELProvider {
