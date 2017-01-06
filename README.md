@@ -49,7 +49,7 @@ public class DTOTemplate implements SrcInterface {
 }
 ```
 
-- The annotation `@Class` tells the annotation processor that this is a template for generating a new class. 
+- The annotation `@Clazz` tells the annotation processor that this is a template for generating a new class. 
 - The `nameSuffixToAppend` describes the name of the generated class. It shall consist of the name of the source class (which is Person in our case) plus "DTO". So we get PersonDTO.
 - `@RuntimeMetadata` should be on every template class. It is again some ceremony of japkit.
 - The template implements the interface `SrcInterface`. This is a so called type function that means "use the type of the source here". The source is again Person in our example. So, the generated PersonDTO will implement the Person interface.
