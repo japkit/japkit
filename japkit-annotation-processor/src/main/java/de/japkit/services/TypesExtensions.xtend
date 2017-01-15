@@ -399,34 +399,52 @@ class TypesExtensions /**implements Types*/{
 		typeUtils.isSubsignature(m1, m2)
 	}
 	
-	def dispatch boolean isSubtype(GenDeclaredType t1, TypeMirror t2) {
+	
+	def boolean isSubtype(TypeMirror t1, TypeMirror t2) {
+		//TODO: Das sollte auch bei allen anderen Mehtoden getan werden, z.B. isSameType. 
+		//Es ist sinnlos, über nicht existierende Typen Aussagen bzgl ihrer Supertypen usw. machen zu wollen.
+		//javac scheint z.B. immer true zu liefern, wenn man auf einem ErrorType isSubtype aufruft...
+		isSubtypeInternal(t1.resolveIfErrorType, t2.resolveIfErrorType);
+	}
+
+	def dispatch boolean isSubtypeInternal(GenDeclaredType t1, TypeMirror t2) {
 		if(!(t2 instanceof DeclaredType)){
 			return false;
 		}
-		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtype(t2)  //TODO: What about type args here?
+		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtypeInternal(t2)  //TODO: What about type args here?
 	}
 	
-	def dispatch boolean isSubtype(DeclaredType t1, GenTypeMirror t2) {
+	def dispatch boolean isSubtypeInternal(DeclaredType t1, GenTypeMirror t2) {
 		if(!(t2 instanceof DeclaredType)){
 			return false;
 		}
-		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtype(t2)  //TODO: What about type args here?
+		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtypeInternal(t2)  //TODO: What about type args here?
 	}
 	
-	def dispatch boolean isSubtype(GenTypeMirror t1, TypeMirror t2) {
+	def dispatch boolean isSubtypeInternal(GenTypeMirror t1, TypeMirror t2) {
 		t1.isSameType(t2)
 	}
 	
-	def dispatch boolean isSubtype(TypeMirror t1, GenTypeMirror t2) {
+	def dispatch boolean isSubtypeInternal(TypeMirror t1, GenTypeMirror t2) {
 		t1.isSameType(t2)
 	}
 	
-	def dispatch boolean isSubtype(TypeMirror t1, TypeMirror t2) {
+	def dispatch boolean isSubtypeInternal(TypeMirror t1, TypeMirror t2) {
 		typeUtils.isSubtype(t1, t2)
 	}
 	
 	def unboxedType(TypeMirror t) {
 		typeUtils.unboxedType(t)
 	}
+
+
+	def private dispatch resolveIfErrorType(ErrorType t) {
+		t.asTypeElement.asType
+	}
+	
+	def private dispatch resolveIfErrorType(TypeMirror t) {
+		t
+	}
+	
 
 }
