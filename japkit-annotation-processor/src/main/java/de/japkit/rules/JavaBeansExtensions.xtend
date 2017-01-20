@@ -8,6 +8,7 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
+import de.japkit.model.PropertyImpl
 
 class JavaBeansExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -66,10 +67,10 @@ class JavaBeansExtensions {
 		if (method.isGetter) {
 			val int offset = if(method.isBooleanGetterWithIs) 2 else 3
 			val propertyName = simpleName.subSequence(offset, simpleName.length).toString.toFirstLower
-			new Property(returnType, propertyName, method, null, null)
+			new PropertyImpl(returnType, propertyName, method, null, null)
 		} else if (method.isSetter) {
 			val propertyName = simpleName.subSequence(3, simpleName.length).toString.toFirstLower
-			new Property(parameters.get(0).asType, propertyName, null, method, null)
+			new PropertyImpl(parameters.get(0).asType, propertyName, null, method, null)
 		} else {
 			throw new IllegalArgumentException("Method is no getter or setter: " + method)
 		}
@@ -78,7 +79,7 @@ class JavaBeansExtensions {
 	
 	//TODO: Type parameter replacements?
 	def toProperty(VariableElement field){
-		new Property(field.asType, field.simpleName.toString, null, null, field);
+		new PropertyImpl(field.asType, field.simpleName.toString, null, null, field);
 	}
 
 	def getters(Iterable<ExecutableElement> methods){

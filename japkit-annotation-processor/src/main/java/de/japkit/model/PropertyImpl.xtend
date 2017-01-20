@@ -11,7 +11,7 @@ import de.japkit.services.ExtensionRegistry
 import de.japkit.rules.JavaBeansExtensions
 
 @Data
-class Property extends GenAnnotatedConstruct implements VariableElement {
+class PropertyImpl extends GenAnnotatedConstruct implements Property {
 
 	/** The type of the property. */
 	TypeMirror type //TODO: Redundant?
@@ -49,15 +49,15 @@ class Property extends GenAnnotatedConstruct implements VariableElement {
 	}
 
 	def withSetter(ExecutableElement setter) {
-		new Property(type, name, getter, setter, field)
+		new PropertyImpl(type, name, getter, setter, field)
 	}
 
 	def withGetter(ExecutableElement getter) {
-		new Property(type, name, getter, setter, field)
+		new PropertyImpl(type, name, getter, setter, field)
 	}
 
 	def withField(VariableElement field) {
-		new Property(type, name, getter, setter, field)
+		new PropertyImpl(type, name, getter, setter, field)
 	}
 
 	override <R, P> accept(ElementVisitor<R, P> v, P p) {
@@ -96,7 +96,7 @@ class Property extends GenAnnotatedConstruct implements VariableElement {
 		new GenName(name)
 	}
 
-	def Element fieldOrGetter() {
+	override Element fieldOrGetter() {
 		if(field != null) field else getter
 	}
 	
@@ -108,11 +108,11 @@ class Property extends GenAnnotatedConstruct implements VariableElement {
 		name.toString
 	}
 	
-	def String getGetterName() {
+	override String getGetterName() {
 		ExtensionRegistry.get(JavaBeansExtensions).getterName(this);
 	}
 	
-	def String getSetterName() {
+	override String getSetterName() {
 		ExtensionRegistry.get(JavaBeansExtensions).setterName(this);
 	}
 
