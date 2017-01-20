@@ -8,7 +8,7 @@ class JavadocUtil {
 	static val returnPattern = Pattern.compile('''@return\s*([^@]*)''')
 	
 	//code within javadoc. 1st group is the name of the according AV. second group is the code
-	//the patterns are sorted from the the most to the leasr specific ones. The first one that matches, will be applied.
+	//the patterns are sorted from the the most to the least specific ones. The first one that matches, will be applied.
 
 	static val codePattern1 = Pattern.compile('''(?:@|<li>)japkit\.(\S+)\s*<pre>\s*\{@code\s*([\s\S]*?)\}\s*</pre>''')
 	static val codePattern2 = Pattern.compile('''(?:@|<li>)japkit\.(\S+)\s*<pre>\s*<code>\s*([\s\S]*?)</code>\s*</pre>''')
@@ -17,8 +17,8 @@ class JavadocUtil {
 	//single line code (everything on the same line till newline or end of string)
 	static val codePattern5 = Pattern.compile('''(?:@|<li>)japkit\.(\S+)[\t\f ]*([\s\S]*?)(?:$|[\r\n])''')
 	
-	
-	
+	//empty ul-Tag. Remains after removing the li-Tags as above.
+	static val emptyUL = Pattern.compile('''<ul>\s*</ul>''')
 	
 	static val leadingWhiteSpaceAfterLinebreak = Pattern.compile('''\n ''')
 	
@@ -52,7 +52,7 @@ class JavadocUtil {
 	}
 	
 	def static removeCode(CharSequence javadoc){
-		remove(javadoc, codePattern1, codePattern2, codePattern3, codePattern4, codePattern5)	
+		remove(javadoc, codePattern1, codePattern2, codePattern3, codePattern4, codePattern5, emptyUL)	
 	}
 	
 	
