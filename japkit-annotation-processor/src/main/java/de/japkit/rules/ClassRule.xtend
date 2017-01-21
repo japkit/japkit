@@ -75,7 +75,12 @@ class ClassRule extends AbstractRule {
 		this.isAuxClass = isAuxClass
 		nameRule = if(isTopLevelClass) new ClassNameRule(metaAnnotation) else null
 		behaviorRule = new BehaviorDelegationRule(metaAnnotation)
-		superclassRule = createTypeRule(metaAnnotation, null, "superclass", null, null)
+		
+		//superclass from AV or template
+		superclassRule = createTypeRule(metaAnnotation, templateClass?.superclass, "superclass", null, null)
+		
+		//interfaces from AV  (interfaces from template are implemented in TemplateRule, since templates can
+		// "contribute" interface implementations to the generated class, even if the template is not the ClassRule itself but only called by it.)
 		interfaceRules = (1 .. 2).map[createTypeRule(metaAnnotation, null, '''interface«it»''', null, null)].toList
 
 		// Supports ELVariables in the scope of the generated class. For inner classes, this is already done in the inner class rule
