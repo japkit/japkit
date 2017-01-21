@@ -38,6 +38,7 @@ class ClassRule extends AbstractRule {
 	ElementKind kind
 	()=>Set<Modifier> modifiersRule
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
+	()=>CharSequence commentRule
 	boolean isTopLevelClass
 	ClassNameRule nameRule
 	BehaviorDelegationRule behaviorRule
@@ -69,6 +70,8 @@ class ClassRule extends AbstractRule {
 		// Es gibt recht viele Redundanzen zwischen @InnerClass und @Template. Vielleicht lässt sich das zusammenführen... z.B. könnte die @InnerClass
 		// Annotation STATT @Template verwendet werden. Das wäre dann aber auch für @Clazz zu überlegen. 
 		annotationsRule = createAnnotationMappingRules(metaAnnotation, null, null)
+		
+		commentRule = createCommentRule(metaAnnotation, templateClass, null, null)
 
 		shallCreateShadowAnnotation = metaAnnotation.value("createShadowAnnotation", Boolean) ?: false
 		this.isTopLevelClass = isTopLevelClass
@@ -88,6 +91,8 @@ class ClassRule extends AbstractRule {
 		// and would for instance be in conflict with ElementExtensions.generatedTypeElementAccordingToTriggerAnnotation 
 		varRules = if(isTopLevelClass) createELVariableRules(metaAnnotation, templateClass, null) else null;
 		scopeRule = if(isTopLevelClass) createScopeRule(metaAnnotation, templateClass, null) else scopeWithCurrentSrc
+		
+		
 	}
 
 	/**
@@ -163,6 +168,7 @@ class ClassRule extends AbstractRule {
 					}
 
 					generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
+					generatedClass.comment = commentRule.apply
 
 					membersRule.apply(generatedClass)
 

@@ -22,13 +22,8 @@ class InnerClassRule extends MemberRuleSupport<TypeElement, GenTypeElement> {
 		//and then pass the name to the class generator.
 		val name = nameRule.apply
 			
-		
-		
-		val clazz = classRule.generateClass(name, null).head 
 			
-		clazz.comment = commentRule.apply
-		
-		clazz
+		classRule.generateClass(name, null).head 
 	}
 	
 	override protected createMember(String name) {

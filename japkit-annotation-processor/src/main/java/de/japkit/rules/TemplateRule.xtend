@@ -80,6 +80,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		}
 		val clazzAnnotation = member.annotationMirror(Clazz)
 		if(clazzAnnotation!=null){
+			//"Aux" class
 			val cr = new ClassRule(clazzAnnotation, member, true, true);
 			return	[
 					cr.generateClass(null, null)
