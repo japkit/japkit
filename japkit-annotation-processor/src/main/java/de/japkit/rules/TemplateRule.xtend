@@ -40,8 +40,8 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	boolean allMethodsAreTemplates
 	boolean allConstructorsAreTemplates
 	
-	new(TypeElement templateClass, AnnotationMirror templateAnnotation, (TemplateRule)=>void registrationCallback) {
-		super(templateAnnotation, templateClass)
+	new(TypeElement templateClass, AnnotationMirror metaAnnotation, (TemplateRule)=>void registrationCallback) {
+		super(metaAnnotation, templateClass)
 		registrationCallback.apply(this) //Allows self cycles of template rules!
 		this.templateClass = templateClass
 		
@@ -67,8 +67,16 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		)	
 
 		annotationsRule = createAnnotationMappingRules(metaAnnotation, templateClass, null)
-		activationRule = createActivationRule(templateAnnotation, null)
-		scopeRule = createScopeRule(metaAnnotation, templateClass, true, null)
+		
+		//If the annotation is @Template, the rule has its own activation and Source Rule
+		//Otherwise, it is part of another rule (@Clazz, @InnerClass) and uses the source element of that rule (no own SrcRule).
+		if(Template.name == metaAnnotation?.annotationType?.qualifiedName ){		
+			activationRule = createActivationRule(metaAnnotation, null)
+			scopeRule = createScopeRule(metaAnnotation, templateClass, true, null)
+		} else {
+			activationRule = [|true]
+			scopeRule = createScopeRule(metaAnnotation, templateClass, true, null, false)		
+		}
 
 	
 	}

@@ -61,15 +61,16 @@ class ClassRule extends AbstractRule {
 	new(AnnotationMirror metaAnnotation, TypeElement templateClass, boolean isTopLevelClass, boolean isAuxClass) {
 		super(metaAnnotation, templateClass)
 		activationRule = createActivationRule(metaAnnotation, null)
-		templateRule = templateClass?.createTemplateRule
-		membersRule = new MembersRule(metaAnnotation)
+		templateRule = templateClass?.createTemplateRule(metaAnnotation)
+		
+		//"Legacy support" when @Clazz is not on a template but on the trigger annotation.
+		membersRule = if(templateClass==null) new MembersRule(metaAnnotation) else null
+		annotationsRule = if(templateClass==null) createAnnotationMappingRules(metaAnnotation, null, null) else null
+		
+		
 		kind = metaAnnotation.value('kind', ElementKind)
 		modifiersRule = createModifiersRule(metaAnnotation, templateClass, null)
 
-		// TODO: Das template wird hier nicht mit hineingegeben, da die Template rule bereits selbst die annotationen des Templates kopiert.
-		// Es gibt recht viele Redundanzen zwischen @InnerClass und @Template. Vielleicht lässt sich das zusammenführen... z.B. könnte die @InnerClass
-		// Annotation STATT @Template verwendet werden. Das wäre dann aber auch für @Clazz zu überlegen. 
-		annotationsRule = createAnnotationMappingRules(metaAnnotation, null, null)
 		
 		commentRule = createCommentRule(metaAnnotation, templateClass, null, null)
 
@@ -90,6 +91,8 @@ class ClassRule extends AbstractRule {
 		// Note: src expression is currently not supported in the annotation, since generating multiple classes is not supported
 		// and would for instance be in conflict with ElementExtensions.generatedTypeElementAccordingToTriggerAnnotation 
 		varRules = if(isTopLevelClass) createELVariableRules(metaAnnotation, templateClass, null) else null;
+		
+		//TODO: A ClassRule can be a library. An InnerClassRule not. Why?
 		scopeRule = if(isTopLevelClass) createScopeRule(metaAnnotation, templateClass, null) else scopeWithCurrentSrc
 		
 		
@@ -167,10 +170,12 @@ class ClassRule extends AbstractRule {
 						createShadowAnnotation(generatedClass)
 					}
 
-					generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)
+					if(annotationsRule != null) {
+						generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)			
+					}
 					generatedClass.comment = commentRule.apply
 
-					membersRule.apply(generatedClass)
+					membersRule?.apply(generatedClass)
 
 					// For @InnerClass, the annotated inner class is the template
 					templateRule?.apply(generatedClass)
