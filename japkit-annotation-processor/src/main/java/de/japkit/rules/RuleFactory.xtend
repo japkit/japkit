@@ -54,7 +54,8 @@ class RuleFactory {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
 		[String templateClassFqn,(TemplateRule)=>void registrationCallBack |
 			mc.printDiagnosticMessage['''Create TemplateRule from «templateClass»'''];
-			new TemplateRule(templateClass, templateAnnotation ?: templateClass.annotationMirror(Template), registrationCallBack)
+			//Always try to find Template annotation. Only if not found, use given annotation (@Class, @InnerClass)
+			new TemplateRule(templateClass, templateClass.annotationMirror(Template) ?:templateAnnotation, registrationCallBack)
 		]
 	}
 
