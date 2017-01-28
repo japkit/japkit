@@ -152,9 +152,9 @@ public @interface InnerClass {
 	
 	/**
 	 * 
-	 * @return the superclass for the generated class. By default it is Object.
+	 * @return the superclass for the generated class.
 	 */
-	Class<?> superclass() default Object.class;
+	Class<?> superclass() default None.class;
 
 	/**
 	 * 

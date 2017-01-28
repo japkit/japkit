@@ -49,19 +49,20 @@ public class DTOTemplate implements SrcInterface {
 }
 ```
 
-- The annotation `@Class` tells the annotation processor that this is a template for generating a new class. 
+- The annotation `@Clazz` tells the annotation processor that this is a template for generating a new class. 
 - The `nameSuffixToAppend` describes the name of the generated class. It shall consist of the name of the source class (which is Person in our case) plus "DTO". So we get PersonDTO.
 - `@RuntimeMetadata` should be on every template class. It is again some ceremony of japkit.
 - The template implements the interface `SrcInterface`. This is a so called type function that means "use the type of the source here". The source is again Person in our example. So, the generated PersonDTO will implement the Person interface.
 - `@Field` tells to generate a field
-- `src` is a JavaEL expression that defines the source the field is generated from. Src is the current source element (the class Person), so `#{src.properties}` means "all properties of class Person". Since this is a collection, a field will be generated for every element in the collection, that is for every property of class Person.
- - The src is a [TypeElement](https://docs.oracle.com/javase/8/docs/api/javax/lang/model/element/TypeElement.html) here. TypeElement does not have any property with the name "properties". However, "properties" is some convinience property that japkit provides for TypeElements in EL expressions.
-- You can generate arbitrary methods with japkit, but getters and setters are so common, that there are convinient `@Getter` and `@Setter` annotations to generate the accessor methods for a field. They allow for some customization, for example fluent setters. But we don't us this feature here.
+- Thr annotation value `src` is a JavaEL expression that defines the source the field is generated from. 
+- `#{src.properties}` means "all properties of class Person", since Person was the src we started with. Since `#{src.properties}` is a collection, a field will be generated for every element in the collection, that is for every property of class Person.
+ - Person is a [TypeElement](https://docs.oracle.com/javase/8/docs/api/javax/lang/model/element/TypeElement.html). So, in the JavaEL expression you have access to all properties of TypeElement. TypeElement does not have any property with the name "properties". However, "properties" is some convinient extension that japkit provides for TypeElements in EL expressions.
+- You can generate arbitrary methods with japkit, but getters and setters are so common, that there are convinient `@Getter` and `@Setter` annotations to generate the accessor methods for a field. They allow for some customization, for example fluent setters. But we don't use this feature here.
 - Next you see, how the generated field should look like. It is private and it shall have the type and name of the source element (the property of Person).
  - `SrcType` is a type function similar to `SrcInterface` and means to use the type of the source element
  - The $...$ syntax tells japkit to insert the result of an expression evaluation here. `$name$` really means `#{src.name}`. So the name of a property of the class Person is inserted here.
 
-That's it. Besides some setup in the Maven POM of the project, nothing more needs to be done.
+That's it. Besides some setup in the Maven POM of the project (see [Installation](https://github.com/stefanocke/japkit/wiki/Installation), nothing more needs to be done.
 
 Finally, this is the code that will be generated:
 ```Java
@@ -137,7 +138,7 @@ public String toString(){
 }
 ```
 
-But the code template is hard to read due to the escaping of the quotes. Thus, japkit also allow to write code templates as JavaDoc comments:
+But the code template is hard to read due to the escaping of the quotes. Thus, japkit also allows to write code templates as JavaDoc comments:
 
 ```Java
 @Clazz(nameSuffixToAppend = "DTO")
@@ -183,8 +184,10 @@ public class DTOTemplate implements SrcInterface {
 ```
 
 - The `bodyIterator` says we want to iterate over the properties of the source class when generating the method body.
+ - As you can see here, it is possible to omit `src.` in `#{src.properties}`. It is implicit.
 - The `bodyBeforeIteratorCode` and `bodyAfterIteratorCode` is the code to be generate before and after we iterate.
-- The `bodyCode` is the one to be generates for each element in the iteration. So we get `"#{name}=" + #{name} +` for each property of the source class.
+ - Within these two code fragments, the source element is Person.
+- The `bodyCode` is generated for each element in the iteration. So we get `"#{name}=" + #{name} +` for each property of the source class.
 - The `bodySeparator` is the code to generate between the iterations, but not before the first one and after the last one.
 
 With the template above we get the following in PersonDTO:
@@ -204,4 +207,4 @@ There is a bunch of other ways to generate more complex method body code in japk
 What next?
 ----------
 
-The documentation for japkit is still work in progress and only covers a small part yet. The best way to learn more about japkit is to play with the [examples](https://github.com/stefanocke/japkit-examples/tree/master/).
+The [documentation](https://github.com/stefanocke/japkit/wiki) for japkit is still work in progress and only covers a small part yet. The best way to learn more about japkit is to play with the [examples](https://github.com/stefanocke/japkit-examples/tree/master/).

@@ -3,12 +3,14 @@ package de.japkit.metaannotations;
 /**
  * The template languages provided by Japkit. The difference between template
  * languages and expression languages (see {@link Lang}) are:
+ * <ul>
  * <li>Templates written in template languages are always separate files.
  * Expressions in expression languages are always part of a Java template class.
  * <li>Template languages are only used in {@link ResourceTemplate} and generate
  * always separate files by streaming the result of the template evaluation.
  * Expression do not stream. They are evaluated to a String or another value
  * which can be used in other expressions or in method bodies.
+ * </ul>
  * 
  * @author stefan
  */

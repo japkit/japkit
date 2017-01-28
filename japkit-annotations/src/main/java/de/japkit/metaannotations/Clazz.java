@@ -146,9 +146,9 @@ public @interface Clazz {
 	
 	/**
 	 * 
-	 * @return the superclass for the generated class. By default it is Object.
+	 * @return the superclass for the generated class. 
 	 */
-	Class<?> superclass() default Object.class;
+	Class<?> superclass() default None.class;
 
 	/**
 	 * 
@@ -331,5 +331,12 @@ public @interface Clazz {
 	 * Libraries with functions to be made available for use in expressions.
 	 */
 	Class<?>[] libraries() default {};
+	
+	/**
+	 * Annotations that shall be accessed by their simple names like this: typeElement.Entity
+	 * 
+	 * @return
+	 */
+	Class<? extends java.lang.annotation.Annotation>[] annotationImports() default {};
 
 }

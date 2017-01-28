@@ -1,13 +1,12 @@
 package de.japkit.rules
 
-import de.japkit.rules.AbstractRule
+import de.japkit.services.RuleException
+import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import org.eclipse.xtext.xbase.lib.Functions.Function0
-import org.eclipse.xtend.lib.annotations.Data
-import java.util.List
-import de.japkit.services.RuleException
 import javax.lang.model.element.TypeElement
+import org.eclipse.xtend.lib.annotations.Data
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 /** A case rule at first checks, if the condition matches. 
  * If so, it evaluates the value expression or function and returns the result.
@@ -42,7 +41,7 @@ class CaseRule<T> extends AbstractRule implements Function0<T>, ICodeFragmentRul
 				val condition = conditionRule?.apply ?: 
 					
 					{
-						//If the condition of the case annotation is "empty", look for the first annotation that represent a funtion and call it as a boolean function
+						//If the condition of the case annotation is "empty", look for the first annotation that represents a function and call it as a boolean function
 						//This is done here, since createFunctionRule within constructor creates some cyclic dependedencies and/or stackoverflow in Xtend
 						var Pair<TypeElement, IParameterlessFunctionRule<?>> typeAndFunction
 						try {
@@ -62,11 +61,14 @@ class CaseRule<T> extends AbstractRule implements Function0<T>, ICodeFragmentRul
 		caseRules?.findFirst[shallBeApplied]
 	}
 
-	def private getRuleToApply() {
+	def private Object getRuleToApply() {
 		val rule = if (!valueRule.isUndefined)
 				valueRule
 			else {
-				metaElement?.createFunctionRule;
+				metaElement?.createFunctionRule 
+				//Für den häufigen Fall des "Type-Switch". Ist nicht ganz allgemein, könnten ja auch Functions mit beliebigen Rückgabetypen sein.
+				//Die Möglichkeit, Paramter per Type-Argumenten zu übergeben ist aber gegenwärtig an den TypeResolver gebunden.
+				?: createTypeRule(null, metaElement.asType(), null);
 			}
 		if (rule ==
 			null) {
