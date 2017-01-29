@@ -1,9 +1,10 @@
 package de.japkit.services
 
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import de.japkit.annotations.Generated
 import de.japkit.model.GenAnnotationMirror
 import de.japkit.model.GenAnnotationValue
-import de.japkit.model.GenClass
 import de.japkit.model.GenDeclaredType
 import de.japkit.model.GenTypeElement
 import de.japkit.model.GenTypeMirror
@@ -12,7 +13,6 @@ import de.japkit.model.GenUnresolvedTypeElement
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.util.Collections
-import java.util.IdentityHashMap
 import java.util.List
 import java.util.Map
 import java.util.Set
@@ -32,10 +32,6 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import com.google.common.collect.Multimap
-import com.google.common.collect.SetMultimap
-import com.google.common.collect.TreeMultimap
-import com.google.common.collect.HashMultimap
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -83,6 +79,10 @@ class TypesRegistry {
 		val fqn = am.value("src", String)
 
 		fqn.getTypeElement
+	}
+	
+	def clearCaches() {
+		typesNotFoundInGenClass.clear();
 	}
 	
 	def persist() {
@@ -836,7 +836,7 @@ class TypesRegistry {
 	
 	
 	
-	static Multimap<GenTypeElement, String> typesNotFoundInGenClass = HashMultimap.create()
+	val Multimap<GenTypeElement, String> typesNotFoundInGenClass = HashMultimap.create()
 	
 	//Always resolve a self cycle and dependency to aux classes immediately. 
 	protected def TypeElement findTypeInCurrentGeneratedClass(String typeFqnOrShortname) {

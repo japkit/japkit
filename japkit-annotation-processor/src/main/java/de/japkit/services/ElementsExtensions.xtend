@@ -369,10 +369,14 @@ class ElementsExtensions {
 	def clearCaches() {
 		annotationValuesCache.clear
 		annotationValueMethodsCache.clear
+		runtimeMetadataByFqn.clear
+		commentsFromRuntimeMetadata.clear
+		orderFromRuntimeMetadata.clear
+		paramNamesFromRuntimeMetadata.clear
 	}
 
 	//FQN of AnnotationTypeElement to (name of annotation value to mehtod)
-	static val annotationValueMethodsCache = new HashMap<String, Map<String, ExecutableElement>>
+	val annotationValueMethodsCache = new HashMap<String, Map<String, ExecutableElement>>
 	
 	def ExecutableElement getAVMethod(AnnotationMirror annotationMirror, String name){
 		val annotationTypeElement = annotationMirror.annotationType.asElement as TypeElement
@@ -394,7 +398,7 @@ class ElementsExtensions {
 	}
 
 
-	static val annotationValuesCache = new IdentityHashMap<AnnotationMirror, Map<String, AnnotationValue>>
+	val annotationValuesCache = new IdentityHashMap<AnnotationMirror, Map<String, AnnotationValue>>
 
 	def private AnnotationValue value(AnnotationMirror annotationMirror, CharSequence name) {
 		loadAnnotationValues(annotationMirror).get(name.toString)

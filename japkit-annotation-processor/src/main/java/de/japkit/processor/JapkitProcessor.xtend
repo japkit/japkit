@@ -110,6 +110,7 @@ class JapkitProcessor extends AbstractProcessor {
 		elementsExtensions.clearCaches
 		//The rules cannot be reused in later rounds since they contain references to elements that are no longer valid.
 		ruleFactory.clearCaches
+		typesRegistry.clearCaches
 
 		val startTime = System.currentTimeMillis
 
