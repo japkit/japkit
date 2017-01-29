@@ -76,18 +76,22 @@ class JapkitProcessor extends AbstractProcessor {
 		annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
 		messageCollector = ExtensionRegistry.get(MessageCollector)
 		messageCollector.diagnosticLogging = "true".equals(processingEnv.options.get("diagnosticMessages"))
+		
+		printDiagnosticMessage(['''Init japkit annotation processor.''']);
 
 		generateClassContext = ExtensionRegistry.get(GenerateClassContext)
 
 		typesRegistry = ExtensionRegistry.get(TypesRegistry)
 		ruleFactory = ExtensionRegistry.get(RuleFactory)
 		elSupport = ExtensionRegistry.get(ELSupport)
+		
 
 	}
 
 	override finalize() {
 
-		//Argh.
+		//Argh. Can we do this in final round instead? Leider nicht so recht... Beim inkrementellen Build in Eclipse kommt nach der letzten Runde 
+		//meist nochmal eine neue Runde (WTF !?!) und da wir der gleiche anno-processor verwendet.
 		ExtensionRegistry.cleanup
 	}
 

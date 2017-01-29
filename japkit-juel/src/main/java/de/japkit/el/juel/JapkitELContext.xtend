@@ -13,9 +13,9 @@ class JapkitELContext extends ELContext {
 	val ELResolver elResolver;
 	val FunctionMapper fnMapper;
 	
-	new(Map<String, ? extends Object> vs){
+	new(Map<String, ? extends Object> vs, MethodCache methodCache){
 		elResolver = new JapkitELResolver(vs);
-		fnMapper = new DynamicFunctionMapper(vs);
+		fnMapper = new DynamicFunctionMapper(vs, methodCache);
 	}
 	
 	override getELResolver() {

@@ -24,6 +24,8 @@ class JuelELProvider implements ELProvider {
 			Thread.currentThread().contextClassLoader = oldCCL
 		}
 	])
+	
+	val methodCache = new MethodCache
 
 	override eval(ValueStack vs, String expr, Class<?> expectedType, String language) {
 		try {
@@ -35,7 +37,7 @@ class JuelELProvider implements ELProvider {
 	}
 
 	def private createElContext(ValueStack vs) {
-		val context = new JapkitELContext(vs);
+		val context = new JapkitELContext(vs, methodCache);
 
 		// Force the use of the same context. For example, when the ELResolver internally calls getExpressionFactory(context)
 		// Otherwise we run into some class loading issues..
