@@ -133,6 +133,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 	ThreadLocal<TypeElement> currentTypeElement = new ThreadLocal<TypeElement>();
 	
 	def dispatch CharSequence code(TypeElement typeElement){
+		try{
 		currentTypeElement.set(typeElement)
 		switch typeElement.kind {
 			case ElementKind.CLASS: codeForClass(typeElement)
@@ -140,6 +141,10 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 			case ElementKind.ENUM: codeForEnum(typeElement) 
 			case ElementKind.ANNOTATION_TYPE:  codeForAnnotationType(typeElement) //TODO
 			default : unknownElement(typeElement)
+		}
+		
+		} finally {
+			currentTypeElement.remove();
 		}
 	}
 	

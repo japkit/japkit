@@ -4,7 +4,6 @@ import de.japkit.el.ElExtensions
 import java.lang.reflect.Method
 import java.util.ArrayList
 import java.util.Map
-import java.util.WeakHashMap
 import javax.el.FunctionMapper
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.dynamic.ClassLoadingStrategy
@@ -20,7 +19,7 @@ import org.eclipse.xtend.lib.annotations.Data
 @Data
 class DynamicFunctionMapper extends FunctionMapper {
 	val Map<String, ? extends Object> contextMap
-	static transient val methodCache = new WeakHashMap<Object, Method>()
+	val MethodCache methodCache
 
 	static class Invoker {
 		val Object function

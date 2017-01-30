@@ -57,6 +57,8 @@ class JapkitProcessor extends AbstractProcessor {
 
 	//annotated classes that have to be re-considered in a later round
 	val Map<String, TypeElementNotFoundException> deferredClasses = new HashMap
+	
+	boolean servicesInitialized;
 
 	override init(ProcessingEnvironment processingEnv) {
 
@@ -64,31 +66,39 @@ class JapkitProcessor extends AbstractProcessor {
 		this.processingEnv = processingEnv;
 		this.elementUtils = processingEnv.elementUtils
 		this.typeUtils = processingEnv.typeUtils
-		ExtensionRegistry.cleanup //Make sure old stuff is removed.
-		ExtensionRegistry.register(ProcessingEnvironment, processingEnv)
-		ExtensionRegistry.register(Types, typeUtils)
-		ExtensionRegistry.register(Elements, elementUtils)
-
-		this.elementsExtensions = ExtensionRegistry.get(ElementsExtensions);
-		this.typesExtensions = ExtensionRegistry.get(TypesExtensions);
-
-		//this.formatter = new EclipseFormatter(messager)
-		annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
-		messageCollector = ExtensionRegistry.get(MessageCollector)
-		messageCollector.diagnosticLogging = "true".equals(processingEnv.options.get("diagnosticMessages"))
-
-		generateClassContext = ExtensionRegistry.get(GenerateClassContext)
-
-		typesRegistry = ExtensionRegistry.get(TypesRegistry)
-		ruleFactory = ExtensionRegistry.get(RuleFactory)
-		elSupport = ExtensionRegistry.get(ELSupport)
+		
+		initServices();
 
 	}
-
-	override finalize() {
-
-		//Argh.
-		ExtensionRegistry.cleanup
+	
+	def initServices() {
+		if(!servicesInitialized){
+			ExtensionRegistry.cleanup //Make sure old stuff is removed.
+			ExtensionRegistry.register(ProcessingEnvironment, this.processingEnv)
+			ExtensionRegistry.register(Types, typeUtils)
+			ExtensionRegistry.register(Elements, elementUtils)
+	
+			this.elementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+			this.typesExtensions = ExtensionRegistry.get(TypesExtensions);
+	
+			annotationExtensions = ExtensionRegistry.get(AnnotationExtensions)
+			messageCollector = ExtensionRegistry.get(MessageCollector)
+			messageCollector.diagnosticLogging = "true".equals(this.processingEnv.options.get("diagnosticMessages"))
+			
+			printDiagnosticMessage(['''Init japkit annotation processor.''']);
+	
+			generateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	
+			typesRegistry = ExtensionRegistry.get(TypesRegistry)
+			ruleFactory = ExtensionRegistry.get(RuleFactory)
+			elSupport = ExtensionRegistry.get(ELSupport)	
+			servicesInitialized = true;	
+		}
+	}
+	
+	def cleanupServices() {
+		ExtensionRegistry.cleanup;
+		servicesInitialized = false;	
 	}
 
 	override getSupportedAnnotationTypes() {
@@ -107,9 +117,13 @@ class JapkitProcessor extends AbstractProcessor {
 	}
 
 	override process(Set<? extends TypeElement> annotations, extension RoundEnvironment roundEnv) {
+		//Necessary here, since we cleanup in the last round, but in Eclipse, there are multiple "last rounds" during incremental build.
+		initServices();
+		
 		elementsExtensions.clearCaches
 		//The rules cannot be reused in later rounds since they contain references to elements that are no longer valid.
 		ruleFactory.clearCaches
+		typesRegistry.clearCaches
 
 		val startTime = System.currentTimeMillis
 
@@ -123,6 +137,7 @@ class JapkitProcessor extends AbstractProcessor {
 
 			//Do not generate anything in last round but just report all errors that have been collected so far.
 			printAllErrors()
+			cleanupServices()
 			return false
 		}
 

@@ -15,19 +15,15 @@ class InnerClassRule extends MemberRuleSupport<TypeElement, GenTypeElement> {
 		classRule = new ClassRule(metaAnnotation, template, false)
 	}
 
-	override protected GenTypeElement createMember() {
-			
+	override protected createMember(String name) {
 		//The name expression for an inner class is not based on the annotated class but
 		//on the current rule source element. Thus, we apply the same logic here as for other member rules
 		//and then pass the name to the class generator.
-		val name = nameRule.apply
-			
-			
 		classRule.generateClass(name, null).head 
 	}
 	
-	override protected createMember(String name) {
-		throw new UnsupportedOperationException("Not used here.")
+	override protected applyRulesAfterCreation(GenTypeElement member) {
+		//deactivate rules for comment, annotations and modifiers since this is done by the ClassRule
 	}
 
 }
