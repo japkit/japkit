@@ -113,11 +113,10 @@ class AnnotationValueMappingRule extends AbstractRule{
 
 		val targetClass = if(avType.kind.isPrimitive) avType.toAnnotationValueClass else Object
 
-		val result = handleException(null, exprAvName)[ 
-			eval(expr, lang, targetClass)
+		handleException(null, exprAvName)[ 
+			val result = eval(expr, lang, targetClass)
+			coerceAnnotationValue(result, avType)
 		]
-
-		coerceAnnotationValue(result, avType)
 
 	}
 

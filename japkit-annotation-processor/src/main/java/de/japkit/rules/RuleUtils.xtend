@@ -568,7 +568,7 @@ class RuleUtils {
 		} catch (RuleException e) {
 			reportRuleError(e, avName ?: e.avName)
 			if(errorResult != null) return errorResult.apply() else throw new ReportedException(e)
-		}catch (Exception e) {
+		} catch (Exception e) {
 			reportRuleError(e, avName)
 			if(errorResult != null) return errorResult.apply() else throw new ReportedException(e)
 		}

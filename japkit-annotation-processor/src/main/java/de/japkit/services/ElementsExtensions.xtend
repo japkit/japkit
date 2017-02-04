@@ -45,7 +45,6 @@ import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
-import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static javax.lang.model.util.ElementFilter.*
 
@@ -820,7 +819,7 @@ class ElementsExtensions {
 			case e.kind == ElementKind.ENUM: {
 				val enumConst = avType.asTypeElement.declaredFields.findFirst[simpleName.contentEquals(s)]
 				if (enumConst == null) {
-					throw new IllegalArgumentException('''«s» is not a valid enum constant for enum type «avType»''');
+					throw new RuleException('''«s» is not a valid enum constant for enum type «avType»''');
 				}
 				enumConst
 			}
@@ -839,8 +838,7 @@ class ElementsExtensions {
 	}
 
 	def static unsupportedAVType(TypeMirror type, Object o) {
-		new IllegalArgumentException(
-			'''An annotation value of type «type» cannot be created from value "«o»" of type «o?.class»''')
+		new RuleException('''An annotation value of type «type» cannot be created from value "«o»" of type «o?.class»''')
 	}
 
 	def isAbstract(Element e) {
