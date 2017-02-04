@@ -1,5 +1,6 @@
 package de.japkit.rules
 
+import de.japkit.annotations.AnnotationTemplate
 import de.japkit.metaannotations.AnnotationMode
 import de.japkit.metaannotations.DefaultAnnotation
 import de.japkit.model.GenAnnotationMirror
@@ -7,6 +8,9 @@ import de.japkit.model.GenExtensions
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.GenerateClassContext
 import de.japkit.services.ProcessingException
+import de.japkit.services.ReportedException
+import de.japkit.services.RuleException
+import de.japkit.services.TypeElementNotFoundException
 import java.util.List
 import java.util.Map
 import java.util.Set
@@ -16,10 +20,6 @@ import javax.lang.model.type.DeclaredType
 import org.eclipse.xtend.lib.annotations.Data
 
 import static de.japkit.metaannotations.AnnotationMode.*
-import de.japkit.services.TypeElementNotFoundException
-import de.japkit.services.ReportedException
-import de.japkit.annotations.AnnotationTemplate
-import de.japkit.services.RuleException
 
 @Data
 class AnnotationMappingRule extends AbstractRule {
@@ -162,17 +162,17 @@ class AnnotationMappingRule extends AbstractRule {
 
 		anno => [
 			valueMappings.forEach [ vm |
-				try {
+				//try {
 					setValue(vm.name, [ avType |
 						vm.mapAnnotationValue(anno, avType)
 					])
 
-				} catch (RuntimeException e) {
+				//} catch (RuntimeException e) {
 
-					reportRuleError('''
-					Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
-					Cause: «e.message»''')
-				}
+				//	reportRuleError('''
+				//	Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
+				//	Cause: «e.message»''')
+				//}
 			]
 		]
 
@@ -207,7 +207,9 @@ class AnnotationMappingRule extends AbstractRule {
 
 		valueMappings = targetAnnotation.asTypeElement.declaredMethods
 			.map[simpleName]
-			.map[name | new AnnotationValueMappingRule(annotationTemplate, templateElement, name.toString)]
+			.map[name | new AnnotationValueMappingRule(
+				annotationTemplate,	templateElement, name.toString
+			)]
 		
 		mode = AnnotationMode.JOIN_LIST
 		scopeRule = createScopeRule(annotationTemplate, null, "_")

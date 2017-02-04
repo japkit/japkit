@@ -22,6 +22,7 @@ class AnnotationValueMappingRule extends AbstractRule{
 	String name
 	Object value
 	String expr
+	String exprAvName
 	String lang
 	()=>AnnotationMappingRule lazyAnnotationMapping
 	AVMode mode
@@ -112,7 +113,9 @@ class AnnotationValueMappingRule extends AbstractRule{
 
 		val targetClass = if(avType.kind.isPrimitive) avType.toAnnotationValueClass else Object
 
-		val result = eval(expr, lang, targetClass)
+		val result = handleException(null, exprAvName)[ 
+			eval(expr, lang, targetClass)
+		]
 
 		coerceAnnotationValue(result, avType)
 
@@ -123,7 +126,8 @@ class AnnotationValueMappingRule extends AbstractRule{
 		super(a, null)
 		name = a.value(null, "name", String)
 		value = a.value(null, "value", String)
-		expr = a.value(null, "expr", String)
+		exprAvName="expr"
+		expr = a.value(null, exprAvName, String)
 		lang = a.value(null, "lang", String)
 		mode = a.value(null, "mode", AVMode)
 		val annotationMappingId = a.value(null, "annotationMappingId", String)
@@ -144,7 +148,8 @@ class AnnotationValueMappingRule extends AbstractRule{
 		value = a.value(avName, Object)
 		
 		val avPrefix = avName+'_'
-		expr = a.value("expr".withPrefix(avPrefix), String)
+		exprAvName="expr".withPrefix(avPrefix)
+		expr = a.value(exprAvName, String)
 		lang = a.value("lang".withPrefix(avPrefix), String)
 		mode = AVMode.JOIN_LIST
 		
