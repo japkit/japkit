@@ -764,19 +764,29 @@ class ElementsExtensions {
 			coerceSingleValue(value, avType)
 		}
 	}
-
-	def coerceSingleValue(Object value, TypeMirror avType) {
-		if(value==null){
-			//This is no valid annotation value but it just says not to set the AV
-			return null;
+	
+	//For example, in annotation templates, array are used to make single-valued AVs optional.
+	//So, we tolerate Iterables when setting single valued AVs
+	def dispatch Object coerceSingleValue(Iterable<?> value, TypeMirror avType) {
+		if(value.size>1) {
+			throw new RuleException(''''«value»' is not a valid value or element value for type «avType», since it contains multiple elements''');
 		}
+		coerceSingleValue(value.head, avType) 
+	}
+
+	def dispatch Object coerceSingleValue(Object value, TypeMirror avType) {
 		val v = toAnnotationValue(avType, value)
 		
 		if (!avType.toAnnotationValueClass.isInstance(v)) {
-			throw new IllegalArgumentException(
+			throw new RuleException(
 				''''«v»' of type «v?.class» is not a valid value or element value for type «avType»''');
 		}
 		v
+	}
+	
+	def dispatch Object coerceSingleValue(Void value, TypeMirror avType) {
+		//This is no valid annotation value but it just says not to set the AV
+		return null;
 	}
 
 	def dispatch toAnnotationValue(DeclaredType avType, Object o) {

@@ -38,5 +38,10 @@ public enum AnnotationMode {
 	 * annotation stays at it is.
 	 */
 	IGNORE,
+	
+	/**
+	 * Add the annotation to the already generated ones, potentially generating an annotation of same type multiple times.
+	 */
+	JOIN_LIST
 
 }
