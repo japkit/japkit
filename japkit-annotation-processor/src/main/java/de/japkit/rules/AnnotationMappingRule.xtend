@@ -162,17 +162,9 @@ class AnnotationMappingRule extends AbstractRule {
 
 		anno => [
 			valueMappings.forEach [ vm |
-				//try {
 					setValue(vm.name, [ avType |
 						vm.mapAnnotationValue(anno, avType)
 					])
-
-				//} catch (RuntimeException e) {
-
-				//	reportRuleError('''
-				//	Could not set annotation value «vm.name» for mapped annotation «it?.annotationType?.qualifiedName».
-				//	Cause: «e.message»''')
-				//}
 			]
 		]
 

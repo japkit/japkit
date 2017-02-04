@@ -20,7 +20,7 @@ import de.japkit.metaannotations.Var;
 			values={
 				@AV(name="id", expr="#{elements.uniqueNameWithinTopLevelEnclosingTypeElement(src)}"), 
 				@AV(name="comment", expr="#{elements.getDocComment(src)}"),
-				@AV(condFun=RuntimeMetadata.methodOrConstructor.class, name="paramNames", expr="#{src.parameters}")
+				@AV(condFun=RuntimeMetadata.methodOrConstructor.class, name="paramNames", src="#{src.parameters}", expr="#{simpleName}")
 		}),
 	@Annotation(targetAnnotation=List.class, mode=AnnotationMode.MERGE, 
 		values=@AV(name = "value", mode=AVMode.JOIN_LIST, annotationMappingId="elementMetadata"))

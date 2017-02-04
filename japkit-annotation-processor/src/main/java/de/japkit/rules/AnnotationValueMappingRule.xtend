@@ -3,7 +3,7 @@ package de.japkit.rules
 import de.japkit.metaannotations.AVMode
 import de.japkit.model.GenAnnotationMirror
 import de.japkit.model.GenAnnotationValue
-import de.japkit.services.ProcessingException
+import de.japkit.services.RuleException
 import java.util.ArrayList
 import java.util.List
 import java.util.Map
@@ -13,7 +13,6 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 import static extension de.japkit.rules.RuleUtils.withPrefix
-import de.japkit.services.RuleException
 
 @Data
 class AnnotationValueMappingRule extends AbstractRule {
@@ -26,7 +25,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 	String lang
 	()=>AnnotationMappingRule lazyAnnotationMapping
 	AVMode mode
-
+	((Object)=>Object)=>Iterable<Object> scopeRule
 
 	def GenAnnotationValue mapAnnotationValue(GenAnnotationMirror annotation, TypeMirror avType) {
 		inRule[
@@ -56,27 +55,29 @@ class AnnotationValueMappingRule extends AbstractRule {
 				}
 			}
 	
-			val v = if (value != null) {
-					coerceAnnotationValue(value, avType)
+			val flatValues = newArrayList
+			
+			scopeRule.apply [
+				if (value != null) {
+					value
 				} else if (lazyAnnotationMapping != null) {
-					
+
 					val annotationMapping = lazyAnnotationMapping.apply
 
 					val annotations = newArrayList
 					annotationMapping.mapOrCopyAnnotations(annotations)
-					if (!annotations.empty) {
-						coerceAnnotationValue(annotations, avType)
-					} else {
-						null
-					}
+					annotations as ArrayList<? extends Object>
 
-				} else if (!expr.nullOrEmpty) {
+				} else if(expr != null) {
 					evaluateExpression(avType, expr)
 				} else {
-					// messager.printMessage(Kind.ERROR, '''Either 'value' or 'expr' must be set.''', am)
-					// throw new IllegalArgumentException(
-					// "Error in annotation value mapping: Either 'value' or 'expr' or 'annotationMappingId'must be set.")
+					//This AV shall not be set. Is relevant for annotation templates. There AVMRs are created for each AV.
+					//Could be optimized by dropping the ones that are "empty", since neither expr nor value nor annotationMapping is set.
+					null
 				}
+			]?.forEach[if(it instanceof Iterable<?>) flatValues.addAll(it) else flatValues.add(it)]
+			
+			val v = coerceAnnotationValue(flatValues, avType)
 	
 			if(v==null){
 				return existingValue;  //No value... Leave existing value unchanged.
@@ -99,8 +100,8 @@ class AnnotationValueMappingRule extends AbstractRule {
 		val targetClass = if(avType.kind.isPrimitive) avType.toAnnotationValueClass else Object
 
 		handleException(null, exprAvName)[ 
-			val result = eval(expr, lang, targetClass)
-			coerceAnnotationValue(result, avType)
+			eval(expr, lang, targetClass)
+			
 		]
 
 	}
@@ -122,10 +123,12 @@ class AnnotationValueMappingRule extends AbstractRule {
 			}
 			amr
 		]
-		if(#[expr!=null,value!=null,lazyAnnotationMapping!=null].filter[it].size > 1){
-			throwRuleCreationException('''At most one of the annotation values 'value', '«exprAvName»', 'annotationMappingId' may be set.''')
+		//Could be optimized by dropping the ones that are "empty", since neither expr nor value nor annotationMapping is set.
+		if(#[expr!=null,value!=null,lazyAnnotationMapping!=null].filter[it].size != 1){
+			throwRuleCreationException('''Exactly one of the annotation values 'value', '«exprAvName»', 'annotationMappingId' must be set.''')
 		}
 		activationRule = createActivationRule(a, null)
+		scopeRule = createScopeRule(a, null, null)
 
 	}
 	
@@ -149,10 +152,11 @@ class AnnotationValueMappingRule extends AbstractRule {
 		}
 		
 		if(#[expr!=null,value!=null,lazyAnnotationMapping!=null].filter[it].size > 1){
-			throwRuleCreationException('''At most one of the annotation values '«avName»', '«exprAvName»', '«avPrefix»' may be set.''')
+			throwRuleCreationException('''At most one of the annotation values '«avName»', '«exprAvName»', '«avPrefix»' must be set.''')
 		}
 		
 		activationRule = createActivationRule(a, avPrefix)
+		scopeRule = createScopeRule(a, null, avPrefix)
 
 	}
 }

@@ -24,6 +24,32 @@ public @interface AV {
 	 */
 	Class<?>[] condFun() default {};
 	
+	/**
+	 * An expression to determine the source object for generating this annotation value(s).
+	 * The source element is available as "src" in expressions. If the src expression is not set, the src
+	 * element of the parent element is used (usually the enclosing element).
+	 * <p>
+	 * If this expression results in an Iterable, each object provided by the
+	 * Iterator is use as source object. That is, the annotation value is generated
+	 * multiple times, once for each object given by the iterator.
+	 * 
+	 * @return
+	 */
+	String src() default "";
+	
+	/**
+	 * As an alternative to the src expression, a function can be called to determine the source object.
+	 * 
+	 * @return
+	 */
+	Class<?>[] srcFun() default {};
+
+	/**
+	 * 
+	 * @return the language of the src expression. Defaults to Java EL.
+	 */
+	String srcLang() default "";
+	
 	
 	/**
 	 * 
