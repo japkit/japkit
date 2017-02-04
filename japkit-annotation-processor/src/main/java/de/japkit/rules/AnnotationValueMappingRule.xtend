@@ -16,7 +16,7 @@ import static extension de.japkit.rules.RuleUtils.withPrefix
 import de.japkit.services.RuleException
 
 @Data
-class AnnotationValueMappingRule extends AbstractRule{
+class AnnotationValueMappingRule extends AbstractRule {
 
 	()=>boolean activationRule
 	String name
@@ -56,41 +56,26 @@ class AnnotationValueMappingRule extends AbstractRule{
 				}
 			}
 	
-			val v = 
-				if (value !=null) {
+			val v = if (value != null) {
 					coerceAnnotationValue(value, avType)
-				} else if (lazyAnnotationMapping!=null){
+				} else if (lazyAnnotationMapping != null) {
+					
 					val annotationMapping = lazyAnnotationMapping.apply
-					
-					if(expr.nullOrEmpty){						
-							val annotations = newArrayList 
-							annotationMapping.mapOrCopyAnnotations(annotations)
-							if(!annotations.empty){
-								coerceAnnotationValue(annotations, avType)
-							} else {
-								null 
-							}
-						
-					} else {
-						//TODO: Warum wird hier über expr iteriert? Für soetwas sollte src verwendet werden...
-						val elements = eval(expr, lang, Iterable) as Iterable<Element>  //TODO: Check if instanceof element
-						val annotations = newArrayList 
-						elements.forEach[
-							scope(it)[
-								annotationMapping.mapOrCopyAnnotations(annotations)
-								null
-							]
-						]
+
+					val annotations = newArrayList
+					annotationMapping.mapOrCopyAnnotations(annotations)
+					if (!annotations.empty) {
 						coerceAnnotationValue(annotations, avType)
+					} else {
+						null
 					}
-					
+
 				} else if (!expr.nullOrEmpty) {
 					evaluateExpression(avType, expr)
 				} else {
-	
-					//messager.printMessage(Kind.ERROR, '''Either 'value' or 'expr' must be set.''', am)
-					//throw new IllegalArgumentException(
-					//	"Error in annotation value mapping: Either 'value' or 'expr' or 'annotationMappingId'must be set.")
+					// messager.printMessage(Kind.ERROR, '''Either 'value' or 'expr' must be set.''', am)
+					// throw new IllegalArgumentException(
+					// "Error in annotation value mapping: Either 'value' or 'expr' or 'annotationMappingId'must be set.")
 				}
 	
 			if(v==null){
@@ -137,6 +122,9 @@ class AnnotationValueMappingRule extends AbstractRule{
 			}
 			amr
 		]
+		if(#[expr!=null,value!=null,lazyAnnotationMapping!=null].filter[it].size > 1){
+			throwRuleCreationException('''At most one of the annotation values 'value', '«exprAvName»', 'annotationMappingId' may be set.''')
+		}
 		activationRule = createActivationRule(a, null)
 
 	}
@@ -158,6 +146,10 @@ class AnnotationValueMappingRule extends AbstractRule{
 		lazyAnnotationMapping = if (annotationMappingAnnotation == null) null else {
 			val amr = new AnnotationMappingRule(annotationMappingAnnotation, templateElement);
 			[| amr]
+		}
+		
+		if(#[expr!=null,value!=null,lazyAnnotationMapping!=null].filter[it].size > 1){
+			throwRuleCreationException('''At most one of the annotation values '«avName»', '«exprAvName»', '«avPrefix»' may be set.''')
 		}
 		
 		activationRule = createActivationRule(a, avPrefix)
