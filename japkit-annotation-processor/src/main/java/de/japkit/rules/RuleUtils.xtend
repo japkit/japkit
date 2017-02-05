@@ -41,6 +41,7 @@ import de.japkit.util.MoreCollectionExtensions
 import de.japkit.annotations.AnnotationTemplate
 import de.japkit.services.TypesRegistry
 import de.japkit.services.RuleException
+import de.japkit.model.AnnotationAndParent
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -358,7 +359,11 @@ class RuleUtils {
 	}
 
 	private def List<AnnotationMappingRule> annotationMappingRulesFromAnnotationTemplates(Element templateElement) {
-		templateElement?.annotationMirrors?.filter[hasMetaAnnotation(AnnotationTemplate.name)]?.map[new AnnotationMappingRule(it, templateElement)]?.toList ?: emptyList
+		templateElement?.annotationMirrors?.filter[hasMetaAnnotation(AnnotationTemplate.name)]?.map[new AnnotationMappingRule(
+			//Wrap the annotation for rule error reporting. For "normal" meta-annotations, this is done in ElementExtensions.annotationMirror 
+			new AnnotationAndParent(it, null, null, templateElement), 
+			templateElement
+		)]?.toList ?: emptyList
 	}
 
 	private def List<AnnotationMappingRule> annotationMappingRulesFromMetaAnnotation(AnnotationMirror metaAnnotation, CharSequence avName) {
@@ -563,7 +568,7 @@ class RuleUtils {
 		} catch (RuleException e) {
 			reportRuleError(e, avName ?: e.avName)
 			if(errorResult != null) return errorResult.apply() else throw new ReportedException(e)
-		}catch (Exception e) {
+		} catch (Exception e) {
 			reportRuleError(e, avName)
 			if(errorResult != null) return errorResult.apply() else throw new ReportedException(e)
 		}

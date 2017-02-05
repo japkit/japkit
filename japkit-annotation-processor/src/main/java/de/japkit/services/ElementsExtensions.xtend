@@ -45,7 +45,6 @@ import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
-import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static javax.lang.model.util.ElementFilter.*
 
@@ -764,19 +763,29 @@ class ElementsExtensions {
 			coerceSingleValue(value, avType)
 		}
 	}
-
-	def coerceSingleValue(Object value, TypeMirror avType) {
-		if(value==null){
-			//This is no valid annotation value but it just says not to set the AV
-			return null;
+	
+	//For example, in annotation templates, array are used to make single-valued AVs optional.
+	//So, we tolerate Iterables when setting single valued AVs
+	def dispatch Object coerceSingleValue(Iterable<?> value, TypeMirror avType) {
+		if(value.size>1) {
+			throw new RuleException(''''«value»' is not a valid value or element value for type «avType», since it contains multiple elements''');
 		}
+		coerceSingleValue(value.head, avType) 
+	}
+
+	def dispatch Object coerceSingleValue(Object value, TypeMirror avType) {
 		val v = toAnnotationValue(avType, value)
 		
 		if (!avType.toAnnotationValueClass.isInstance(v)) {
-			throw new IllegalArgumentException(
+			throw new RuleException(
 				''''«v»' of type «v?.class» is not a valid value or element value for type «avType»''');
 		}
 		v
+	}
+	
+	def dispatch Object coerceSingleValue(Void value, TypeMirror avType) {
+		//This is no valid annotation value but it just says not to set the AV
+		return null;
 	}
 
 	def dispatch toAnnotationValue(DeclaredType avType, Object o) {
@@ -810,7 +819,7 @@ class ElementsExtensions {
 			case e.kind == ElementKind.ENUM: {
 				val enumConst = avType.asTypeElement.declaredFields.findFirst[simpleName.contentEquals(s)]
 				if (enumConst == null) {
-					throw new IllegalArgumentException('''«s» is not a valid enum constant for enum type «avType»''');
+					throw new RuleException('''«s» is not a valid enum constant for enum type «avType»''');
 				}
 				enumConst
 			}
@@ -829,8 +838,7 @@ class ElementsExtensions {
 	}
 
 	def static unsupportedAVType(TypeMirror type, Object o) {
-		new IllegalArgumentException(
-			'''An annotation value of type «type» cannot be created from value "«o»" of type «o?.class»''')
+		new RuleException('''An annotation value of type «type» cannot be created from value "«o»" of type «o?.class»''')
 	}
 
 	def isAbstract(Element e) {

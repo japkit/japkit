@@ -16,14 +16,14 @@ import de.japkit.metaannotations.Var;
 
 @Trigger(layer=-1, vars=@Var(name="srcClass", ifEmpty=true, expr="#{annotatedClass.asType()}"))
 @Clazz(nameSuffixToAppend=RuntimeMetadata.CLASS_SUFFIX, annotations={
-	@Annotation(id="elementMetadata", targetAnnotation=Element.class, 
+	@Annotation(id="elementMetadata", src="#{elements.elementAndAllEnclosedElements(src)}", targetAnnotation=Element.class, 
 			values={
 				@AV(name="id", expr="#{elements.uniqueNameWithinTopLevelEnclosingTypeElement(src)}"), 
 				@AV(name="comment", expr="#{elements.getDocComment(src)}"),
-				@AV(condFun=RuntimeMetadata.methodOrConstructor.class, name="paramNames", expr="#{src.parameters}")
+				@AV(condFun=RuntimeMetadata.methodOrConstructor.class, name="paramNames", src="#{src.parameters}", expr="#{simpleName}")
 		}),
 	@Annotation(targetAnnotation=List.class, mode=AnnotationMode.MERGE, 
-		values=@AV(name = "value", expr="#{elements.elementAndAllEnclosedElements(src)}", mode=AVMode.JOIN_LIST, annotationMappingId="elementMetadata"))
+		values=@AV(name = "value", mode=AVMode.JOIN_LIST, annotationMappingId="elementMetadata"))
 })
 
 public @interface RuntimeMetadata {
