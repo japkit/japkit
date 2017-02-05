@@ -13,6 +13,8 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 import static extension de.japkit.rules.RuleUtils.withPrefix
+import java.util.Set
+import java.util.HashSet
 
 @Data
 class AnnotationValueMappingRule extends AbstractRule {
@@ -21,7 +23,8 @@ class AnnotationValueMappingRule extends AbstractRule {
 	String name
 	Object value
 	String expr
-	String exprAvName
+	//the avName used for error reporting (one of expr, annotationMappingId or value)
+	String errorAvName
 	String lang
 	()=>AnnotationMappingRule lazyAnnotationMapping
 	AVMode mode
@@ -55,29 +58,32 @@ class AnnotationValueMappingRule extends AbstractRule {
 				}
 			}
 	
-			val flatValues = newArrayList
-			
-			scopeRule.apply [
-				if (value != null) {
-					value
-				} else if (lazyAnnotationMapping != null) {
+			val v = handleException(null, errorAvName) [
+				val flatValues = newArrayList
 
-					val annotationMapping = lazyAnnotationMapping.apply
+				scopeRule.apply [
+					if (value != null) {
+						value
+					} else if (lazyAnnotationMapping != null) {
 
-					val annotations = newArrayList
-					annotationMapping.mapOrCopyAnnotations(annotations)
-					annotations as ArrayList<? extends Object>
+						val annotationMapping = lazyAnnotationMapping.apply
 
-				} else if(expr != null) {
-					evaluateExpression(avType, expr)
-				} else {
-					//This AV shall not be set. Is relevant for annotation templates. There AVMRs are created for each AV.
-					//Could be optimized by dropping the ones that are "empty", since neither expr nor value nor annotationMapping is set.
-					null
-				}
-			]?.forEach[if(it instanceof Iterable<?>) flatValues.addAll(it) else flatValues.add(it)]
-			
-			val v = coerceAnnotationValue(flatValues, avType)
+						val annotations = newArrayList
+						annotationMapping.mapOrCopyAnnotations(annotations)
+						annotations as ArrayList<? extends Object>
+
+					} else if (expr != null) {
+						evaluateExpression(avType, expr)
+					} else {
+						// This AV shall not be set. Is relevant for annotation templates. There AVMRs are created for each AV.
+						// Could be optimized by dropping the ones that are "empty", since neither expr nor value nor annotationMapping is set.
+						null
+					}
+				]?.forEach[if(it instanceof Iterable<?>) flatValues.addAll(it) else flatValues.add(it)]
+
+				coerceAnnotationValue(flatValues, avType)
+
+			]
 	
 			if(v==null){
 				return existingValue;  //No value... Leave existing value unchanged.
@@ -97,12 +103,8 @@ class AnnotationValueMappingRule extends AbstractRule {
 
 	def private Object evaluateExpression(TypeMirror avType, String expr) {
 
-		val targetClass = if(avType.kind.isPrimitive) avType.toAnnotationValueClass else Object
-
-		handleException(null, exprAvName)[ 
-			eval(expr, lang, targetClass)
-			
-		]
+		val targetClass = if(avType.kind.isPrimitive) avType.toAnnotationValueClass else Object	
+		eval(expr, lang, targetClass)
 
 	}
 
@@ -110,23 +112,24 @@ class AnnotationValueMappingRule extends AbstractRule {
 	new(AnnotationMirror a,  Map<String, AnnotationMappingRule> mappingsWithId) {
 		super(a, null)
 		name = a.value(null, "name", String)
-		value = a.value(null, "value", String)
-		exprAvName="expr"
-		expr = a.value(null, exprAvName, String)
-		lang = a.value(null, "lang", String)
-		mode = a.value(null, "mode", AVMode)
-		val annotationMappingId = a.value(null, "annotationMappingId", String)
+		
+		val setAvNames = newHashSet
+		
+		value = a.valueAndRemember("value", String, setAvNames)
+		expr = a.valueAndRemember("expr", String, setAvNames)	
+		lang = a.value("lang", String)
+		mode = a.value("mode", AVMode)
+		val annotationMappingId = a.valueAndRemember("annotationMappingId", String, setAvNames)
+		
 		lazyAnnotationMapping = if(annotationMappingId.nullOrEmpty) null else [| 
 			val amr = mappingsWithId.get(annotationMappingId)
 			if(amr==null){
-				throw new IllegalArgumentException("Annotation Mapping with id "+annotationMappingId+" not found");
+				throw new RuleException("Annotation Mapping with id "+annotationMappingId+" not found");
 			}
 			amr
 		]
-		//Could be optimized by dropping the ones that are "empty", since neither expr nor value nor annotationMapping is set.
-		if(#[expr!=null,value!=null,lazyAnnotationMapping!=null].filter[it].size != 1){
-			throwRuleCreationException('''Exactly one of the annotation values 'value', '«exprAvName»', 'annotationMappingId' must be set.''')
-		}
+
+		errorAvName = atMostOneAvName(setAvNames, true)
 		activationRule = createActivationRule(a, null)
 		scopeRule = createScopeRule(a, null, null)
 
@@ -135,28 +138,47 @@ class AnnotationValueMappingRule extends AbstractRule {
 	new(AnnotationMirror a,  Element templateElement, String avName) {
 		super(a, templateElement)
 		name = avName
-		value = a.value(avName, Object)
 		
+		val setAvNames = newHashSet
+		
+		value = a.valueAndRemember(avName, Object, setAvNames)
+
 		val avPrefix = avName+'_'
-		exprAvName="expr".withPrefix(avPrefix)
-		expr = a.value(exprAvName, String)
+
+		expr = a.valueAndRemember("expr".withPrefix(avPrefix), String, setAvNames)
 		lang = a.value("lang".withPrefix(avPrefix), String)
 		mode = AVMode.JOIN_LIST
 		
 		
-		val annotationMappingAnnotation =  a.value(avPrefix, AnnotationMirror)
+		val annotationMappingAnnotation =  a.valueAndRemember(avPrefix, AnnotationMirror, setAvNames)
 		
 		lazyAnnotationMapping = if (annotationMappingAnnotation == null) null else {
 			val amr = new AnnotationMappingRule(annotationMappingAnnotation, templateElement);
 			[| amr]
 		}
 		
-		if(#[expr!=null,value!=null,lazyAnnotationMapping!=null].filter[it].size > 1){
-			throwRuleCreationException('''At most one of the annotation values '«avName»', '«exprAvName»', '«avPrefix»' must be set.''')
-		}
-		
+		errorAvName = atMostOneAvName(setAvNames, false)		
 		activationRule = createActivationRule(a, avPrefix)
 		scopeRule = createScopeRule(a, null, avPrefix)
 
 	}
+	
+	private def <T> T valueAndRemember(AnnotationMirror am, String avName, Class<T> avType, Set<String> setAvNames) {
+		val v = am.value(avName, avType)
+		if(v!= null) {
+			setAvNames.add(avName)
+		}
+		v
+	} 
+	
+	private def atMostOneAvName(Set<String> setAvNames, boolean required) {
+		if(setAvNames.size > 1) {
+			throwRuleCreationException('''At most one of the annotation values «setAvNames.join(', ')» must be set.''')
+		}
+		if(required && setAvNames.empty) {
+			throwRuleCreationException('''At least one of the annotation values «setAvNames.join(', ')» must be set.''')
+		}
+		setAvNames.head
+	}
+
 }
