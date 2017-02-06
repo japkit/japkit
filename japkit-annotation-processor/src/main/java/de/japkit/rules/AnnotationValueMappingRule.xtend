@@ -57,6 +57,13 @@ class AnnotationValueMappingRule extends AbstractRule {
 					}
 				}
 			}
+			
+			//If this AV-Mapping is not completely initialized, return the value unchanged.
+			//Is relevant for annotation templates. There AVMRs are created for each AV.
+			// Could be optimized by dropping the ones that are "empty", since neither expr nor value nor annotationMapping is set.
+			if(value == null && expr == null && lazyAnnotationMapping == null) {
+				return existingValue;
+			}
 	
 			val v = handleException(null, errorAvName) [
 				val flatValues = newArrayList
@@ -75,9 +82,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 					} else if (expr != null) {
 						evaluateExpression(avType, expr)
 					} else {
-						// This AV shall not be set. Is relevant for annotation templates. There AVMRs are created for each AV.
-						// Could be optimized by dropping the ones that are "empty", since neither expr nor value nor annotationMapping is set.
-						null
+						throw new IllegalStateException("Annotation value could not be determined.");
 					}
 				]?.forEach[if(it instanceof Iterable<?>) flatValues.addAll(it) else flatValues.add(it)]
 
