@@ -1,20 +1,19 @@
 package de.japkit.el.javael3
 
 import de.japkit.el.ElExtensions
+import de.japkit.el.javael3.JapkitImportHandler.ValueStackPseudoClass
 import java.util.Map
 import javax.el.ArrayELResolver
 import javax.el.BeanELResolver
 import javax.el.CompositeELResolver
+import javax.el.ELClass
 import javax.el.ELContext
 import javax.el.ELResolver
+import javax.el.ExpressionFactory
 import javax.el.ListELResolver
 import javax.el.MapELResolver
-import javax.el.PropertyNotFoundException
 import javax.el.ResourceBundleELResolver
 import javax.el.StaticFieldELResolver
-import javax.el.ExpressionFactory
-import de.japkit.el.javael3.JapkitImportHandler.ValueStackPseudoClass
-import javax.el.ELClass
 
 /**
  * An ELResolver that resolves root properties from a map (japkit ValueStack) and that supports the extensions provided by de.japkit.el.ElExtensions.

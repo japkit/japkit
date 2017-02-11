@@ -1,9 +1,9 @@
 package de.japkit.rules
 
-import de.japkit.el.ElVariableError
 import de.japkit.metaannotations.ResourceLocation
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.FileExtensions
+import de.japkit.services.ReportedException
 import de.japkit.services.TypeElementNotFoundException
 import java.io.File
 import java.io.FileWriter
@@ -13,7 +13,6 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
 import org.eclipse.xtend.lib.annotations.Data
-import de.japkit.services.ReportedException
 
 @Data
 class ResourceRule extends AbstractRule{

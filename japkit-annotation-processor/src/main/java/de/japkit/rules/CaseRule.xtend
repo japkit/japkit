@@ -70,8 +70,7 @@ class CaseRule<T> extends AbstractRule implements Function0<T>, ICodeFragmentRul
 				//Die Möglichkeit, Paramter per Type-Argumenten zu übergeben ist aber gegenwärtig an den TypeResolver gebunden.
 				?: createTypeRule(null, metaElement.asType(), null);
 			}
-		if (rule ==
-			null) {
+		if (rule === null) {
 			throw new RuleException('''Case rule «metaElement?.simpleName ?: metaAnnotation» must either have a value or be put on an element that is a function.''');
 		}
 		rule

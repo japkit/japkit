@@ -7,14 +7,13 @@ import de.japkit.services.RuleException
 import java.util.ArrayList
 import java.util.List
 import java.util.Map
+import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
 import static extension de.japkit.rules.RuleUtils.withPrefix
-import java.util.Set
-import java.util.HashSet
 
 @Data
 class AnnotationValueMappingRule extends AbstractRule {
@@ -170,7 +169,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 	
 	private def <T> T valueAndRemember(AnnotationMirror am, String avName, Class<T> avType, Set<String> setAvNames) {
 		val v = am.value(avName, avType)
-		if(v!= null) {
+		if(v !== null) {
 			setAvNames.add(avName)
 		}
 		v

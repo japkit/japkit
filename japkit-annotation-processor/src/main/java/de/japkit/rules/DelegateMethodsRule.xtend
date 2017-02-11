@@ -2,7 +2,6 @@ package de.japkit.rules
 
 import de.japkit.model.GenMethod
 import de.japkit.model.Property
-import de.japkit.services.ExtensionRegistry
 import java.util.ArrayList
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element

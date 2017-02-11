@@ -1,7 +1,5 @@
 package de.japkit.metaannotations;
 
-import javax.lang.model.element.Element;
-
 import de.japkit.metaannotations.classselectors.None;
 
 public @interface Param {

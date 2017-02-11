@@ -2,7 +2,6 @@ package de.japkit.model
 
 import de.japkit.activeannotations.FieldsFromInterface
 import de.japkit.activeannotations.Required
-import java.lang.annotation.Annotation
 import java.util.Collections
 import java.util.Comparator
 import java.util.List

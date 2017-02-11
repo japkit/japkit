@@ -1,9 +1,10 @@
 package de.japkit.rules
 
+import de.japkit.annotations.AnnotationTemplate
 import de.japkit.el.ELSupport
-import de.japkit.el.ElVariableError
 import de.japkit.metaannotations.Param
-import de.japkit.metaannotations.ResultVar
+import de.japkit.metaannotations.Var
+import de.japkit.model.AnnotationAndParent
 import de.japkit.model.GenAnnotationMirror
 import de.japkit.model.GenElement
 import de.japkit.model.GenExtensions
@@ -12,8 +13,12 @@ import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.GenerateClassContext
 import de.japkit.services.MessageCollector
+import de.japkit.services.ReportedException
+import de.japkit.services.RuleException
 import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.TypesExtensions
+import de.japkit.services.TypesRegistry
+import de.japkit.util.MoreCollectionExtensions
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections
@@ -31,17 +36,6 @@ import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 import static extension de.japkit.rules.JavadocUtil.*
-import de.japkit.services.ReportedException
-import de.japkit.metaannotations.Var
-import org.eclipse.xtext.xbase.lib.Functions.Function0
-import java.util.LinkedHashSet
-import java.util.Collection
-import java.util.Map
-import de.japkit.util.MoreCollectionExtensions
-import de.japkit.annotations.AnnotationTemplate
-import de.japkit.services.TypesRegistry
-import de.japkit.services.RuleException
-import de.japkit.model.AnnotationAndParent
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according

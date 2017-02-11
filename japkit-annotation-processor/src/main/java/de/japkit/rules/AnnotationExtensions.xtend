@@ -6,7 +6,6 @@ import de.japkit.model.GenAnnotationValue
 import de.japkit.model.GenExtensions
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
-import de.japkit.services.MessageCollector
 import de.japkit.services.ProcessingException
 import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.TypesExtensions
@@ -18,8 +17,6 @@ import javax.lang.model.element.TypeElement
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 
 	def List<GenAnnotationMirror> overrideAnnotations(Element overrideElement,

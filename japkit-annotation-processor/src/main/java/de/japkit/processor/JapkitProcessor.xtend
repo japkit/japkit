@@ -32,7 +32,6 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import de.japkit.annotations.RuntimeMetadata
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**

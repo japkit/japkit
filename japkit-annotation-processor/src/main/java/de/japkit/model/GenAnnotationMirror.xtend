@@ -2,16 +2,14 @@ package de.japkit.model
 
 import de.japkit.activeannotations.FieldsFromInterface
 import de.japkit.activeannotations.Required
+import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
 import java.util.Map
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.AnnotationValue
-import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
-import de.japkit.services.ElementsExtensions
 
 @FieldsFromInterface
 class GenAnnotationMirror implements AnnotationMirror {
