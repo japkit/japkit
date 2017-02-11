@@ -69,7 +69,7 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 						result
 					} else if(result instanceof TypeElement){
 						result.asType()
-					} else if(result == null){
+					} else if(result === null){
 						null
 					} else {
 						reportRuleError('''The result of «expr» must be a TypeMirror or a TypeElement, but not «result.class»''')
@@ -81,7 +81,7 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 			case ClassSelectorKind.FQN : {
 				val fqn = evalClassSelectorExpr(resolvedSelector, String)
 				resolvedSelector.type = findTypeElement(fqn)?.asType
-				if(resolvedSelector.type == null){
+				if(resolvedSelector.type === null){
 					resolvedSelector.type = new GenUnresolvedType(fqn, false)
 				}
 			}
@@ -97,7 +97,7 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 
 	
 		
-		if (!requiredTriggerAnnotation.nullOrEmpty && resolvedSelector.type !=null) {
+		if (!requiredTriggerAnnotation.nullOrEmpty && resolvedSelector.type  !== null) {
 			resolvedSelector.type = generatedTypeAccordingToTriggerAnnotation(resolvedSelector.type, requiredTriggerAnnotation, true)
 		}
 		
@@ -113,19 +113,19 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 	
 	private def resolveInnerClassSelector(ResolvedClassSelector resolvedSelector) {
 		resolvedSelector.enclosingTypeElement = getEnclosingTypeElement()
-		if(resolvedSelector.enclosingTypeElement==null){
+		if(resolvedSelector.enclosingTypeElement === null){
 			reportRuleError('''Could not determine enclosing type element for inner class.''')
 			return
 		}
 		resolvedSelector.innerClassName = evalClassSelectorExpr(resolvedSelector, String)
 		
 		//simple name of the type template as fallback
-		if(resolvedSelector.innerClassName==null){
+		if(resolvedSelector.innerClassName === null){
 			resolvedSelector.innerClassName=metaElement.simpleName.toString
 		}
 		
 		resolvedSelector.typeElement = resolvedSelector.enclosingTypeElement.declaredTypes.findFirst[simpleName.contentEquals(resolvedSelector.innerClassName)]
-		resolvedSelector.type = if(resolvedSelector.typeElement != null)
+		resolvedSelector.type = if(resolvedSelector.typeElement !== null)
 			resolvedSelector.typeElement.asType
 			else new GenUnresolvedType('''«resolvedSelector.enclosingTypeElement.qualifiedName».«resolvedSelector.innerClassName»''', true)
 	}
@@ -208,7 +208,7 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 			val fqn = rule.getGeneratedTypeElementFqn(typeElement)
 			
 			val generatedTypeElement = findTypeElement(fqn)
-			if (generatedTypeElement == null) {
+			if (generatedTypeElement === null) {
 				throw new TypeElementNotFoundException(fqn, '')  
 			} else {
 				generatedTypeElement				

@@ -77,7 +77,7 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	 * 
 	 */
 	def void setSuperclass(DeclaredType type, TypeMirror... typeArgs) {
-		if (type != null) {
+		if (type !== null) {
 
 			//Make sure we have a prototype an not the type erasure
 			val superclassPrototype = type.asElement.asType as DeclaredType
@@ -146,7 +146,7 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 		val resolvedTypeArgs = (0 ..< prototype.typeArguments.size).map [ n |
 			val typeArg = if(typeArgs.nullOrEmpty) null else typeArgs.get(n)
 			val typeVariable = prototype.typeArguments.get(n) as TypeVariable
-			val resolved = if (typeArg == null) {
+			val resolved = if (typeArg === null) {
 				addTypeParameter(getOrCreateTypeParameter(typeVariable.asElement as TypeParameterElement));
 
 				//Das Folgende ist so nicht ganz exakt. Eigentlich müsste man hier eine neue Typ-Variable erzeugen, 
@@ -179,7 +179,7 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	 */
 	override protected TypeMirror resolveTypeVariable(TypeVariable tv){
 		val resolvedTypeVar = resolvedTypeArgsMap.get(tv.asElement)
-		if(resolvedTypeVar==null && nestingKind == NestingKind.TOP_LEVEL){
+		if(resolvedTypeVar === null && nestingKind == NestingKind.TOP_LEVEL){
 			//We reached top level type and the variable is still not resolved -> error 
 			//throw new IllegalArgumentException('''Could not resolve type variable «tv» in «this.qualifiedName»''');
 		}
@@ -230,7 +230,7 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 		
 		//Add all superclass methods that are not overriden and that are visible.
 		//TODO: In Eclipse liefert Types.allMethods zwar die "asMemberOf-Sicht". Maven tut dies jedoch nicht! D.h. , die TypeVariablen werden nicht ersetzt. 
-		if (superclass != null) {
+		if (superclass !== null) {
 			
 			
 			methods.addAll(

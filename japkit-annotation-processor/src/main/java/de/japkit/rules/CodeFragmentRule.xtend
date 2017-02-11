@@ -32,7 +32,7 @@ class CodeFragmentRule extends CodeRule implements ICodeFragmentRule {
 		scopeRule.apply[
 			valueStack.put("surrounded", surrounded)
 			val result = code()
-			if(result == null || result.length == 0) surrounded else result
+			if(result === null || result.length == 0) surrounded else result
 		].head    //TODO: use scope for iteration instead of "bodyIterator" ? 
 	}
 	

@@ -33,7 +33,7 @@ class JavadocUtil {
 	}
 	
 	def static getFirstGroup(CharSequence javadoc, Pattern pattern) {
-		if(javadoc==null){
+		if(javadoc === null){
 			return ''
 		}
 		
@@ -57,7 +57,7 @@ class JavadocUtil {
 	
 	
 	def static getMapFromTwoGroups(CharSequence javadoc, Pattern ... patterns) {
-		if(javadoc==null){
+		if(javadoc === null){
 			emptyMap
 		}
 		else {
@@ -76,7 +76,7 @@ class JavadocUtil {
 	}
 	
 	def static remove(CharSequence javadoc, Pattern ... patterns){
-		if(javadoc==null){
+		if(javadoc === null){
 			null
 		} else {
 			var result = javadoc

@@ -62,14 +62,14 @@ class ElExtensionsRegistry {
 	def private <V> V findForClassOrSuperclass(Class<?> clazz, Map<Class<?>, Map<String, V>> map, String name){
 		map.get(clazz)?.get(name) ?: {
 			clazz.superclass?.findForClassOrSuperclass(map, name) ?: 
-			clazz.interfaces.map[findForClassOrSuperclass(map, name)].findFirst[it != null]		
+			clazz.interfaces.map[findForClassOrSuperclass(map, name)].findFirst[it !== null]		
 		}
 	}
 	
 	def private <V> V findForClassOrSuperclass(Class<?> clazz, Map<Class<?>, V> map){
 		map.get(clazz) ?: {
 			clazz.superclass?.findForClassOrSuperclass(map) ?: 
-			clazz.interfaces.map[findForClassOrSuperclass(map)].findFirst[it != null]		
+			clazz.interfaces.map[findForClassOrSuperclass(map)].findFirst[it !== null]		
 		}
 	}
 }

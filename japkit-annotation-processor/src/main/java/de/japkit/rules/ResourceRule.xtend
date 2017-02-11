@@ -51,7 +51,7 @@ class ResourceRule extends AbstractRule{
 		val templatePackagePath = templatePackage.qualifiedName.toString.replace('.', '/')
 				
 		var Long lastModified=null	
-		templateURL = if (resourceTemplateDir != null) {
+		templateURL = if (resourceTemplateDir !== null) {
 			val templateDir = new File(resourceTemplateDir, templatePackagePath)
 			val file = new File(templateDir, templateName)
 			lastModified=file.lastModified

@@ -45,7 +45,7 @@ class CaseRule<T> extends AbstractRule implements Function0<T>, ICodeFragmentRul
 						//This is done here, since createFunctionRule within constructor creates some cyclic dependedencies and/or stackoverflow in Xtend
 						var Pair<TypeElement, IParameterlessFunctionRule<?>> typeAndFunction
 						try {
-							typeAndFunction = otherAnnotationTypes.map[it -> createFunctionRule].findFirst[it.value != null] 	
+							typeAndFunction = otherAnnotationTypes.map[it -> createFunctionRule].findFirst[it.value !== null] 	
 							typeAndFunction?.value?.apply as Boolean			
 						} catch(Exception e) {
 							throw new RuleException('''Error when evaluating condition function «typeAndFunction?.key.simpleName» : '''+e.message)

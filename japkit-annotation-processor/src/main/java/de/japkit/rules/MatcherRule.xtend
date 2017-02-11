@@ -68,18 +68,18 @@ class MatcherRule extends AbstractFunctionRule<Boolean> {
 			val e = if(src instanceof Element) src
 			val type = if(src instanceof TypeMirror) src else e?.srcType
 			
-			if(e==null && type == null) {
+			if(e === null && type === null) {
 				throw new RuleException('''For a Matcher, the source must be an Element or a TypeMirror, but src «src» is of type «src?.class»''');
 			}
 			
-			if(e==null && hasAnyElementConditions) {
+			if(e === null && hasAnyElementConditions) {
 				throw new RuleException('''The Matcher has conditions that apply to an Element, but src «src» is a TypeMirror.''');
 			}
 			
 
 			val result = 
-				(e == null || fulfillsElementConditions(e)) 
-				&& (type==null || fulfillsTypeConditions(type)) 
+				(e === null || fulfillsElementConditions(e)) 
+				&& (type === null || fulfillsTypeConditions(type)) 
 				&& fulfillsConditionExpression
 
 			// evaluate all constraints, if the matcher matches
@@ -115,7 +115,7 @@ class MatcherRule extends AbstractFunctionRule<Boolean> {
 	}
 	
 	private def boolean hasAnyElementConditions() {
-		!name.nullOrEmpty || nameIn != null || nameNotIn != null || !modifiers.empty || !modifiersNot.empty ||
+		!name.nullOrEmpty || nameIn !== null || nameNotIn !== null || !modifiers.empty || !modifiersNot.empty ||
 			!kind.empty || !annotations.empty || !annotationsNot.empty || !enclosingAnnotations.empty || !enclosingAnnotationsNot.empty ||
 			!notDeclaredBy.empty 
 	}
@@ -191,7 +191,7 @@ class MatcherRule extends AbstractFunctionRule<Boolean> {
 
 	def private dispatch boolean typeElementHasAllAnnotations(DeclaredType type, DeclaredType[] annotations) {
 		handleTypeElementNotFound(true, '''Matcher cannot determine annotations of type «type»''') [
-			type != null && type.asTypeElement.hasAllAnnotations(annotations)
+			type !== null && type.asTypeElement.hasAllAnnotations(annotations)
 		]
 	}
 

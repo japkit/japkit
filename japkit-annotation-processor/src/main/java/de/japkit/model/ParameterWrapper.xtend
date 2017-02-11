@@ -48,7 +48,7 @@ class ParameterWrapper extends GenAnnotatedConstruct implements VariableElement 
 	}
 	
 	override getSimpleName() {
-		if(name!=null) name else delegate.simpleName
+		if(name !== null) name else delegate.simpleName
 	}
 	
 }

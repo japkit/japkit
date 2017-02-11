@@ -18,7 +18,7 @@ class Path {
 		Integer index
 		
 		override toString(){
-			'''«name»«IF index !=null»[«index»]«ENDIF»'''.toString
+			'''«name»«IF index  !== null»[«index»]«ENDIF»'''.toString
 		}
 	}
 	

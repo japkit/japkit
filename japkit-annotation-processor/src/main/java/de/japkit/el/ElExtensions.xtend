@@ -107,7 +107,7 @@ class ElExtensions {
 	 */
 	def static get(Element e, String functionName,  Map<String, Object> context) {
 		val function = context.get(functionName)
-		if(function != null && function instanceof Function1<?,?>){
+		if(function !== null && function instanceof Function1<?,?>){
 			(function as Function1<Element,?>).apply(e)
 		} else {
 			//Mit Groovy scheint das zu funktionieren, da die get Methode anscheinden die letzte ist, die aufgerufen wird
@@ -230,7 +230,7 @@ class ElExtensions {
 		val invokeMethodClosure = registry.findInvokeMethodClosure(base)
 
 		try {
-			if (invokeMethodClosure != null) {
+			if (invokeMethodClosure !== null) {
 				return invokeMethodClosure.apply(contextMap, base, name, paramTypes, params)
 			}
 
@@ -238,7 +238,7 @@ class ElExtensions {
 		}
 
 		val function = contextMap.get(name)
-		if (function == null)
+		if (function === null)
 			throw new ELMethodException('''No function with name «name» is on value stack and there is also no other property of element «base» with this name.''')
 
 		invoke(function, base, params)
@@ -248,7 +248,7 @@ class ElExtensions {
 	def static invoke(Object functionObject, Object base, Object[] params) {
 		if(functionObject instanceof AbstractFunctionRule<?>){
 			if(functionObject.mustBeCalledWithParams){
-				if(base==null){
+				if(base === null){
 					return functionObject.evalWithParams(params)
 				} else {
 					val paramsWithBase = newArrayList(base)
@@ -258,15 +258,15 @@ class ElExtensions {
 			}
 		}
 		if(functionObject instanceof Function0<?>){
-			if(base==null && params.empty){
+			if(base === null && params.empty){
 				return functionObject.apply
 			}			
 		} 
 		if(functionObject instanceof Function1){
-			if(base!=null && params.empty){
+			if(base !== null && params.empty){
 				return functionObject.apply(base)
 			}
-			if(base==null && params.size==1){
+			if(base === null && params.size==1){
 				return functionObject.apply(params.get(0))
 			}
 		}
@@ -356,7 +356,7 @@ class ElExtensions {
 		
 		registry.registerInvokeMethod(Class, [context, clazz, methodName, paramTypes, params| 
 			try {
-				if(paramTypes == null) MethodUtils.invokeStaticMethod(clazz, methodName, params) else MethodUtils.invokeStaticMethod(clazz, methodName, params, paramTypes)
+				if(paramTypes === null) MethodUtils.invokeStaticMethod(clazz, methodName, params) else MethodUtils.invokeStaticMethod(clazz, methodName, params, paramTypes)
 			} catch (NoSuchMethodException e) {
 				throw new ELMethodException(e.message)
 			}
@@ -372,13 +372,13 @@ class ElExtensions {
 		{
 			val closure = registry.findPropertyClosure(base, propertyName)
 		
-			if (closure != null) {
+			if (closure !== null) {
 				return true -> closure.apply(rootProperties, base) 
 			} else {
 		
 				try {
 					val getPropertyClosure = de.japkit.el.ElExtensions.registry.findGetPropertyClosure(base)
-					if (getPropertyClosure != null) {						
+					if (getPropertyClosure !== null) {						
 						return true -> getPropertyClosure.apply(rootProperties, base, propertyName)
 					} 		
 				} catch (ELPropertyNotFoundException e) {
@@ -395,7 +395,7 @@ class ElExtensions {
 		String methodName, Class<?>[] paramTypes, Object[] params) {
 		val closure = registry.findMethodClosure(base, methodName)
 
-		if (closure != null) {
+		if (closure !== null) {
 			return true -> closure.apply(rootProperties, base, paramTypes, params)
 		} else {
 

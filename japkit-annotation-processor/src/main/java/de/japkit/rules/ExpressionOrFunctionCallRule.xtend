@@ -77,7 +77,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 	
 	//true if neither an expression nor a function is set and if no default value has been provided
 	def boolean isUndefined() {
-		expr.nullOrEmpty && functionClasses.nullOrEmpty && defaultValue == null 
+		expr.nullOrEmpty && functionClasses.nullOrEmpty && defaultValue === null 
 	}
 	
 	override apply(){ 
@@ -94,11 +94,11 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 				]
 			} else UNDEFINED
 			
-			if(exprResult==null) return null;
+			if(exprResult === null) return null;
 			
 			val functionRules = if (!functionClasses.nullOrEmpty) functionClasses.map[
 				val function = createFunctionRule
-				if (function == null) {
+				if (function === null) {
 						throw new RuleException('''«it» is not a function.''');
 					}
 				function
@@ -110,7 +110,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 				for (function : functionRules) {
 					try{
 						r = checkNotNull(combiner.apply(r == UNDEFINED, r, function))	
-						if(r==null) return null; //Don't call further functions		
+						if(r === null) return null; //Don't call further functions		
 					} catch (Exception e){
 						throw new RuleException('''Error when calling function «function?.metaElement?.simpleName»: «e.message»''');
 					}
@@ -131,7 +131,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 	}
 	
 	def <V> checkNotNull(V value) {
-		if(value == null && !nullable)throw new RuleException("The result is null. This is not allowed here.")		
+		if(value === null && !nullable)throw new RuleException("The result is null. This is not allowed here.")		
 		value
 	}
 

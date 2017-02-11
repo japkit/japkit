@@ -12,7 +12,7 @@ class FileExtensions {
             
             if(existingDirs.contains(parent)) return;
             
-            if (parent != null && !parent.exists()) {
+            if (parent !== null && !parent.exists()) {
                 if (!parent.mkdirs()) {
                     // could have been concurrently created
                     if (!parent.exists() || !parent.isDirectory())

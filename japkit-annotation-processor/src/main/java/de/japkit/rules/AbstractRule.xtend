@@ -35,7 +35,7 @@ class AbstractRule implements Rule {
 		try{
 			handleException(null, null) [
 				//Throw Exceptions during rule creation here to get proper error reporting
-				if(ruleCreationException.get(0)!=null){
+				if(ruleCreationException.get(0) !== null){
 					throw ruleCreationException.get(0);
 				}
 				metaElement?.registerMetaTypeElement
@@ -61,7 +61,7 @@ class AbstractRule implements Rule {
 	//several triggers could share the same meta-type elements...
 	
 	def void registerMetaTypeElement(Element element) {
-		if(element instanceof TypeElement && currentTriggerAnnotation !=null){
+		if(element instanceof TypeElement && currentTriggerAnnotation  !== null){
 			registerMetaTypeElement(element.topLevelEnclosingTypeElement, currentTriggerAnnotation.annotationAsTypeElement)			
 		}
 		

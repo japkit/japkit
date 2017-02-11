@@ -36,7 +36,7 @@ class DynamicFunctionMapper extends FunctionMapper {
 	override Method resolveFunction(String prefix, String localName) {
 		if(!prefix.nullOrEmpty) throw new UnsupportedOperationException('''Prefix «prefix» not supported.''')
 		val function = contextMap.get(localName)
-		if(function == null) return null
+		if(function === null) return null
 
 		methodCache.get(function) ?: {
 

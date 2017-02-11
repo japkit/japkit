@@ -46,8 +46,8 @@ abstract class GenParameterizable extends GenElement implements Parameterizable 
 	def dispatch TypeMirror resolveTypeVariables(TypeVariable tv){
 		
 		var resolvedTypeVar = resolveTypeVariable(tv)	
-		if(resolvedTypeVar==null){		
-			if(enclosingParameterizable != null){
+		if(resolvedTypeVar === null){		
+			if(enclosingParameterizable !== null){
 				//If there is an enclosing type, look there...
 				resolvedTypeVar = enclosingParameterizable.resolveTypeVariables(tv)
 			} else {

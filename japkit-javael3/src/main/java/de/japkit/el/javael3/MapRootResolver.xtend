@@ -5,13 +5,13 @@ import javax.el.ELContext
 import javax.el.PropertyNotFoundException
 
 /**
- * Resolves root properties (base == null) from a map. 
+ * Resolves root properties (base === null) from a map. 
  */
 class MapRootResolver extends javax.el.ELResolver {
 	Map<String, ? extends Object> map;
 	
 	def private boolean isResolvable(Object base) {
-		return base == null;
+		return base === null;
 	}
 	
 	def private boolean isResolvable(ELContext context, Object base, Object property) {

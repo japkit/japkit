@@ -118,11 +118,11 @@ class RuleUtils {
 		boolean nullable,
 		String uniqueAV
 	) {
-		if(metaAnnotation == null) return SINGLE_SRC_ELEMENT
+		if(metaAnnotation === null) return SINGLE_SRC_ELEMENT
 
 		val type = metaAnnotation?.value(typeAV?.withPrefix(avPrefix), TypeMirror)
 
-		val typeClass = if (type != null) {
+		val typeClass = if (type !== null) {
 				Class.forName(type.asElement.qualifiedName.toString);
 			} else
 				Object
@@ -150,7 +150,7 @@ class RuleUtils {
 
 				if (elements instanceof Iterable<?>) {
 					elements
-				} else if (elements != null && elements.class.array) {
+				} else if (elements !== null && elements.class.array) {
 					Arrays.asList(elements)
 				} else {
 					elements
@@ -229,7 +229,7 @@ class RuleUtils {
 	ScopeRule<Object> SCOPE_WITH_CURRENT_SRC
 
 	public def ScopeRule scopeWithCurrentSrc() {
-		if (SCOPE_WITH_CURRENT_SRC == null) {
+		if (SCOPE_WITH_CURRENT_SRC === null) {
 			SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null, null)
 		}
 		SCOPE_WITH_CURRENT_SRC
@@ -255,7 +255,7 @@ class RuleUtils {
 	}
 
 	def boolean isVariable(Element memberElement) {
-		memberElement.annotationMirror(Var) != null
+		memberElement.annotationMirror(Var) !== null
 	}
 
 	public static val ALWAYS_ACTIVE = [|true]
@@ -408,7 +408,7 @@ class RuleUtils {
 		String avPrefix) {
 		val templateModifiers = template?.modifiers ?: emptySet
 
-		if(metaAnnotation == null) return [|template?.modifiers]
+		if(metaAnnotation === null) return [|template?.modifiers]
 		val modi = metaAnnotation.value("modifiers".withPrefix(avPrefix), typeof(Modifier[]));
 		val modifiersFromSrc = metaAnnotation.value("modifiersFromSrc".withPrefix(avPrefix), Boolean) ?: false;
 
@@ -439,7 +439,7 @@ class RuleUtils {
 				if (!type.isVoid) {
 					type
 				} else {
-					if (template != null) {
+					if (template !== null) {
 						template.resolveType ?: getNoType(TypeKind.NONE)
 					} else
 						defaultValue?.apply
@@ -453,7 +453,7 @@ class RuleUtils {
 
 	def protected ()=>List<? extends GenParameter> createParamRules(AnnotationMirror paramsAnnotation,
 		ExecutableElement template, String avPrefix) {
-		val rules = if (template != null) {
+		val rules = if (template !== null) {
 				// If there is a template, use its parameters. They can optionally have @Param annotation
 				template.parametersWithSrcNames.map[createParamRule(it.annotationMirror(Param), it, null)].toList
 			} else {
@@ -496,7 +496,7 @@ class RuleUtils {
 
 				val param = new GenParameter(name, type)
 
-				if (annotationMappingRules != null) {
+				if (annotationMappingRules !== null) {
 					param.annotationMirrors = annotationMappingRules.apply(param)
 				}
 				param
@@ -550,7 +550,7 @@ class RuleUtils {
 	 */
 	def createMatcherRules(AnnotationMirror annotation, CharSequence avName) {
 		val av = (annotation.value(avName, typeof(AnnotationMirror[])))
-		if(av != null) av.map[createMatcherRule(it)] else emptyList
+		if(av !== null) av.map[createMatcherRule(it)] else emptyList
 	}
 
 	// Catches Exceptions and reports them as errors for the current meta annotation.
@@ -564,13 +564,13 @@ class RuleUtils {
 			throw tenfe
 		} catch (ReportedException e) {
 			// Do not report the error again to avoid error flooding
-			if(errorResult != null) return errorResult.apply() else throw e
+			if(errorResult !== null) return errorResult.apply() else throw e
 		} catch (RuleException e) {
 			reportRuleError(e, avName ?: e.avName)
-			if(errorResult != null) return errorResult.apply() else throw new ReportedException(e)
+			if(errorResult !== null) return errorResult.apply() else throw new ReportedException(e)
 		} catch (Exception e) {
 			reportRuleError(e, avName)
-			if(errorResult != null) return errorResult.apply() else throw new ReportedException(e)
+			if(errorResult !== null) return errorResult.apply() else throw new ReportedException(e)
 		}
 	}
 

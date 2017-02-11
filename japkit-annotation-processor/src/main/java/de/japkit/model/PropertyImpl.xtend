@@ -97,7 +97,7 @@ class PropertyImpl extends GenAnnotatedConstruct implements Property {
 	}
 
 	override Element fieldOrGetter() {
-		if(field != null) field else getter
+		if(field !== null) field else getter
 	}
 	
 	override getConstantValue() {

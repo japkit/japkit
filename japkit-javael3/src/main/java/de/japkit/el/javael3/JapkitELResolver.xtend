@@ -43,7 +43,7 @@ class JapkitELResolver extends ELResolver {
 			
 			add(new MapRootResolver(valueStack));
 			val streamELResolver = factory.streamELResolver
-			if(streamELResolver != null) add(streamELResolver);
+			if(streamELResolver !== null) add(streamELResolver);
 			add(defaultResolvers);
 		]
 
@@ -65,7 +65,7 @@ class JapkitELResolver extends ELResolver {
 		// TODO: We have a different order here compared to Groovy. In Groovy the default resolver seems to be called first !?
 		val value =  delegate.getValue(context, base, property)
 		
-		if(base == null && !context.propertyResolved) {
+		if(base === null && !context.propertyResolved) {
 			// For root properties, we retry  by prepending "src."			
 			try{
 				val src = getValue(context, null, "src");

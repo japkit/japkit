@@ -104,7 +104,7 @@ class JapkitProcessor extends AbstractProcessor {
 	override getSupportedAnnotationTypes() {
 		val set = newHashSet('''«Behavior.package.name».*''','''«Trigger.package.name».*''')
 		val annotationsOption = processingEnv.options.get("annotations")
-		if (annotationsOption != null) {
+		if (annotationsOption !== null) {
 			annotationsOption.split(",").forEach[set.add(it)]
 		} else {
 			messager.printMessage(Kind.ERROR, "The processor option 'annotations' is not set. ");
@@ -179,7 +179,7 @@ class JapkitProcessor extends AbstractProcessor {
 		//comments, parameter names and member order. Thus, we filter them here. The filtering is kept simple, assuming @RuntimeMetadata is only used on templates
 		//but not on "real" application classes.
 		val annotatedClassesForUncommitedGenClasses = classesToProcessUnfiltered.filter[!committed && !qualifiedName.toString.endsWith("_RuntimeMetadata")].map[
-			annotatedClassForGenClassOnDisk].filter[it != null].toSet
+			annotatedClassForGenClassOnDisk].filter[it !== null].toSet
 
 		printDiagnosticMessage(
 			['''Annotated classes for uncommited gen classes: «annotatedClassesForUncommitedGenClasses»'''])

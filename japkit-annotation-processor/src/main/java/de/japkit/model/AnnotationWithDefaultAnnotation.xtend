@@ -20,7 +20,7 @@ class AnnotationWithDefaultAnnotation implements AnnotationMirror{
 	}
 	
 	def static createIfNecessary(AnnotationMirror annotation, AnnotationMirror defaultAnnotation){
-		if(annotation!=null && defaultAnnotation!=null) new AnnotationWithDefaultAnnotation(annotation, defaultAnnotation)
+		if(annotation !== null && defaultAnnotation !== null) new AnnotationWithDefaultAnnotation(annotation, defaultAnnotation)
 			else annotation ?: defaultAnnotation
 		
 	}

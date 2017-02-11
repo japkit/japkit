@@ -60,7 +60,7 @@ class TypesRegistry {
 	}
 
 	def isGenerated(TypeElement typeElement) {
-		(typeElement instanceof GenTypeElement) || findGenAnnotation(typeElement) != null
+		(typeElement instanceof GenTypeElement) || findGenAnnotation(typeElement) !== null
 	}
 
 	def findGenAnnotation(TypeElement typeElement) {
@@ -71,7 +71,7 @@ class TypesRegistry {
 
 	def getAnnotatedClassForGenClassOnDisk(TypeElement typeElement) {
 		val am = typeElement.findGenAnnotation
-		if (am == null) {
+		if (am === null) {
 			return null
 		}
 
@@ -122,13 +122,13 @@ class TypesRegistry {
 			var String[] line = null
 			do{
 				line = reader.readLine?.split(',')
-				if(line!=null){
+				if(line !== null){
 					val acFqn = line.get(0)
 					val trigger = line.get(1)->Boolean.valueOf(line.get(2))
 					allAnnotatedClasses.getOrCreateList(acFqn).add(trigger)		
 					allAnnotatedClassesByTrigger.getOrCreateSet(trigger).add(acFqn)
 				}
-			} while (line!=null)
+			} while (line !== null)
 		} catch (Exception e){
 			ExtensionRegistry.get(MessageCollector).printDiagnosticMessage['''Loading .japkitClasses failed: «e»''']
 		} finally {
@@ -162,14 +162,14 @@ class TypesRegistry {
 			var String[] line = null
 			do{
 				line = reader.readLine?.split(',')
-				if(line!=null){
+				if(line !== null){
 					val triggerFqn = line.get(0)
 					val shadow = Boolean.valueOf(line.get(1))
 						
 					genericTriggerDependencies.getOrCreateSet(triggerFqn->shadow).add(line.get(2))
 					
 				}
-			} while (line!=null)
+			} while (line !== null)
 		} catch (Exception e){
 			ExtensionRegistry.get(MessageCollector).printDiagnosticMessage['''Loading .japkitGenericDependencies failed: «e»''']
 		} finally {
@@ -229,7 +229,7 @@ class TypesRegistry {
 	 */
 	def annotatedClassesOnWhichThatOneDependsOn(String annotatedClassFqn) {
 		annotatedClassFqn.getTypesOnWhichThatAnnotatedClassDependsOn.map[annotatedClassForGenTypeElement.get(it)].filter[
-			it != null && !equals(annotatedClassFqn)].toSet
+			it !== null && !equals(annotatedClassFqn)].toSet
 	}
 
 	/**
@@ -264,7 +264,7 @@ class TypesRegistry {
 	def dependsOnOtherAnnotatedClasses(String annotatedClassFqn) {
 		annotatedClassFqn.getTypesOnWhichThatAnnotatedClassDependsOn.exists [
 			val other = annotatedClassForGenTypeElement.get(it)
-			other != null && !other.equals(annotatedClassFqn)
+			other !== null && !other.equals(annotatedClassFqn)
 		]
 	}
 
@@ -294,7 +294,7 @@ class TypesRegistry {
 			if (it == TypeElementNotFoundException.UNKNOWN_TYPE)
 				!ignoreUnknownTypes
 			else
-				!annotatedClassForGenTypeElement.containsKey(it) && elementUtils.getTypeElement(it) == null
+				!annotatedClassForGenTypeElement.containsKey(it) && elementUtils.getTypeElement(it) === null
 		]
 	}
 
@@ -337,10 +337,10 @@ class TypesRegistry {
 
 		val exisitingFqn = typeElementSimpleNameToFqn.get(genTypeSimpleName)
 
-		if (exisitingFqn != null && !exisitingFqn.equals(genTypeFqn)) {
+		if (exisitingFqn !== null && !exisitingFqn.equals(genTypeFqn)) {
 			messageCollector.reportRuleError(
 				'''The simple names of generated classes must be unique. Found «exisitingFqn» and «genTypeFqn»''')
-		} else if (exisitingFqn == null) {
+		} else if (exisitingFqn === null) {
 			messageCollector.printDiagnosticMessage[
 				'''Register fqn for simple name: «genTypeSimpleName» -> «genTypeFqn»''']
 			typeElementSimpleNameToFqn.put(genTypeSimpleName, genTypeFqn)
@@ -353,7 +353,7 @@ class TypesRegistry {
 		//If the generated class has a shadow trigger annotation, register the class as annotated class, to allow other classes 
 		//to find it by findAllTypeElementsWithTriggerAnnotation
 		//TODO: Also manually created classes with trigger annotation should be registered to make them query-able.
-		if(trigger!=null){
+		if(trigger !== null){
 			
 			registerAnnotatedClass(genTypeElement, Collections.singletonList(trigger->true))	
 		
@@ -375,7 +375,7 @@ class TypesRegistry {
 	def dispatch CharSequence getSimpleOrPartiallyQualifiedName(TypeElement typeElement) {
 		val enclosingName = typeElement.enclosingElement?.simpleOrPartiallyQualifiedName
 			
-		if(enclosingName!=null)
+		if(enclosingName !== null)
 			'''«enclosingName».«typeElement.simpleName»'''	
 		else
 			typeElement.simpleName
@@ -420,7 +420,7 @@ class TypesRegistry {
 	def private tryToGetFqnForErrorTypeSimpleName(String simpleName) {
 
 		val fqn = typeElementSimpleNameToFqn.get(simpleName)
-		if (fqn == null) {
+		if (fqn === null) {
 			if (throwTypeElementNotFoundExceptionWhenResolvingSimpleTypeNames) {
 				throw new TypeElementNotFoundException(simpleName)
 			} else {
@@ -442,7 +442,7 @@ class TypesRegistry {
 			annotatedClassesThatDependOnThatType.put(genTypeFqn, annotatedClasses)
 			annotatedClasses.forEach [
 				val dependentTypes = typesOnWhichThatAnnotatedClassDependsOn.get(it)
-				if(dependentTypes!=null){
+				if(dependentTypes !== null){
 					val simpleTypeNameDependencies = dependentTypes.filter[value==genTypeSimpleName].toSet  
 					dependentTypes.addAll(simpleTypeNameDependencies.map[key -> genTypeFqn])
 					dependentTypes.removeAll(simpleTypeNameDependencies)
@@ -481,7 +481,7 @@ class TypesRegistry {
 		val types = typesOnWhichThatAnnotatedClassDependsOn.remove(annotatedClassFqn)?.map[value]?.toSet
 		types?.forEach [
 			val ac = annotatedClassesThatDependOnThatType.get(it)
-			if (ac != null) {
+			if (ac !== null) {
 				ac.remove(annotatedClassFqn)
 				if (ac.empty) {
 					annotatedClassesThatDependOnThatType.remove(it)
@@ -539,7 +539,7 @@ class TypesRegistry {
 	}
 	
 	def void registerTypeDependencyForCurrentAnnotatedClass(TypeMirror type) {
-		if(currentAnnotatedClass!=null){
+		if(currentAnnotatedClass !== null){
 			registerTypeDependencyForAnnotatedClass(currentAnnotatedClass, type)
 		}
 	}
@@ -594,15 +594,15 @@ class TypesRegistry {
 			{
 				//The type is known to be generated from an annotated class and has just been generated in current round. 
 				//The annotated class is not part of a cycle currently being resolved.	
-				annotatedClassForType != null && !annotatedClassesInSameCycle.contains(annotatedClassForType) &&
+				annotatedClassForType !== null && !annotatedClassesInSameCycle.contains(annotatedClassForType) &&
 				genTypeElementInCurrentRoundByFqn.containsKey(it) ||
 				
 				//The type does not exist and will not be generated as  part of a cycle currently being resolved.		
-				(annotatedClassForType == null || !annotatedClassesInSameCycle.contains(annotatedClassForType)) && 
+				(annotatedClassForType === null || !annotatedClassesInSameCycle.contains(annotatedClassForType)) && 
 				{ 
 					//TODO: Das ist evtl. etwas ineffizient. Wir wissen i.d.R. schon beim Registrieren der dependency, ob der typ bereits existiert oder nicht.
 					val te = elementUtils.getTypeElement(it) //Eclipse may return MissingTypeElement here. Therfore the additional check in next line.
-					te == null || te.asType instanceof ErrorType 
+					te === null || te.asType instanceof ErrorType 
 					
 				}
 				
@@ -659,7 +659,7 @@ class TypesRegistry {
 	}
 	
 	def handleTypeElementNotFound(CharSequence msg, String typeFqnOrShortname, TypeElement annotatedClass) {
-		if(annotatedClass != null) { //Null check is for corner cases where annotation types are missing, since they are to be generated (f.e. annotation templates).
+		if(annotatedClass !== null) { //Null check is for corner cases where annotation types are missing, since they are to be generated (f.e. annotation templates).
 			val errorMsg = '''«msg» Missing type: «typeFqnOrShortname»'''		
 			registerTypeDependencyForAnnotatedClassByFqn(annotatedClass.qualifiedName.toString, typeFqnOrShortname, msg)		
 	
@@ -690,7 +690,7 @@ class TypesRegistry {
 	def dispatch TypeElement asTypeElement(GenUnresolvedType genDeclType) {
 		//May be it exists now. Try to find it.
 		val te = findTypeElement(genDeclType.qualifiedName) 
-		if(te!=null) return te
+		if(te !== null) return te
 		//The TENFE is delayed until any properties of the type element are requested.
 		//This makes it for example easier to generate inner classes that depend on each other.
 		return new GenUnresolvedTypeElement(genDeclType)
@@ -722,7 +722,7 @@ class TypesRegistry {
 			return declType.erasure.asTypeElement
 		}
 		val e = findGenTypeElementForShortName(declType.simpleNameForErrorType)
-		if (e != null) {
+		if (e !== null) {
 			e
 		} else {
 			throw new TypeElementNotFoundException(declType.simpleNameForErrorType)
@@ -763,7 +763,7 @@ class TypesRegistry {
 			annotatedClasses.addAll(getAnnotatedClassesDependingGenericallyOnThatTriggerAnnotation(triggerFqn, false))	
 		]
 		annotatedClasses.map[findTypeElement]
-			.filter[it!=null]
+			.filter[it !== null]
 			//Eclipse sometimes returns TypeElements for non-existing types, instead of null	
 			.filter[!(it.asType instanceof ErrorType)]
 		
@@ -785,7 +785,7 @@ class TypesRegistry {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 		
 		val typeFqns = allAnnotatedClassesByTrigger.get(triggerFqn->shadow)	?: emptySet
-		if(clienAnnotatedClassFqn!=null){
+		if(clienAnnotatedClassFqn !== null){
 			genericTriggerDependencies.getOrCreateSet(triggerFqn->shadow).add(clienAnnotatedClassFqn)	
 		}
 		
@@ -793,12 +793,12 @@ class TypesRegistry {
 			'''Found types for trigger «triggerFqn», «shadow»: «typeFqns»'''
 		]
 		
-		if(clienAnnotatedClassFqn!=null){
+		if(clienAnnotatedClassFqn !== null){
 			//Register dependencies to those types, that cannot be found yet. That is, they are not yet generated since they 
 			//have dependencies to other types.
 			//Note: Types to be generated that are discovered later in the iteration will also wake up the clientAnnotatedClass
 			//but this happens in registerGenTypeElement.
-			typeFqns.filter[findTypeElement(it) == null].forEach[
+			typeFqns.filter[findTypeElement(it) === null].forEach[
 				registerTypeDependencyForAnnotatedClassByFqn(clienAnnotatedClassFqn, it, '''Generic dependency on trigger annotation «triggerFqn»''')
 			]	
 		}
@@ -806,11 +806,11 @@ class TypesRegistry {
 		
 		//Order?
 		val elements = typeFqns.map[findTypeElement]
-			.filter[it!=null]
+			.filter[it !== null]
 			//Eclipse sometimes returns TypeElements for non-existing types, instead of null	
 			.filter[!(it.asType instanceof ErrorType)]
 			//make sure they really have the requested annotation
-			.filter[annotationMirror(triggerFqn) != null]  
+			.filter[annotationMirror(triggerFqn) !== null]  
 		
 		ExtensionRegistry.get(MessageCollector).printDiagnosticMessage[
 			'''Found type elements for trigger «triggerFqn», «shadow»: «elements.map[qualifiedName]»'''
@@ -841,7 +841,7 @@ class TypesRegistry {
 	//Always resolve a self cycle and dependency to aux classes immediately. 
 	protected def TypeElement findTypeInCurrentGeneratedClass(String typeFqnOrShortname) {
 		val currGenClass = currentGeneratedClass
-		if (currGenClass != null){
+		if (currGenClass !== null){
 			//If it has not been found the first time, there is no good reason to try again and again.
 			//If the user wants to resolve inner types within the generate class, he must generate them in the proper order...
 			if(typesNotFoundInGenClass.get(currGenClass).contains(typeFqnOrShortname)) return null;
@@ -849,9 +849,9 @@ class TypesRegistry {
 			val found =  findTypeInGeneratedClass(currGenClass, typeFqnOrShortname) 
 				?: currentPrimaryGenClass.auxTopLevelClasses?.map[
 					findTypeInGeneratedClass(typeFqnOrShortname)
-				]?.findFirst[it!=null]		
+				]?.findFirst[it !== null]		
 				
-			if(found == null) {
+			if(found === null) {
 				typesNotFoundInGenClass.put(currGenClass, typeFqnOrShortname)
 			}	
 			return found
@@ -881,7 +881,7 @@ class TypesRegistry {
 		var result = e
 		for(segment : path){
 			result = result.enclosedElements.findFirst[simpleName.contentEquals(segment)]
-			if(result==null) return null;
+			if(result === null) return null;
 		}
 		result
 		
@@ -927,13 +927,13 @@ class TypesRegistry {
 			var String[] line = null
 			do{
 				line = reader.readLine?.split(',')
-				if(line!=null){
+				if(line !== null){
 					val keyValue = lineParser.apply(line)
 						
 					map.getOrCreateSet(keyValue.key).add(keyValue.value)
 					
 				}
-			} while (line!=null)
+			} while (line !== null)
 		} catch (Exception e){
 			ExtensionRegistry.get(MessageCollector).printDiagnosticMessage['''Loading «fileName» failed: «e»''']
 		} finally {

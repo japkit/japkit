@@ -89,7 +89,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	 * Gets the code as a closure usable in generated methods, constructors and fields.
 	 */
 	def static CodeBody getAsCodeBody(GenElement genElement, CodeRule cr) {
-		if(cr == null) return null
+		if(cr === null) return null
 
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
@@ -205,7 +205,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	}
 
 	public static def CharSequence withLinebreak(CharSequence cs, boolean linebreak) {
-		if (linebreak && cs != null && cs.length > 0) '''«cs»
+		if (linebreak && cs !== null && cs.length > 0) '''«cs»
 		''' else
 			cs
 	}

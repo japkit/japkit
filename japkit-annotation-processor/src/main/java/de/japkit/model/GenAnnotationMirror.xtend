@@ -37,7 +37,7 @@ class GenAnnotationMirror implements AnnotationMirror {
 	}
 	
 	def private setValueInternal(ExecutableElement exEl, GenAnnotationValue v) {
-		if(v==null){
+		if(v === null){
 			elementValues.remove(exEl)
 		} else {
 			elementValues.put(exEl, v)

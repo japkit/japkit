@@ -57,7 +57,7 @@ class JapkitELResolver extends ELResolver {
 		try {
 			return delegate.getValue(context, base, property)
 		} catch (PropertyNotFoundException pnfe) {
-			if(base != null) throw pnfe;
+			if(base !== null) throw pnfe;
 			// The MapRootResolver throws PNFE if it cannot find a root property.
 			// we retry in this case by prepending "src."
 			val src = getValue(context, null, "src");

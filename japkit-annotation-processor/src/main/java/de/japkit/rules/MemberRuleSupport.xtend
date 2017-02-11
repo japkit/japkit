@@ -93,7 +93,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	}
 	
 	protected def void addDependentMemberRule(MemberRuleSupport<?,?> mr){
-		if(mr==null) return;
+		if(mr === null) return;
 		dependentMemberRules.add [g| mr.apply(g)]
 	}
 	
@@ -217,7 +217,7 @@ public abstract class MemberRuleSupport<E extends Element, T extends GenElement>
 	
 
 	protected def void createAndAddDelegateMethodRules() {
-		if(metaAnnotation == null) return;
+		if(metaAnnotation === null) return;
 		
 		metaAnnotation.value("delegateMethods", typeof(AnnotationMirror[]))?.forEach [
 			val dmr =  new DelegateMethodsRule(it, null)

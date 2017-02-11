@@ -39,7 +39,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 				return existingValue
 			}
 	
-			if (existingValue != null) {
+			if (existingValue !== null) {
 				switch (mode) {
 					case AVMode.ERROR_IF_EXISTS:
 						throw new RuleException(
@@ -61,7 +61,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 			//If this AV-Mapping is not completely initialized, return the value unchanged.
 			//Is relevant for annotation templates. There AVMRs are created for each AV.
 			// Could be optimized by dropping the ones that are "empty", since neither expr nor value nor annotationMapping is set.
-			if(value == null && expr == null && lazyAnnotationMapping == null) {
+			if(value === null && expr === null && lazyAnnotationMapping === null) {
 				return existingValue;
 			}
 	
@@ -69,9 +69,9 @@ class AnnotationValueMappingRule extends AbstractRule {
 				val flatValues = newArrayList
 
 				scopeRule.apply [
-					if (value != null) {
+					if (value !== null) {
 						value
-					} else if (lazyAnnotationMapping != null) {
+					} else if (lazyAnnotationMapping !== null) {
 
 						val annotationMapping = lazyAnnotationMapping.apply
 
@@ -79,7 +79,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 						annotationMapping.mapOrCopyAnnotations(annotations)
 						annotations as ArrayList<? extends Object>
 
-					} else if (expr != null) {
+					} else if (expr !== null) {
 						evaluateExpression(avType, expr)
 					} else {
 						throw new IllegalStateException("Annotation value could not be determined.");
@@ -90,11 +90,11 @@ class AnnotationValueMappingRule extends AbstractRule {
 
 			]
 	
-			if(v==null){
+			if(v === null){
 				return existingValue;  //No value... Leave existing value unchanged.
 			}
 			
-			if (mode == AVMode.JOIN_LIST && existingValue != null) {
+			if (mode == AVMode.JOIN_LIST && existingValue !== null) {
 				val joined = new ArrayList(existingValue.valueWithErrorHandling as List<Object>)
 				joined.addAll(v as List<Object>)
 				new GenAnnotationValue(joined)
@@ -128,7 +128,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 		
 		lazyAnnotationMapping = if(annotationMappingId.nullOrEmpty) null else [| 
 			val amr = mappingsWithId.get(annotationMappingId)
-			if(amr==null){
+			if(amr === null){
 				throw new RuleException("Annotation Mapping with id "+annotationMappingId+" not found");
 			}
 			amr
@@ -157,7 +157,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 		
 		val annotationMappingAnnotation =  a.valueAndRemember(avPrefix, AnnotationMirror, setAvNames)
 		
-		lazyAnnotationMapping = if (annotationMappingAnnotation == null) null else {
+		lazyAnnotationMapping = if (annotationMappingAnnotation === null) null else {
 			val amr = new AnnotationMappingRule(annotationMappingAnnotation, templateElement);
 			[| amr]
 		}
