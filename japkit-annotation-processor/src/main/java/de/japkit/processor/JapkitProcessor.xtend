@@ -32,6 +32,7 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
+import de.japkit.services.ReportedException
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -603,7 +604,13 @@ class JapkitProcessor extends AbstractProcessor {
 			//TODO: Reconsider. Is @Behavior considered as Trigger Annotation or as something else?
 			//generatedTopLevelClasses.putAll(processBehaviorAnnotation(annotatedClass))
 			generatedTopLevelClasses
-		
+		} catch (ReportedException re) {
+			//Do nothing. It has been reported as error before.
+			emptyMap
+		} catch (Exception e) {
+			//This is the last fallback when a exception has not been handled well. Especially in rule constructors, this may still occur in some cases.
+			messageCollector.reportError('Unexpected Exception when processing annotated class:', e, annotatedClass, null, null)
+			emptyMap	 
 		} finally {
 			setCurrentAnnotatedClass(null)
 		}
