@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.stefanocke.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.7-SNAPSHOT</version>
+		<version>1.8-SNAPSHOT</version>
 	</parent>
 	<artifactId>japkit-xtend-parent</artifactId>
 	<name>Japkit Annotation Processor - Xtend modules parent pom</name>
