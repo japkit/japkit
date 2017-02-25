@@ -104,12 +104,12 @@ class ElementsExtensions {
 	def enclosedElementsOrdered(TypeElement type) {
 		val elements = type.enclosedElements
 
-		if (elements.exists[annotationMirror(ORDER_ANNOTATION_NAME) != null]) {
+		if (elements.exists[annotationMirror(ORDER_ANNOTATION_NAME) !== null]) {
 			elements.sortBy[ordinalNumber]
 		} else {
 			val orderFromRuntimeMetadata = getOrderFromRuntimeMetadata(type);
 
-			if (orderFromRuntimeMetadata != null) {
+			if (orderFromRuntimeMetadata !== null) {
 				elements.sortBy(orderFromRuntimeMetadata)
 			} else
 				elements
@@ -122,7 +122,7 @@ class ElementsExtensions {
 
 	def Integer getOrdinalNumber(Element e) {
 		val am = e.annotationMirror(ORDER_ANNOTATION_NAME)
-		if (am == null) {
+		if (am === null) {
 			Integer.MAX_VALUE //elements without order go to the end
 		} else {
 			am.requiredValue(e, "value", Integer)
@@ -174,7 +174,7 @@ class ElementsExtensions {
 	def List<? extends VariableElement> parametersWithSrcNames(ExecutableElement e) {
 		val am = e.annotationMirror(ParamNames)
 		val params = e.parameters
-		if (am != null) {
+		if (am !== null) {
 			val namesAv = am.value("value", typeof(String[]))
 			val names = if (namesAv.size == 1) {
 
@@ -239,7 +239,7 @@ class ElementsExtensions {
 
 	def <T> T findFirstInTypeAndSuperclasses(TypeElement typeElement, String stopSuperclass, (TypeElement)=>T query) {
 		var v = query.apply(typeElement)
-		if (v == null) {
+		if (v === null) {
 			val sup = typeElement.superclass
 			if (sup.kind != TypeKind.NONE && stopSuperclass != sup.asTypeElement.qualifiedName.toString) {
 				v = sup.asTypeElement.findFirstInTypeAndSuperclasses(stopSuperclass, query)
@@ -271,7 +271,7 @@ class ElementsExtensions {
 	 */
 	def AnnotationMirror annotationMirror(Element annotatedElement, CharSequence annotationFqn) {
 		val am = annotatedElement.annotationMirrors.findFirst[hasFqn(annotationFqn)]
-		if(am==null) null else new AnnotationAndParent(am, null, null, annotatedElement)
+		if(am === null) null else new AnnotationAndParent(am, null, null, annotatedElement)
 	}
 
 	/**
@@ -303,15 +303,15 @@ class ElementsExtensions {
 	def List<AnnotationMirror> annotationMirrors(Element annotatedElement, CharSequence annotationFqn) {
 		val listAnnotationType = findTypeElement(annotationFqn.toString).declaredTypes.findFirst[
 			simpleName.contentEquals("List")]
-		if (listAnnotationType != null) {
+		if (listAnnotationType !== null) {
 			val listAnnotation = annotatedElement.annotationMirror(listAnnotationType.qualifiedName)
-			if (listAnnotation != null) {
+			if (listAnnotation !== null) {
 				return listAnnotation.value("value", typeof(AnnotationMirror[]))
 			}
 
 		}
 		val singleAnnotation = annotatedElement.annotationMirror(annotationFqn)
-		return if(singleAnnotation == null) emptyList else Collections.singletonList(singleAnnotation)
+		return if(singleAnnotation === null) emptyList else Collections.singletonList(singleAnnotation)
 	}
 
 	def boolean hasMetaAnnotation(AnnotationMirror am, CharSequence metaAnnotationFqn) {	
@@ -411,7 +411,7 @@ class ElementsExtensions {
 	def private dispatch Map<String, AnnotationValue> loadAnnotationValues(AnnotationMirror annotationMirror) {
 		var valuesMap = annotationValuesCache.get(annotationMirror)
 
-		if (valuesMap == null) {
+		if (valuesMap === null) {
 			valuesMap = loadAnnotationValuesCacheMiss(annotationMirror)
 		}
 		valuesMap
@@ -420,7 +420,7 @@ class ElementsExtensions {
 	def private Map<String, AnnotationValue>loadAnnotationValuesCacheMiss(AnnotationMirror annotationMirror) {
 		val map = newHashMap
 		annotationMirror.elementValuesWithDefaults.forEach[k, v|
-			val v2 = if((v.value instanceof List<?>) && k.annotationMirror(SingleValue)!=null){
+			val v2 = if((v.value instanceof List<?>) && k.annotationMirror(SingleValue) !== null){
 				val list = (v.value as List<AnnotationValue>)
 //Does not work, since currentAnnotatedClass is not always available.
 //				if(list.size>1){
@@ -462,7 +462,7 @@ class ElementsExtensions {
 				//In Eclipse: zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): 
 				//Arrays mit UnresolvedTypeBindings werden nicht resolved.	
 				//https://bugs.eclipse.org/bugs/show_bug.cgi?id=498022	
-				if(v.class.eclipseGetBindingMethod !=null && v.class.eclipseGetBindingMethod.invoke(v).class.canonicalName.contains("Unresolved")){
+				if(v.class.eclipseGetBindingMethod  !== null && v.class.eclipseGetBindingMethod.invoke(v).class.canonicalName.contains("Unresolved")){
 					val te =  (v as DeclaredType).asTypeElement			
 					val char dollar = '$'  //UnresolvedTypeBindings for inner classes have $ in their FQNs.
 					val teFqn = te.qualifiedName.toString.replace(dollar ,'.')
@@ -529,7 +529,7 @@ class ElementsExtensions {
 	}
 	
 	def isNullOrEmptyAV(Object value) {
-		value == null || value.isEmptyAV
+		value === null || value.isEmptyAV
 	}
 	
 	def dispatch boolean isEmptyAV(String s) {
@@ -558,7 +558,7 @@ class ElementsExtensions {
 	private def <T> T mapAs(AnnotationValue av, Object value, AnnotationMirror annotationMirror,
 		Element annotatedElement, CharSequence name, Integer index, Class<T> avType) {
 		
-		if(value==null) {return null;}
+		if(value === null) {return null;}
 
 		//Arrays can be converted to single values to support optionality. The array may contain zero or one element then.
 		if (!avType.array && value instanceof Iterable<?>) {	
@@ -638,7 +638,7 @@ class ElementsExtensions {
 	}		
 
 	def getPrefixedAvName(AnnotationMirror metaAnnotation, CharSequence name) {
-		if (metaAnnotation == null) {
+		if (metaAnnotation === null) {
 			return name
 		}
 		val prefix = metaAnnotation.value("_prefix", String)
@@ -753,7 +753,7 @@ class ElementsExtensions {
 					new GenAnnotationValue(coerceSingleValue(it, compType))
 				].toList
 
-			} else if(value==null){
+			} else if(value === null){
 				emptyList
 			} else {
 				newArrayList(new GenAnnotationValue(coerceSingleValue(value, compType)))
@@ -808,7 +808,7 @@ class ElementsExtensions {
 
 				//FQN to type mirror
 				val typeMirror = getTypeElement(s)?.asType
-				if (typeMirror == null) {
+				if (typeMirror === null) {
 					throw new IllegalArgumentException('''Class «s» could not be found.''');
 				}
 				typeMirror
@@ -818,7 +818,7 @@ class ElementsExtensions {
 			}
 			case e.kind == ElementKind.ENUM: {
 				val enumConst = avType.asTypeElement.declaredFields.findFirst[simpleName.contentEquals(s)]
-				if (enumConst == null) {
+				if (enumConst === null) {
 					throw new RuleException('''«s» is not a valid enum constant for enum type «avType»''');
 				}
 				enumConst
@@ -942,7 +942,7 @@ class ElementsExtensions {
 	def boolean loadRuntimeMetadata(Element element) {
 		val topLevelEnclosingTypeElement = element.getTopLevelEnclosingTypeElement
 		val typeElementFqn = topLevelEnclosingTypeElement.qualifiedName.toString
-		if (topLevelEnclosingTypeElement.annotationMirror(RuntimeMetadata) == null) {
+		if (topLevelEnclosingTypeElement.annotationMirror(RuntimeMetadata) === null) {
 			//shortcut: If there is no according trigger annoatation there won't be runtime metadata at all
 			//TODO: Exception, since we know at this point that we NEED comments or param names?
 			return false
@@ -950,7 +950,7 @@ class ElementsExtensions {
 		
 		val runtimemetadataFqn = typeElementFqn + "_RuntimeMetadata"
 		var runtimeMetadataTypeElement = findTypeElement(runtimemetadataFqn) //TODO: Constant
-		if (runtimeMetadataTypeElement != null) {
+		if (runtimeMetadataTypeElement !== null) {
 			if(runtimeMetadataTypeElement != runtimeMetadataByFqn.get(runtimemetadataFqn)){
 				loadCommentsAndParamNames(runtimeMetadataTypeElement)
 				runtimeMetadataByFqn.put(runtimemetadataFqn, runtimeMetadataTypeElement)	
@@ -1016,7 +1016,7 @@ class ElementsExtensions {
 
 	def dispatch Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValuesWithDefaults(
 		GenAnnotationMirror am) {
-		val result = am.annotationType.asTypeElement.declaredMethods.filter[defaultValue != null].toInvertedMap[
+		val result = am.annotationType.asTypeElement.declaredMethods.filter[defaultValue !== null].toInvertedMap[
 			defaultValue]
 		result.putAll(am.elementValues)
 		result
@@ -1059,7 +1059,7 @@ class ElementsExtensions {
 	}
 
 	def overrides(ExecutableElement overrider, ExecutableElement overridden, TypeElement type) {
-		if (type != null) {
+		if (type !== null) {
 			throw new UnsupportedOperationException("Method overrides with type parameter currently not supported")
 		}
 		return overrides(overrider, overridden)
@@ -1094,7 +1094,7 @@ class ElementsExtensions {
 		else if (e.enclosingElement == enclosing)
 			e.uniqueSimpleName.toString
 		else {
-			if (e?.enclosingElement == null) {
+			if (e?.enclosingElement === null) {
 				throw new IllegalArgumentException('''«e» is not enclosed by element «enclosing»''')
 			}
 			'''«e.enclosingElement.uniqueNameWithin(enclosing)».«e.uniqueSimpleName.toString»'''

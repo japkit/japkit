@@ -53,7 +53,7 @@ class BehaviorDelegationRule extends AbstractRule {
 	 */
 	def void createBehaviorDelegation(GenTypeElement c) {
 		inRule[
-			if (activationRule != null && !activationRule.apply) {
+			if (activationRule !== null && !activationRule.apply) {
 				return null
 			}
 			//TODO: Name of interface and base class configurable
@@ -61,7 +61,7 @@ class BehaviorDelegationRule extends AbstractRule {
 			val behaviorProxyAndTypeElement = behaviorClass.resolveTypeAndCreateProxy
 			val foundBehaviorClass = behaviorProxyAndTypeElement.value
 			
-			if(activationRule==null && foundBehaviorClass==null){
+			if(activationRule === null && foundBehaviorClass === null){
 				//If there is no custom activation rule, the behavior delegation is only generated if the custom behavior class exists.
 				return null;
 			}
@@ -77,7 +77,7 @@ class BehaviorDelegationRule extends AbstractRule {
 			]
 			
 			//Methods defined in the behavior class
-			val customBehaviorMethods = if (foundBehaviorClass == null)
+			val customBehaviorMethods = if (foundBehaviorClass === null)
 					#[]
 				else
 					foundBehaviorClass.declaredMethods.filter[!static && !private]
@@ -90,7 +90,7 @@ class BehaviorDelegationRule extends AbstractRule {
 					val result = isSubSignature(m)
 					result
 				]
-				if (collidingMethod != null) {
+				if (collidingMethod !== null) {
 					collidingBehaviorMethods.put(collidingMethod, m as GenMethod)
 				}
 			]
@@ -190,7 +190,7 @@ class BehaviorDelegationRule extends AbstractRule {
 						body = [codeForDelegation(m, behaviorFieldName)]
 						comment = m.docComment
 						val genMethod = collidingBehaviorMethods.get(m)
-						if (genMethod != null) {
+						if (genMethod !== null) {
 
 							//if it is a colliding method, retain the visibility of the existing (renamed) gen-method
 							visibility = genMethod.visibility ?: m.visibility
@@ -254,7 +254,7 @@ class BehaviorDelegationRule extends AbstractRule {
 					null
 				}
 			
-			if(te!=null && !(tm instanceof GenUnresolvedType)){
+			if(te !== null && !(tm instanceof GenUnresolvedType)){
 				//The class has already been created by the user.
 				// Nevertheless create a proxy to provide a place to add expected interfaces and superclasses. 
 				val proxy = new GenClass(te.simpleName)

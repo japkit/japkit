@@ -29,14 +29,14 @@ abstract class GenExecutableElement extends GenJava8ExecutableElement implements
 	
 	def setBody(CodeBody body){			
 		this.body = body
-		if(body!=null){
+		if(body !== null){
 			removeModifier(Modifier.ABSTRACT)	
 		
 		}	
 	}
 	
 	override addModifier(Modifier m){
-		if(body != null && m == Modifier.ABSTRACT){
+		if(body !== null && m == Modifier.ABSTRACT){
 			//Methods with a body are not abstract
 			return
 		}
@@ -77,7 +77,7 @@ abstract class GenExecutableElement extends GenJava8ExecutableElement implements
 	
 	def void setReturnType(TypeMirror returnType){
 		//Always "normalize" return type to VOID if it is a no-type
-		this.returnType = if(returnType==null || returnType.kind == TypeKind.NONE || returnType.kind == TypeKind.NULL)  
+		this.returnType = if(returnType === null || returnType.kind == TypeKind.NONE || returnType.kind == TypeKind.NULL)  
 			ExtensionRegistry.get(TypesExtensions).getNoType(TypeKind.VOID) 
 			else returnType
 	}

@@ -34,7 +34,7 @@ class ManualOverrideRule {
 	
 	def apply(Iterable<? extends GenElement> elementsToOverride){
 		val overridesSource = manualOverrides?.resolveType?.asTypeElement
-		if(overridesSource==null) return;
+		if(overridesSource === null) return;
 		
 		val overrideElementsByName = (overridesSource?.enclosedElements?.filter[manualOverridesMatcher.apply(it)] ?: emptyList).toMap[simpleName.toString]
 		
@@ -53,7 +53,7 @@ class ManualOverrideRule {
 		
 		elementsToOverride.forEach[
 			val overrideElement = overrideElementsByName.get(it.simpleName.toString)
-			if(overrideElement!=null){
+			if(overrideElement !== null){
 				annotationMirrors = overrideAnnotations(overrideElement, annotationMirrors as List<GenAnnotationMirror>)			
 			}
 		]

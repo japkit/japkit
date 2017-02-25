@@ -23,7 +23,7 @@ class ConstraintRule extends AbstractRule{
 			]
 			
 			
-			if(result == null || !result){
+			if(result === null || !result){
 				reportMessage(msg, if(currentSrc instanceof Element) currentSrcElement, msgKind)
 			}
 			null

@@ -230,8 +230,8 @@ class TypesExtensions /**implements Types*/{
 	}
 
 	def dispatch boolean containsErrorType(WildcardType t) {
-		(t.extendsBound != null && t.extendsBound.containsErrorType) ||
-			(t.superBound != null && t.superBound.containsErrorType)
+		(t.extendsBound !== null && t.extendsBound.containsErrorType) ||
+			(t.superBound !== null && t.superBound.containsErrorType)
 	}
 
 	def dispatch boolean containsErrorType(TypeMirror t) {
@@ -320,7 +320,7 @@ class TypesExtensions /**implements Types*/{
 	}
 
 	def isVoid(TypeMirror type) {
-		type == null || type.kind == TypeKind.VOID || type.kind == TypeKind.NONE
+		type === null || type.kind == TypeKind.VOID || type.kind == TypeKind.NONE
 	}
 	
 	def getVoid(){

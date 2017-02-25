@@ -5,15 +5,15 @@ import de.japkit.metaannotations.ResourceTemplate
 import de.japkit.model.GenTypeElement
 import de.japkit.services.ProcessingException
 import de.japkit.services.TypeElementNotFoundException
+import java.util.ArrayList
 import java.util.List
 import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
-import java.util.ArrayList
 
 @Data
-class TriggerAnnotationRule extends AbstractRule{
+class TriggerAnnotationRule extends AbstractRule {
 	
 	TypeElement triggerAnnotationTypeElement
 	List<ELVariableRule> varRules
@@ -34,7 +34,15 @@ class TriggerAnnotationRule extends AbstractRule{
 		
 		//@Clazz
 		classRules= new ArrayList( if(!classTemplates.empty) 
-			classTemplates.map[new ClassRule(it.annotationMirror(Clazz), it, true)].toList
+			classTemplates.map[			
+				val clazzAnnotation = it.annotationMirror(Clazz)
+				if(clazzAnnotation === null) {
+					throwRuleCreationException('''No @Clazz annotation found on «it.simpleName» ''', "template");
+					null
+				} else
+				new ClassRule(clazzAnnotation, it, true)
+			]
+			.filter[it !== null].toList
 			else 
 			triggerAnnotationTypeElement.annotationMirrors(Clazz).map[new ClassRule(it, null, true)].toList)
 		

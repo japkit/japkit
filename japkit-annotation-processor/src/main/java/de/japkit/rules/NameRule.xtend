@@ -21,7 +21,7 @@ class NameRule extends AbstractRule{
 	
 	new(AnnotationMirror metaAnnotation, String avPrefix){
 		super(metaAnnotation, null)
-		val prefix = if(avPrefix==null) "name" else avPrefix
+		val prefix = if(avPrefix === null) "name" else avPrefix
 		regEx = metaAnnotation.value('''«prefix»RegEx''', Pattern)
 		regExReplace = metaAnnotation.value('''«prefix»RegExReplace''', String)		
 		expr =  metaAnnotation.value('''«prefix»Expr''', String)		
@@ -29,12 +29,12 @@ class NameRule extends AbstractRule{
 	}
 	
 	def isEmpty(){
-		regEx == null && expr == null
+		regEx === null && expr === null
 	}
 		
 	def String getName(CharSequence orgName, Element orgElement){
 		inRule[
-			if(regEx != null){
+			if(regEx !== null){
 			
 				val matcher = regEx.matcher(orgName)
 				

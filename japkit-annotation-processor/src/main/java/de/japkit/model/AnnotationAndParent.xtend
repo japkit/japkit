@@ -38,7 +38,7 @@ class AnnotationAndParent implements AnnotationWrapper{
 		new Path(getPathFromRootAnnotation_)
 	}
 	def private List<Path.Segment> getPathFromRootAnnotation_(){
-		if(parentAnnotation==null) newArrayList() 
+		if(parentAnnotation === null) newArrayList() 
 		else {
 			 val path = parentAnnotation.pathFromRootAnnotation_
 			 path.add(pathSegment)

@@ -33,7 +33,7 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 		)
 		
 		var beanType = elVarAnnotation.loadClassFromAV("bean")		
-		createBeanInstance = beanType != null;	
+		createBeanInstance = beanType !== null;	
 		beanType = beanType?: elVarAnnotation.loadClassFromAV("beanClass")
 		beanClass = beanType
 		
@@ -42,7 +42,7 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 	def private Class<?> loadClassFromAV(AnnotationMirror am, String avName) {
 		val fqn = am.value(avName, TypeElement)?.qualifiedName?.toString
 		try{	
-			if(fqn != null) ELVariableRule.classLoader.loadClass(fqn) else null;		
+			if(fqn !== null) ELVariableRule.classLoader.loadClass(fqn) else null;		
 		} catch (ClassNotFoundException cnfe) {
 			throwRuleCreationException("The class could not be loaded from annotation processor's classpath:" + cnfe.message, avName);	
 			null
@@ -52,7 +52,7 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 	def void putELVariable() {
 		
 		val exisitingValue = valueStack.get(name)
-		if(ifEmpty && exisitingValue!==null && !exisitingValue.emptyVar) return
+		if(ifEmpty && exisitingValue !== null && !exisitingValue.emptyVar) return
 		
 		val value = handleException([| new ElVariableError(name) as Object], null)[
 			eval(currentSrc)
@@ -63,7 +63,7 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 	
 	def Object eval(Object src) {
 		inRule[
-			if (beanClass != null) {
+			if (beanClass !== null) {
 				if(createBeanInstance) beanClass.newInstance else beanClass;
 			} else
 				exprOrFunctionCallRule.apply

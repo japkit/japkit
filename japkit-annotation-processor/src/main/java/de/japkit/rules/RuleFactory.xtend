@@ -117,7 +117,7 @@ class RuleFactory {
 	
 	def private createFunctionInternal(Element element){
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
-		val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key!=null]
+		val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key !== null]
 		factory?.value?.apply(factory.key, element)
 	}
 	

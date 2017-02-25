@@ -41,7 +41,7 @@ class MessageCollector {
 	Map<String, Set<Message>> messagesPerAnnotatedClass = newHashMap
 
 	def void addMessage(Message m) {
-		if (currentAnnotatedClass == null) {
+		if (currentAnnotatedClass === null) {
 			throw new IllegalStateException("Currently processed annotated class must be set to report errors!")
 		}
 		val currentAnnotatedClassFqn = currentAnnotatedClass.qualifiedName.toString
@@ -84,14 +84,14 @@ class MessageCollector {
 	def void printAllMessages() {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 		printDiagnosticMessage(['''Print Messages: «messagesPerAnnotatedClass»'''])
-		messagesPerAnnotatedClass.values.filter[it != null].flatten.forEach [ m |
+		messagesPerAnnotatedClass.values.filter[it !== null].flatten.forEach [ m |
 			//Rediscover the element where the message occured...
 			var Element element = null 
 			var AnnotationMirror annotation = null
 			var AnnotationValue annotationValue = null
 			try{
 				val typeElement = getTypeElement(m.typeElementFqn)
-				if(m.uniqueMemberName!=null){
+				if(m.uniqueMemberName !== null){
 					//TODO: Support inner classes. Use uniqueIdentifier
 					element = typeElement.enclosedElements.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]
 				} else {
@@ -133,7 +133,7 @@ class MessageCollector {
 		val pathSegments = path?.segments
 		var annotation = rootAnnotation
 				
-		if(pathSegments!=null){
+		if(pathSegments !== null){
 			for(s : pathSegments){
 				var av = annotation.getValue(s.name, s.index)
 				
@@ -146,7 +146,7 @@ class MessageCollector {
 	def getValue(AnnotationMirror am, String avName, Integer index){
 		if(avName.nullOrEmpty) return null
 		val av = am?.elementValues.filter[k, v| k.simpleName.contentEquals(avName)].values.head
-		if(index!=null) (av?.value as List<AnnotationValue>).get(index) else av
+		if(index !== null) (av?.value as List<AnnotationValue>).get(index) else av
 	}
 
 	def removeMessagesForAnnotatedClass(String annotatedClassFqn) {
@@ -214,18 +214,18 @@ class MessageCollector {
 	def reportError(ProcessingException pe) {
 
 		//Always prepend the location, so it can be found even if not in current project (f.e. annotations with meta annotations)
-		val elementStr = if (pe.element != null) {
+		val elementStr = if (pe.element !== null) {
 				'''Element: «pe.element», '''
 			} else {
 				''
 			}
-		val annotationStr = if (pe.annotationMirror != null) {
+		val annotationStr = if (pe.annotationMirror !== null) {
 				'''Annotation: «pe.annotationMirror», '''
 			} else {
 				''
 			}
-		val annotationValueStr = if (pe.annotationValueName != null) {
-				'''Annotation Value: «pe.annotationValueName»«IF pe.annotationValue != null» ="«pe.annotationValue.value»"«ENDIF», '''
+		val annotationValueStr = if (pe.annotationValueName !== null) {
+				'''Annotation Value: «pe.annotationValueName»«IF pe.annotationValue !== null» ="«pe.annotationValue.value»"«ENDIF», '''
 			} else {
 				''
 			}
@@ -233,17 +233,17 @@ class MessageCollector {
 
 		val msg = '''«elementStr»«annotationStr»«annotationValueStr»«pe.message»'''
 		var element = pe.element
-		if (element == null) {
+		if (element === null) {
 			element = currentAnnotatedClass //Make sure there is always an element where the error can be reported
 		}
 		var annotation = pe.annotationMirror
-		if (annotation == null) {
+		if (annotation === null) {
 			annotation = currentTriggerAnnotation
 		}
 
 		addMessage(Kind.ERROR, msg, element, annotation, pe.annotationValueName?.toString)
 
-		if (currentAnnotatedClass!=null) {
+		if (currentAnnotatedClass !== null) {
 
 			//Make sure, the error is reported for an element within the project, even if the original cause is an element outside the project
 			addMessage(Kind.ERROR, msg, currentAnnotatedClass, currentTriggerAnnotation, null)
@@ -254,14 +254,14 @@ class MessageCollector {
 	def reportMessage(String msg, Element element, Kind kind) {
 		addMessage(kind, msg, element, currentTriggerAnnotation, null)
 		//If the element is not the current annotated class or is not contained in it, report one more message for the annotated class
-		if (currentAnnotatedClass!=null && element.enclosingTopLevelElement != currentAnnotatedClass) {
+		if (currentAnnotatedClass !== null && element.enclosingTopLevelElement != currentAnnotatedClass) {
 			addMessage(kind, msg, currentAnnotatedClass, currentTriggerAnnotation, null)
 		}
 	}
 	
 	def private Element enclosingTopLevelElement(Element element){
 		val enclosing = element?.enclosingElement 
-		if(enclosing == null || enclosing instanceof PackageElement){
+		if(enclosing === null || enclosing instanceof PackageElement){
 			element
 		} else {
 			enclosing.enclosingTopLevelElement

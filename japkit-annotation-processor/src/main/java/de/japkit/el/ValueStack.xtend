@@ -28,7 +28,7 @@ class ValueStack implements Map<String, Object> {
 	//deep copy
 	new(ValueStack other){
 		this.current = new HashMap(other.current)
-		if(other.parent != null){
+		if(other.parent !== null){
 			this.parent = new ValueStack(other.parent)	
 		}
 	}
@@ -54,7 +54,7 @@ class ValueStack implements Map<String, Object> {
 	}
 	
 	def void pop(){
-		if(parent == null){
+		if(parent === null){
 			throw new IllegalStateException("ValueStack has no parent. pop() is not allowed.")
 		}
 		current = parent.current
@@ -67,7 +67,7 @@ class ValueStack implements Map<String, Object> {
 	}
 	
 	override containsKey(Object key) {
-		current.containsKey(key) || (parent != null && parent.containsKey(key)) || (parent != null && key=="parent" )
+		current.containsKey(key) || (parent !== null && parent.containsKey(key)) || (parent !== null && key=="parent" )
 	}
 	
 	override containsValue(Object value) {
@@ -96,19 +96,19 @@ class ValueStack implements Map<String, Object> {
 	
 	def getRequired(Object key){
 		val v = get(key)
-		if(v==null) {
+		if(v === null) {
 			throw new IllegalStateException('''No value found on value stack for key «key»''')
 		}
 		v
 	}
 	
 	override isEmpty() {
-		current.empty && (parent==null || parent.empty)
+		current.empty && (parent === null || parent.empty)
 	}
 	
 	override keySet() {
 		val keys = new HashSet(current.keySet)
-		if(parent!=null) keys.addAll(parent.keySet)
+		if(parent !== null) keys.addAll(parent.keySet)
 		keys.unmodifiableView
 	}
 	

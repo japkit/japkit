@@ -2,7 +2,6 @@ package de.japkit.rules
 
 import de.japkit.model.GenMethod
 import de.japkit.model.Property
-import de.japkit.services.ExtensionRegistry
 import java.util.ArrayList
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
@@ -50,7 +49,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 			null
 		}
 		
-		if(getDelegateMethod != null){
+		if(getDelegateMethod !== null){
 			//the delegate is retrieved by calling a method. Prepend the parameters.
 			val params = new ArrayList(getDelegateMethod.parametersWithSrcNames)
 			params.addAll(method.parameters)
@@ -58,7 +57,7 @@ class DelegateMethodsRule extends MemberRuleSupport<ExecutableElement, GenMethod
 		}
 
 		method.body = [ec|
-			val getDelegate = if(getDelegateMethod != null){
+			val getDelegate = if(getDelegateMethod !== null){
 				'''this.«getDelegateMethod.simpleName»(«getDelegateMethod.argumentsList»)'''
 			} else {
 				'''this.«delegate.simpleName»'''

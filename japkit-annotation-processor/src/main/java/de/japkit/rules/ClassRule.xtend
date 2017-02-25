@@ -64,8 +64,8 @@ class ClassRule extends AbstractRule {
 		templateRule = templateClass?.createTemplateRule(metaAnnotation)
 		
 		//"Legacy support" when @Clazz is not on a template but on the trigger annotation.
-		membersRule = if(templateClass==null) new MembersRule(metaAnnotation) else null
-		annotationsRule = if(templateClass==null) createAnnotationMappingRules(metaAnnotation, null, null) else null
+		membersRule = if(templateClass === null) new MembersRule(metaAnnotation) else null
+		annotationsRule = if(templateClass === null) createAnnotationMappingRules(metaAnnotation, null, null) else null
 		
 		
 		kind = metaAnnotation.value('kind', ElementKind)
@@ -111,20 +111,20 @@ class ClassRule extends AbstractRule {
 			if(!activationRule.apply) return Collections.<GenTypeElement>emptyList
 
 			val enclosingClass = if (!isTopLevelClass) {
-					if (currentGeneratedClass == null) {
+					if (currentGeneratedClass === null) {
 						throw new IllegalArgumentException(
 							"currentGeneratedClass must be available when it is a rule for an inner class.")
 					}
 					currentGeneratedClass
 				} else
 					null
-			if (!isTopLevelClass && (enclosingClass == null)) {
+			if (!isTopLevelClass && (enclosingClass === null)) {
 				throw new IllegalArgumentException(
 					"enclosingClass must be available when it is a rule for an inner class.")
 			}
 
 			if (isAuxClass) {
-				if (currentGeneratedClass == null) {
+				if (currentGeneratedClass === null) {
 					throw new IllegalArgumentException(
 						"currentGeneratedClass must be available when it is a rule for an aux class.")
 				}
@@ -157,12 +157,12 @@ class ClassRule extends AbstractRule {
 					generatedClass.modifiers = modifiersRule.apply
 
 					// TODO: Move to modifiers rule ?
-					if (templateRule != null) {
+					if (templateRule !== null) {
 						generatedClass.removeModifier(Modifier.ABSTRACT) // Templates are usually abstract
 					}
 
 					generatedClass.setSuperclass(superclassRule.apply)
-					interfaceRules.map[apply].filter[it != null].forEach [
+					interfaceRules.map[apply].filter[it !== null].forEach [
 						generatedClass.addInterface(it)
 					]
 
@@ -170,7 +170,7 @@ class ClassRule extends AbstractRule {
 						createShadowAnnotation(generatedClass)
 					}
 
-					if(annotationsRule != null) {
+					if(annotationsRule !== null) {
 						generatedClass.annotationMirrors = annotationsRule.apply(generatedClass)			
 					}
 					generatedClass.comment = commentRule.apply
@@ -193,7 +193,7 @@ class ClassRule extends AbstractRule {
 				} catch (Exception e) {
 					reportRuleError(e)
 				} finally {
-					if (isTopLevelClass && !isAuxClass && generatedClass != null) {
+					if (isTopLevelClass && !isAuxClass && generatedClass !== null) {
 						val Set<GenTypeElement> generatedClasses = newHashSet
 						generatedClasses.add(generatedClass)
 						addAllAuxTopLevelClasses(generatedClasses, generatedClass)
@@ -202,7 +202,7 @@ class ClassRule extends AbstractRule {
 						generatedClasses.forEach[addOrderAnnotations]
 						generatedClasses.forEach[addParamNamesAnnotations]
 
-						if (generatedTopLevelClasses != null) {
+						if (generatedTopLevelClasses !== null) {
 							generatedTopLevelClasses.addAll(generatedClasses)
 						}
 
@@ -230,7 +230,7 @@ class ClassRule extends AbstractRule {
 
 				shadowAnnotation.annotationValueNames.forEach [ avName |
 					val valueFromStack = valueStack.get(avName.toString)
-					if (valueFromStack != null && !valueFromStack.isEmptyVar) {
+					if (valueFromStack !== null && !valueFromStack.isEmptyVar) {
 						shadowAnnotation.setValue(avName.toString, [ t |
 							// TODO: Schicker. In extension o.ä verlagern. 
 							new GenAnnotationValue(coerceAnnotationValue(valueFromStack, t))

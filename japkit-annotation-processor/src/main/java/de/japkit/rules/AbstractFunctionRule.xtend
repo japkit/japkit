@@ -40,11 +40,11 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements IParamete
 	}
 	
 	def boolean mustBeCalledWithParams(){
-		params != null
+		params !== null
 	}
 		
 	def eval(Object src){
-		if(params!=null){
+		if(params !== null){
 			throw new IllegalStateException("A function with params must be called using the evalWithParams method "+metaElement+" "+metaAnnotation+" "+src)
 		}
 		inRule[
@@ -60,7 +60,7 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements IParamete
 		
 		inRule[
 			handleException(errorValue, null)[
-				if(params==null){
+				if(params === null){
 					throw new RuleException("A function without params cannot be called using the evalWithParams method")
 				}
 				if(args.length != params.length){

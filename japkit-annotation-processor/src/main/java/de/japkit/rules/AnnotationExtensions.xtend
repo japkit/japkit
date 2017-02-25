@@ -6,7 +6,6 @@ import de.japkit.model.GenAnnotationValue
 import de.japkit.model.GenExtensions
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
-import de.japkit.services.MessageCollector
 import de.japkit.services.ProcessingException
 import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.TypesExtensions
@@ -18,13 +17,11 @@ import javax.lang.model.element.TypeElement
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
-	val transient extension MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
-	val transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	val transient extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 
 	def List<GenAnnotationMirror> overrideAnnotations(Element overrideElement,
 		List<GenAnnotationMirror> existingAnnotations) {
-		if (overrideElement == null) {
+		if (overrideElement === null) {
 			return new ArrayList(existingAnnotations)
 		}
 
@@ -57,7 +54,7 @@ class AnnotationExtensions {
 			{
 				val avMethod = am.getAVMethod(SHADOW_AV, false)
 
-				if (avMethod == null || !avMethod.returnType.
+				if (avMethod === null || !avMethod.returnType.
 					boolean) {
 					throw new ProcessingException(
 					'''The annotation value '«SHADOW_AV»' could not be set on annotation «am.annotationType», since it is not declared in the annotation type or is not boolean.''',
@@ -81,7 +78,7 @@ class AnnotationExtensions {
 	}
 
 	def isTriggerAnnotation(TypeElement te) {
-		te.annotationMirror(Trigger.name) != null
+		te.annotationMirror(Trigger.name) !== null
 	}
 
 	def List<? extends AnnotationMirror> getTriggerAnnotations(TypeElement annotatedClass) {

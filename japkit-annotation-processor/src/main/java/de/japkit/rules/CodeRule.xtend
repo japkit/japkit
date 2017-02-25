@@ -37,6 +37,8 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	(CharSequence)=>CharSequence defaultFragmentsRule
 	boolean linebreak
 	boolean indentAfterLinebreak
+	
+	val LINE_DELIM = StringConcatenation.DEFAULT_LINE_DELIMITER;
 
 	new(AnnotationMirror metaAnnotation, String avPrefix) {
 		this(metaAnnotation, null, avPrefix, "")
@@ -89,7 +91,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	 * Gets the code as a closure usable in generated methods, constructors and fields.
 	 */
 	def static CodeBody getAsCodeBody(GenElement genElement, CodeRule cr) {
-		if(cr == null) return null
+		if(cr === null) return null
 
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 
@@ -171,10 +173,15 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 								val before = eval(beforeExpr, lang,
 									CharSequence, '''Error in code body before expression.''', '').
 									withLinebreak(linebreak) + if(linebreak && indentAfterLinebreak) '\t' else ''
-								val after = eval(afterExpr, lang,
-									CharSequence, '''Error in code body after expression.''', '').withLinebreak(
-									linebreak)
-								'''«FOR e : bodyIterator BEFORE before SEPARATOR separator + if(linebreak) StringConcatenation.DEFAULT_LINE_DELIMITER + (if(indentAfterLinebreak)'\t' else '') else '' AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''
+								
+								//If there shall be linebreak, it is also added after the last iteration (== before the 'after'-code)
+								//However, if the iterated code is indented, we assume that the 'after'-code shall be kept on same line 
+								val after =
+									(if(linebreak && !indentAfterLinebreak) LINE_DELIM else '') + 
+									eval(afterExpr, lang,
+										CharSequence, '''Error in code body after expression.''', '').withLinebreak(linebreak)
+								val sep = separator + if(linebreak) LINE_DELIM + (if(indentAfterLinebreak)'\t' else '') else '';
+								'''«FOR e : bodyIterator BEFORE before SEPARATOR sep AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''
 							} else {
 								eval(emptyExpr, lang, CharSequence, '''Error in code body empty expression.''',
 									errorValue)
@@ -205,7 +212,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	}
 
 	public static def CharSequence withLinebreak(CharSequence cs, boolean linebreak) {
-		if (linebreak && cs != null && cs.length > 0) '''«cs»
+		if (linebreak && cs !== null && cs.length > 0) '''«cs»
 		''' else
 			cs
 	}

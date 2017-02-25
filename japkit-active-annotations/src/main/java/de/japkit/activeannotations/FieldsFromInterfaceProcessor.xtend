@@ -73,7 +73,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 				]
 			}
 			//generate accessors if there is a field (generated or existing)
-			if (generateField || existingField != null) {
+			if (generateField || existingField !== null) {
 				if (shallGenerateGetter(annotatedClass, existingField, existingGetter)) {
 					annotatedClass.addMethod(m.simpleName) [
 						it.returnType = propertyType
@@ -92,7 +92,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 
 						annotatedClass.addMethod(property.setterName) [
 							addParameter(property, propertyType)
-							visibility = if(existingSetter != null) existingSetter.visibility else Visibility.PUBLIC
+							visibility = if(existingSetter !== null) existingSetter.visibility else Visibility.PUBLIC
 							body = ['''this.«property» = «property»;''']
 						]
 
@@ -176,7 +176,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 	}
 
 	def hasAnnotation(AnnotationTarget target, String annotationFqn) {
-		findAnnotation(target, annotationFqn) != null
+		findAnnotation(target, annotationFqn) !== null
 	}
 
 	var parameterLessConstructorCreated = false //Dirty hack for not generating more than one parameterless constructor.
@@ -189,16 +189,16 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 			return
 		}
 		
-		if(superConstructor != null && superConstructor.parameters==null){
+		if(superConstructor !== null && superConstructor.parameters === null){
 			//Sometimes we get invalid constructors here with "null" as parameters. Bug? Try to skip...
 			return
 		}	
 		
 		
-		val parametersFromSuperConstructor = superConstructor?.parameters?.filter[classDecl.findDefaultValueField(it.simpleName) == null]	
+		val parametersFromSuperConstructor = superConstructor?.parameters?.filter[classDecl.findDefaultValueField(it.simpleName) === null]	
 		
 		var parameterTypes = newArrayList
-		if(parametersFromSuperConstructor!=null){
+		if(parametersFromSuperConstructor !== null){
 			parameterTypes.addAll(parametersFromSuperConstructor.map[type].toList)
 		}
 		parameterTypes.addAll(fields.map[type])
@@ -206,7 +206,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 		//addWarning(classDecl, '''addConstructor for superConstructor «superConstructor» with super-params «superConstructor?.parameters?.map[simpleName]?.toString» and own params «parameterTypes»''')
 		
 		
-		if(!parameterTypes.empty && classDecl.findDeclaredConstructor(parameterTypes) != null){
+		if(!parameterTypes.empty && classDecl.findDeclaredConstructor(parameterTypes) !== null){
 			//Constructor already exists	
 			return
 		}
@@ -218,14 +218,14 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 			val declConstr = classDecl.declaredConstructors.filter[parameters.empty]
 			//we always seem to get the default constructor here, even not declared.
 
-			if(!declConstr.empty && declConstr.head.body != null){
+			if(!declConstr.empty && declConstr.head.body !== null){
 				return			
 			}
 			parameterLessConstructorCreated = true
 			
 		}
 		
-		val visibility = if(superConstructor != null) superConstructor.visibility else Visibility.PUBLIC
+		val visibility = if(superConstructor !== null) superConstructor.visibility else Visibility.PUBLIC
 		
 
 		
@@ -235,7 +235,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 				fields.forEach[c.addParameter(simpleName, type)]
 				c.body = [
 					'''
-						«IF superConstructor != null»
+						«IF superConstructor !== null»
 							super(«FOR p : superConstructor.parameters SEPARATOR ','»«classDecl.propertyNameOrDefaultValue(p.simpleName)»«ENDFOR»);
 						«ENDIF»
 						«FOR f : fields»
@@ -252,7 +252,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 //					c.addParameter(INITIALIZER_PARAM, newTypeReference(Procedures.Procedure1, newTypeReference(classDecl)))
 //					c.body = [
 //						'''
-//							«IF superConstructor != null»
+//							«IF superConstructor !== null»
 //								super(«FOR p : superConstructor.parameters SEPARATOR ','»«classDecl.propertyNameOrDefaultValue(p.simpleName)»«ENDFOR»);
 //							«ENDIF»
 //							«FOR f : fields»
@@ -267,7 +267,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 	
 	def propertyNameOrDefaultValue(ClassDeclaration classDecl, String name){
 		val defaultValueField = classDecl.findDefaultValueField(name)
-		if(defaultValueField != null){
+		if(defaultValueField !== null){
 			defaultValueField.simpleName
 		} else {
 			name
@@ -277,7 +277,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 	def shallGenerateField(ClassDeclaration annotatedClass, FieldDeclaration existingField,
 		MethodDeclaration existingGetter) {
 		shallImplementProperty(annotatedClass, existingField, existingGetter) 
-		&& existingField == null //if the field already exists in the class, it shall not be generated
+		&& existingField === null //if the field already exists in the class, it shall not be generated
 		&& !existingGetter.hasAnnotation(Derived.name)
 	}
 
@@ -293,7 +293,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 
 		//if the setter already exists in the class, it shall not be generated
 		existingSetter?.declaringType != annotatedClass //if the field is final, don't generate a setter
-		&& (existingField == null || !existingField.final)
+		&& (existingField === null || !existingField.final)
 	}
 
 	/**
@@ -303,12 +303,12 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 		MethodDeclaration existingGetter) {
 			
 		//The class shall implement the property, if there is a field with according name
-		existingField != null
+		existingField !== null
 		
 		//everything below does not work starting from xtend 2.4.3, since we somtimes get empty superclass stubs
 
 //		//There is no getter yet declared in the class or its superclasses and its not going to be generated (by this processor)
-//		(existingGetter == null) ||
+//		(existingGetter === null) ||
 //		//or the getter is implemented manually in the class itself, for example to wrap the field somehow before returning it							
 //		(existingGetter.declaringType == annotatedClass && !existingGetter.abstract) ||
 //		//or the getter is declared abstract in a superclass				
@@ -339,7 +339,7 @@ def dispatch superClass(Type classDecl) {
 def MethodDeclaration findMostSpecificMethod(extension ClassDeclaration classDecl, String name,
 	TypeReference ... parameterTypes) {
 	var method = findDeclaredMethod(name, parameterTypes)
-	if (method == null) {
+	if (method === null) {
 		method = classDecl.superClass?.findMostSpecificMethod(name, parameterTypes)
 	}
 	method
@@ -351,7 +351,7 @@ def MethodDeclaration findMostSpecificMethod(ClassDeclaration classDecl, MethodD
 
 def MethodDeclaration findMethodInInterfaces(ClassDeclaration classDecl, MethodDeclaration method) {
 	
-	classDecl.interfaces.map[findMostSpecificMethod(method)].findFirst[it!=null] ?:
+	classDecl.interfaces.map[findMostSpecificMethod(method)].findFirst[it !== null] ?:
 	classDecl.superClass?.findMethodInInterfaces(method)	
 }
 
@@ -359,7 +359,7 @@ def MethodDeclaration findMostSpecificMethod(InterfaceDeclaration interfaceDecl,
 	
 	
 	 interfaceDecl.findDeclaredMethod(method.simpleName, method.parameters.map[type]) ?:
-	 interfaceDecl.extendedInterfaces.map[type as InterfaceDeclaration].map[findMostSpecificMethod(method)].findFirst[it!=null]
+	 interfaceDecl.extendedInterfaces.map[type as InterfaceDeclaration].map[findMostSpecificMethod(method)].findFirst[it !== null]
 }
 
 def isGetter(MethodDeclaration m) {
@@ -394,7 +394,7 @@ def boolean implementsInterface(Type type, String interfaceFqn) {
 
 	type.interfaces.exists [
 		qualifiedName == interfaceFqn || it.implementsInterface(interfaceFqn)
-	] || (type.superClass != null && type.superClass.implementsInterface(interfaceFqn))
+	] || (type.superClass !== null && type.superClass.implementsInterface(interfaceFqn))
 }
 
 def propertyName(MethodDeclaration m) {

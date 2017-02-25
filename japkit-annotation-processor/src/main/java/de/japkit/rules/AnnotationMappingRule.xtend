@@ -113,7 +113,7 @@ class AnnotationMappingRule extends AbstractRule {
 
 		var am = annotations.findFirst[hasFqn(targetAnnotation.qualifiedName)]
 
-		if (am == null) {
+		if (am === null) {
 			if (mode == REMOVE) {
 				return
 			} else {

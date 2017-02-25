@@ -69,7 +69,7 @@ class ScopeRule<T> implements Function1<(Object)=>T,List<T>>, Function2<(Object)
 				val src = srcRule?.apply ?: currentSrc;
 
 				//Iterate only, if the scope has its own src rule
-				val iterate = srcRule != null && (src instanceof Iterable<?> || src instanceof Map<?, ?>)
+				val iterate = srcRule !== null && (src instanceof Iterable<?> || src instanceof Map<?, ?>)
 
 				val result = if (iterate) {
 						val iterable = if(src instanceof Iterable<?>) src else (src as Map<?, ?>).entrySet
@@ -80,7 +80,7 @@ class ScopeRule<T> implements Function1<(Object)=>T,List<T>>, Function2<(Object)
 					} else {
 						newArrayList(doInScope(src, earlyClosure, closure))
 					};
-				if (resultVarAnnotation != null && !resultVarName.nullOrEmpty) {
+				if (resultVarAnnotation !== null && !resultVarName.nullOrEmpty) {
 					valueStack.put(resultVarName, if(iterate) result else result.head)
 				}
 
@@ -89,7 +89,7 @@ class ScopeRule<T> implements Function1<(Object)=>T,List<T>>, Function2<(Object)
 			} catch (Exception e) {
 				// To avoid error flooding or misleading errors
 				// TODO: Reconsider resultVar. Better use some functional approach + "mapping cache" instead
-				if (resultVarAnnotation != null && !resultVarName.nullOrEmpty) {
+				if (resultVarAnnotation !== null && !resultVarName.nullOrEmpty) {
 					valueStack.put(resultVarName, new ElVariableError(resultVarName))
 				}
 				throw e
@@ -102,7 +102,7 @@ class ScopeRule<T> implements Function1<(Object)=>T,List<T>>, Function2<(Object)
 			if (!srcVarName.nullOrEmpty) {
 				valueStack.put(srcVarName, src)
 			}
-			if(earlyClosure != null) {
+			if(earlyClosure !== null) {
 				earlyClosure.apply(src)
 			}
 			libraryRules.forEach[apply]

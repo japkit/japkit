@@ -2,16 +2,16 @@ package de.japkit.el.javael3
 
 import java.util.Map
 import javax.el.ELContext
-import javax.el.PropertyNotFoundException
+import javax.el.ELResolver
 
 /**
- * Resolves root properties (base == null) from a map. 
+ * Resolves root properties (base === null) from a map. 
  */
-class MapRootResolver extends javax.el.ELResolver {
+class MapRootResolver extends ELResolver {
 	Map<String, ? extends Object> map;
 	
 	def private boolean isResolvable(Object base) {
-		return base == null;
+		return base === null;
 	}
 	
 	def private boolean isResolvable(ELContext context, Object base, Object property) {

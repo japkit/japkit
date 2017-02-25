@@ -37,7 +37,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 	def CharSequence importIfPossibleAndGetNameForCode(TypeElement te, String shortName, String fqn) {
 		if (importIfPossible(shortName, fqn)) {
 			shortName
-		} else if (te != null && te.enclosingElement instanceof TypeElement) {
+		} else if (te !== null && te.enclosingElement instanceof TypeElement) {
 			//If it is an inner class that cannot be imported, try to import the enclosing class
 			val enclosing = te.enclosingElement as TypeElement;
 			importIfPossibleAndGetNameForCode(enclosing, enclosing.simpleName.toString, enclosing.qualifiedName.toString)+"."+shortName;
@@ -64,7 +64,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 	def boolean isDeclaredAndVisible(TypeElement namespace, String shortName, String fqn) {
 		val candidate = namespace.declaredTypes.findFirst[simpleName.toString.equals(shortName)] 
 		
-		if(candidate == null){
+		if(candidate === null){
 			namespace.enclosingElement instanceof TypeElement &&  isDeclaredAndVisible(namespace.enclosingElement as TypeElement, shortName, fqn)
 		} else if(candidate.qualifiedName.toString.equals(fqn))	{
 			true;
@@ -200,7 +200,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 	}
 	
 	def dispatch docCommentCode(de.japkit.model.GenElement element){
-		if(element.comment == null) '''''' else '''/** «element.comment» */'''
+		if(element.comment === null) '''''' else '''/** «element.comment» */'''
 	}
 	
 	def dispatch docCommentCode(Element element){
@@ -214,7 +214,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 	}
 	
 	def codeForSuper(TypeElement e){
-		'''«IF e.superclass != null && e.superclass.qualifiedName != "java.lang.Object"»extends «e.superclass.typeRef» «ENDIF»'''
+		'''«IF e.superclass !== null && e.superclass.qualifiedName != "java.lang.Object"»extends «e.superclass.typeRef» «ENDIF»'''
 	}
 	
 	def dispatch CharSequence code(extension VariableElement field){ 
@@ -271,7 +271,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 		val body = if(e.abstract || enclosingElement.kind == ElementKind.INTERFACE ){
 			";"
 		} else if(enclosingElement.kind == ElementKind.ANNOTATION_TYPE){
-			'''«IF e.defaultValue !=null» default «e.defaultValue.annotationValueCode»«ENDIF»;'''
+			'''«IF e.defaultValue  !== null» default «e.defaultValue.annotationValueCode»«ENDIF»;'''
 		}else {
 			'''«block(e.codeForBody)»'''
 		}
@@ -290,7 +290,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 	
 	
 	def dispatch codeForBody(de.japkit.model.GenExecutableElement e){
-		if (e.body != null){ 
+		if (e.body !== null){ 
 			e.body.code(this)
 		} else {
 			'''throw new UnsupportedOperationException("Method not implemented");''' 		
@@ -349,9 +349,9 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 	}
 	
 	def dispatch CharSequence typeRef(WildcardType type){
-		if(type.extendsBound!=null){
+		if(type.extendsBound !== null){
 			'''? extends «typeRef(type.extendsBound)»'''
-		} else if(type.superBound!=null){
+		} else if(type.superBound !== null){
 			'''? super «typeRef(type.superBound)»'''
 		} else {
 			'?'
@@ -367,7 +367,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 	}
 	
 	override staticTypeRef(TypeMirror type){
-		if (type == null) {
+		if (type === null) {
 			"void"
 		} else {
 			val te =  if(type instanceof DeclaredType &&!(type instanceof ErrorType)) type.asTypeElement else null;
@@ -532,11 +532,11 @@ class JavaEmitter implements de.japkit.model.EmitterContext{
 		
 	def enclosingPackageName(TypeElement typeElement){
 		val enclosingElement = typeElement.enclosingElement
-		if(enclosingElement==null || !(enclosingElement instanceof PackageElement)){
+		if(enclosingElement === null || !(enclosingElement instanceof PackageElement)){
 			throw new IllegalArgumentException('''Enclosing element of «typeElement.simpleName» is not a package but «enclosingElement»''');
 		}		
 		val packageName = (enclosingElement as PackageElement).qualifiedName
-		if(packageName==null || packageName.length == 0){
+		if(packageName === null || packageName.length == 0){
 			throw new IllegalArgumentException('''Default package not supported: «typeElement.simpleName»''')
 		}
 		packageName

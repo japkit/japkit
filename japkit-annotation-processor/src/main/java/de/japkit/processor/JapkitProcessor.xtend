@@ -32,7 +32,7 @@ import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import de.japkit.annotations.RuntimeMetadata
+import de.japkit.services.ReportedException
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -104,7 +104,7 @@ class JapkitProcessor extends AbstractProcessor {
 	override getSupportedAnnotationTypes() {
 		val set = newHashSet('''«Behavior.package.name».*''','''«Trigger.package.name».*''')
 		val annotationsOption = processingEnv.options.get("annotations")
-		if (annotationsOption != null) {
+		if (annotationsOption !== null) {
 			annotationsOption.split(",").forEach[set.add(it)]
 		} else {
 			messager.printMessage(Kind.ERROR, "The processor option 'annotations' is not set. ");
@@ -179,7 +179,7 @@ class JapkitProcessor extends AbstractProcessor {
 		//comments, parameter names and member order. Thus, we filter them here. The filtering is kept simple, assuming @RuntimeMetadata is only used on templates
 		//but not on "real" application classes.
 		val annotatedClassesForUncommitedGenClasses = classesToProcessUnfiltered.filter[!committed && !qualifiedName.toString.endsWith("_RuntimeMetadata")].map[
-			annotatedClassForGenClassOnDisk].filter[it != null].toSet
+			annotatedClassForGenClassOnDisk].filter[it !== null].toSet
 
 		printDiagnosticMessage(
 			['''Annotated classes for uncommited gen classes: «annotatedClassesForUncommitedGenClasses»'''])
@@ -604,7 +604,13 @@ class JapkitProcessor extends AbstractProcessor {
 			//TODO: Reconsider. Is @Behavior considered as Trigger Annotation or as something else?
 			//generatedTopLevelClasses.putAll(processBehaviorAnnotation(annotatedClass))
 			generatedTopLevelClasses
-		
+		} catch (ReportedException re) {
+			//Do nothing. It has been reported as error before.
+			emptyMap
+		} catch (Exception e) {
+			//This is the last fallback when a exception has not been handled well. Especially in rule constructors, this may still occur in some cases.
+			messageCollector.reportError('Unexpected Exception when processing annotated class:', e, annotatedClass, null, null)
+			emptyMap	 
 		} finally {
 			setCurrentAnnotatedClass(null)
 		}

@@ -55,7 +55,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		
 		memberRules=newArrayList()	
 		
-		if(metaAnnotation!=null){
+		if(metaAnnotation !== null){
 			//Members from AVs
 			memberRules.add(new MembersRule(metaAnnotation))
 		}
@@ -63,7 +63,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		memberRules.addAll(templateClass.enclosedElementsOrdered
 			.filter[!isVariable]  //TODO: Violates SRP, since the knowledge about how to handle variables is spread to several places? Anyway: This is redundant as soon as a var is a function...
 			.map[createRuleForMember]
-			.filter[it!=null].toList
+			.filter[it !== null].toList
 		)	
 
 		annotationsRule = createAnnotationMappingRules(metaAnnotation, templateClass, null)
@@ -83,11 +83,11 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	
 	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(TypeElement member){
 		val innerClassAnnotation = member.annotationMirror(InnerClass)
-		if(innerClassAnnotation!=null){
+		if(innerClassAnnotation !== null){
 			 return new InnerClassRule(innerClassAnnotation, member) 	 
 		}
 		val clazzAnnotation = member.annotationMirror(Clazz)
-		if(clazzAnnotation!=null){
+		if(clazzAnnotation !== null){
 			//"Aux" class
 			val cr = new ClassRule(clazzAnnotation, member, true, true);
 			return	[
@@ -96,7 +96,7 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 		}
 		//immediately execute non-static inner-templates
 		val templateAnnotation = member.annotationMirror(Template)
-		if(templateAnnotation != null && !member.static){
+		if(templateAnnotation !== null && !member.static){
 			return createTemplateRule(member);
 		}
 		
@@ -105,21 +105,21 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	
 	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(VariableElement member){
 		val annotation =  member.annotationMirror(Field)
-		if(annotation != null || allFieldsAreTemplates)
+		if(annotation !== null || allFieldsAreTemplates)
 			new FieldRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotation, fieldDefaults), member)
 		else null
 	}
 	
 	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(ExecutableElement member){
-		val isNoFunction = createFunctionRule(member) == null
+		val isNoFunction = createFunctionRule(member) === null
 		if(member.kind == ElementKind.METHOD){
 			val annotation =  member.annotationMirror(Method)
-			if(annotation != null || allMethodsAreTemplates && isNoFunction)
+			if(annotation !== null || allMethodsAreTemplates && isNoFunction)
 				return new MethodRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotation, methodDefaults), member)
 			
 		} else (member.kind == ElementKind.CONSTRUCTOR ){
 			val annotation =  member.annotationMirror(Constructor)
-			if(annotation != null || (allConstructorsAreTemplates && !member.isDefaultConstructor && isNoFunction))
+			if(annotation !== null || (allConstructorsAreTemplates && !member.isDefaultConstructor && isNoFunction))
 				return new ConstructorRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotation, constructorDefaults), member)
 		} 
 		return null

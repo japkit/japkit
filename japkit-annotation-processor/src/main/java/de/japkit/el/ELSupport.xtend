@@ -116,7 +116,7 @@ class ELSupport {
 	
 	def <T> T getCurrentSrc(Class<T> clazz){
 		val currSrc = getCurrentSrc
-		if(currSrc != null && !clazz.isInstance(currSrc)){
+		if(currSrc !== null && !clazz.isInstance(currSrc)){
 			throw new RuleException('''Current src «currSrc» is of type «currSrc?.class», but type «clazz» is required here.''');
 		}
 		clazz.cast(currSrc)
@@ -150,7 +150,7 @@ class ELSupport {
 			errorResult
 		} catch (Exception e) {
 			reportRuleError(e)
-			if(errorResult != null) return errorResult else throw new ReportedException(e)
+			if(errorResult !== null) return errorResult else throw new ReportedException(e)
 		}
 	}
 	
@@ -164,7 +164,7 @@ class ELSupport {
 			} else {
 				v 
 			}
-			if(result!=null && !expectedType.isInstance(result)){
+			if(result !== null && !expectedType.isInstance(result)){
 				throw new ELProviderException('''Value or function «expr» on values stack is not of expected type «expectedType», but «result.class»''')
 			}
 			result as T
@@ -178,7 +178,7 @@ class ELSupport {
 	def <T> T eval(String expr, String lang, Class<T> expectedType, boolean evalFromValueStackFirst) {
 		if(evalFromValueStackFirst){
 			val resultFromValueStack = evalFromValueStack(expr, lang, expectedType)
-			if(resultFromValueStack != null) return resultFromValueStack
+			if(resultFromValueStack !== null) return resultFromValueStack
 		}
 		
 		if(expr.nullOrEmpty && expectedType == String){
@@ -205,7 +205,7 @@ class ELSupport {
 			closure.apply
 		} finally {
 
-			if (oldValueStackTL != null) {
+			if (oldValueStackTL !== null) {
 				ExtensionRegistry.register(ValueStack, oldValueStackTL)
 			}
 
@@ -216,7 +216,7 @@ class ELSupport {
 
 	def getElProvider(String lang) {
 		val p = elProviders.get(if(lang.nullOrEmpty) defaultLanguage else lang)
-		if(p == null) throw new ELProviderException('''No ELProvider found for language «lang»''')
+		if(p === null) throw new ELProviderException('''No ELProvider found for language «lang»''')
 		p
 	}
 
@@ -227,7 +227,7 @@ class ELSupport {
 
 	def getTemplateProvider(String lang) {
 		val p = templateProviders.get(lang)
-		if(p == null) throw new ELProviderException('''No ELProvider found for template language «lang»''')
+		if(p === null) throw new ELProviderException('''No ELProvider found for template language «lang»''')
 		p
 	}
 

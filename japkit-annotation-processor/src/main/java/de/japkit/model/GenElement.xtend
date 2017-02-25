@@ -2,7 +2,6 @@ package de.japkit.model
 
 import de.japkit.activeannotations.FieldsFromInterface
 import de.japkit.activeannotations.Required
-import java.lang.annotation.Annotation
 import java.util.Collections
 import java.util.Comparator
 import java.util.List
@@ -44,10 +43,10 @@ abstract class GenElement extends GenAnnotatedConstruct implements Element{
  		}
  		val enclosed = enclosedEl as GenElement
  		
- 		if(enclosed.getEnclosingElement!=null && enclosed.getEnclosingElement != this){
+ 		if(enclosed.getEnclosingElement !== null && enclosed.getEnclosingElement != this){
  			throw new IllegalStateException('''Element «enclosed» has already a different enclosing element:«enclosed.getEnclosingElement»''')
  		}
- 		if(enclosedElementComparator==null){
+ 		if(enclosedElementComparator === null){
  			enclosedElements.add(enclosed)
  		} else {
  			var index = Collections.binarySearch(enclosedElements, enclosed, enclosedElementComparator) 
@@ -73,7 +72,7 @@ abstract class GenElement extends GenAnnotatedConstruct implements Element{
  	}
  	
  	def GenParameterizable enclosingParameterizable(){
- 		if(enclosingElement==null){
+ 		if(enclosingElement === null){
  			null
  		} else if(enclosingElement instanceof GenParameterizable){
  			enclosingElement
@@ -89,11 +88,11 @@ abstract class GenElement extends GenAnnotatedConstruct implements Element{
  	 * Sets the visibility. Null means default access.
  	 */
  	def setVisibility(Modifier visibility){
- 		if(visibility!=null && !VISIBILITY_MODIFIERS.contains(visibility)){
+ 		if(visibility !== null && !VISIBILITY_MODIFIERS.contains(visibility)){
  			throw new IllegalArgumentException('''«visibility» is not a valid visibility modifier''');
  		}
  		modifiers.removeAll(VISIBILITY_MODIFIERS)
- 		if(visibility!=null){
+ 		if(visibility !== null){
  			modifiers.add(visibility);
  		}
  		

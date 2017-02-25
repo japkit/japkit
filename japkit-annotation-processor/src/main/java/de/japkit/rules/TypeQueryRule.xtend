@@ -71,7 +71,7 @@ class TypeQueryRule extends AbstractFunctionRule<Object> {
 						throw new IllegalArgumentException("filterAV must be a type or a set of types, but not "+t);
 					}
 				}
-			].map[asType];
+			].map[asType].sortBy[qualifiedName];
 
 		if(unique) MoreCollectionExtensions.singleValue(types) else types
 	}

@@ -33,7 +33,7 @@ class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
 	
 	
 	def static CharSequence surround(String[] fragmentNames, CharSequence surrounded){
-		if(fragmentNames==null) return surrounded
+		if(fragmentNames === null) return surrounded
 		val extension ElSupport = ExtensionRegistry.get(ELSupport)
 		
 		var result = surrounded
@@ -46,7 +46,7 @@ class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
 	}
 	
 	def static CharSequence code(String[] fragmentNames){
-		if(fragmentNames==null) return ''
+		if(fragmentNames === null) return ''
 		val extension ElSupport = ExtensionRegistry.get(ELSupport)
 		
 		fragmentNames.map[valueStack.getRequired(it) as ICodeFragmentRule].map[it.code].join
@@ -72,7 +72,7 @@ class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
 	}
 	
 	def static nullOrEmpty(CharSequence cs){
-		cs==null || cs.length ==0
+		cs === null || cs.length ==0
 	}
 	
 	override apply() {

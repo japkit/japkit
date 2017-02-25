@@ -42,7 +42,7 @@ class TypeResolver {
 	}
 	
 	def private TypeMirror createTypeIfNecessary(TypeMirror type, List<? extends TypeMirror> typeArgs) {
-		if (type == null || typeArgs.nullOrEmpty || !(type instanceof DeclaredType)) {
+		if (type === null || typeArgs.nullOrEmpty || !(type instanceof DeclaredType)) {
 			type
 		} else {
 			getDeclaredType(type.asElement, typeArgs)
@@ -102,12 +102,12 @@ class TypeResolver {
 			type = if(type instanceof ErrorType && required) type.asTypeElement.asType as DeclaredType else type
 			
 			//TODO: Wird das hier wirklich noch benötigt oder ist das redundant zu anderen Mechanismen (tenfe)?
-			if (type != null && required) {
+			if (type !== null && required) {
 				currentAnnotatedClass.registerTypeDependencyForAnnotatedClass(type)
 			}
 			
 			
-			if(type == null) {
+			if(type === null) {
 				type
 			} else {
 				//If there are type arguments, map them as well. 
@@ -143,7 +143,7 @@ class TypeResolver {
 			var TypeElement te = type.asTypeElement
 			if (!(type instanceof GenDeclaredType)) {
 				te = getTypeElement(te.qualifiedName)
-				if (te == null) {
+				if (te === null) {
 					throw new TypeElementNotFoundException(te.qualifiedName.toString)
 				}
 			}
@@ -152,7 +152,7 @@ class TypeResolver {
 			// if it is a function, call it and return the resulting type
 			val function = createFunctionRule(te);
 
-			if (function != null) {
+			if (function !== null) {
 				return scope[
 					//if the type function has type arguments, resolve them and put them on the value stack. They can be retrieved by the simpleName of the type parameter. 
 					if (!type.typeArguments.nullOrEmpty) {
@@ -167,7 +167,7 @@ class TypeResolver {
 					}
 
 					val result = function.apply
-					if (result == null ||
+					if (result === null ||
 						result instanceof TypeMirror) {
 						result as TypeMirror
 					} else {
