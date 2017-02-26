@@ -207,8 +207,8 @@ There is a bunch of other ways to generate more complex method body code in japk
 What next?
 ----------
 
-There is a more comprehensive step by step tutorial for generating [value objects](https://github.com/stefanocke/japkit-tutorial-valueobject).
-The [documentation](https://github.com/stefanocke/japkit/wiki) for japkit is still work in progress and only covers a small part yet.
-A complex example for generating whole applications like Spring Roo can be found in the [examples repository}(https://github.com/stefanocke/japkit-examples/tree/master/japkit-examples-roo-petclinic).
+- There is a more comprehensive step by step tutorial for generating [value objects](https://github.com/stefanocke/japkit-tutorial-valueobject).
+- The [documentation](https://github.com/stefanocke/japkit/wiki) for japkit is still work in progress and only covers a small part yet.
+- A complex example for generating whole applications like Spring Roo can be found in the [examples repository](https://github.com/stefanocke/japkit-examples/tree/master/japkit-examples-roo-petclinic).
 
 
