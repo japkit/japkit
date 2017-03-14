@@ -5,7 +5,7 @@
 		<relativePath>../japkit-xtend-parent/pom.xml</relativePath>
 		<groupId>com.github.stefanocke.japkit</groupId>
 		<artifactId>japkit-xtend-parent</artifactId>
-		<version>1.8-SNAPSHOT</version>
+		<version>1.9-SNAPSHOT</version>
 	</parent>
 	<artifactId>japkit-javael3</artifactId>
 	<name>Japkit Annotation Processor - Java EL Version 3 Provider</name>
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-annotation-processor</artifactId>
-			<version>1.8-SNAPSHOT</version>
+			<version>1.9-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
