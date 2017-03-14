@@ -236,8 +236,12 @@ class JapkitProcessor extends AbstractProcessor {
 	
 	def getLayer(TypeElement annotatedClass){
 		val layers = annotatedClass.triggerAnnotations.map[metaAnnotation(Trigger)].map[value('layer', Integer)].toSet
-				
-		Collections.max(layers)
+		if(layers.nullOrEmpty) {
+			printDiagnosticMessage(['''Error: Layer could not be determined for «annotatedClass» of type «annotatedClass?.class»'''])
+			0
+		} else {			
+			Collections.max(layers)
+		}
 		
 	}
 	

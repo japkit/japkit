@@ -45,26 +45,42 @@ class TypesExtensions /**implements Types*/{
 
 	static val BOXED_TYPES = #{Boolean, Byte, Short, Integer, Long, Character, Float, Double}.map[name].toSet
 
-	def isBoxed(TypeMirror mirror) {
-		BOXED_TYPES.contains(mirror?.qualifiedName)
+	def dispatch isBoxed(DeclaredType type) {
+		BOXED_TYPES.contains(type?.qualifiedName)
+	}
+	
+	def dispatch isBoxed(TypeMirror type) {
+		false
 	}
 
 	public static val STRING = String.name
 
-	def isString(TypeMirror mirror) {
+	def dispatch isString(DeclaredType mirror) {
 		STRING == mirror.qualifiedName
+	}
+	
+	def dispatch isString(TypeMirror mirror) {
+		false
 	}
 
 	static val TEMPORAL_TYPES = #{Calendar, Date}.map[name].toSet
 
-	def isTemporal(TypeMirror mirror) {
+	def dispatch isTemporal(DeclaredType mirror) {
 		TEMPORAL_TYPES.contains(mirror?.qualifiedName)
+	}
+	
+	def dispatch isTemporal(TypeMirror mirror) {
+		false
 	}
 
 	static val MATH_TYPES = #{BigDecimal.name, BigInteger.name}
 
-	def boolean isMath(TypeMirror mirror) {
+	def dispatch boolean isMath(DeclaredType mirror) {
 		MATH_TYPES.contains(mirror?.qualifiedName)
+	}
+	
+	def dispatch boolean isMath(TypeMirror type) {
+		false
 	}
 
 	def boolean collectionOrMap(TypeMirror type) {
