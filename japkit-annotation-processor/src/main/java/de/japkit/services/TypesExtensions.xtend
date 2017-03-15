@@ -163,12 +163,20 @@ class TypesExtensions /**implements Types*/{
 	
 	def dispatch TypeMirror singleValueType(DeclaredType type) {
 		if(type.collection){
-			type.getRequiredTypeArg(0)
+			type.getRequiredTypeArg(0).extendsBoundIfWildcard
 		} else if(type.map) {
-			type.getRequiredTypeArg(1)
+			type.getRequiredTypeArg(1).extendsBoundIfWildcard
 		} else {
 			type
 		}
+	}
+	
+	def dispatch TypeMirror extendsBoundIfWildcard(WildcardType type) {
+		type.extendsBound
+	}
+	
+	def dispatch TypeMirror extendsBoundIfWildcard(TypeMirror type) {
+		type
 	}
 	
 	def dispatch TypeMirror singleValueType(ArrayType type) {
