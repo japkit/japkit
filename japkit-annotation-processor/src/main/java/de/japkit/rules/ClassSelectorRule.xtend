@@ -150,6 +150,7 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 	) {
 		var typeCandidate = type
 		
+		
 		if (typeCandidate instanceof DeclaredType && !(typeCandidate instanceof ErrorType)) {
 			
 			
@@ -157,7 +158,11 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 			typeCandidate = 
 			generatedTypeElementAccordingToTriggerAnnotation(typeElement, triggerAnnotationTypes, mustHaveTrigger)?.asType
 		}
-		typeCandidate
+		
+		val result = typeCandidate
+		printDiagnosticMessage['''generatedTypeAccordingToTriggerAnnotation: «type» of «type?.class». Result: «result»''']
+		
+		result
 	}
 	
 	def private TypeElement generatedTypeElementAccordingToTriggerAnnotation(TypeElement typeElement, Iterable<TypeMirror> triggerAnnotationTypes, boolean mustHaveTrigger) {

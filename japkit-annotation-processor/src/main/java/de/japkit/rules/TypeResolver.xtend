@@ -117,10 +117,7 @@ class TypeResolver {
 					type
 				} else {
 					
-					getDeclaredType(type.asElement as TypeElement, typeArgs.map[typeArg |
-						
-						typeArg.resolveType(required)
-					])				
+					getDeclaredType(type.asElement as TypeElement, typeArgs.map[resolveType(required)])				
 				}	
 			}
 		} catch (TypeElementNotFoundException tenfe) {
@@ -154,26 +151,23 @@ class TypeResolver {
 
 			if (function !== null) {
 				return scope[
-					//if the type function has type arguments, resolve them and put them on the value stack. They can be retrieved by the simpleName of the type parameter. 
-					if (!type.typeArguments.nullOrEmpty) {
-						teFinal.typeParameters?.forEach [ param, index |
-							if (index < type.typeArguments.length) {
-								val resolvedArg = type.typeArguments.get(index)?.resolveType(true)
-								valueStack.put(param.simpleName.toString, resolvedArg);
-								//put it also under unique name
-								valueStack.put('''«teFinal.qualifiedName».«param.simpleName»''' , resolvedArg);
-							}
-						]
+					//if the type function has type arguments, resolve them 				
+					val resolvedTypeArgs = type.typeArguments.map[resolveType(true)];
+										
+					if(function instanceof AbstractFunctionRule<?> && (function as AbstractFunctionRule<?>).mustBeCalledWithParams) {
+						//The type function accepts parameters (for example, a @Switch). Call the function with the resolved type args
+						asTypeMirror(teFinal, (function as AbstractFunctionRule<?>).evalWithParams(resolvedTypeArgs))
+					} else { 
+						//The type function does not accept parameters. If there are some, use only the raw type of the function result 
+						//and append the parameters. 
+						val raw = asTypeMirror(teFinal, function.apply)				
+						if(resolvedTypeArgs.nullOrEmpty){
+							raw
+						} else {					
+							getDeclaredType(raw.asElement, resolvedTypeArgs.map[resolveType(true)])				
+						}
 					}
-
-					val result = function.apply
-					if (result === null ||
-						result instanceof TypeMirror) {
-						result as TypeMirror
-					} else {
-						reportRuleError('''«teFinal.qualifiedName» cannot be used as type since it's result is not a TypeMirror but «result».''')
-						null
-					}
+						
 
 				]
 
@@ -181,6 +175,16 @@ class TypeResolver {
 		}
 
 		type
+	}
+	
+	private def TypeMirror asTypeMirror(TypeElement typeFunction, Object result) {
+		if (result === null ||
+			result instanceof TypeMirror) {
+			result as TypeMirror
+		} else {
+			reportRuleError('''«typeFunction.qualifiedName» cannot be used as type since it's result is not a TypeMirror but «result».''')
+			null
+		}
 	}
 
 }
