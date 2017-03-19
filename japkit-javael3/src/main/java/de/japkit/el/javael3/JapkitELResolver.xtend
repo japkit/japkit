@@ -14,6 +14,7 @@ import javax.el.ListELResolver
 import javax.el.MapELResolver
 import javax.el.ResourceBundleELResolver
 import javax.el.StaticFieldELResolver
+import javax.el.ELException
 
 /**
  * An ELResolver that resolves root properties from a map (japkit ValueStack) and that supports the extensions provided by de.japkit.el.ElExtensions.
@@ -66,14 +67,19 @@ class JapkitELResolver extends ELResolver {
 		
 		if(base === null && !context.propertyResolved) {
 			// For root properties, we retry  by prepending "src."			
-			//try{
+			try{
 				val src = getValue(context, null, "src");
 				context.setPropertyResolved(false)
 				return getValue(context, src, property)	
-			//} catch (Exception e) {
-				//If we failed, catch any exception to give static imports a chance
-				//context.setPropertyResolved(false)
-			//}
+			} catch (ELException e) {
+				if(e.cause !== null && !(e.cause instanceof ELException)){
+					//Exception caused by bug (and not due to PropertyNotFound or similar) -> rethrow
+					throw e.cause
+				}
+				
+				//Do not rethrow. Give EL imports a chance (for example, default import for java.lang, used like #{Boolean.TRUE}). 
+				context.setPropertyResolved(false)
+			}
 		}
 			
 		value
