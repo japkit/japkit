@@ -25,6 +25,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.WildcardType
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
+import javax.lang.model.type.TypeVariable
 
 class TypesExtensions /**implements Types*/{
 	val Types typeUtils = ExtensionRegistry.get(Types)
@@ -163,19 +164,27 @@ class TypesExtensions /**implements Types*/{
 	
 	def dispatch TypeMirror singleValueType(DeclaredType type) {
 		if(type.collection){
-			type.getRequiredTypeArg(0).extendsBoundIfWildcard
+			type.getRequiredTypeArg(0).uppertBoundIfTypeVarOrWildcard
 		} else if(type.map) {
-			type.getRequiredTypeArg(1).extendsBoundIfWildcard
+			type.getRequiredTypeArg(1).uppertBoundIfTypeVarOrWildcard
 		} else {
 			type
 		}
 	}
 	
-	def dispatch TypeMirror extendsBoundIfWildcard(WildcardType type) {
+	def dispatch TypeMirror singleValueType(TypeVariable type) {
+		type.uppertBoundIfTypeVarOrWildcard
+	}
+	
+	def dispatch TypeMirror uppertBoundIfTypeVarOrWildcard(WildcardType type) {
 		type.extendsBound
 	}
 	
-	def dispatch TypeMirror extendsBoundIfWildcard(TypeMirror type) {
+	def dispatch TypeMirror uppertBoundIfTypeVarOrWildcard(TypeVariable type) {
+		type.upperBound
+	}
+	
+	def dispatch TypeMirror uppertBoundIfTypeVarOrWildcard(TypeMirror type) {
 		type
 	}
 	
