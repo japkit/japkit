@@ -217,17 +217,22 @@ class TypesExtensions /**implements Types*/{
 	def dispatch erasure(TypeMirror type) {
 		typeUtils.erasure(type)
 	}
-
-	//TODO: Type arguments ???
-	def isSameType(TypeMirror t1, TypeMirror t2) {
+	
+	def boolean isSameType(TypeMirror t1, TypeMirror t2) {
 		if((t1 === null) || (t2 === null)){
 			return false
-		}
-		
+		}		
 		if(t1.isVoid || t2.isVoid) {
 			return t2.isVoid && t1.isVoid
 		}
+		
+		return isSameTypeInternal(t1,t2)
+	}
 
+	//isSameType needs special handling, since we have our own GenDeclaredTypes. Furthermore, ErrorTypes are considered...
+	//TODO: Type arguments ???
+	def dispatch boolean isSameTypeInternal(DeclaredType t1, DeclaredType t2) {
+		
 		//if(t1.containsErrorType || t1.containsErrorType){
 		//There are several issues with error types that we try to workaround here:
 		//Eclipse considers error types only as sameType, 
@@ -247,11 +252,18 @@ class TypesExtensions /**implements Types*/{
 				(!fqn1.contains('.') || !fqn2.contains('.')) && t1.simpleName.equals(t2.simpleName)
 
 		}
-
-	//		} else {		
-	//			val result = typeUtils.isSameType(t1, t2) 
-	//			result
-	//		}
+	}
+	
+	def dispatch boolean isSameTypeInternal(DeclaredType t1, TypeMirror t2) {
+		false
+	}
+	
+	def dispatch boolean isSameTypeInternal(TypeMirror t1, DeclaredType t2) {
+		false
+	}
+	
+	def dispatch boolean isSameTypeInternal(TypeMirror t1, TypeMirror t2) {
+		typeUtils.isSameType(t1, t2)
 	}
 
 	def dispatch boolean containsErrorType(ErrorType t) {
