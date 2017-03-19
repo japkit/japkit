@@ -66,14 +66,14 @@ class JapkitELResolver extends ELResolver {
 		
 		if(base === null && !context.propertyResolved) {
 			// For root properties, we retry  by prepending "src."			
-			try{
+			//try{
 				val src = getValue(context, null, "src");
 				context.setPropertyResolved(false)
 				return getValue(context, src, property)	
-			} catch (Exception e) {
+			//} catch (Exception e) {
 				//If we failed, catch any exception to give static imports a chance
-				context.setPropertyResolved(false)
-			}
+				//context.setPropertyResolved(false)
+			//}
 		}
 			
 		value
