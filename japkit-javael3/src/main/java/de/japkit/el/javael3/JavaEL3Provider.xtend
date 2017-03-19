@@ -25,6 +25,11 @@ class JavaEL3Provider implements ELProvider {
 			val context = new JapkitELContext(ef, vs);
 			expectedType.cast(ef.createValueExpression(context, expr, expectedType).getValue(context))
 		} catch (ELException e) {
+			if(e.cause !== null && !(e.cause instanceof ELException)){
+				//Unwrap all Exceptions that are likely not caused by human mistakes.
+				//This will lead to better error reporting (stack trace)
+				throw e.cause
+			}
 			throw new ELProviderException(e)
 		} finally {
 			Thread.currentThread().contextClassLoader = oldCCL

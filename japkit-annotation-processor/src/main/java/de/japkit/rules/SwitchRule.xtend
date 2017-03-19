@@ -8,6 +8,7 @@ import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
 import javax.lang.model.element.ElementKind
 import de.japkit.metaannotations.DefaultCase
+import javax.lang.model.type.TypeMirror
 
 @Data
 class SwitchRule extends AbstractFunctionRule<Object> implements ICodeFragmentRule{
@@ -32,6 +33,22 @@ class SwitchRule extends AbstractFunctionRule<Object> implements ICodeFragmentRu
 				.map[ new CaseRule<Object>(it.annotationMirror(Case) ?: it.annotationMirror(DefaultCase), it, type, it.annotationMirror(DefaultCase) !== null)]
 				.toList
 		} else caseRulesFromAnnotation
+	}
+	
+	override List<Pair<Class<?>, String>> createParams(Element element) {
+		//If the Switch is a class, support Type Parameters to be passed to type functions in the Cases
+		if(metaElement instanceof TypeElement) {
+			val te = (metaElement as TypeElement)
+			if(te.typeParameters.empty) {
+				return null;
+			}
+			te.typeParameters.map[
+				TypeMirror as Class<?> -> '''«te.qualifiedName».«simpleName»'''
+			]
+		} else {
+			super.createParams(element);
+		}
+		
 	}
 	
 	override protected evalInternal() {

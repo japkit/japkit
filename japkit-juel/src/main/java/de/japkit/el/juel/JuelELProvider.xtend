@@ -32,6 +32,11 @@ class JuelELProvider implements ELProvider {
 			val context = createElContext(vs)
 			eval(context, expr, expectedType)
 		} catch (ELException e) {
+			if(e.cause !== null && !(e.cause instanceof ELException)){
+				//Unwrap all Exceptions that are likely not caused by human mistakes.
+				//This will lead to better error reporting (stack trace)
+				throw e.cause
+			}
 			throw new ELProviderException(e)
 		}
 	}
