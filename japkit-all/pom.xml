@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.github.stefanocke.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.9-SNAPSHOT</version>
+		<version>1.9</version>
 	</parent>
 	<name>Japkit All</name>
 	<description>All dependencies that can be used in the annotation processor path. For convenience and due to https://issues.apache.org/jira/browse/MCOMPILER-272.</description>
@@ -12,17 +12,17 @@
 		<dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-annotation-processor</artifactId>
-			<version>1.9-SNAPSHOT</version>
+			<version>1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-juel</artifactId>
-			<version>1.9-SNAPSHOT</version>
+			<version>1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-groovy</artifactId>
-			<version>1.9-SNAPSHOT</version>
+			<version>1.9</version>
 		</dependency>
 	</dependencies>
 </project>
