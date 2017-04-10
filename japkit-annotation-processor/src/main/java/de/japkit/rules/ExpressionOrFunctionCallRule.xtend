@@ -7,6 +7,7 @@ import javax.lang.model.element.Element
 import de.japkit.services.RuleException
 import static extension de.japkit.rules.RuleUtils.withPrefix
 import org.eclipse.xtext.xbase.lib.Functions.Function0
+import de.japkit.services.TypeElementNotFoundException
 
 /** At several places in meta annotations it is possible to either directly use an expression or to refer to a function to be called. */
 @Data
@@ -111,9 +112,12 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 					try{
 						r = checkNotNull(combiner.apply(r == UNDEFINED, r, function))	
 						if(r === null) return null; //Don't call further functions		
+					} catch (TypeElementNotFoundException tenfe) {
+						// Always rethrow TENFE 
+						throw tenfe
 					} catch (Exception e){
 						throw new RuleException('''Error when calling function «function?.metaElement?.simpleName»: «e.message»''');
-					}
+					} 
 				}
 				if(!type.isInstance(r)) {
 					throw new RuleException('''The function «functionRules.last?.metaElement?.simpleName» returned «r» of type «r?.class», but the required type is «type»''')
