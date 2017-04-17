@@ -60,7 +60,7 @@ class TypesRegistry {
 	}
 
 	def isGenerated(TypeElement typeElement) {
-		(typeElement instanceof GenTypeElement) || findGenAnnotation(typeElement) !== null
+		(typeElement instanceof GenTypeElement) || (typeElement instanceof GenUnresolvedTypeElement) || findGenAnnotation(typeElement) !== null
 	}
 
 	def findGenAnnotation(TypeElement typeElement) {
@@ -516,9 +516,9 @@ class TypesRegistry {
 			val typeFqn = typeElement.qualifiedName.toString
 			val annotatedClassFqn = annotatedClass.qualifiedName.toString
 			if (typeFqn.startsWith("java") || typeFqn.equals(annotatedClassFqn) || !typeElement.generated ||
-				typeElement == currentGeneratedClass || typeElement.committed) {
-				//TODO: Die self-cycles zu generierten inner classes werden bsiher noch hier registriert und erst in 	
-				//hasUnresolvedTypeDependencies aussortiert. Das kann man noch etwas schöner machen.	
+				typeElement == currentGeneratedClass || 
+				currentGeneratedClass !== null && typeFqn.startsWith(currentGeneratedClass.qualifiedName + '.') 
+				|| typeElement.committed) {
 
 				//Es werden hier nur Abhängigkeiten zu anderen generierten Klassen existiert, denn nur diese können
 				//sich im Rahmen des inkrementellen Builds ändern.
