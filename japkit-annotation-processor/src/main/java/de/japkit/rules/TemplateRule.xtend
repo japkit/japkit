@@ -21,6 +21,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 import de.japkit.metaannotations.Template
+import java.util.Objects
 
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
@@ -147,8 +148,11 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	}
 
 	def private addInterfaces(GenTypeElement generatedClass) {
-		templateClass.interfaces.forEach [
-			generatedClass.addInterface(it.resolveType) //TODO: Check , if interface already exists? 
-		]
+		templateClass.interfaces
+			.map[it.resolveType]
+			.filter[!isVoid]
+			.forEach [
+				generatedClass.addInterface(it) //TODO: Check , if interface already exists? 
+			]
 	}
 }

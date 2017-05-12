@@ -161,8 +161,12 @@ class ClassRule extends AbstractRule {
 						generatedClass.removeModifier(Modifier.ABSTRACT) // Templates are usually abstract
 					}
 
-					generatedClass.setSuperclass(superclassRule.apply)
-					interfaceRules.map[apply].filter[it !== null].forEach [
+					val superClass = superclassRule.apply;
+					if(!superClass.isVoid){
+						generatedClass.setSuperclass(superclassRule.apply)
+					}
+
+					interfaceRules.map[apply].filter[!isVoid].forEach [
 						generatedClass.addInterface(it)
 					]
 
