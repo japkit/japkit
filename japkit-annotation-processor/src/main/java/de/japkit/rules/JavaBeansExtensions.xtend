@@ -121,6 +121,7 @@ class JavaBeansExtensions {
 			.map[toProperty]
 			.map[withSetter(methods.settersFor(it).head)]
 			.map[withField(typeElement.fieldFor(it, stopSuperclass))]
+			.toList
 
 	}
 	
@@ -131,6 +132,7 @@ class JavaBeansExtensions {
 				withSetter(methods.settersFor(it).head)
 				.withGetter(methods.filter[m | m.isGetterFor(it)].head)
 			]
+			.toList
 	}
 	
 	def properties(TypeElement typeElement, String stopSuperclass, boolean fromFields) {
