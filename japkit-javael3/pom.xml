@@ -39,10 +39,5 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>net.bytebuddy</groupId>
-			<artifactId>byte-buddy</artifactId>
-			<version>0.4.1</version>
-		</dependency>
 	</dependencies>
 </project>
