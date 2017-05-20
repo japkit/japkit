@@ -1,7 +1,9 @@
 package de.japkit.services
 
+import de.japkit.el.ELProviderException
 import de.japkit.el.ELSupport
 import de.japkit.model.AnnotationAndParent
+import de.japkit.model.ParameterWrapper
 import de.japkit.model.Path
 import de.japkit.rules.Rule
 import java.util.List
@@ -17,7 +19,7 @@ import javax.tools.Diagnostic.Kind
 import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import de.japkit.el.ELProviderException
+import javax.tools.Diagnostic
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -92,23 +94,37 @@ class MessageCollector {
 			try{
 				val typeElement = getTypeElement(m.typeElementFqn)
 				if(m.uniqueMemberName !== null){
-					//TODO: Support inner classes. Use uniqueIdentifier
+					
 					element = typeElement.enclosedElements.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]
 				} else {
 					element = typeElement
 				}
-				val rootAnnotation = element?.annotationMirrors.findFirst[(annotationType.asElement as TypeElement).qualifiedName.contentEquals(m.annotationFqn)]
 				
-				annotation = if(supportsNestedAnnotations) getNestedAnnotation(rootAnnotation, m.nestedAnnotationPath) else rootAnnotation
-				
-				annotationValue = annotation.getValue(
-					//If the messager does not support nested annotations, only use the first path segment to determine the AV
-					if(supportsNestedAnnotations) m.avName else m.nestedAnnotationPath?.segments?.get(0)?.name ?: m.avName,
-					null
+				if (element !== null && m.annotationFqn !== null) {
+					val rootAnnotation = element.annotationMirrors.findFirst [
+						(annotationType.asElement as TypeElement).qualifiedName.contentEquals(m.annotationFqn)
+					]
+
+					annotation = if(supportsNestedAnnotations) getNestedAnnotation(rootAnnotation,
+						m.nestedAnnotationPath) else rootAnnotation
+
+					annotationValue = annotation?.getValue(
+						// If the messager does not support nested annotations, only use the first path segment to determine the AV
+						if(supportsNestedAnnotations) m.avName else m.nestedAnnotationPath?.segments?.get(0)?.name ?:
+							m.avName,
+						null
+					)
+
+				}
+
+
+			} catch (Exception e) {
+				messager.printMessage(Diagnostic.Kind.ERROR, 
+					'''Error during error reporting: «e», cause: «e.rootCause.message» 
+					«FOR ste : e.stackTrace.subList(0, Math.min(20, e.stackTrace.length))»
+						«ste»
+					«ENDFOR»'''
 				)
-
-
-			} catch(RuntimeException e){
 			}
 			messager.printMessage(m.kind, m.msg, element, annotation, annotationValue)
 			
@@ -130,6 +146,9 @@ class MessageCollector {
 	}
 	
 	def getNestedAnnotation(AnnotationMirror rootAnnotation, Path path){
+		if(rootAnnotation === null) {
+			return null;
+		}
 		val pathSegments = path?.segments
 		var annotation = rootAnnotation
 				
@@ -190,9 +209,11 @@ class MessageCollector {
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
 		
 		val metaAnnotation = rule?.metaAnnotation 
-		val metaElement = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotatedElement else rule?.metaElement   //There are rules without any meta annotation. They only have a template element.
+		var metaElement = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotatedElement else rule?.metaElement   //There are rules without any meta annotation. They only have a template element.
 		
-		
+		if(metaElement instanceof ParameterWrapper) {
+			metaElement = metaElement.delegate
+		}	
 		
 		addMessage(Kind.ERROR, '''«msg?.toString» MetaElement: «metaElement», MetaAnnotation: «metaAnnotation», Src: «currentSrcOptional»''', currentAnnotatedClass, null, null)
 		
