@@ -463,27 +463,29 @@ class RuleUtils {
 	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation,
 		VariableElement template, String avPrefix) {
 
+		val activationRule = createActivationRule(paramAnnotation, avPrefix) ?: RuleUtils.ALWAYS_ACTIVE
 		val srcRule = createSrcRule(paramAnnotation, avPrefix)
 		val scopeRule = createScopeRule(paramAnnotation, template, avPrefix, srcRule)
 		val nameRule = createNameExprRule(paramAnnotation, template, avPrefix)
 		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation, template, avPrefix)
 		val typeRule = createTypeRule(paramAnnotation, template?.asType, avPrefix);
 
-		createParamRule(scopeRule, nameRule, typeRule, annotationMappingRules)
+		createParamRule(activationRule, scopeRule, nameRule, typeRule, annotationMappingRules)
 
 	}
 
 	public def ()=>List<? extends GenParameter> createParamRule(()=>String nameRule, ()=>TypeMirror typeRule,
 		(GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
-		createParamRule(scopeWithCurrentSrc, nameRule, typeRule, annotationMappingRules)
-
+		createParamRule(RuleUtils.ALWAYS_ACTIVE, scopeWithCurrentSrc, nameRule, typeRule, annotationMappingRules)
 	}
 
-	public def ()=>List<? extends GenParameter> createParamRule(
+	public def ()=>List<? extends GenParameter> createParamRule(()=>boolean activationRule, 
 		((Object)=>GenParameter)=>Iterable<GenParameter> scopeRule, ()=>String nameRule, ()=>TypeMirror typeRule,
 		(GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
 
 		[|
+			if(!activationRule.apply) return emptyList
+			
 			scopeRule.apply [
 				val name = nameRule.apply
 				val type = typeRule.apply
