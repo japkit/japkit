@@ -92,13 +92,18 @@ class MessageCollector {
 			var Element element = null 
 			var AnnotationMirror annotation = null
 			var AnnotationValue annotationValue = null
+			var Element enclosingExecutableElement = null;
+			var String paramName = null;
+			
 			try{
 				val typeElement = getTypeElement(m.typeElementFqn)
 				if(m.uniqueMemberName !== null){	
 					val enclosedElementsAndParams = typeElement.elementAndAllEnclosedElements(true)
 					element = enclosedElementsAndParams.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]
 					if(element instanceof ParameterWrapper) {
-						element = element.delegate
+						enclosingExecutableElement = element.enclosingElement
+						paramName = element.name?.toString
+						element = element.delegate						
 					}
 				} else {
 					element = typeElement
@@ -131,6 +136,12 @@ class MessageCollector {
 				)
 			}
 			messager.printMessage(m.kind, m.msg, element, annotation, annotationValue)
+			
+			//Workaround for https://github.com/stefanocke/japkit/issues/20 ,  https://bugs.eclipse.org/bugs/show_bug.cgi?id=427752
+			if(enclosingExecutableElement !== null) {
+				messager.printMessage(m.kind, 
+				'''Error in parameter «paramName» (Annotation: «m.annotationFqn», AnnotationValue: «m.avName»): ''' + m.msg, enclosingExecutableElement, null, null)
+			}
 			
 			//Make it appear at least in error log...
 			messager.printMessage(m.kind, '''«m.msg» «m.typeElementFqn» «m.annotationFqn» «m.nestedAnnotationPath»''')
