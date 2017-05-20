@@ -20,6 +20,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 import javax.tools.Diagnostic
+import java.util.ArrayList
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -93,9 +94,12 @@ class MessageCollector {
 			var AnnotationValue annotationValue = null
 			try{
 				val typeElement = getTypeElement(m.typeElementFqn)
-				if(m.uniqueMemberName !== null){
-					
-					element = typeElement.enclosedElements.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]
+				if(m.uniqueMemberName !== null){	
+					val enclosedElementsAndParams = typeElement.elementAndAllEnclosedElements(true)
+					element = enclosedElementsAndParams.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]
+					if(element instanceof ParameterWrapper) {
+						element = element.delegate
+					}
 				} else {
 					element = typeElement
 				}
@@ -210,10 +214,7 @@ class MessageCollector {
 		
 		val metaAnnotation = rule?.metaAnnotation 
 		var metaElement = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotatedElement else rule?.metaElement   //There are rules without any meta annotation. They only have a template element.
-		
-		if(metaElement instanceof ParameterWrapper) {
-			metaElement = metaElement.delegate
-		}	
+			
 		
 		addMessage(Kind.ERROR, '''«msg?.toString» MetaElement: «metaElement», MetaAnnotation: «metaAnnotation», Src: «currentSrcOptional»''', currentAnnotatedClass, null, null)
 		
