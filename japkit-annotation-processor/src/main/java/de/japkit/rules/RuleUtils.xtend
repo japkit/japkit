@@ -462,41 +462,10 @@ class RuleUtils {
 
 	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation,
 		VariableElement template, String avPrefix) {
-
-		val srcRule = createSrcRule(paramAnnotation, avPrefix)
-		val scopeRule = createScopeRule(paramAnnotation, template, avPrefix, srcRule)
-		val nameRule = createNameExprRule(paramAnnotation, template, avPrefix)
-		val annotationMappingRules = createAnnotationMappingRules(paramAnnotation, template, avPrefix)
-		val typeRule = createTypeRule(paramAnnotation, template?.asType, avPrefix);
-
-		createParamRule(scopeRule, nameRule, typeRule, annotationMappingRules)
+		new ParamRule(paramAnnotation, template, avPrefix);
 
 	}
-
-	public def ()=>List<? extends GenParameter> createParamRule(()=>String nameRule, ()=>TypeMirror typeRule,
-		(GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
-		createParamRule(scopeWithCurrentSrc, nameRule, typeRule, annotationMappingRules)
-
-	}
-
-	public def ()=>List<? extends GenParameter> createParamRule(
-		((Object)=>GenParameter)=>Iterable<GenParameter> scopeRule, ()=>String nameRule, ()=>TypeMirror typeRule,
-		(GenElement)=>List<? extends AnnotationMirror> annotationMappingRules) {
-
-		[|
-			scopeRule.apply [
-				val name = nameRule.apply
-				val type = typeRule.apply
-
-				val param = new GenParameter(name, type)
-
-				if (annotationMappingRules !== null) {
-					param.annotationMirrors = annotationMappingRules.apply(param)
-				}
-				param
-			].toList
-		]
-	}
+	
 
 	def ()=>CharSequence createCommentRule(AnnotationMirror metaAnnotation, Element template, String avPrefix,
 		()=>CharSequence defaultComment) {

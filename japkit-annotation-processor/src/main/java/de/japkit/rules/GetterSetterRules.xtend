@@ -60,7 +60,7 @@ class GetterSetterRules {
 			null,
 			if(fluent) nameRule else [|setterName(nameRule.apply)],
 			[|'''@param «nameRule.apply» «commentRule.apply»'''], //Fragwürdig. So lässt sich per annotation nur das @param customizen :( ggf "setterComment" AV
-			createParamRule(
+			new ParamRule(
 				nameRule,
 				typeRule,
 				createAnnotationMappingRules(metaAnnotation, null, "param".withPrefix(avPrefix))

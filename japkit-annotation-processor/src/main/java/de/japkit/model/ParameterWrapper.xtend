@@ -5,9 +5,14 @@ import javax.lang.model.element.ElementVisitor
 import javax.lang.model.element.Name
 import javax.lang.model.element.VariableElement
 import org.eclipse.xtend.lib.annotations.Data
+import javax.lang.model.element.ExecutableElement
 
 @Data
 class ParameterWrapper extends GenAnnotatedConstruct implements VariableElement {
+	//We also remember the ExecutableElement, since for constructor parameters this is null in Eclipse (at least up to Neon).
+	ExecutableElement enclosing
+	
+	int index;
 	VariableElement delegate;
 	Name name;
 	
@@ -36,7 +41,7 @@ class ParameterWrapper extends GenAnnotatedConstruct implements VariableElement 
 	}
 	
 	override getEnclosingElement() {
-		delegate.enclosingElement
+		enclosing
 	}
 	
 	override getKind() {

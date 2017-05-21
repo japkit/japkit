@@ -6,7 +6,7 @@
 	<groupId>com.github.stefanocke.japkit</groupId>
 	<artifactId>japkit-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.10</version>
+	<version>1.11</version>
 	<name>Japkit Parent</name>
 
 	<description>A declarative approach to writing Java annotation processors.</description>
@@ -57,6 +57,7 @@
 		<module>japkit-groovy</module>
 		<module>japkit-all</module>
 		<module>japkit-all-javael3</module>
+		<module>japkit-all-nogroovy</module>
 		<module>japkit-annotationtemplates</module>
 	</modules>
 

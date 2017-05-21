@@ -170,6 +170,7 @@ class ElementsExtensions {
 	 * Unfortunately, Eclipse does not always provide parameter names during incremental build, since types
 	 * that are not root elements of current round are provided as binary type bindings. We fix the parameter names here,
 	 * if the method has a ParamNames annotation 
+	 * We also remember the ExecutableElement, since for constructor parameters this is null in Eclipse (at least up to Neon).
 	 */
 	def List<? extends VariableElement> parametersWithSrcNames(ExecutableElement e) {
 		val am = e.annotationMirror(ParamNames)
@@ -190,12 +191,12 @@ class ElementsExtensions {
 				//mc.reportError("Then number of parameter names must match the number of parameters", e, am, "value")
 				params
 			} else {
-				wrapParams(params, names)
+				wrapParams(e, names)
 			}
 		} else {
 			val names = getParamNamesFromRuntimeMetadata(e)
 			if(!names.nullOrEmpty){
-				wrapParams(params, names)
+				wrapParams(e, names)
 			} else {
 				params
 			}
@@ -203,8 +204,10 @@ class ElementsExtensions {
 		}
 	}
 	
-	private def List<ParameterWrapper> wrapParams(List<? extends VariableElement> params, List<String> names) {
-		(0 ..< params.size).map[i|new ParameterWrapper(params.get(i), new GenName(names.get(i)))].toList
+	private def List<ParameterWrapper> wrapParams(ExecutableElement e, List<String> names) {
+		val params = e.parameters;
+		
+		(0 ..< params.size).map[i|new ParameterWrapper(e, i, params.get(i), new GenName(names.get(i)))].toList
 	}
 
 	/**We cannot use the ElementUtils.override, since it does not work for our GenElements... */
@@ -1107,11 +1110,18 @@ class ElementsExtensions {
 		element.uniqueNameWithin(element.topLevelEnclosingTypeElement)
 	}
 	
-	//quick and dirty. Should probably be an iterator instead.
 	def Iterable<? extends Element> elementAndAllEnclosedElements(Element e){
+		elementAndAllEnclosedElements(e, false)
+	}
+	
+	//quick and dirty. Should probably be an iterator instead.
+	def Iterable<? extends Element> elementAndAllEnclosedElements(Element e, boolean withMethodParams){
 		val List<Element> list = newArrayList()
 		list.add(e)
-		list.addAll(e.enclosedElements.map[elementAndAllEnclosedElements].flatten)
+		if(withMethodParams && e instanceof ExecutableElement) {
+			list.addAll((e as ExecutableElement).parametersWithSrcNames)
+		}
+		list.addAll(e.enclosedElements.map[elementAndAllEnclosedElements(withMethodParams)].flatten)
 		list
 	}
 	

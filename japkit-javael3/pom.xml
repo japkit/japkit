@@ -5,7 +5,7 @@
 		<relativePath>../japkit-xtend-parent/pom.xml</relativePath>
 		<groupId>com.github.stefanocke.japkit</groupId>
 		<artifactId>japkit-xtend-parent</artifactId>
-		<version>1.10</version>
+		<version>1.11</version>
 	</parent>
 	<artifactId>japkit-javael3</artifactId>
 	<name>Japkit Annotation Processor - Java EL Version 3 Provider</name>
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
 			<artifactId>japkit-annotation-processor</artifactId>
-			<version>1.10</version>
+			<version>1.11</version>
 		</dependency>
 
 		<dependency>
@@ -39,10 +39,5 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>net.bytebuddy</groupId>
-			<artifactId>byte-buddy</artifactId>
-			<version>0.4.1</version>
-		</dependency>
 	</dependencies>
 </project>

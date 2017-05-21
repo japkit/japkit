@@ -189,6 +189,15 @@ public @interface Clazz {
 	Modifier[] modifiers() default {};
 	
 	/**
+	 * By default, the abstract modifier on a class template is always removed  when generating a class. 
+	 * The rationale behind this is to allow abstract method templates (to avoid writing dummy method bodies).
+	 * This behavior can be switched off by setting this annotation value to false.
+	 * 
+	 * @return whether to keep the abstract modifier
+	 */
+	boolean keepAbstract() default false;
+	
+	/**
 	 * If true, the modifiers from the current src element a copied and merged with the ones given by modifiers AV.
 	 * @return
 	 */

@@ -37,6 +37,7 @@ class ClassRule extends AbstractRule {
 	MembersRule membersRule
 	ElementKind kind
 	()=>Set<Modifier> modifiersRule
+	boolean keepAbstract
 	(GenElement)=>List<? extends AnnotationMirror> annotationsRule
 	()=>CharSequence commentRule
 	boolean isTopLevelClass
@@ -70,6 +71,7 @@ class ClassRule extends AbstractRule {
 		
 		kind = metaAnnotation.value('kind', ElementKind)
 		modifiersRule = createModifiersRule(metaAnnotation, templateClass, null)
+		keepAbstract = metaAnnotation.value("keepAbstract", Boolean) ?: false
 
 		
 		commentRule = createCommentRule(metaAnnotation, templateClass, null, null)
@@ -156,13 +158,16 @@ class ClassRule extends AbstractRule {
 					varRules?.forEach[it.putELVariable]
 					generatedClass.modifiers = modifiersRule.apply
 
-					// TODO: Move to modifiers rule ?
-					if (templateRule !== null) {
+					if (templateRule !== null && !keepAbstract) {
 						generatedClass.removeModifier(Modifier.ABSTRACT) // Templates are usually abstract
 					}
 
-					generatedClass.setSuperclass(superclassRule.apply)
-					interfaceRules.map[apply].filter[it !== null].forEach [
+					val superClass = superclassRule.apply;
+					if(!superClass.isVoid){
+						generatedClass.setSuperclass(superclassRule.apply)
+					}
+
+					interfaceRules.map[apply].filter[!isVoid].forEach [
 						generatedClass.addInterface(it)
 					]
 
