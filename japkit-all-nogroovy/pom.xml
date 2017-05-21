@@ -5,11 +5,11 @@
 		<artifactId>japkit-parent</artifactId>
 		<version>1.11-SNAPSHOT</version>
 	</parent>
-	<name>Japkit All - Java EL 3</name>
+	<name>Japkit All - No groovy</name>
 	<description>All dependencies that can be used in the annotation processor path. For convenience and due to https://issues.apache.org/jira/browse/MCOMPILER-272.
-	Tomcat's Java EL 3 implementation is used.
+	Tomcat's Java EL 3 implementation is used. No groovy is included since mostly Java EL 3 is sufficient and groovy causes some overhead.
 	</description>
-	<artifactId>japkit-all-javael3</artifactId>
+	<artifactId>japkit-all-nogroovy</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.stefanocke.japkit</groupId>
@@ -25,11 +25,6 @@
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-el</artifactId>
 			<version>8.5.8</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.stefanocke.japkit</groupId>
-			<artifactId>japkit-groovy</artifactId>
-			<version>1.11-SNAPSHOT</version>
-		</dependency>
+		</dependency>		
 	</dependencies>
 </project>
