@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.stefanocke.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.11-SNAPSHOT</version>
+		<version>1.11</version>
 	</parent>
 	<artifactId>japkit-annotations</artifactId>
 	<name>Japkit Annotations</name>
