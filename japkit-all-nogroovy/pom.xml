@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.github.stefanocke.japkit</groupId>
+		<groupId>com.github.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
 		<version>1.12-SNAPSHOT</version>
 	</parent>
@@ -12,12 +12,12 @@
 	<artifactId>japkit-all-nogroovy</artifactId>
 	<dependencies>
 		<dependency>
-			<groupId>com.github.stefanocke.japkit</groupId>
+			<groupId>com.github.japkit</groupId>
 			<artifactId>japkit-annotation-processor</artifactId>
 			<version>1.12-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.stefanocke.japkit</groupId>
+			<groupId>com.github.japkit</groupId>
 			<artifactId>japkit-javael3</artifactId>
 			<version>1.12-SNAPSHOT</version>
 		</dependency>

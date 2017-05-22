@@ -3,14 +3,14 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.stefanocke.japkit</groupId>
+	<groupId>com.github.japkit</groupId>
 	<artifactId>japkit-parent</artifactId>
 	<packaging>pom</packaging>
 	<version>1.12-SNAPSHOT</version>
 	<name>Japkit Parent</name>
 
 	<description>A declarative approach to writing Java annotation processors.</description>
-	<url>https://github.com/stefanocke/japkit</url>
+	<url>https://github.com/japkit/japkit</url>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
@@ -20,13 +20,13 @@
 	<developers>
 		<developer>
 			<name>Stefan Ocke</name>
-			<organizationUrl>https://github.com/stefanocke</organizationUrl>
+			<organizationUrl>https://github.com/japkit</organizationUrl>
 		</developer>
 	</developers>
 	<scm>
-		<connection>scm:git:git@github.com:stefanocke/japkit.git</connection>
-		<developerConnection>scm:git:git@github.com:stefanocke/japkit.git</developerConnection>
-		<url>https://github.com/stefanocke/japkit</url>
+		<connection>scm:git:git@github.com:japkit/japkit.git</connection>
+		<developerConnection>scm:git:git@github.com:japkit/japkit.git</developerConnection>
+		<url>https://github.com/japkit/japkit</url>
 	</scm>
 	<distributionManagement>
 		<snapshotRepository>
@@ -40,11 +40,11 @@
 	</distributionManagement>
 
 	<issueManagement>
-		<url>https://github.com/stefanocke/japkit/issues</url>
+		<url>https://github.com/japkit/japkit/issues</url>
 	</issueManagement>
 
 	<ciManagement>
-		<url>https://travis-ci.org/stefanocke/japkit</url>
+		<url>https://travis-ci.org/japkit/japkit</url>
 	</ciManagement>
 
 	<modules>
