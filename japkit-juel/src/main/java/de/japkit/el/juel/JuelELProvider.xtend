@@ -9,6 +9,7 @@ import java.net.URL
 import javax.el.ELContext
 import javax.el.ELException
 import javax.el.ExpressionFactory
+import java.util.List
 
 class JuelELProvider implements ELProvider {
 	val ExpressionFactory ef = ExtensionRegistry.get(ExpressionFactory, [|
@@ -27,7 +28,8 @@ class JuelELProvider implements ELProvider {
 	
 	val methodCache = new MethodCache
 
-	override eval(ValueStack vs, String expr, Class<?> expectedType, String language) {
+	override eval(ValueStack vs, String expr, Class<?> expectedType, String language, List<String> importedClasses) {
+		//importedClasses are ignored since not supported by EL2
 		try {
 			val context = createElContext(vs)
 			eval(context, expr, expectedType)

@@ -91,7 +91,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 			
 			val exprResult = if(!expr.nullOrEmpty){
 				handleException(null, exprAvName)[
-					checkNotNull(eval(expr, lang, type, true))									
+					checkNotNull(eval(expr, lang, type, true, LibraryRule.findELImports(metaElement)))									
 				]
 			} else UNDEFINED
 			
