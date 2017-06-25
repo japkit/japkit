@@ -349,14 +349,14 @@ public @interface Clazz {
 	Class<? extends java.lang.annotation.Annotation>[] annotationImports() default {};
 	
 	/**
-	 * Imported classes to be used in expression language. Those classes must be available on anntoation processor path.
+	 * Imported classes to be used in expression language. Those classes must be available on annotation processor path.
 	 * 
 	 * @return
 	 */
 	Class<?>[] elImportedClasses() default {};
 	
 	/**
-	 * As an alternative to langImportedClasses, the FQNs of the classes to be imported can be used here.
+	 * As an alternative to {@link #elImportedClasses()}, the FQNs of the classes to be imported can be set here.
 	 * 
 	 * @return
 	 */
