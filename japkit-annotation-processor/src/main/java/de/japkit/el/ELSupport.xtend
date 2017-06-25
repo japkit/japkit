@@ -18,6 +18,9 @@ import static de.japkit.util.MoreCollectionExtensions.*
 import de.japkit.services.RuleException
 import de.japkit.services.ReportedException
 import java.util.List
+import de.japkit.services.GenerateClassContext
+import de.japkit.model.AnnotationAndParent
+import de.japkit.rules.LibraryRule
 
 class ELSupport {
 	val transient extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
@@ -177,7 +180,17 @@ class ELSupport {
 	}
 	
 	def <T> T eval(String expr, String lang, Class<T> expectedType, boolean evalFromValueStackFirst) {
-		eval(expr, lang, expectedType, evalFromValueStackFirst, EMPTY_EL_IMPORTS)
+		eval(expr, lang, expectedType, evalFromValueStackFirst, findElImports())
+	}
+	
+	//find current Meta-Element and determine ElImports of it. 
+	//TODO: Should be done in rule package instead. (Factoring out some ExpressionRule, like already done for other rules. See ExpressionOrFunctionCallRule) 
+	private def findElImports() {
+		val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext);
+		val rule = currentRule
+		val metaAnnotation = rule.metaAnnotation;
+		var metaElement = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotatedElement else rule?.metaElement
+		return if(metaElement !== null) LibraryRule.findELImports(metaElement) else EMPTY_EL_IMPORTS
 	}
 	
 	public static ELImports EMPTY_EL_IMPORTS = new ELImports(emptyList);
