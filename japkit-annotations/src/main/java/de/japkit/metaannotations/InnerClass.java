@@ -321,6 +321,18 @@ public @interface InnerClass {
 	 */
 	Constructor[] constructors() default {};
 	
+	/**
+	 * Imported classes to be used in expression language. Those classes must be available on anntoation processor path.
+	 * 
+	 * @return
+	 */
+	Class<?>[] elImportedClasses() default {};
 	
+	/**
+	 * As an alternative to langImportedClasses, the FQNs of the classes to be imported can be used here.
+	 * 
+	 * @return
+	 */
+	String[] elImportedClassNames() default {};
 
 }

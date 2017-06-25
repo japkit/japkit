@@ -7,10 +7,11 @@ import java.io.Writer
 import java.net.URL
 import javax.el.ELException
 import javax.el.ELManager
+import java.util.List
 
 class JavaEL3Provider implements ELProvider {
 
-	override eval(ValueStack vs, String expr, Class<?> expectedType, String language) {
+	override eval(ValueStack vs, String expr, Class<?> expectedType, String language, List<String> importedClasses ) {
 		val oldCCL = Thread.currentThread().contextClassLoader
 
 		try {
@@ -23,6 +24,9 @@ class JavaEL3Provider implements ELProvider {
 			val ef = ELManager.expressionFactory
 			
 			val context = new JapkitELContext(ef, vs);
+			for (importedClass : importedClasses) {
+				context.importHandler.importClass(importedClass);
+			}			
 			expectedType.cast(ef.createValueExpression(context, expr, expectedType).getValue(context))
 		} catch (ELException e) {
 			if(e.cause !== null && !(e.cause instanceof ELException)){

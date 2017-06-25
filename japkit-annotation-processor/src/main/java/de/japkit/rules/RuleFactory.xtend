@@ -24,6 +24,8 @@ import de.japkit.metaannotations.And
 import de.japkit.metaannotations.Or
 import de.japkit.metaannotations.Not
 import de.japkit.services.MessageCollector
+import de.japkit.metaannotations.Clazz
+import de.japkit.metaannotations.InnerClass
 
 class RuleFactory {
 	
@@ -84,11 +86,16 @@ class RuleFactory {
 	
 	def createLibraryRule(TypeElement libraryClass){
 		
-		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+		
 		getOrCreate(libraryCache, libraryClass, [
 			mc.printDiagnosticMessage['''Create LibraryRule from «libraryClass»'''];
-			new LibraryRule(libraryClass.annotationMirror(Library), libraryClass)
+			new LibraryRule(libraryClass.findLibraryAnnotation, libraryClass)
 		])
+	}
+	
+	def findLibraryAnnotation(TypeElement libraryClass) {
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+		#[Library, Clazz, InnerClass, Template].map[libraryClass.annotationMirror(it)].findFirst[it !== null]
 	}
 	
 	

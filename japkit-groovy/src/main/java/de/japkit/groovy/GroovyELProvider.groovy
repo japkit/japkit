@@ -30,8 +30,9 @@ class GroovyELProvider implements ELProvider {
 	private static int counter = 1;
 
 	@Override
-	Object eval(ValueStack valueStack, String expr, Class expectedType, String language)throws ELProviderException {
-
+	Object eval(ValueStack valueStack, String expr, Class expectedType, String language, List<String> importedClasses) throws ELProviderException {
+		//Note: importedClasses are currently ignored. 
+		//At least for GroovyScript and GString, we could generate import statements.
 		try{
 			switch(language){
 				case "GroovyScript": return evalAsScript(valueStack, expr, expectedType)
