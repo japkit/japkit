@@ -62,7 +62,7 @@ public class DTOTemplate implements SrcInterface {
  - `SrcType` is a type function similar to `SrcInterface` and means to use the type of the source element
  - The $...$ syntax tells japkit to insert the result of an expression evaluation here. `$name$` really means `#{src.name}`. So the name of a property of the class Person is inserted here.
 
-That's it. Besides some setup in the Maven POM of the project (see [Installation](https://github.com/stefanocke/japkit/wiki/Installation), nothing more needs to be done.
+That's it. Besides some setup in the Maven POM of the project (see [Installation](https://github.com/stefanocke/japkit/wiki/Installation)), nothing more needs to be done.
 
 Finally, this is the code that will be generated:
 ```Java
