@@ -4,7 +4,6 @@ japkit
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.japkit/japkit-parent.svg)](http://mvnrepository.com/artifact/com.github.japkit)
 [![Build Status](https://travis-ci.org/japkit/japkit.svg?branch=master)](https://travis-ci.org/japkit/japkit)
 
-
 Japkit is an annotation processor that allows to develop Java code generators by using natural templates. That is, a code template that is written in Java (with some annotations) describes what to generate. There is no need to write any imperative code. This makes the code generators short and concise and so eases their maintenance. 
 	
 Huh?
@@ -62,7 +61,7 @@ public class DTOTemplate implements SrcInterface {
  - `SrcType` is a type function similar to `SrcInterface` and means to use the type of the source element
  - The $...$ syntax tells japkit to insert the result of an expression evaluation here. `$name$` really means `#{src.name}`. So the name of a property of the class Person is inserted here.
 
-That's it. Besides some setup in the Maven POM of the project (see [Installation](https://github.com/stefanocke/japkit/wiki/Installation), nothing more needs to be done.
+That's it. Besides some setup in the Maven POM of the project (see [Installation](https://github.com/stefanocke/japkit/wiki/Installation)), nothing more needs to be done.
 
 Finally, this is the code that will be generated:
 ```Java
