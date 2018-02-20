@@ -21,8 +21,6 @@
 					<compilerId>groovy-eclipse-compiler</compilerId>
 					<!-- set verbose to be true if you want lots of uninteresting messages -->
 					<!-- <verbose>true</verbose> -->
-					<source>1.7</source>
-					<target>1.7</target>
 					<!-- To prevent the annotation processor to call itself... -->
 					<compilerArgument>-proc:none</compilerArgument>
 				</configuration>
