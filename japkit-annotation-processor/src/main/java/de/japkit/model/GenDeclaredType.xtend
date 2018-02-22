@@ -7,6 +7,7 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
+import javax.lang.model.type.TypeVisitor
 
 @FieldsFromInterface
 class GenDeclaredType extends GenTypeMirror implements DeclaredType {
@@ -46,5 +47,9 @@ class GenDeclaredType extends GenTypeMirror implements DeclaredType {
 	
 	def erasure(){
 		new GenDeclaredType(element)
+	}
+	
+	override <R, P> accept(TypeVisitor<R,P> v, P p) {
+		v.visitDeclared(this, p)
 	}
 }

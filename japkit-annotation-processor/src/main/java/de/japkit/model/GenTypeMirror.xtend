@@ -10,8 +10,6 @@ abstract class GenTypeMirror extends GenAnnotatedConstruct implements TypeMirror
 	
 	override abstract TypeKind getKind()
 	
-	override <R, P> accept(TypeVisitor<R,P> v, P p) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
+	
 	
 }

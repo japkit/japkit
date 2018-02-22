@@ -1,6 +1,7 @@
 package de.japkit.model
 
 import javax.lang.model.type.ErrorType
+import javax.lang.model.type.TypeVisitor
 
 /**
  * A type that has been created during code generation but that could not be resolved so far, sine the type element is not available or
@@ -40,6 +41,10 @@ public class GenUnresolvedType extends GenDeclaredType implements ErrorType {
 	
 	def boolean isInnerClass(){
 		innerClass
+	}
+	
+	override <R, P> accept(TypeVisitor<R,P> v, P p) {
+		v.visitError(this, p)
 	}
 
 }
