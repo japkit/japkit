@@ -96,9 +96,12 @@ class TypeResolver {
 			override TypeMirror visitTypeVariable(TypeVariable typeVariable, Boolean required) {
 
 				val param = typeVariable.asElement as TypeParameterElement
-				valueStack.get('''«(param.enclosingElement as TypeElement).qualifiedName».«param.simpleName»'''.
-					toString) as TypeMirror ?: typeVariable
-
+				
+				if(param.enclosingElement instanceof TypeElement) {
+					valueStack.get('''«(param.enclosingElement as TypeElement).qualifiedName».«param.simpleName»'''.
+						toString) as TypeMirror ?: typeVariable
+					
+				} else typeVariable
 			}
 		}, required);
 
