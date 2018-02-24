@@ -26,6 +26,8 @@ import javax.lang.model.type.WildcardType
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import javax.lang.model.type.TypeVariable
+import javax.lang.model.type.TypeVisitor
+import javax.lang.model.util.SimpleTypeVisitor8
 
 class TypesExtensions /**implements Types*/{
 	val Types typeUtils = ExtensionRegistry.get(Types)
@@ -226,45 +228,51 @@ class TypesExtensions /**implements Types*/{
 			return t2.isVoid && t1.isVoid
 		}
 		
-		return isSameTypeInternal(t1,t2)
-	}
-
-	//isSameType needs special handling, since we have our own GenDeclaredTypes. Furthermore, ErrorTypes are considered...
-	//TODO: Type arguments ???
-	def dispatch boolean isSameTypeInternal(DeclaredType t1, DeclaredType t2) {
-		
-		//if(t1.containsErrorType || t1.containsErrorType){
-		//There are several issues with error types that we try to workaround here:
-		//Eclipse considers error types only as sameType, 
-		//if they have same type binding. But this seems to be different for the obviously same type is some cases.
-		//(For example, sometimes  List<SomeErrorType> != List<SomeErrorType>)
-		//
-		//In javac, all ErrorTypes seem to be considered as being the same.
-		//
-		//So, comparing their string representations seems to be the best way to compare ErrorTypes or types that contain error types.
-		//
-		//Alternatively, we could defer processing until the according class is generated. But by this, we would completely forbid circular dependencies between classes...
-		val fqn1 = t1.qualifiedName
-		val fqn2 = t2.qualifiedName
-		fqn1.equals(fqn2) || {
-			(t1.containsErrorType || t2.containsErrorType) &&
-				//In Eclipse, ErrorTypes toString method does only yield simple name...
-				(!fqn1.contains('.') || !fqn2.contains('.')) && t1.simpleName.equals(t2.simpleName)
-
+		if(t1.kind !== t2.kind) {
+			return false;
 		}
+		//From now on, it is assumed the cast of t2 to the same interface as t1 is safe
+		t1.accept(new SimpleTypeVisitor8<Boolean, TypeMirror> {
+			override defaultAction(TypeMirror t1, TypeMirror t2) {
+				typeUtils.isSameType(t1, t2);
+			}
+			
+			override Boolean visitDeclared(DeclaredType t1, TypeMirror t2) {
+				//if(t1.containsErrorType || t1.containsErrorType){
+				//There are several issues with error types that we try to workaround here:
+				//Eclipse considers error types only as sameType, 
+				//if they have same type binding. But this seems to be different for the obviously same type is some cases.
+				//(For example, sometimes  List<SomeErrorType> != List<SomeErrorType>)
+				//
+				//In javac, all ErrorTypes seem to be considered as being the same.
+				//
+				//So, comparing their string representations seems to be the best way to compare ErrorTypes or types that contain error types.
+				//
+				//Alternatively, we could defer processing until the according class is generated. But by this, we would completely forbid circular dependencies between classes...
+				val fqn1 = t1.qualifiedName
+				val fqn2 = t2.qualifiedName
+				fqn1.equals(fqn2) || {
+					(t1.containsErrorType || t2.containsErrorType) &&
+						//In Eclipse, ErrorTypes toString method does only yield simple name...
+						(!fqn1.contains('.') || !fqn2.contains('.')) && t1.simpleName.equals(t2.simpleName)
+		
+				}
+			}
+			
+			override Boolean visitError(ErrorType t1, TypeMirror t2) {
+				visitDeclared(t1,t2);
+			}
+			
+			override Boolean visitArray(ArrayType t1, TypeMirror t2)  {
+				//due to GenArrayType
+				isSameType(t1.componentType, (t2 as ArrayType).componentType);
+			}
+			
+		}, t2);
+		
+		
 	}
 	
-	def dispatch boolean isSameTypeInternal(DeclaredType t1, TypeMirror t2) {
-		false
-	}
-	
-	def dispatch boolean isSameTypeInternal(TypeMirror t1, DeclaredType t2) {
-		false
-	}
-	
-	def dispatch boolean isSameTypeInternal(TypeMirror t1, TypeMirror t2) {
-		typeUtils.isSameType(t1, t2)
-	}
 
 	def dispatch boolean containsErrorType(ErrorType t) {
 		true
