@@ -332,35 +332,34 @@ class TypesExtensions /**implements Types*/{
 		}, null);
 	}
 
+	def String simpleName(TypeMirror type) {
+		type?.accept(new SimpleTypeVisitor8<String, Void>(type.toString) {
+			
+			override String visitDeclared(DeclaredType declType, Void v) {
+				if(declType instanceof GenDeclaredType) {
+					return declType.simpleName
+				}
+				declType.asTypeElement.simpleName.toString
+			}
+			
+			/** Best guess for error types... */
+			override String visitError(ErrorType declType, Void v) {
+				if (declType.typeArguments.nullOrEmpty) {
+					declType.simpleNameForErrorType  //TODO: Das ist bei inner classes nicht wirklich der simple name sondern das Symbol wie im Quelltext, also ggf mit umgebender Klasse
+				} else {
+		
+					//In Elipse, a genric type seems to be an ErrorType as soon as one of the type args is an ErrorType...
+					//-> Try erasure instead.
+					declType.erasure.simpleName
+				}
+			}
+			
+			override String visitArray(ArrayType type, Void v) {
+				'''«type.componentType.simpleName»[]'''
+			}
+		}, null);
+	}
 
-	def dispatch String simpleName(GenDeclaredType declType) {
-		declType.simpleName
-	}
-	
-	def dispatch String simpleName(DeclaredType declType) {
-		declType.asTypeElement.simpleName.toString
-	}
-
-	/** Best guess for error types... */
-	def dispatch String simpleName(ErrorType declType) {
-		if (declType.typeArguments.nullOrEmpty) {
-			declType.simpleNameForErrorType  //TODO: Das ist bei inner classes nicht wirklich der simple name sondern das Symbol wie im Quelltext, also ggf mit umgebender Klasse
-		} else {
-
-			//In Elipse, a genric type seems to be an ErrorType as soon as one of the type args is an ErrorType...
-			//-> Try erasure instead.
-			declType.erasure.simpleName
-		}
-	}
-	
-	def dispatch String simpleName(ArrayType type) {
-		'''«type.componentType.simpleName»[]'''
-	}
-	
-
-	def dispatch String simpleName(PrimitiveType type) {
-		type.toString
-	}
 
 	def boolean operator_equals(TypeMirror t1, TypeMirror t2) {
 		if (t1 === null || t2 === null) {
