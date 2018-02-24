@@ -224,8 +224,8 @@ class ElementsExtensions {
 	def boolean isSubSignature(ExecutableElement m1, ExecutableElement m2) {
 		val result = m1.simpleName.contentEquals(m2.simpleName) && m1.parameters.size == m2.parameters.size && (0 ..<
 			m1.parameters.length).forall [ i |
-			val t1 = m1.parameters.get(i).asType
-			val t2 = m2.parameters.get(i).asType
+			val TypeMirror t1 = m1.parameters.get(i).asType
+			val TypeMirror t2 = m2.parameters.get(i).asType
 			t1.isSameType(t2) || t1.isSameType(t2?.erasure)
 		]
 

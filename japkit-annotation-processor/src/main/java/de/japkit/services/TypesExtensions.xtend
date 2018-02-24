@@ -228,7 +228,15 @@ class TypesExtensions /**implements Types*/{
 			return t2.isVoid && t1.isVoid
 		}
 		
-		if(t1.kind !== t2.kind) {
+		//At least the roo-petclinic example fails if error types are always considered as being not equal to 
+		//non-error declared types.
+		//So, we relax the type kind comparision here. 
+		//TODO: Determine exact place where it fails. Is it really circular dependency in generated classes or is it 
+		//a flaw in Japkit processor workflow?
+		val t1Kind = if(t1.kind == TypeKind.ERROR) TypeKind.DECLARED else t1.kind
+		val t2Kind = if(t2.kind == TypeKind.ERROR) TypeKind.DECLARED else t2.kind
+		
+		if(t1Kind !== t2Kind) {
 			return false;
 		}
 		//From now on, it is assumed the cast of t2 to the same interface as t1 is safe
