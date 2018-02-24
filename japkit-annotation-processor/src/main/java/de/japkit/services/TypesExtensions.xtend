@@ -162,41 +162,39 @@ class TypesExtensions /**implements Types*/{
 		typeArg
 	}
 	
-	
-	
-	def dispatch TypeMirror singleValueType(DeclaredType type) {
-		if(type.collection){
-			type.getRequiredTypeArg(0).uppertBoundIfTypeVarOrWildcard
-		} else if(type.map) {
-			type.getRequiredTypeArg(1).uppertBoundIfTypeVarOrWildcard
-		} else {
-			type
-		}
+	def TypeMirror singleValueType(TypeMirror type) {
+		type?.accept(new SimpleTypeVisitor8<TypeMirror,Void>(type) {
+			override TypeMirror visitDeclared(DeclaredType type, Void v) {
+				if(type.collection){
+					type.getRequiredTypeArg(0).uppertBoundIfTypeVarOrWildcard
+				} else if(type.map) {
+					type.getRequiredTypeArg(1).uppertBoundIfTypeVarOrWildcard
+				} else {
+					type
+				}
+			}
+			
+			override TypeMirror visitArray(ArrayType type, Void v) {
+				type.componentType.singleValueType
+			}
+			
+			override TypeMirror visitTypeVariable(TypeVariable type, Void v) {
+				type.uppertBoundIfTypeVarOrWildcard
+			}
+		}, null)
 	}
 	
-	def dispatch TypeMirror singleValueType(TypeVariable type) {
-		type.uppertBoundIfTypeVarOrWildcard
+	def TypeMirror uppertBoundIfTypeVarOrWildcard(TypeMirror type) {
+		type?.accept(new SimpleTypeVisitor8<TypeMirror,Void>(type) {
+			override visitWildcard(WildcardType type, Void v ) {
+				type.extendsBound
+			} 
+			override visitTypeVariable(TypeVariable type, Void v ) {
+				type.upperBound
+			}
+		}, null)	
 	}
 	
-	def dispatch TypeMirror uppertBoundIfTypeVarOrWildcard(WildcardType type) {
-		type.extendsBound
-	}
-	
-	def dispatch TypeMirror uppertBoundIfTypeVarOrWildcard(TypeVariable type) {
-		type.upperBound
-	}
-	
-	def dispatch TypeMirror uppertBoundIfTypeVarOrWildcard(TypeMirror type) {
-		type
-	}
-	
-	def dispatch TypeMirror singleValueType(ArrayType type) {
-		type.componentType.singleValueType
-	}
-	
-	def dispatch TypeMirror singleValueType(TypeMirror type) {
-		type
-	}
 
 	def declaredType(Class<?> clazz, TypeMirror ... typeArgs) {
 		declaredType(clazz.name, typeArgs)
@@ -212,11 +210,11 @@ class TypesExtensions /**implements Types*/{
 		typeFqn== Object.name
 	}
 
-	def dispatch erasure(GenDeclaredType type) {
+	def dispatch TypeMirror erasure(GenDeclaredType type) {
 		if(type.typeArguments.nullOrEmpty) type else new GenDeclaredType(type.asElement as TypeElement)
 	}
 
-	def dispatch erasure(TypeMirror type) {
+	def dispatch TypeMirror erasure(TypeMirror type) {
 		typeUtils.erasure(type)
 	}
 	
@@ -304,36 +302,36 @@ class TypesExtensions /**implements Types*/{
 			enclosingTopLevelType
 	}
 
-	def dispatch String qualifiedName(GenDeclaredType declType) {
-		declType.qualifiedName
-	}
-	
-	def dispatch String qualifiedName(DeclaredType declType) {
-		declType.asTypeElement.qualifiedName.toString
-	}
-
-	/** Best guess for error types... */
-	def dispatch String qualifiedName(ErrorType declType) {
-		if (declType.typeArguments.nullOrEmpty) {
-			return typesRegistry.handleTypeElementNotFound(declType.toString, '''Cannot determine qualified name for error type «declType.toString»''')[
-				typesRegistry.tryToGetFqnForErrorType(declType)			
-			]
+	def String qualifiedName(TypeMirror type) {
+		type?.accept(new SimpleTypeVisitor8<String, Void>(type.toString) {
 			
-		} else {
-
-			//In Eclipse, a generic type seem to be an ErrorType as soon as one of the type args is an ErrorType...
-			//-> Try erasure instead.
-			return declType.erasure.qualifiedName
-		}
+			override String visitDeclared(DeclaredType declType, Void v) {
+				if(declType instanceof GenDeclaredType) {
+					return declType.qualifiedName
+				}
+				declType.asTypeElement.qualifiedName.toString
+			}
+			
+			/** Best guess for error types... */
+			override String visitError(ErrorType declType, Void v) {
+				if (declType.typeArguments.nullOrEmpty) {
+					return typesRegistry.handleTypeElementNotFound(declType.toString, '''Cannot determine qualified name for error type «declType.toString»''')[
+						typesRegistry.tryToGetFqnForErrorType(declType)			
+					]
+					
+				} else {		
+					//In Eclipse, a generic type seem to be an ErrorType as soon as one of the type args is an ErrorType...
+					//-> Try erasure instead.
+					return declType.erasure.qualifiedName
+				}
+			}
+			
+			override String visitArray(ArrayType type, Void v) {
+				'''«type.componentType.qualifiedName»[]'''
+			}
+		}, null);
 	}
 
-	def dispatch String qualifiedName(ArrayType type) {
-		'''«type.componentType.qualifiedName»[]'''
-	}
-
-	def dispatch String qualifiedName(PrimitiveType type) {
-		type.toString
-	}
 
 	def dispatch String simpleName(GenDeclaredType declType) {
 		declType.simpleName
