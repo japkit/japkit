@@ -33,6 +33,7 @@ import org.jgrapht.graph.DefaultEdge
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 import javax.lang.model.util.SimpleTypeVisitor8
+import javax.lang.model.type.TypeKind
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -510,6 +511,10 @@ class TypesRegistry {
 	}
 
 	def dispatch void registerTypeDependencyForAnnotatedClass(TypeElement annotatedClass, DeclaredType type) {
+		if(type === null || type.kind != TypeKind.DECLARED && type.kind != TypeKind.ERROR ) {
+			return
+		}
+		
 		type.typeArguments.forEach[annotatedClass.registerTypeDependencyForAnnotatedClass(it)]
 		val rawType = type.erasure
 		try {
