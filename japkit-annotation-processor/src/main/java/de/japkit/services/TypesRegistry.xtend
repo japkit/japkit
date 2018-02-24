@@ -32,6 +32,7 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
+import javax.lang.model.util.SimpleTypeVisitor8
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -686,54 +687,72 @@ class TypesRegistry {
 	def cleanUpTypesAtEndOfRound() {
 		genTypeElementInCurrentRoundByFqn.clear
 	}
+	
+	def TypeElement asTypeElement(TypeMirror declType) {
+		declType?.accept(new SimpleTypeVisitor8<TypeElement, Void>(){
+			override defaultAction(TypeMirror declType, Void v) {
+				declType.asElement as TypeElement
+			}		
 
-	def dispatch TypeElement asTypeElement(GenUnresolvedType genDeclType) {
-		//May be it exists now. Try to find it.
-		val te = findTypeElement(genDeclType.qualifiedName) 
-		if(te !== null) return te
-		//The TENFE is delayed until any properties of the type element are requested.
-		//This makes it for example easier to generate inner classes that depend on each other.
-		return new GenUnresolvedTypeElement(genDeclType)
+			override TypeElement visitDeclared(DeclaredType declType, Void v) {
+				if(declType instanceof GenDeclaredType) {
+					return visitGenDeclared(declType)
+				}
+
+				val e = declType.asElement
+				
+				if (e instanceof TypeElement) {
+					//Even if we find the type element, we prefer the generated one, since it is newer.
+					//This is relevant during incremental build.
+					findGenTypeElementForFqn(e.qualifiedName.toString) ?: e
+				} else {
+					//should not happen
+					throw new TypeElementNotFoundException(declType.erasure.toString)
+				}
+
+			}
+			
+			def TypeElement visitGenDeclared(GenDeclaredType genDeclType) {
+				genDeclType.asElement as TypeElement
+			}
+	
+			override TypeElement visitError(ErrorType declType, Void v) {
+				if(declType instanceof GenUnresolvedType) {
+					return visitGenUnresolvedType(declType);
+				}
+				if (!declType.typeArguments.nullOrEmpty) {
+					return declType.erasure.asTypeElement
+				}
+				val e = findGenTypeElementForShortName(declType.simpleNameForErrorType)
+				if (e !== null) {
+					e
+				} else {
+					throw new TypeElementNotFoundException(declType.simpleNameForErrorType)
+				}
+				
+			}
+				
+			def TypeElement visitGenUnresolvedType(GenUnresolvedType genDeclType) {
+				//May be it exists now. Try to find it.
+				val te = findTypeElement(genDeclType.qualifiedName) 
+				if(te !== null) return te
+				//The TENFE is delayed until any properties of the type element are requested.
+				//This makes it for example easier to generate inner classes that depend on each other.
+				return new GenUnresolvedTypeElement(genDeclType)
+			}
+			
+		}, null)
+		
 	}
 	
-	def dispatch TypeElement asTypeElement(GenDeclaredType genDeclType) {
-		genDeclType.asElement as TypeElement
-	}
 
-	//val generatedTypesByFqn
-	def dispatch TypeElement asTypeElement(DeclaredType declType) {
-
-		val e = declType.asElement
-		
-		if (e instanceof TypeElement) {
-			//Even if we find the type element, we prefer the generated one, since it is newer.
-			//This is relevant during incremental build.
-			findGenTypeElementForFqn(e.qualifiedName.toString) ?: e
-		} else {
-			//should not happen
-			throw new TypeElementNotFoundException(declType.erasure.toString)
-		}
-		
-		
-	}
-
-	def dispatch TypeElement asTypeElement(ErrorType declType) {
-		if (!declType.typeArguments.nullOrEmpty) {
-			return declType.erasure.asTypeElement
-		}
-		val e = findGenTypeElementForShortName(declType.simpleNameForErrorType)
-		if (e !== null) {
-			e
-		} else {
-			throw new TypeElementNotFoundException(declType.simpleNameForErrorType)
-		}
-		
-	}
 	
-	def dispatch TypeElement asTypeElement(TypeMirror declType) {
-		declType.asElement as TypeElement
-	}
+	
+	
 
+	
+	
+	
 	//Key is FQN of trigger annotation and shadow flag. 
 	//Value is set of all annotated classes that genrically depend on that trigger. That is, they shall be regernerated,
 	//if anything changes regarding the classes with the trigger annotation. 
