@@ -495,14 +495,18 @@ class TypesExtensions /**implements Types*/{
 		typeUtils.unboxedType(t)
 	}
 
-
-	def private dispatch resolveIfErrorType(ErrorType t) {
-		t.asTypeElement.asType
+	def private resolveIfErrorType(TypeMirror t) {
+		//Imporant to use TypeVisior here, since AnnotatedType in Oracle JDK8 will never be ErrorType, even if underlying type is...
+		t?.accept(new SimpleTypeVisitor8<TypeMirror,Void>(t){
+			override visitError(ErrorType t, Void v) {
+				t.asTypeElement.asType
+			}
+		},null);
 	}
 	
-	def private dispatch resolveIfErrorType(TypeMirror t) {
-		t
-	}
+	
+	
+	
 	
 
 }
