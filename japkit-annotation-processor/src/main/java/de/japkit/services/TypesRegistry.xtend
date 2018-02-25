@@ -693,6 +693,9 @@ class TypesRegistry {
 		genTypeElementInCurrentRoundByFqn.clear
 	}
 	
+	/**
+	 * Get the TypeElement for the type. For ErrorTypes, the generated TypeElement is returned, if available.  
+	 */
 	def TypeElement asTypeElement(TypeMirror declType) {
 		declType?.accept(new SimpleTypeVisitor8<TypeElement, Void>(){
 			override defaultAction(TypeMirror declType, Void v) {
@@ -726,6 +729,8 @@ class TypesRegistry {
 					return visitGenUnresolvedType(declType);
 				}
 				if (!declType.typeArguments.nullOrEmpty) {
+					//In JDT, a type with a ERROR type argument is ERROR itself. 
+					//The type erasure might be non-ERROR in such a case.
 					return declType.erasure.asTypeElement
 				}
 				val e = findGenTypeElementForShortName(declType.simpleNameForErrorType)

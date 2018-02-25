@@ -26,7 +26,6 @@ import javax.lang.model.type.WildcardType
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import javax.lang.model.type.TypeVariable
-import javax.lang.model.type.TypeVisitor
 import javax.lang.model.util.SimpleTypeVisitor8
 
 class TypesExtensions /**implements Types*/{
@@ -42,48 +41,47 @@ class TypesExtensions /**implements Types*/{
 		typeKind.primitiveType.boxedClass.asType
 	}
 
-	def isPrimitive(TypeMirror mirror) {
-		mirror.kind.primitive
+	def isPrimitive(TypeMirror type) {
+		type?.kind.isPrimitive
+	}
+	
+	def isDeclared(TypeMirror type) {
+		type?.kind == TypeKind.DECLARED
+	}
+	
+	def isError(TypeMirror type) {
+		type?.kind == TypeKind.ERROR
+	}
+	/**
+	 * In JDT, a generic type seem to be an ErrorType as soon as one of the type args is an ErrorType...
+	 * If one is only interested in the erasure of a generic type, this method should be used to check for DECLARED.
+	 */
+	def isDeclaredOrErasureIsDeclared(TypeMirror type) {
+		return type.isDeclared || type.isError && (type as DeclaredType).erasure.isDeclared 
 	}
 
 	static val BOXED_TYPES = #{Boolean, Byte, Short, Integer, Long, Character, Float, Double}.map[name].toSet
 
-	def dispatch isBoxed(DeclaredType type) {
-		BOXED_TYPES.contains(type?.qualifiedName)
-	}
-	
-	def dispatch isBoxed(TypeMirror type) {
-		false
+	def isBoxed(TypeMirror type) {
+		//No need to consider ErrorTypes here, since they will never become one of the boxed types.
+		if (type.isDeclared) BOXED_TYPES.contains(type.qualifiedName) else false
 	}
 
-	public static val STRING = String.name
-
-	def dispatch isString(DeclaredType mirror) {
-		STRING == mirror.qualifiedName
-	}
-	
-	def dispatch isString(TypeMirror mirror) {
-		false
+	def isString(TypeMirror type) {
+		if (type.isDeclared) String.name == type.qualifiedName else false
 	}
 
 	static val TEMPORAL_TYPES = #{Calendar, Date}.map[name].toSet
 
-	def dispatch isTemporal(DeclaredType mirror) {
-		TEMPORAL_TYPES.contains(mirror?.qualifiedName)
+	def isTemporal(TypeMirror type) {
+		if (type.isDeclared) TEMPORAL_TYPES.contains(type.qualifiedName) else false
 	}
 	
-	def dispatch isTemporal(TypeMirror mirror) {
-		false
-	}
 
 	static val MATH_TYPES = #{BigDecimal.name, BigInteger.name}
 
-	def dispatch boolean isMath(DeclaredType mirror) {
-		MATH_TYPES.contains(mirror?.qualifiedName)
-	}
-	
-	def dispatch boolean isMath(TypeMirror type) {
-		false
+	def boolean isMath(TypeMirror type) {
+		if (type.isDeclared) MATH_TYPES.contains(type.qualifiedName) else false
 	}
 
 	def boolean collectionOrMap(TypeMirror type) {
@@ -92,54 +90,28 @@ class TypesExtensions /**implements Types*/{
 
 	static val COLLECTION_TYPES = #{Collection.name, Set.name, List.name, SortedSet.name}
 
-	def dispatch boolean isCollection(DeclaredType type) {
-		COLLECTION_TYPES.contains(type?.qualifiedName)
+	def boolean isCollection(TypeMirror type) {
+		if(type.isDeclaredOrErasureIsDeclared) COLLECTION_TYPES.contains(type?.qualifiedName) else false
 	}
 
-	def dispatch boolean isCollection(TypeMirror type) {
-		false
+	def boolean isMap(TypeMirror type) {
+		if(type.isDeclaredOrErasureIsDeclared) Map.name == type.qualifiedName else false
 	}
 
-	static val MAP = Map.name
-
-	def dispatch boolean isMap(DeclaredType type) {
-		type.toString.startsWith(MAP)
+	def boolean isSet(TypeMirror type) {
+		if(type.isDeclaredOrErasureIsDeclared) Set.name == type.qualifiedName else false
 	}
 
-	def dispatch boolean isMap(TypeMirror type) {
-		false
+	def boolean isList(TypeMirror type) {
+		if(type.isDeclaredOrErasureIsDeclared) List.name == type.qualifiedName else false
 	}
 
-	static val SET = Set.name
-
-	def dispatch boolean isSet(DeclaredType type) {
-		type.toString.startsWith(SET)
+	def boolean isEnum(TypeMirror type) {
+		if (type.isDeclared) type.asTypeElement.kind == ElementKind.ENUM else false
 	}
 
-	def dispatch boolean isSet(TypeMirror type) {
-		false
-	}
-
-	static val LIST = List.name
-
-	def dispatch boolean isList(DeclaredType type) {
-		type.toString.startsWith(LIST)
-	}
-
-	def dispatch boolean isList(TypeMirror type) {
-		false
-	}
-
-	def dispatch boolean isEnum(DeclaredType type) {
-		type.asTypeElement.kind == ElementKind.ENUM
-	}
-
-	def dispatch boolean isEnum(TypeMirror type) {
-		false
-	}
-
-	def boolean isBoolean(TypeMirror mirror) {
-		mirror == TypeKind.BOOLEAN.primitiveType || mirror == TypeKind.BOOLEAN.boxed
+	def boolean isBoolean(TypeMirror type) {
+		type.isPrimitive && type == TypeKind.BOOLEAN.primitiveType || type.isDeclared && type == TypeKind.BOOLEAN.boxed
 	}
 	
 	def dispatch getTypeArg(DeclaredType type, int argIndex){
@@ -320,7 +292,7 @@ class TypesExtensions /**implements Types*/{
 					]
 					
 				} else {		
-					//In Eclipse, a generic type seem to be an ErrorType as soon as one of the type args is an ErrorType...
+					//In JDT, a generic type seem to be an ErrorType as soon as one of the type args is an ErrorType...
 					//-> Try erasure instead.
 					return declType.erasure.qualifiedName
 				}
@@ -348,7 +320,7 @@ class TypesExtensions /**implements Types*/{
 					declType.simpleNameForErrorType  //TODO: Das ist bei inner classes nicht wirklich der simple name sondern das Symbol wie im Quelltext, also ggf mit umgebender Klasse
 				} else {
 		
-					//In Elipse, a genric type seems to be an ErrorType as soon as one of the type args is an ErrorType...
+					//In JDT, a generic type seems to be an ErrorType as soon as one of the type args is an ErrorType...
 					//-> Try erasure instead.
 					declType.erasure.simpleName
 				}
@@ -496,17 +468,8 @@ class TypesExtensions /**implements Types*/{
 	}
 
 	def private resolveIfErrorType(TypeMirror t) {
-		//Imporant to use TypeVisior here, since AnnotatedType in Oracle JDK8 will never be ErrorType, even if underlying type is...
-		t?.accept(new SimpleTypeVisitor8<TypeMirror,Void>(t){
-			override visitError(ErrorType t, Void v) {
-				t.asTypeElement.asType
-			}
-		},null);
+		if(t?.kind == TypeKind.ERROR) t.asTypeElement.asType else t		
 	}
-	
-	
-	
-	
-	
+
 
 }
