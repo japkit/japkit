@@ -26,6 +26,7 @@ import javax.lang.model.type.WildcardType
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import javax.lang.model.type.TypeVariable
+import javax.lang.model.util.SimpleTypeVisitor8
 
 class TypesExtensions /**implements Types*/{
 	val Types typeUtils = ExtensionRegistry.get(Types)
@@ -40,48 +41,51 @@ class TypesExtensions /**implements Types*/{
 		typeKind.primitiveType.boxedClass.asType
 	}
 
-	def isPrimitive(TypeMirror mirror) {
-		mirror.kind.primitive
+	def isPrimitive(TypeMirror type) {
+		type?.kind.isPrimitive
+	}
+	
+	def isDeclared(TypeMirror type) {
+		type?.kind == TypeKind.DECLARED
+	}
+	
+	def isError(TypeMirror type) {
+		type?.kind == TypeKind.ERROR
+	}
+	/**
+	 * In JDT, a generic type seem to be an ErrorType as soon as one of the type args is an ErrorType...
+	 * If one is only interested in the erasure of a generic type, this method should be used to check for DECLARED.
+	 */
+	def isDeclaredOrErasureIsDeclared(TypeMirror type) {
+		return type.isDeclared || type.isError && (type as DeclaredType).erasure.isDeclared 
+	}
+
+	def isDeclaredOrError(TypeMirror type) {
+		return type.isDeclared || type.isError
 	}
 
 	static val BOXED_TYPES = #{Boolean, Byte, Short, Integer, Long, Character, Float, Double}.map[name].toSet
 
-	def dispatch isBoxed(DeclaredType type) {
-		BOXED_TYPES.contains(type?.qualifiedName)
-	}
-	
-	def dispatch isBoxed(TypeMirror type) {
-		false
+	def isBoxed(TypeMirror type) {
+		//No need to consider ErrorTypes here, since they will never become one of the boxed types.
+		if (type.isDeclared) BOXED_TYPES.contains(type.qualifiedName) else false
 	}
 
-	public static val STRING = String.name
-
-	def dispatch isString(DeclaredType mirror) {
-		STRING == mirror.qualifiedName
-	}
-	
-	def dispatch isString(TypeMirror mirror) {
-		false
+	def isString(TypeMirror type) {
+		if (type.isDeclared) String.name == type.qualifiedName else false
 	}
 
 	static val TEMPORAL_TYPES = #{Calendar, Date}.map[name].toSet
 
-	def dispatch isTemporal(DeclaredType mirror) {
-		TEMPORAL_TYPES.contains(mirror?.qualifiedName)
+	def isTemporal(TypeMirror type) {
+		if (type.isDeclared) TEMPORAL_TYPES.contains(type.qualifiedName) else false
 	}
 	
-	def dispatch isTemporal(TypeMirror mirror) {
-		false
-	}
 
 	static val MATH_TYPES = #{BigDecimal.name, BigInteger.name}
 
-	def dispatch boolean isMath(DeclaredType mirror) {
-		MATH_TYPES.contains(mirror?.qualifiedName)
-	}
-	
-	def dispatch boolean isMath(TypeMirror type) {
-		false
+	def boolean isMath(TypeMirror type) {
+		if (type.isDeclared) MATH_TYPES.contains(type.qualifiedName) else false
 	}
 
 	def boolean collectionOrMap(TypeMirror type) {
@@ -90,65 +94,39 @@ class TypesExtensions /**implements Types*/{
 
 	static val COLLECTION_TYPES = #{Collection.name, Set.name, List.name, SortedSet.name}
 
-	def dispatch boolean isCollection(DeclaredType type) {
-		COLLECTION_TYPES.contains(type?.qualifiedName)
+	def boolean isCollection(TypeMirror type) {
+		if(type.isDeclaredOrErasureIsDeclared) COLLECTION_TYPES.contains(type?.qualifiedName) else false
 	}
 
-	def dispatch boolean isCollection(TypeMirror type) {
-		false
+	def boolean isMap(TypeMirror type) {
+		if(type.isDeclaredOrErasureIsDeclared) Map.name == type.qualifiedName else false
 	}
 
-	static val MAP = Map.name
-
-	def dispatch boolean isMap(DeclaredType type) {
-		type.toString.startsWith(MAP)
+	def boolean isSet(TypeMirror type) {
+		if(type.isDeclaredOrErasureIsDeclared) Set.name == type.qualifiedName else false
 	}
 
-	def dispatch boolean isMap(TypeMirror type) {
-		false
+	def boolean isList(TypeMirror type) {
+		if(type.isDeclaredOrErasureIsDeclared) List.name == type.qualifiedName else false
 	}
 
-	static val SET = Set.name
-
-	def dispatch boolean isSet(DeclaredType type) {
-		type.toString.startsWith(SET)
+	def boolean isEnum(TypeMirror type) {
+		if (type.isDeclared) type.asTypeElement.kind == ElementKind.ENUM else false
 	}
 
-	def dispatch boolean isSet(TypeMirror type) {
-		false
-	}
-
-	static val LIST = List.name
-
-	def dispatch boolean isList(DeclaredType type) {
-		type.toString.startsWith(LIST)
-	}
-
-	def dispatch boolean isList(TypeMirror type) {
-		false
-	}
-
-	def dispatch boolean isEnum(DeclaredType type) {
-		type.asTypeElement.kind == ElementKind.ENUM
-	}
-
-	def dispatch boolean isEnum(TypeMirror type) {
-		false
-	}
-
-	def boolean isBoolean(TypeMirror mirror) {
-		mirror == TypeKind.BOOLEAN.primitiveType || mirror == TypeKind.BOOLEAN.boxed
+	def boolean isBoolean(TypeMirror type) {
+		type.isPrimitive && type == TypeKind.BOOLEAN.primitiveType || type.isDeclared && type == TypeKind.BOOLEAN.boxed
 	}
 	
-	def dispatch getTypeArg(DeclaredType type, int argIndex){
-		if(argIndex >= type.typeArguments.size ){
+	def dispatch TypeMirror getTypeArg(DeclaredType type, int argIndex){
+		if(!type.isDeclaredOrError || argIndex >= type.typeArguments.size ){
 			null
 		} else {
 			type.typeArguments.get(argIndex)
 		}
 	}
 	
-	def dispatch getTypeArg(TypeMirror type, int argIndex){
+	def dispatch TypeMirror getTypeArg(TypeMirror type, int argIndex){
 		null
 	}
 	
@@ -160,41 +138,39 @@ class TypesExtensions /**implements Types*/{
 		typeArg
 	}
 	
-	
-	
-	def dispatch TypeMirror singleValueType(DeclaredType type) {
-		if(type.collection){
-			type.getRequiredTypeArg(0).uppertBoundIfTypeVarOrWildcard
-		} else if(type.map) {
-			type.getRequiredTypeArg(1).uppertBoundIfTypeVarOrWildcard
-		} else {
-			type
-		}
+	def TypeMirror singleValueType(TypeMirror type) {
+		type?.accept(new SimpleTypeVisitor8<TypeMirror,Void>(type) {
+			override TypeMirror visitDeclared(DeclaredType type, Void v) {
+				if(type.collection){
+					type.getRequiredTypeArg(0).uppertBoundIfTypeVarOrWildcard
+				} else if(type.map) {
+					type.getRequiredTypeArg(1).uppertBoundIfTypeVarOrWildcard
+				} else {
+					type
+				}
+			}
+			
+			override TypeMirror visitArray(ArrayType type, Void v) {
+				type.componentType.singleValueType
+			}
+			
+			override TypeMirror visitTypeVariable(TypeVariable type, Void v) {
+				type.uppertBoundIfTypeVarOrWildcard
+			}
+		}, null)
 	}
 	
-	def dispatch TypeMirror singleValueType(TypeVariable type) {
-		type.uppertBoundIfTypeVarOrWildcard
+	def TypeMirror uppertBoundIfTypeVarOrWildcard(TypeMirror type) {
+		type?.accept(new SimpleTypeVisitor8<TypeMirror,Void>(type) {
+			override visitWildcard(WildcardType type, Void v ) {
+				type.extendsBound
+			} 
+			override visitTypeVariable(TypeVariable type, Void v ) {
+				type.upperBound
+			}
+		}, null)	
 	}
 	
-	def dispatch TypeMirror uppertBoundIfTypeVarOrWildcard(WildcardType type) {
-		type.extendsBound
-	}
-	
-	def dispatch TypeMirror uppertBoundIfTypeVarOrWildcard(TypeVariable type) {
-		type.upperBound
-	}
-	
-	def dispatch TypeMirror uppertBoundIfTypeVarOrWildcard(TypeMirror type) {
-		type
-	}
-	
-	def dispatch TypeMirror singleValueType(ArrayType type) {
-		type.componentType.singleValueType
-	}
-	
-	def dispatch TypeMirror singleValueType(TypeMirror type) {
-		type
-	}
 
 	def declaredType(Class<?> clazz, TypeMirror ... typeArgs) {
 		declaredType(clazz.name, typeArgs)
@@ -210,11 +186,11 @@ class TypesExtensions /**implements Types*/{
 		typeFqn== Object.name
 	}
 
-	def dispatch erasure(GenDeclaredType type) {
+	def dispatch TypeMirror erasure(GenDeclaredType type) {
 		if(type.typeArguments.nullOrEmpty) type else new GenDeclaredType(type.asElement as TypeElement)
 	}
 
-	def dispatch erasure(TypeMirror type) {
+	def dispatch TypeMirror erasure(TypeMirror type) {
 		typeUtils.erasure(type)
 	}
 	
@@ -226,61 +202,74 @@ class TypesExtensions /**implements Types*/{
 			return t2.isVoid && t1.isVoid
 		}
 		
-		return isSameTypeInternal(t1,t2)
-	}
-
-	//isSameType needs special handling, since we have our own GenDeclaredTypes. Furthermore, ErrorTypes are considered...
-	//TODO: Type arguments ???
-	def dispatch boolean isSameTypeInternal(DeclaredType t1, DeclaredType t2) {
+		//At least the roo-petclinic example fails if error types are always considered as being not equal to 
+		//non-error declared types.
+		//So, we relax the type kind comparision here. 
+		//TODO: Determine exact place where it fails. Is it really circular dependency in generated classes or is it 
+		//a flaw in Japkit processor workflow?
+		val t1Kind = if(t1.kind == TypeKind.ERROR) TypeKind.DECLARED else t1.kind
+		val t2Kind = if(t2.kind == TypeKind.ERROR) TypeKind.DECLARED else t2.kind
 		
-		//if(t1.containsErrorType || t1.containsErrorType){
-		//There are several issues with error types that we try to workaround here:
-		//Eclipse considers error types only as sameType, 
-		//if they have same type binding. But this seems to be different for the obviously same type is some cases.
-		//(For example, sometimes  List<SomeErrorType> != List<SomeErrorType>)
-		//
-		//In javac, all ErrorTypes seem to be considered as being the same.
-		//
-		//So, comparing their string representations seems to be the best way to compare ErrorTypes or types that contain error types.
-		//
-		//Alternatively, we could defer processing until the according class is generated. But by this, we would completely forbid circular dependencies between classes...
-		val fqn1 = t1.qualifiedName
-		val fqn2 = t2.qualifiedName
-		fqn1.equals(fqn2) || {
-			(t1.containsErrorType || t2.containsErrorType) &&
-				//In Eclipse, ErrorTypes toString method does only yield simple name...
-				(!fqn1.contains('.') || !fqn2.contains('.')) && t1.simpleName.equals(t2.simpleName)
-
+		if(t1Kind !== t2Kind) {
+			return false;
 		}
+		//From now on, it is assumed the cast of t2 to the same interface as t1 is safe
+		t1.accept(new SimpleTypeVisitor8<Boolean, TypeMirror> {
+			override defaultAction(TypeMirror t1, TypeMirror t2) {
+				typeUtils.isSameType(t1, t2);
+			}
+			
+			override Boolean visitDeclared(DeclaredType t1, TypeMirror t2) {
+				//if(t1.containsErrorType || t1.containsErrorType){
+				//There are several issues with error types that we try to workaround here:
+				//Eclipse considers error types only as sameType, 
+				//if they have same type binding. But this seems to be different for the obviously same type is some cases.
+				//(For example, sometimes  List<SomeErrorType> != List<SomeErrorType>)
+				//
+				//In javac, all ErrorTypes seem to be considered as being the same.
+				//
+				//So, comparing their string representations seems to be the best way to compare ErrorTypes or types that contain error types.
+				//
+				//Alternatively, we could defer processing until the according class is generated. But by this, we would completely forbid circular dependencies between classes...
+				val fqn1 = t1.qualifiedName
+				val fqn2 = t2.qualifiedName
+				fqn1.equals(fqn2) || {
+					(t1.containsErrorType || t2.containsErrorType) &&
+						//In Eclipse, ErrorTypes toString method does only yield simple name...
+						(!fqn1.contains('.') || !fqn2.contains('.')) && t1.simpleName.equals(t2.simpleName)
+		
+				}
+			}
+			
+			override Boolean visitError(ErrorType t1, TypeMirror t2) {
+				visitDeclared(t1,t2);
+			}
+			
+			override Boolean visitArray(ArrayType t1, TypeMirror t2)  {
+				//due to GenArrayType
+				isSameType(t1.componentType, (t2 as ArrayType).componentType);
+			}
+			
+		}, t2);
+		
+		
 	}
 	
-	def dispatch boolean isSameTypeInternal(DeclaredType t1, TypeMirror t2) {
-		false
-	}
-	
-	def dispatch boolean isSameTypeInternal(TypeMirror t1, DeclaredType t2) {
-		false
-	}
-	
-	def dispatch boolean isSameTypeInternal(TypeMirror t1, TypeMirror t2) {
-		typeUtils.isSameType(t1, t2)
-	}
+	def private boolean containsErrorType(TypeMirror type) {
+		return type.accept(new SimpleTypeVisitor8<Boolean, Void>(false) {
+			override Boolean visitError(ErrorType t, Void v) {
+				true
+			}
 
-	def dispatch boolean containsErrorType(ErrorType t) {
-		true
-	}
+			override Boolean visitDeclared(DeclaredType t, Void v) {
+				t.typeArguments.exists[containsErrorType]
+			}
 
-	def dispatch boolean containsErrorType(DeclaredType t) {
-		t.typeArguments.exists[containsErrorType]
-	}
-
-	def dispatch boolean containsErrorType(WildcardType t) {
-		(t.extendsBound !== null && t.extendsBound.containsErrorType) ||
-			(t.superBound !== null && t.superBound.containsErrorType)
-	}
-
-	def dispatch boolean containsErrorType(TypeMirror t) {
-		false
+			override Boolean visitWildcard(WildcardType t, Void v) {
+				(t.extendsBound !== null && t.extendsBound.containsErrorType) ||
+					(t.superBound !== null && t.superBound.containsErrorType)
+			}
+		}, null);
 	}
 
 	def DeclaredType enclosingTopLevelType(DeclaredType declType) {
@@ -288,65 +277,64 @@ class TypesExtensions /**implements Types*/{
 			enclosingTopLevelType
 	}
 
-	def dispatch String qualifiedName(GenDeclaredType declType) {
-		declType.qualifiedName
-	}
-	
-	def dispatch String qualifiedName(DeclaredType declType) {
-		declType.asTypeElement.qualifiedName.toString
-	}
-
-	/** Best guess for error types... */
-	def dispatch String qualifiedName(ErrorType declType) {
-		if (declType.typeArguments.nullOrEmpty) {
-			return typesRegistry.handleTypeElementNotFound(declType.toString, '''Cannot determine qualified name for error type «declType.toString»''')[
-				typesRegistry.tryToGetFqnForErrorType(declType)			
-			]
+	def String qualifiedName(TypeMirror type) {
+		type?.accept(new SimpleTypeVisitor8<String, Void>(type.toString) {
 			
-		} else {
-
-			//In Eclipse, a generic type seem to be an ErrorType as soon as one of the type args is an ErrorType...
-			//-> Try erasure instead.
-			return declType.erasure.qualifiedName
-		}
+			override String visitDeclared(DeclaredType declType, Void v) {
+				if(declType instanceof GenDeclaredType) {
+					return declType.qualifiedName
+				}
+				declType.asTypeElement.qualifiedName.toString
+			}
+			
+			/** Best guess for error types... */
+			override String visitError(ErrorType declType, Void v) {
+				if (declType.typeArguments.nullOrEmpty) {
+					return typesRegistry.handleTypeElementNotFound(declType.toString, '''Cannot determine qualified name for error type «declType.toString»''')[
+						typesRegistry.tryToGetFqnForErrorType(declType)			
+					]
+					
+				} else {		
+					//In JDT, a generic type seem to be an ErrorType as soon as one of the type args is an ErrorType...
+					//-> Try erasure instead.
+					return declType.erasure.qualifiedName
+				}
+			}
+			
+			override String visitArray(ArrayType type, Void v) {
+				'''«type.componentType.qualifiedName»[]'''
+			}
+		}, null);
 	}
 
-	def dispatch String qualifiedName(ArrayType type) {
-		'''«type.componentType.qualifiedName»[]'''
+	def String simpleName(TypeMirror type) {
+		type?.accept(new SimpleTypeVisitor8<String, Void>(type.toString) {
+			
+			override String visitDeclared(DeclaredType declType, Void v) {
+				if(declType instanceof GenDeclaredType) {
+					return declType.simpleName
+				}
+				declType.asTypeElement.simpleName.toString
+			}
+			
+			/** Best guess for error types... */
+			override String visitError(ErrorType declType, Void v) {
+				if (declType.typeArguments.nullOrEmpty) {
+					declType.simpleNameForErrorType  //TODO: Das ist bei inner classes nicht wirklich der simple name sondern das Symbol wie im Quelltext, also ggf mit umgebender Klasse
+				} else {
+		
+					//In JDT, a generic type seems to be an ErrorType as soon as one of the type args is an ErrorType...
+					//-> Try erasure instead.
+					declType.erasure.simpleName
+				}
+			}
+			
+			override String visitArray(ArrayType type, Void v) {
+				'''«type.componentType.simpleName»[]'''
+			}
+		}, null);
 	}
 
-	def dispatch String qualifiedName(PrimitiveType type) {
-		type.toString
-	}
-
-	def dispatch String simpleName(GenDeclaredType declType) {
-		declType.simpleName
-	}
-	
-	def dispatch String simpleName(DeclaredType declType) {
-		declType.asTypeElement.simpleName.toString
-	}
-
-	/** Best guess for error types... */
-	def dispatch String simpleName(ErrorType declType) {
-		if (declType.typeArguments.nullOrEmpty) {
-			declType.simpleNameForErrorType  //TODO: Das ist bei inner classes nicht wirklich der simple name sondern das Symbol wie im Quelltext, also ggf mit umgebender Klasse
-		} else {
-
-			//In Elipse, a genric type seems to be an ErrorType as soon as one of the type args is an ErrorType...
-			//-> Try erasure instead.
-			declType.erasure.simpleName
-		}
-	}
-	
-	def dispatch String simpleName(ArrayType type) {
-		'''«type.componentType.simpleName»[]'''
-	}
-	
-
-	def dispatch String simpleName(PrimitiveType type) {
-		type.toString
-	}
 
 	def boolean operator_equals(TypeMirror t1, TypeMirror t2) {
 		if (t1 === null || t2 === null) {
@@ -446,50 +434,26 @@ class TypesExtensions /**implements Types*/{
 	
 	
 	def boolean isSubtype(TypeMirror t1, TypeMirror t2) {
-		//TODO: Das sollte auch bei allen anderen Mehtoden getan werden, z.B. isSameType. 
+		//TODO: Das sollte auch bei allen anderen Mehtoden getan werden, z.B. isSameType. (Wirklich?)
 		//Es ist sinnlos, über nicht existierende Typen Aussagen bzgl ihrer Supertypen usw. machen zu wollen.
 		//javac scheint z.B. immer true zu liefern, wenn man auf einem ErrorType isSubtype aufruft...
 		isSubtypeInternal(t1.resolveIfErrorType, t2.resolveIfErrorType);
 	}
-
-	def dispatch boolean isSubtypeInternal(GenDeclaredType t1, TypeMirror t2) {
-		if(!(t2 instanceof DeclaredType)){
-			return false;
-		}
-		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtypeInternal(t2)  //TODO: What about type args here?
-	}
-	
-	def dispatch boolean isSubtypeInternal(DeclaredType t1, GenTypeMirror t2) {
-		if(!(t2 instanceof DeclaredType)){
-			return false;
-		}
-		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtypeInternal(t2)  //TODO: What about type args here?
-	}
-	
-	def dispatch boolean isSubtypeInternal(GenTypeMirror t1, TypeMirror t2) {
-		t1.isSameType(t2)
-	}
-	
-	def dispatch boolean isSubtypeInternal(TypeMirror t1, GenTypeMirror t2) {
-		t1.isSameType(t2)
-	}
-	
-	def dispatch boolean isSubtypeInternal(TypeMirror t1, TypeMirror t2) {
-		typeUtils.isSubtype(t1, t2)
+		
+	def private boolean isSubtypeInternal(TypeMirror t1, TypeMirror t2) {
+		if (t1 instanceof GenTypeMirror || t2 instanceof GenTypeMirror) {
+			t1.isSameType(t2) || t1.isDeclared && t2.isDeclared && t1.asTypeElement.superclass.isSubtypeInternal(t2) // TODO: What about type args here?
+		} else
+			typeUtils.isSubtype(t1, t2)
 	}
 	
 	def unboxedType(TypeMirror t) {
 		typeUtils.unboxedType(t)
 	}
 
+	def private resolveIfErrorType(TypeMirror t) {
+		if(t?.kind == TypeKind.ERROR) t.asTypeElement.asType else t		
+	}
 
-	def private dispatch resolveIfErrorType(ErrorType t) {
-		t.asTypeElement.asType
-	}
-	
-	def private dispatch resolveIfErrorType(TypeMirror t) {
-		t
-	}
-	
 
 }

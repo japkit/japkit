@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>com.github.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.13</version>
+		<version>1.14</version>
 	</parent>
 	<artifactId>japkit-xtend-parent</artifactId>
 	<name>Japkit Annotation Processor - Xtend modules parent pom</name>
 	<packaging>pom</packaging>
 	<properties>
-        <xtend.version>2.11.0</xtend.version>
+        <xtend.version>2.13.0</xtend.version>
 	</properties>
 	<build>
 		<plugins>

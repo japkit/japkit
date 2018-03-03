@@ -6,11 +6,11 @@ import java.util.ArrayList
 import java.util.Map
 import javax.el.FunctionMapper
 import net.bytebuddy.ByteBuddy
-import net.bytebuddy.dynamic.ClassLoadingStrategy
-import net.bytebuddy.instrumentation.MethodDelegation
-import net.bytebuddy.modifier.MethodArguments
-import net.bytebuddy.modifier.Ownership
-import net.bytebuddy.modifier.Visibility
+import net.bytebuddy.description.modifier.MethodArguments
+import net.bytebuddy.description.modifier.Ownership
+import net.bytebuddy.description.modifier.Visibility
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy
+import net.bytebuddy.implementation.MethodDelegation
 import org.eclipse.xtend.lib.annotations.Data
 
 /**
@@ -63,11 +63,10 @@ class DynamicFunctionMapper extends FunctionMapper {
 			class.package.name + ".functioninvokers." + functionName.toFirstUpper).defineMethod(
 			"invoke",
 			Object,
-			argTypes,
 			MethodArguments.VARARGS,
 			Ownership.STATIC,
 			Visibility.PUBLIC
-		).intercept(MethodDelegation.to(invoker)).make().load(class.classLoader, ClassLoadingStrategy.Default.WRAPPER).
+		).withParameters(argTypes).intercept(MethodDelegation.to(invoker)).make().load(class.classLoader, ClassLoadingStrategy.Default.WRAPPER).
 			getLoaded()
 
 		val method = invokerClass.getMethod("invoke", typeof(Object[]))
