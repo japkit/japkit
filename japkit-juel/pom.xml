@@ -5,7 +5,7 @@
 		<relativePath>../japkit-xtend-parent/pom.xml</relativePath>
 		<groupId>com.github.japkit</groupId>
 		<artifactId>japkit-xtend-parent</artifactId>
-		<version>1.15-SNAPSHOT</version>
+		<version>1.14</version>
 	</parent>
 	<artifactId>japkit-juel</artifactId>
 	<name>Japkit Annotation Processor - JUEL EL Provider</name>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.github.japkit</groupId>
 			<artifactId>japkit-annotation-processor</artifactId>
-			<version>1.15-SNAPSHOT</version>
+			<version>1.14</version>
 		</dependency>
 
 		<dependency>
