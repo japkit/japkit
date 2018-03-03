@@ -189,15 +189,14 @@ class MatcherRule extends AbstractFunctionRule<Boolean> {
 		type.getTypeArg(argIndex).typeElementHasAllAnnotations(annotations)
 	}
 
-	def private dispatch boolean typeElementHasAllAnnotations(DeclaredType type, DeclaredType[] annotations) {
+	def private boolean typeElementHasAllAnnotations(TypeMirror type, DeclaredType[] annotations) {
+		if(!type.isDeclaredOrError ) return annotations.nullOrEmpty;
+		
 		handleTypeElementNotFound(true, '''Matcher cannot determine annotations of type «type»''') [
 			type !== null && type.asTypeElement.hasAllAnnotations(annotations)
 		]
 	}
 
-	def private dispatch boolean typeElementHasAllAnnotations(TypeMirror type, DeclaredType[] annotations) {
-		annotations.nullOrEmpty
-	}
 
 	def private boolean hasAllAnnotations(Element e, DeclaredType[] annotations) {
 		annotations.forall[e.hasAnnotation(it)]

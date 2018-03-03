@@ -60,6 +60,10 @@ class TypesExtensions /**implements Types*/{
 		return type.isDeclared || type.isError && (type as DeclaredType).erasure.isDeclared 
 	}
 
+	def isDeclaredOrError(TypeMirror type) {
+		return type.isDeclared || type.isError
+	}
+
 	static val BOXED_TYPES = #{Boolean, Byte, Short, Integer, Long, Character, Float, Double}.map[name].toSet
 
 	def isBoxed(TypeMirror type) {
@@ -114,15 +118,15 @@ class TypesExtensions /**implements Types*/{
 		type.isPrimitive && type == TypeKind.BOOLEAN.primitiveType || type.isDeclared && type == TypeKind.BOOLEAN.boxed
 	}
 	
-	def dispatch getTypeArg(DeclaredType type, int argIndex){
-		if(argIndex >= type.typeArguments.size ){
+	def dispatch TypeMirror getTypeArg(DeclaredType type, int argIndex){
+		if(!type.isDeclaredOrError || argIndex >= type.typeArguments.size ){
 			null
 		} else {
 			type.typeArguments.get(argIndex)
 		}
 	}
 	
-	def dispatch getTypeArg(TypeMirror type, int argIndex){
+	def dispatch TypeMirror getTypeArg(TypeMirror type, int argIndex){
 		null
 	}
 	
@@ -251,22 +255,21 @@ class TypesExtensions /**implements Types*/{
 		
 	}
 	
+	def private boolean containsErrorType(TypeMirror type) {
+		return type.accept(new SimpleTypeVisitor8<Boolean, Void>(false) {
+			override Boolean visitError(ErrorType t, Void v) {
+				true
+			}
 
-	def dispatch boolean containsErrorType(ErrorType t) {
-		true
-	}
+			override Boolean visitDeclared(DeclaredType t, Void v) {
+				t.typeArguments.exists[containsErrorType]
+			}
 
-	def dispatch boolean containsErrorType(DeclaredType t) {
-		t.typeArguments.exists[containsErrorType]
-	}
-
-	def dispatch boolean containsErrorType(WildcardType t) {
-		(t.extendsBound !== null && t.extendsBound.containsErrorType) ||
-			(t.superBound !== null && t.superBound.containsErrorType)
-	}
-
-	def dispatch boolean containsErrorType(TypeMirror t) {
-		false
+			override Boolean visitWildcard(WildcardType t, Void v) {
+				(t.extendsBound !== null && t.extendsBound.containsErrorType) ||
+					(t.superBound !== null && t.superBound.containsErrorType)
+			}
+		}, null);
 	}
 
 	def DeclaredType enclosingTopLevelType(DeclaredType declType) {
@@ -431,36 +434,17 @@ class TypesExtensions /**implements Types*/{
 	
 	
 	def boolean isSubtype(TypeMirror t1, TypeMirror t2) {
-		//TODO: Das sollte auch bei allen anderen Mehtoden getan werden, z.B. isSameType. 
+		//TODO: Das sollte auch bei allen anderen Mehtoden getan werden, z.B. isSameType. (Wirklich?)
 		//Es ist sinnlos, über nicht existierende Typen Aussagen bzgl ihrer Supertypen usw. machen zu wollen.
 		//javac scheint z.B. immer true zu liefern, wenn man auf einem ErrorType isSubtype aufruft...
 		isSubtypeInternal(t1.resolveIfErrorType, t2.resolveIfErrorType);
 	}
-
-	def dispatch boolean isSubtypeInternal(GenDeclaredType t1, TypeMirror t2) {
-		if(!(t2 instanceof DeclaredType)){
-			return false;
-		}
-		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtypeInternal(t2)  //TODO: What about type args here?
-	}
-	
-	def dispatch boolean isSubtypeInternal(DeclaredType t1, GenTypeMirror t2) {
-		if(!(t2 instanceof DeclaredType)){
-			return false;
-		}
-		t1.isSameType(t2) || t1.asTypeElement.superclass.isSubtypeInternal(t2)  //TODO: What about type args here?
-	}
-	
-	def dispatch boolean isSubtypeInternal(GenTypeMirror t1, TypeMirror t2) {
-		t1.isSameType(t2)
-	}
-	
-	def dispatch boolean isSubtypeInternal(TypeMirror t1, GenTypeMirror t2) {
-		t1.isSameType(t2)
-	}
-	
-	def dispatch boolean isSubtypeInternal(TypeMirror t1, TypeMirror t2) {
-		typeUtils.isSubtype(t1, t2)
+		
+	def private boolean isSubtypeInternal(TypeMirror t1, TypeMirror t2) {
+		if (t1 instanceof GenTypeMirror || t2 instanceof GenTypeMirror) {
+			t1.isSameType(t2) || t1.isDeclared && t2.isDeclared && t1.asTypeElement.superclass.isSubtypeInternal(t2) // TODO: What about type args here?
+		} else
+			typeUtils.isSubtype(t1, t2)
 	}
 	
 	def unboxedType(TypeMirror t) {
