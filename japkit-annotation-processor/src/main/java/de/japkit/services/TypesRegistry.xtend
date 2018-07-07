@@ -708,11 +708,22 @@ class TypesRegistry {
 				}
 
 				val e = declType.asElement
-				
+							
 				if (e instanceof TypeElement) {
+					var te = e
+					
+					// Due to https://bugs.eclipse.org/bugs/show_bug.cgi?id=498022
+					// Forces "clean resolve" of the type element
+					if(te.class.name.startsWith("org.eclipse.jdt.")) {
+						te = getTypeElement(te.qualifiedName);
+					}
+					if(te === null) {
+						//should not happen
+						throw new TypeElementNotFoundException(declType.erasure.toString)
+					}
 					//Even if we find the type element, we prefer the generated one, since it is newer.
 					//This is relevant during incremental build.
-					findGenTypeElementForFqn(e.qualifiedName.toString) ?: e
+					findGenTypeElementForFqn(te.qualifiedName.toString) ?: te
 				} else {
 					//should not happen
 					throw new TypeElementNotFoundException(declType.erasure.toString)

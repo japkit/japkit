@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>com.github.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.14</version>
+		<version>1.15</version>
 	</parent>
 	<artifactId>japkit-xtend-parent</artifactId>
 	<name>Japkit Annotation Processor - Xtend modules parent pom</name>
 	<packaging>pom</packaging>
 	<properties>
-        <xtend.version>2.13.0</xtend.version>
+		<xtend.version>2.13.0</xtend.version>
 	</properties>
 	<build>
 		<plugins>
@@ -18,6 +18,14 @@
 				<groupId>org.eclipse.xtend</groupId>
 				<artifactId>xtend-maven-plugin</artifactId>
 				<version>${xtend.version}</version>
+				<dependencies>
+					<!-- https://github.com/eclipse/xtext/issues/1231#issuecomment-401125569 -->
+					<dependency>
+						<groupId>org.eclipse.platform</groupId>
+						<artifactId>org.eclipse.equinox.common</artifactId>
+						<version>3.10.0</version>
+					</dependency>
+				</dependencies>
 				<executions>
 					<execution>
 						<goals>

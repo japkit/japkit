@@ -148,17 +148,9 @@ class TypeResolver {
 	def private TypeMirror resolveTypeFunctionIfNecessary(DeclaredType type) {
 
 		if (!(type instanceof ErrorType)) {
-			// zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): Arrays mit UnresolvedTypeBindings werden nicht resolved.
-			// TODO: Ist das schon in ElementsExtensions geregelt?
-			var TypeElement te = type.asTypeElement
-			if (!(type instanceof GenDeclaredType)) {
-				te = getTypeElement(te.qualifiedName)
-				if (te === null) {
-					throw new TypeElementNotFoundException(te.qualifiedName.toString)
-				}
-			}
-			val teFinal = te
-
+			
+			val TypeElement te = type.asTypeElement
+			
 			// if it is a function, call it and return the resulting type
 			val function = createFunctionRule(te);
 
@@ -170,11 +162,11 @@ class TypeResolver {
 					if (function instanceof AbstractFunctionRule<?> &&
 						(function as AbstractFunctionRule<?>).mustBeCalledWithParams) {
 						// The type function accepts parameters (for example, a @Switch). Call the function with the resolved type args
-						asTypeMirror(teFinal, (function as AbstractFunctionRule<?>).evalWithParams(resolvedTypeArgs))
+						asTypeMirror(te, (function as AbstractFunctionRule<?>).evalWithParams(resolvedTypeArgs))
 					} else {
 						// The type function does not accept parameters. If there are some, use only the raw type of the function result 
 						// and append the parameters. 
-						val raw = asTypeMirror(teFinal, function.apply)
+						val raw = asTypeMirror(te, function.apply)
 						if (resolvedTypeArgs.nullOrEmpty) {
 							raw
 						} else {

@@ -150,6 +150,12 @@ class TypesExtensions /**implements Types*/{
 				}
 			}
 			
+			//In JDT, something like List<SomeErrorType> is itself an error type.
+			//Thus, error types must be treated like DeclaredType.
+			override TypeMirror visitError(ErrorType type, Void v) {
+				visitDeclared(type, v)
+			}
+			
 			override TypeMirror visitArray(ArrayType type, Void v) {
 				type.componentType.singleValueType
 			}
