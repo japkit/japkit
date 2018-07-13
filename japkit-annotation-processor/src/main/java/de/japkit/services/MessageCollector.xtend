@@ -20,7 +20,6 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 import javax.tools.Diagnostic
-import java.util.ArrayList
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -96,37 +95,37 @@ class MessageCollector {
 			var String paramName = null;
 			
 			try{
-				val typeElement = getTypeElement(m.typeElementFqn)
-				if(m.uniqueMemberName !== null){	
-					val enclosedElementsAndParams = typeElement.elementAndAllEnclosedElements(true)
-					element = enclosedElementsAndParams.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]
-					if(element instanceof ParameterWrapper) {
-						enclosingExecutableElement = element.enclosingElement
-						paramName = element.name?.toString
-						element = element.delegate						
+				if(m.typeElementFqn !== null) {
+					val typeElement = getTypeElement(m.typeElementFqn)
+					if(m.uniqueMemberName !== null){	
+						val enclosedElementsAndParams = typeElement.elementAndAllEnclosedElements(true)
+						element = enclosedElementsAndParams.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]
+						if(element instanceof ParameterWrapper) {
+							enclosingExecutableElement = element.enclosingElement
+							paramName = element.name?.toString
+							element = element.delegate						
+						}
+					} else {
+						element = typeElement
 					}
-				} else {
-					element = typeElement
+					
+					if (element !== null && m.annotationFqn !== null) {
+						val rootAnnotation = element.annotationMirrors.findFirst [
+							(annotationType.asElement as TypeElement).qualifiedName.contentEquals(m.annotationFqn)
+						]
+	
+						annotation = if(supportsNestedAnnotations) getNestedAnnotation(rootAnnotation,
+							m.nestedAnnotationPath) else rootAnnotation
+	
+						annotationValue = annotation?.getValue(
+							// If the messager does not support nested annotations, only use the first path segment to determine the AV
+							if(supportsNestedAnnotations) m.avName else m.nestedAnnotationPath?.segments?.get(0)?.name ?:
+								m.avName,
+							null
+						)
+	
+					}			
 				}
-				
-				if (element !== null && m.annotationFqn !== null) {
-					val rootAnnotation = element.annotationMirrors.findFirst [
-						(annotationType.asElement as TypeElement).qualifiedName.contentEquals(m.annotationFqn)
-					]
-
-					annotation = if(supportsNestedAnnotations) getNestedAnnotation(rootAnnotation,
-						m.nestedAnnotationPath) else rootAnnotation
-
-					annotationValue = annotation?.getValue(
-						// If the messager does not support nested annotations, only use the first path segment to determine the AV
-						if(supportsNestedAnnotations) m.avName else m.nestedAnnotationPath?.segments?.get(0)?.name ?:
-							m.avName,
-						null
-					)
-
-				}
-
-
 			} catch (Exception e) {
 				messager.printMessage(Diagnostic.Kind.ERROR, 
 					'''Error during error reporting: «e», cause: «e.rootCause.message» 
