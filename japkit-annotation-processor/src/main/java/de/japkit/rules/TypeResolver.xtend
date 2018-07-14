@@ -43,7 +43,7 @@ class TypeResolver {
 	}
 
 	def private TypeMirror createTypeIfNecessary(TypeMirror type, List<? extends TypeMirror> typeArgs) {
-		if (type === null || typeArgs.nullOrEmpty || !(type instanceof DeclaredType)) {
+		if (type === null || typeArgs.nullOrEmpty || !(type.isDeclared || type.isError)) {
 			type
 		} else {
 			getDeclaredType(type.asElement, typeArgs)
@@ -82,8 +82,8 @@ class TypeResolver {
 			override TypeMirror visitDeclared(DeclaredType typeOrTypeFunction, Boolean required) {
 				val typeFunctionResult = resolveTypeFunctionIfNecessary(typeOrTypeFunction)
 
-				if (typeFunctionResult instanceof DeclaredType)
-					typeFunctionResult.resolveType_(required)
+				if (typeFunctionResult.isDeclared || typeFunctionResult.isError)
+					(typeFunctionResult as DeclaredType).resolveType_(required)
 				else
 					typeFunctionResult?.resolveType(required)
 			}
@@ -147,7 +147,7 @@ class TypeResolver {
 	 */
 	def private TypeMirror resolveTypeFunctionIfNecessary(DeclaredType type) {
 
-		if (!(type instanceof ErrorType)) {
+		if (!type.isError) {
 			
 			val TypeElement te = type.asTypeElement
 			

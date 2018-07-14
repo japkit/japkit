@@ -805,7 +805,7 @@ class TypesRegistry {
 		annotatedClasses.map[findTypeElement]
 			.filter[it !== null]
 			//Eclipse sometimes returns TypeElements for non-existing types, instead of null	
-			.filter[!(it.asType instanceof ErrorType)]
+			.filter[it.asType.kind !== TypeKind.ERROR]
 		
 	}
 
@@ -848,7 +848,7 @@ class TypesRegistry {
 		val elements = typeFqns.map[findTypeElement]
 			.filter[it !== null]
 			//Eclipse sometimes returns TypeElements for non-existing types, instead of null	
-			.filter[!(it.asType instanceof ErrorType)]
+			.filter[it.asType.kind !== TypeKind.ERROR]
 			//make sure they really have the requested annotation
 			.filter[annotationMirror(triggerFqn) !== null]  
 		

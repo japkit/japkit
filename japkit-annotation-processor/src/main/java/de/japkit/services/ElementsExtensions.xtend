@@ -460,7 +460,7 @@ class ElementsExtensions {
 			throw new TypeElementNotFoundException(TypeElementNotFoundException.UNKNOWN_TYPE, "Error in annotation value: "+av+". Could not determine the missing type.");
 		}
 		
-		if(v instanceof DeclaredType && !(v instanceof ErrorType) && v.class.canonicalName.startsWith("org.eclipse.jdt")){
+		if(v instanceof DeclaredType && (v as DeclaredType).isDeclared && v.class.canonicalName.startsWith("org.eclipse.jdt")){
 			try{
 				//In Eclipse: zusätzlicher Aufruf von getTypeElement wegen Bug in UnresolvedAnnotationBinding.getElementValuePairs(): 
 				//Arrays mit UnresolvedTypeBindings werden nicht resolved.	
@@ -747,9 +747,9 @@ class ElementsExtensions {
 	}
 	
 	def coerceAnnotationValue(Object value, TypeMirror avType) {
-		if (avType instanceof ArrayType) {
+		if (avType.kind === TypeKind.ARRAY) {
 
-			val compType = avType.componentType
+			val compType = (avType as ArrayType).componentType
 
 			if (value instanceof Iterable<?>) {
 				value.map [

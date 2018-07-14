@@ -342,7 +342,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext {
 
 				override CharSequence visitDeclared(DeclaredType type, Void p) {
 
-					val rawType = if (type.erasure instanceof ErrorType) {
+					val rawType = if (type.erasure.isError) {
 							// The type itself is an error type
 							val simpleName = type.erasure.simpleNameForErrorType
 //			if(simpleName.contains('.')){
@@ -386,7 +386,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext {
 		if (type === null) {
 			"void"
 		} else {
-			val te = if(type instanceof DeclaredType && !(type instanceof ErrorType)) type.asTypeElement else null;
+			val te = if(type.isDeclared) type.asTypeElement else null;
 			importIfPossibleAndGetNameForCode(te, type.simpleName.toString, type.qualifiedName.toString)
 		}
 	}
