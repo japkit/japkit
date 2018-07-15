@@ -407,9 +407,16 @@ class TypesRegistry {
 		errorType.simpleName
 	}
 	
-	def dispatch getSimpleNameForErrorType(TypeMirror errorType){
-		
-		val name = errorType.toString
+	def dispatch getSimpleNameForErrorType(TypeMirror errorType){	
+		errorType.guessTypeNameFromToString	
+	}
+	
+	/**
+	 * Best guess to get the type name from the toString() Method. Since toString() might contain type annotations,
+	 * we split be space and return the last element.
+	 */
+	def guessTypeNameFromToString(TypeMirror errorType) {
+		val name = errorType.toString().trim().split("\\s+").last
 		
 		if(name.startsWith("<any?>.")){
 			//Javac
@@ -765,20 +772,10 @@ class TypesRegistry {
 		}, null)
 		
 	}
-	
 
-	
-	
-	
-
-	
-	
-	
 	//Key is FQN of trigger annotation and shadow flag. 
 	//Value is set of all annotated classes that genrically depend on that trigger. That is, they shall be regernerated,
 	//if anything changes regarding the classes with the trigger annotation. 
-	
-
 	val Map<Pair<String, Boolean>, Set<String>> genericTriggerDependencies = newHashMap
 	
 	def boolean hasGenericDependencyOnTriggerShadowAnnotation(TypeElement annotatedClass, Iterable<AnnotationMirror> triggers){

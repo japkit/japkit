@@ -26,14 +26,6 @@ import org.apache.commons.lang3.StringEscapeUtils
 import org.eclipse.xtend2.lib.StringConcatenation
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import javax.lang.model.type.TypeVisitor
-import javax.lang.model.type.ExecutableType
-import javax.lang.model.type.IntersectionType
-import javax.lang.model.type.NoType
-import javax.lang.model.type.NullType
-import javax.lang.model.type.PrimitiveType
-import javax.lang.model.type.TypeVariable
-import javax.lang.model.type.UnionType
 import javax.lang.model.util.SimpleTypeVisitor8
 
 class JavaEmitter implements de.japkit.model.EmitterContext {
@@ -56,6 +48,11 @@ class JavaEmitter implements de.japkit.model.EmitterContext {
 	}
 
 	def importIfPossible(String shortName, String fqn) {
+		if(shortName == fqn) {
+			//No Import necessary.
+			//Especially for unresolved types, that might be the case
+			return true;
+		}
 		if (!imports.containsKey(shortName) && !isShadowedOrDeclared(currentTypeElement.get, shortName)) {
 			imports.put(shortName, fqn)
 		}

@@ -284,7 +284,7 @@ class TypesExtensions /**implements Types*/{
 	}
 
 	def String qualifiedName(TypeMirror type) {
-		type?.accept(new SimpleTypeVisitor8<String, Void>(type.toString) {
+		type?.accept(new SimpleTypeVisitor8<String, Void>(type.guessTypeNameFromToString) {
 			
 			override String visitDeclared(DeclaredType declType, Void v) {
 				if(declType instanceof GenDeclaredType) {
@@ -296,7 +296,7 @@ class TypesExtensions /**implements Types*/{
 			/** Best guess for error types... */
 			override String visitError(ErrorType declType, Void v) {
 				if (declType.typeArguments.nullOrEmpty) {
-					return typesRegistry.handleTypeElementNotFound(declType.toString, '''Cannot determine qualified name for error type «declType.toString»''')[
+					return typesRegistry.handleTypeElementNotFound(declType.guessTypeNameFromToString, '''Cannot determine qualified name for error type «declType.guessTypeNameFromToString»''')[
 						typesRegistry.tryToGetFqnForErrorType(declType)			
 					]
 					
