@@ -36,6 +36,7 @@ import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
 import static extension de.japkit.rules.JavadocUtil.*
+import de.japkit.model.GenUnresolvedType
 
 /** Many rules have common components, for example annotation mappings or setting modifiers. This class provides
  * those common components as reusable closures. Each one establishes as certain naming convention for the according
@@ -440,7 +441,7 @@ class RuleUtils {
 				}
 			} catch (TypeElementNotFoundException tenfe) {
 				handleTypeElementNotFound('''TypeElement not found for «template?.simpleName ?: avName».''', tenfe.fqn);
-				null
+				new GenUnresolvedType(tenfe.fqn, false)
 			}
 		]
 	}
