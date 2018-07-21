@@ -42,10 +42,12 @@ class TypesRegistry {
 
 	val transient extension Types = ExtensionRegistry.get(Types)
 	//val transient extension Elements = ExtensionRegistry.get(Elements)
-	val transient extension TypeElementFromCompilerCache = ExtensionRegistry.get(TypeElementFromCompilerCache)
+	
 	val transient extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
 	val MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	
+	val TypeElementFromCompilerCache typeElementCache= ExtensionRegistry.get(TypeElementFromCompilerCache)
 
 	new(){
 		load	
@@ -56,7 +58,7 @@ class TypesRegistry {
 	}
 
 	def markAsGenerated(GenTypeElement typeElement, TypeElement original) {
-		val genAnno = new GenAnnotationMirror(getTypeElement(getGenAnnotationFqn()).asType as DeclaredType) => [
+		val genAnno = new GenAnnotationMirror(typeElementCache.getTypeElement(getGenAnnotationFqn()).asType as DeclaredType) => [
 			setValue("src", new GenAnnotationValue(original.qualifiedName.toString))
 		]
 		typeElement.addAnnotationMirror(genAnno)
@@ -81,7 +83,7 @@ class TypesRegistry {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 		val fqn = am.value("src", String)
 
-		fqn.getTypeElement
+		typeElementCache.getTypeElement(fqn)
 	}
 	
 	def clearCaches() {
@@ -615,8 +617,8 @@ class TypesRegistry {
 				(annotatedClassForType === null || !annotatedClassesInSameCycle.contains(annotatedClassForType)) && 
 				{ 
 					//TODO: Das ist evtl. etwas ineffizient. Wir wissen i.d.R. schon beim Registrieren der dependency, ob der typ bereits existiert oder nicht.
-					val te = elementUtils.getTypeElement(it) //Eclipse may return MissingTypeElement here. Therfore the additional check in next line.
-					te === null || te.asType instanceof ErrorType 
+					val te = typeElementCache.getTypeElement(it) //Eclipse may return MissingTypeElement here. Therfore the additional check in next line.
+					te === null || te.asType.kind === TypeKind.ERROR
 					
 				}
 				
@@ -723,7 +725,7 @@ class TypesRegistry {
 					// Due to https://bugs.eclipse.org/bugs/show_bug.cgi?id=498022
 					// Forces "clean resolve" of the type element
 					if(te.class.name.startsWith("org.eclipse.jdt.")) {
-						te = getTypeElement(te.qualifiedName.toString);
+						te = typeElementCache.getTypeElement(te.qualifiedName.toString);
 					}
 					if(te === null) {
 						//should not happen
@@ -859,7 +861,7 @@ class TypesRegistry {
 
 	//Finding type element by FQN. 
 	def TypeElement findTypeElement(String typeFqn) {
-			findGenTypeElementForFqn(typeFqn) ?: elementUtils.getTypeElement(typeFqn)
+			findGenTypeElementForFqn(typeFqn) ?: typeElementCache.getTypeElement(typeFqn)
 	}
 	
 	def TypeElement findGenTypeElementForShortName(String shortname){

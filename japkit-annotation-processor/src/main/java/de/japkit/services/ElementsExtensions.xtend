@@ -53,6 +53,8 @@ class ElementsExtensions {
 	val transient extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
 	val MessageCollector mc = ExtensionRegistry.get(MessageCollector)
 	val Elements elementUtils = ExtensionRegistry.get(Elements)
+	
+	val TypeElementFromCompilerCache typeElementCache = ExtensionRegistry.get(TypeElementFromCompilerCache)
 
 	def hasType(Element e, TypeMirror type) {
 		e.asType == type;
@@ -1050,7 +1052,7 @@ class ElementsExtensions {
 
 	//Note: Callers currently rely on not throwning tenfe here
 	def getTypeElement(CharSequence name) {
-		elementUtils.getTypeElement(name)
+		typeElementCache.getTypeElement(name?.toString)
 	}
 
 	def hides(Element hider, Element hidden) {
