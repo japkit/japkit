@@ -41,7 +41,8 @@ import javax.lang.model.type.TypeKind
 class TypesRegistry {
 
 	val transient extension Types = ExtensionRegistry.get(Types)
-	val transient extension Elements = ExtensionRegistry.get(Elements)
+	//val transient extension Elements = ExtensionRegistry.get(Elements)
+	val transient extension TypeElementFromCompilerCache = ExtensionRegistry.get(TypeElementFromCompilerCache)
 	val transient extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
 	val MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
@@ -722,7 +723,7 @@ class TypesRegistry {
 					// Due to https://bugs.eclipse.org/bugs/show_bug.cgi?id=498022
 					// Forces "clean resolve" of the type element
 					if(te.class.name.startsWith("org.eclipse.jdt.")) {
-						te = getTypeElement(te.qualifiedName);
+						te = getTypeElement(te.qualifiedName.toString);
 					}
 					if(te === null) {
 						//should not happen

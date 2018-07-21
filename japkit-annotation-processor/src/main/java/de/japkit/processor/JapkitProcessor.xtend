@@ -33,6 +33,7 @@ import javax.tools.Diagnostic.Kind
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 import de.japkit.services.ReportedException
+import de.japkit.services.TypeElementFromCompilerCache
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -54,6 +55,8 @@ class JapkitProcessor extends AbstractProcessor {
 	extension TypesRegistry typesRegistry
 	extension RuleFactory ruleFactory
 	extension ELSupport elSupport
+	
+	extension TypeElementFromCompilerCache typeElementCache
 
 	//annotated classes that have to be re-considered in a later round
 	val Map<String, TypeElementNotFoundException> deferredClasses = new HashMap
@@ -89,6 +92,7 @@ class JapkitProcessor extends AbstractProcessor {
 	
 			generateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	
+			typeElementCache =  ExtensionRegistry.get(TypeElementFromCompilerCache)
 			typesRegistry = ExtensionRegistry.get(TypesRegistry)
 			ruleFactory = ExtensionRegistry.get(RuleFactory)
 			elSupport = ExtensionRegistry.get(ELSupport)	
@@ -124,6 +128,7 @@ class JapkitProcessor extends AbstractProcessor {
 		//The rules cannot be reused in later rounds since they contain references to elements that are no longer valid.
 		ruleFactory.clearCaches
 		typesRegistry.clearCaches
+		typeElementCache.clear
 
 		val startTime = System.currentTimeMillis
 
