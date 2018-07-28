@@ -26,15 +26,9 @@ import org.apache.commons.lang3.StringEscapeUtils
 import org.eclipse.xtend2.lib.StringConcatenation
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import javax.lang.model.type.TypeVisitor
-import javax.lang.model.type.ExecutableType
-import javax.lang.model.type.IntersectionType
-import javax.lang.model.type.NoType
-import javax.lang.model.type.NullType
-import javax.lang.model.type.PrimitiveType
-import javax.lang.model.type.TypeVariable
-import javax.lang.model.type.UnionType
 import javax.lang.model.util.SimpleTypeVisitor8
+import javax.lang.model.type.PrimitiveType
+import javax.lang.model.type.NoType
 
 class JavaEmitter implements de.japkit.model.EmitterContext {
 
@@ -56,6 +50,11 @@ class JavaEmitter implements de.japkit.model.EmitterContext {
 	}
 
 	def importIfPossible(String shortName, String fqn) {
+		if(shortName == fqn) {
+			//No Import necessary.
+			//Especially for unresolved types, that might be the case
+			return true;
+		}
 		if (!imports.containsKey(shortName) && !isShadowedOrDeclared(currentTypeElement.get, shortName)) {
 			imports.put(shortName, fqn)
 		}
@@ -336,13 +335,20 @@ class JavaEmitter implements de.japkit.model.EmitterContext {
 			type.accept(new SimpleTypeVisitor8<CharSequence, Void>() {
 
 				override defaultAction(TypeMirror type, Void p) {
-
-					type.toString
+					'''/* Unsuported type: «type.toString» */ Object'''
+				}
+				
+				override CharSequence visitPrimitive(PrimitiveType type, Void p) {
+					type.kind.toString.toLowerCase
+				}
+				
+				override CharSequence visitNoType(NoType type, Void p) {
+					type.kind.toString.toLowerCase
 				}
 
 				override CharSequence visitDeclared(DeclaredType type, Void p) {
 
-					val rawType = if (type.erasure instanceof ErrorType) {
+					val rawType = if (type.erasure.isError) {
 							// The type itself is an error type
 							val simpleName = type.erasure.simpleNameForErrorType
 //			if(simpleName.contains('.')){
@@ -386,7 +392,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext {
 		if (type === null) {
 			"void"
 		} else {
-			val te = if(type instanceof DeclaredType && !(type instanceof ErrorType)) type.asTypeElement else null;
+			val te = if(type.isDeclared) type.asTypeElement else null;
 			importIfPossibleAndGetNameForCode(te, type.simpleName.toString, type.qualifiedName.toString)
 		}
 	}

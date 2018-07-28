@@ -26,6 +26,7 @@ import de.japkit.metaannotations.Not
 import de.japkit.services.MessageCollector
 import de.japkit.metaannotations.Clazz
 import de.japkit.metaannotations.InnerClass
+import de.japkit.services.TypeElementNotFoundException
 
 class RuleFactory {
 	
@@ -123,9 +124,14 @@ class RuleFactory {
 		]
 	
 	def private createFunctionInternal(Element element){
-		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
-		val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key !== null]
-		factory?.value?.apply(factory.key, element)
+		try {
+			val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+			val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key !== null]
+			factory?.value?.apply(factory.key, element)
+		} catch (TypeElementNotFoundException tenfe) {
+			//Unknown Types are never functions.
+			return null;
+		}
 	}
 	
 
@@ -137,7 +143,7 @@ class RuleFactory {
 				cache.put(key, v)
 				v 
 			} catch (Exception e) {
-				ExtensionRegistry.get(MessageCollector).printDiagnosticMessage['''Exception whe creating Rule for «key»: «e»'''];
+				ExtensionRegistry.get(MessageCollector).printDiagnosticMessage['''Exception when creating Rule for «key»: «e»'''];
 				//Delete potential early registration if there was an exception during creation
 				cache.remove(key);
 				throw e

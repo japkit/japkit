@@ -41,10 +41,13 @@ import javax.lang.model.type.TypeKind
 class TypesRegistry {
 
 	val transient extension Types = ExtensionRegistry.get(Types)
-	val transient extension Elements = ExtensionRegistry.get(Elements)
+	//val transient extension Elements = ExtensionRegistry.get(Elements)
+	
 	val transient extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
 	val MessageCollector messageCollector = ExtensionRegistry.get(MessageCollector)
 	val transient extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
+	
+	val TypeElementFromCompilerCache typeElementCache= ExtensionRegistry.get(TypeElementFromCompilerCache)
 
 	new(){
 		load	
@@ -55,7 +58,7 @@ class TypesRegistry {
 	}
 
 	def markAsGenerated(GenTypeElement typeElement, TypeElement original) {
-		val genAnno = new GenAnnotationMirror(getTypeElement(getGenAnnotationFqn()).asType as DeclaredType) => [
+		val genAnno = new GenAnnotationMirror(typeElementCache.getTypeElement(getGenAnnotationFqn()).asType as DeclaredType) => [
 			setValue("src", new GenAnnotationValue(original.qualifiedName.toString))
 		]
 		typeElement.addAnnotationMirror(genAnno)
@@ -80,7 +83,7 @@ class TypesRegistry {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 		val fqn = am.value("src", String)
 
-		fqn.getTypeElement
+		typeElementCache.getTypeElement(fqn)
 	}
 	
 	def clearCaches() {
@@ -407,9 +410,16 @@ class TypesRegistry {
 		errorType.simpleName
 	}
 	
-	def dispatch getSimpleNameForErrorType(TypeMirror errorType){
-		
-		val name = errorType.toString
+	def dispatch getSimpleNameForErrorType(TypeMirror errorType){	
+		errorType.guessTypeNameFromToString	
+	}
+	
+	/**
+	 * Best guess to get the type name from the toString() Method. Since toString() might contain type annotations,
+	 * we split be space and return the last element.
+	 */
+	def guessTypeNameFromToString(TypeMirror errorType) {
+		val name = errorType.toString().trim().split("\\s+").last
 		
 		if(name.startsWith("<any?>.")){
 			//Javac
@@ -607,8 +617,8 @@ class TypesRegistry {
 				(annotatedClassForType === null || !annotatedClassesInSameCycle.contains(annotatedClassForType)) && 
 				{ 
 					//TODO: Das ist evtl. etwas ineffizient. Wir wissen i.d.R. schon beim Registrieren der dependency, ob der typ bereits existiert oder nicht.
-					val te = elementUtils.getTypeElement(it) //Eclipse may return MissingTypeElement here. Therfore the additional check in next line.
-					te === null || te.asType instanceof ErrorType 
+					val te = typeElementCache.getTypeElement(it) //Eclipse may return MissingTypeElement here. Therfore the additional check in next line.
+					te === null || te.asType.kind === TypeKind.ERROR
 					
 				}
 				
@@ -715,7 +725,7 @@ class TypesRegistry {
 					// Due to https://bugs.eclipse.org/bugs/show_bug.cgi?id=498022
 					// Forces "clean resolve" of the type element
 					if(te.class.name.startsWith("org.eclipse.jdt.")) {
-						te = getTypeElement(te.qualifiedName);
+						te = typeElementCache.getTypeElement(te.qualifiedName.toString);
 					}
 					if(te === null) {
 						//should not happen
@@ -765,20 +775,10 @@ class TypesRegistry {
 		}, null)
 		
 	}
-	
 
-	
-	
-	
-
-	
-	
-	
 	//Key is FQN of trigger annotation and shadow flag. 
 	//Value is set of all annotated classes that genrically depend on that trigger. That is, they shall be regernerated,
 	//if anything changes regarding the classes with the trigger annotation. 
-	
-
 	val Map<Pair<String, Boolean>, Set<String>> genericTriggerDependencies = newHashMap
 	
 	def boolean hasGenericDependencyOnTriggerShadowAnnotation(TypeElement annotatedClass, Iterable<AnnotationMirror> triggers){
@@ -805,7 +805,7 @@ class TypesRegistry {
 		annotatedClasses.map[findTypeElement]
 			.filter[it !== null]
 			//Eclipse sometimes returns TypeElements for non-existing types, instead of null	
-			.filter[!(it.asType instanceof ErrorType)]
+			.filter[it.asType.kind !== TypeKind.ERROR]
 		
 	}
 
@@ -848,7 +848,7 @@ class TypesRegistry {
 		val elements = typeFqns.map[findTypeElement]
 			.filter[it !== null]
 			//Eclipse sometimes returns TypeElements for non-existing types, instead of null	
-			.filter[!(it.asType instanceof ErrorType)]
+			.filter[it.asType.kind !== TypeKind.ERROR]
 			//make sure they really have the requested annotation
 			.filter[annotationMirror(triggerFqn) !== null]  
 		
@@ -861,7 +861,7 @@ class TypesRegistry {
 
 	//Finding type element by FQN. 
 	def TypeElement findTypeElement(String typeFqn) {
-			findGenTypeElementForFqn(typeFqn) ?: elementUtils.getTypeElement(typeFqn)
+			findGenTypeElementForFqn(typeFqn) ?: typeElementCache.getTypeElement(typeFqn)
 	}
 	
 	def TypeElement findGenTypeElementForShortName(String shortname){

@@ -151,9 +151,7 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 		var typeCandidate = type
 		
 		
-		if (typeCandidate instanceof DeclaredType && !(typeCandidate instanceof ErrorType)) {
-			
-			
+		if (typeCandidate.isDeclared && !typeCandidate.isError) {
 			val typeElement = typeCandidate.asTypeElement
 			typeCandidate = 
 			generatedTypeElementAccordingToTriggerAnnotation(typeElement, triggerAnnotationTypes, mustHaveTrigger)?.asType

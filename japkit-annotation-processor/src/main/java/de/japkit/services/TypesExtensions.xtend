@@ -27,6 +27,7 @@ import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import javax.lang.model.type.TypeVariable
 import javax.lang.model.util.SimpleTypeVisitor8
+import javax.lang.model.type.NoType
 
 class TypesExtensions /**implements Types*/{
 	val Types typeUtils = ExtensionRegistry.get(Types)
@@ -284,7 +285,18 @@ class TypesExtensions /**implements Types*/{
 	}
 
 	def String qualifiedName(TypeMirror type) {
-		type?.accept(new SimpleTypeVisitor8<String, Void>(type.toString) {
+		type?.accept(new SimpleTypeVisitor8<String, Void>() {
+			override defaultAction(TypeMirror type, Void p) {
+				throw new RuleException("Unsupported Type: "+type);
+			}
+			
+			override String visitPrimitive(PrimitiveType type, Void p) {
+				type.kind.toString.toLowerCase
+			}
+			
+			override String visitNoType(NoType type, Void p) {
+				type.kind.toString.toLowerCase
+			}
 			
 			override String visitDeclared(DeclaredType declType, Void v) {
 				if(declType instanceof GenDeclaredType) {
@@ -296,7 +308,7 @@ class TypesExtensions /**implements Types*/{
 			/** Best guess for error types... */
 			override String visitError(ErrorType declType, Void v) {
 				if (declType.typeArguments.nullOrEmpty) {
-					return typesRegistry.handleTypeElementNotFound(declType.toString, '''Cannot determine qualified name for error type «declType.toString»''')[
+					return typesRegistry.handleTypeElementNotFound(declType.guessTypeNameFromToString, '''Cannot determine qualified name for error type «declType.guessTypeNameFromToString»''')[
 						typesRegistry.tryToGetFqnForErrorType(declType)			
 					]
 					
@@ -314,7 +326,18 @@ class TypesExtensions /**implements Types*/{
 	}
 
 	def String simpleName(TypeMirror type) {
-		type?.accept(new SimpleTypeVisitor8<String, Void>(type.toString) {
+		type?.accept(new SimpleTypeVisitor8<String, Void>() {
+			override defaultAction(TypeMirror type, Void p) {
+				throw new RuleException("Unsupported Type: "+type);
+			}
+			
+			override String visitPrimitive(PrimitiveType type, Void p) {
+				type.kind.toString.toLowerCase
+			}
+			
+			override String visitNoType(NoType type, Void p) {
+				type.kind.toString.toLowerCase
+			}
 			
 			override String visitDeclared(DeclaredType declType, Void v) {
 				if(declType instanceof GenDeclaredType) {

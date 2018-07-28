@@ -10,6 +10,7 @@ import de.japkit.el.ELImports
 import javax.lang.model.element.Element
 import de.japkit.services.ExtensionRegistry
 import de.japkit.el.ELSupport
+import javax.lang.model.element.PackageElement
 
 /**
  * A collection of functions and code fragments to be made available on value stack.
@@ -72,8 +73,14 @@ class LibraryRule extends AbstractRule implements Procedure0 {
 	
 	def static TypeElement nextEnclosingTypeElementWithLibraryAnnotation(Element e) {
 		val extension ruleFactory = ExtensionRegistry.get(RuleFactory)
-		if(e instanceof TypeElement && findLibraryAnnotation(e as TypeElement) !== null) e as TypeElement
-			else e?.enclosingElement?.nextEnclosingTypeElementWithLibraryAnnotation
+		if(e instanceof PackageElement) {
+			return null;
+		}
+		if(e instanceof TypeElement && findLibraryAnnotation(e as TypeElement) !== null) { 
+			e as TypeElement 
+		} else {
+			 e?.enclosingElement?.nextEnclosingTypeElementWithLibraryAnnotation 
+		}
 	}
 	
 	
