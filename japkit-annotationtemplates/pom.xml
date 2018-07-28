@@ -3,14 +3,14 @@
 	<parent>
 		<groupId>com.github.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.16-SNAPSHOT</version>
+		<version>1.16</version>
 	</parent>
 	<name>Japkit Annotation Templates</name>
 	<description>Provides a code generator for Annotation Templates. Annotation Templates provide an easy way to generate annotations.</description>
 	<artifactId>japkit-annotationtemplates</artifactId>
 
 	<properties>
-		<japkit.version>1.16-SNAPSHOT</japkit.version>
+		<japkit.version>1.16</japkit.version>
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 	</properties>
 
