@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.github.japkit</groupId>
@@ -15,20 +17,23 @@
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				
+
 
 				<configuration>
 					<compilerId>groovy-eclipse-compiler</compilerId>
 					<!-- set verbose to be true if you want lots of uninteresting messages -->
 					<!-- <verbose>true</verbose> -->
+					<compilerArgs>
+						<arg>indy</arg>
+					</compilerArgs>
 					<!-- To prevent the annotation processor to call itself... -->
-					<compilerArgument>-proc:none</compilerArgument>
+					<proc>none</proc>
 				</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>org.codehaus.groovy</groupId>
 						<artifactId>groovy-eclipse-compiler</artifactId>
-						<version>2.9.1-01</version>
+						<version>3.0.0-01</version>
 					</dependency>
 					<!-- for 2.8.0-01 and later you must have an explicit dependency on 
 						groovy-eclipse-batch -->
@@ -36,7 +41,7 @@
 					<dependency>
 						<groupId>org.codehaus.groovy</groupId>
 						<artifactId>groovy-eclipse-batch</artifactId>
-						<version>2.3.7-01</version>
+						<version>2.5.3-01</version>
 					</dependency>
 
 				</dependencies>
@@ -69,8 +74,22 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-			<version>2.4.7</version>
-			<classifier>indy</classifier>
+			<version>2.5.3</version>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>bintray</id>
+			<name>Groovy Bintray</name>
+			<url>https://dl.bintray.com/groovy/maven</url>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
