@@ -655,16 +655,21 @@ class JapkitProcessor extends AbstractProcessor {
 		printDiagnosticMessage['''Try to write source file: «typeElement.qualifiedName»''']
 
 		if (!writtenTypeElements.contains(typeElement.qualifiedName.toString)) {
-			val emitter = new JavaEmitter(typeElement)
-
-			var code = emitter.compilationUnit();
-
-			//code = formatCode(code)
-			val file = filer.createSourceFile(typeElement.qualifiedName, orgClass);
-			val writer = file.openWriter;
-			writer.append(code)
-			writer.close
-			printDiagnosticMessage ['''Source file written: «typeElement.qualifiedName»''']
+			try {
+				val emitter = new JavaEmitter(typeElement)
+	
+				var code = emitter.compilationUnit();
+	
+				//code = formatCode(code)
+				val file = filer.createSourceFile(typeElement.qualifiedName, orgClass);
+				val writer = file.openWriter;
+				writer.append(code)
+				writer.close
+				printDiagnosticMessage ['''Source file written: «typeElement.qualifiedName»''']		
+			} catch (Exception e) {
+				logFilerException(typeElement, e);
+				throw e;
+			}
 
 		} else {
 
@@ -675,6 +680,21 @@ class JapkitProcessor extends AbstractProcessor {
 
 		writtenTypeElements.add(typeElement.qualifiedName.toString)
 
+	}
+	
+	//debug logging for https://bugs.eclipse.org/bugs/show_bug.cgi?id=540090
+	def logFilerException(TypeElement typeElement, Exception e) {
+		processingEnv.messager.printMessage(Kind::WARNING, '''Error when writing source file «typeElement.qualifiedName»: «e», cause: «e.rootCause.message» 
+			«FOR ste : e.stackTrace.subList(0, Math.min(20, e.stackTrace.length))»
+				«ste»
+			«ENDFOR»''');
+		val found = processingEnv.elementUtils.getTypeElement(typeElement.qualifiedName);
+		processingEnv.messager.printMessage(Kind::WARNING, '''Found TypeElement: «found» «found.kind» «found.class», Type Mirror:  «found.asType» «found.asType.kind» «found.asType.class»''');
+				
+	}
+	
+	def private Throwable getRootCause(Throwable t) {
+		t.cause?.rootCause ?: t
 	}
 
 }
