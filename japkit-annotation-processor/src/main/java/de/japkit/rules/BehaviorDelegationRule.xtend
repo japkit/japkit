@@ -20,6 +20,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
+import javax.lang.model.element.ElementKind
 
 @Data
 class BehaviorDelegationRule extends AbstractRule {
@@ -56,6 +57,13 @@ class BehaviorDelegationRule extends AbstractRule {
 			if (activationRule !== null && !activationRule.apply) {
 				return null
 			}
+			
+			if(activationRule === null && currentAnnotatedClass.kind === ElementKind.PACKAGE ) {
+				//If annotated element is a package, only generate behavior delegation, if explicitely activated.
+				//Otherwise the default (BehaviorInnerClass) would fail.
+				return null;
+			}
+			
 			//TODO: Name of interface and base class configurable
 			//TODO: Visibility of interface and base class configurable
 			val behaviorProxyAndTypeElement = behaviorClass.resolveTypeAndCreateProxy
