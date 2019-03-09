@@ -5,6 +5,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
+import javax.lang.model.element.QualifiedNameable
 
 @Data
 class ClassNameRule extends AbstractRule{
@@ -15,7 +16,8 @@ class ClassNameRule extends AbstractRule{
 	NameRule classNameRule
 	NameRule packageNameRule
 	
-	def private String generateClassName(TypeElement orgClass){
+	def private String generateClassName(QualifiedNameable orgClass){
+		//TODO: Special Handling if orgClass is Package
 		val orgName = orgClass.simpleName.toString
 		if(!(classNameRule.empty)){	
 			return classNameRule.getName(orgName, orgClass)
@@ -54,7 +56,7 @@ class ClassNameRule extends AbstractRule{
 		packageNameRule.getName(name, orgPackage)
 	}
 	
-	def Pair<String,String> generateClassAndPackageName(TypeElement orgClass){
+	def Pair<String,String> generateClassAndPackageName(QualifiedNameable orgClass){
 		inRule[
 			generatePackageName(orgClass.package)->generateClassName(orgClass)		
 		]

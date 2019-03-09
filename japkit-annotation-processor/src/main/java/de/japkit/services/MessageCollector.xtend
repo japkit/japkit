@@ -20,6 +20,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
 import javax.tools.Diagnostic
+import javax.lang.model.element.QualifiedNameable
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -72,11 +73,11 @@ class MessageCollector {
 		addMessage(m)
 	}
 
-	def private dispatch TypeElement nextEnclosingTypeElement(TypeElement e) {
+	def private dispatch QualifiedNameable nextEnclosingTypeElement(QualifiedNameable e) {
 		e
 	}
 
-	def private dispatch TypeElement nextEnclosingTypeElement(Element e) {
+	def private dispatch QualifiedNameable nextEnclosingTypeElement(Element e) {
 		e.enclosingElement.nextEnclosingTypeElement
 	}
 	
@@ -96,7 +97,7 @@ class MessageCollector {
 			
 			try{
 				if(m.typeElementFqn !== null) {
-					val typeElement = getTypeElement(m.typeElementFqn)
+					val typeElement = getTypeElement(m.typeElementFqn) ?: getPackageElement(m.typeElementFqn)
 					if(m.uniqueMemberName !== null){	
 						val enclosedElementsAndParams = typeElement.elementAndAllEnclosedElements(true)
 						element = enclosedElementsAndParams.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]

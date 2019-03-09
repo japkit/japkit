@@ -77,11 +77,11 @@ class AnnotationExtensions {
 		}
 	}
 
-	def isTriggerAnnotation(TypeElement te) {
+	def isTriggerAnnotation(Element te) {
 		te.annotationMirror(Trigger.name) !== null
 	}
 
-	def List<? extends AnnotationMirror> getTriggerAnnotations(TypeElement annotatedClass) {
+	def List<? extends AnnotationMirror> getTriggerAnnotations(Element annotatedClass) {
 		annotatedClass.annotationMirrors.filter[isTriggerAnnotation].toList
 	}
 

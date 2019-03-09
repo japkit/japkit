@@ -11,6 +11,7 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
+import javax.lang.model.element.QualifiedNameable
 
 @Data
 class TriggerAnnotationRule extends AbstractRule {
@@ -54,7 +55,7 @@ class TriggerAnnotationRule extends AbstractRule {
 	}
 	
 	
-	def Set<GenTypeElement> processTriggerAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation){
+	def Set<GenTypeElement> processTriggerAnnotation(QualifiedNameable annotatedClass, AnnotationMirror triggerAnnotation){
 		inRule[
 			scope(annotatedClass) [
 				val generatedClasses = newHashSet

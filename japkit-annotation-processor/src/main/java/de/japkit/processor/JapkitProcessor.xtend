@@ -34,6 +34,8 @@ import javax.tools.Diagnostic.Kind
 import static extension de.japkit.util.MoreCollectionExtensions.*
 import de.japkit.services.ReportedException
 import de.japkit.services.TypeElementFromCompilerCache
+import javax.lang.model.element.Element
+import javax.lang.model.element.QualifiedNameable
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -150,10 +152,11 @@ class JapkitProcessor extends AbstractProcessor {
 
 		//The annotated classes that have been defered by previous rounds. During the round, some of them will be removed and processed.
 		//But also, new ones might be added
-		val annotatedClassesToDefer = new HashSet(deferredClasses.keySet.map[getTypeElement].toSet)
+		val Set<QualifiedNameable> annotatedClassesToDefer = new HashSet(deferredClasses.keySet.map[getTypeElement].toSet)
 		deferredClasses.clear
+		//TODO deferredPackages 
 
-		val classesToProcessUnfiltered = roundEnv.rootElements.typeElements.toList
+		val classesToProcessUnfiltered = roundEnv.rootElements.filter[it instanceof QualifiedNameable].map[it as QualifiedNameable].toList
 		val classesToProcess = new HashSet(classesToProcessUnfiltered)
 
 		//Search for trigger annotations
@@ -218,7 +221,9 @@ class JapkitProcessor extends AbstractProcessor {
 		//all higher layer classes are deferred to next round
 
 		//defer remaining annotated classes to next round
-		annotatedClassesToDefer.forEach[deferredClasses.put(qualifiedName.toString, null)]
+		annotatedClassesToDefer.filter[it instanceof TypeElement].forEach[deferredClasses.put(qualifiedName.toString, null)]
+		
+		//TODO: defered packages
 
 		typesRegistry.cleanUpTypesAtEndOfRound //They refer types of current round and thus should not be used in next round, but re-generated. 
 
@@ -234,12 +239,12 @@ class JapkitProcessor extends AbstractProcessor {
 		false
 	}
 	
-	def getMinLayer(Set<TypeElement> annotatedClasses){
+	def getMinLayer(Set<QualifiedNameable> annotatedClasses){
 		val layers = annotatedClasses.map[layer].toSet
 		Collections.min(layers)
 	}
 	
-	def getLayer(TypeElement annotatedClass){
+	def getLayer(Element annotatedClass){
 		val layers = annotatedClass.triggerAnnotations.map[metaAnnotation(Trigger)].map[value('layer', Integer)].toSet
 		if(layers.nullOrEmpty) {
 			printDiagnosticMessage(['''Error: Layer could not be determined for «annotatedClass» of type «annotatedClass?.class»'''])
@@ -250,19 +255,19 @@ class JapkitProcessor extends AbstractProcessor {
 		
 	}
 	
-	def filterLayer(Iterable<TypeElement> elements, int l) {
+	def filterLayer(Iterable<QualifiedNameable> elements, int l) {
 		new HashSet(elements.filter[layer == l].toSet)
 	}
 	
-	def boolean processLayerAsFarAsPossible(HashSet<TypeElement> annotatedClassesToDefer, HashSet<TypeElement> classesInCurrentRound, int layer, HashSet<GenTypeElement> writtenTypeElementsInCurrentRound) {
+	def boolean processLayerAsFarAsPossible(Set<QualifiedNameable> annotatedClassesToDefer, Set<QualifiedNameable> classesInCurrentRound, int layer, Set<GenTypeElement> writtenTypeElementsInCurrentRound) {
 		printDiagnosticMessage(['''Processing layer «layer»'''])
 		
 		//Key the annotated class. Value is Set of  generated type elements for it.
-		val Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound = newHashMap
+		val Map<QualifiedNameable, Set<GenTypeElement>> generatedTypeElementsInCurrentRound = newHashMap
 		
 		val writtenTypeElementsInCurrentLoop = newHashSet
 		
-		var Set<TypeElement> classesToProcess = classesInCurrentRound.filterLayer(layer)
+		var Set<QualifiedNameable> classesToProcess = classesInCurrentRound.filterLayer(layer)
 		
 		val ctp = classesToProcess
 		printDiagnosticMessage['''Annotated classes to process in layer «layer»: «ctp»''']
@@ -366,10 +371,10 @@ class JapkitProcessor extends AbstractProcessor {
 	
 
 	def writeClassesWithPermanentTypeErrors(
-			Set<TypeElement> classesToProcess,
-			Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
-			HashSet<TypeElement> annotatedClassesToDefer,
-			HashSet<GenTypeElement> writtenTypeElementsInCurrentRound,
+			Set<QualifiedNameable> classesToProcess,
+			Map<QualifiedNameable, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
+			Set<QualifiedNameable> annotatedClassesToDefer,
+			Set<GenTypeElement> writtenTypeElementsInCurrentRound,
 			boolean alsoWriteClassesThatDependOnUnknownTypes
 		) {
 
@@ -430,8 +435,8 @@ class JapkitProcessor extends AbstractProcessor {
 
 		}
 
-	def processClassesWithCycles(Set<TypeElement> classesToProcess, Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
-		Set<TypeElement> annotatedClassesToDefer, HashSet<GenTypeElement> writtenTypeElementsInCurrentRound) {
+	def processClassesWithCycles(Set<QualifiedNameable> classesToProcess, Map<QualifiedNameable, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
+		Set<QualifiedNameable> annotatedClassesToDefer, Set<GenTypeElement> writtenTypeElementsInCurrentRound) {
 		if (writtenTypeElementsInCurrentRound.empty && !classesToProcess.empty) {
 
 			val cyclesToProcess = findCyclesInAnnotatedClasses(classesToProcess)
@@ -452,17 +457,17 @@ class JapkitProcessor extends AbstractProcessor {
 	 * Finds cycles in annotated classes. Only those cycles are returned, that do not depend on / wait for other annotated classes and 
 	 * that do not have dependencies to unknown types
 	 */
-	def findCyclesInAnnotatedClasses(Set<TypeElement> annotatedClasses) {
+	def findCyclesInAnnotatedClasses(Set<QualifiedNameable> annotatedClasses) {
 		val byFqn = annotatedClasses.toMap[qualifiedName.toString]
 		typesRegistry.findCyclesInAnnotatedClasses(byFqn.keySet).filter[
 			!dependOnOtherAnnotatedClasses && !dependOnUnknownTypes].map[map[byFqn.get(it)].toSet]
 	}
 
 	def processClassesAndWriteTypeElements(
-		Set<TypeElement> classesToProcess,
+		Set<QualifiedNameable> classesToProcess,
 		boolean isCycle,
-		Map<TypeElement, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
-		Set<TypeElement> annotatedClassesToDefer,
+		Map<QualifiedNameable, Set<GenTypeElement>> generatedTypeElementsInCurrentRound,
+		Set<QualifiedNameable> annotatedClassesToDefer,
 		Set<GenTypeElement> writtenTypeElementsInCurrentRound
 	) {
 
@@ -573,7 +578,7 @@ class JapkitProcessor extends AbstractProcessor {
 
 	}
 
-	def writeSourceFileAndCommitTypeElement(GenTypeElement genTypeElement, TypeElement original,
+	def writeSourceFileAndCommitTypeElement(GenTypeElement genTypeElement, QualifiedNameable original,
 		Set<GenTypeElement> writtenTypeElementsInCurrentRound) {
 
 		scope[
@@ -595,10 +600,10 @@ class JapkitProcessor extends AbstractProcessor {
 		]
 	}
 
-	def Map<GenTypeElement, TypeElement> processAnnotatedClass(TypeElement annotatedClass) {
+	def Map<GenTypeElement, QualifiedNameable> processAnnotatedClass(QualifiedNameable annotatedClass) {
 		try {
 			setCurrentAnnotatedClass(annotatedClass)
-			val Map<GenTypeElement, TypeElement> generatedTopLevelClasses = newHashMap;
+			val Map<GenTypeElement, QualifiedNameable> generatedTopLevelClasses = newHashMap;
 	
 			//Whatever messages we had so far - they will be re-created if the reason still exists
 			removeMessagesForAnnotatedClass(annotatedClass.qualifiedName.toString)
@@ -626,7 +631,7 @@ class JapkitProcessor extends AbstractProcessor {
 	}
 
 
-	def private Set<GenTypeElement> processTriggerAnnotations(TypeElement annotatedClass) {
+	def private Set<GenTypeElement> processTriggerAnnotations(QualifiedNameable annotatedClass) {
 
 		val triggerAnnotations = getTriggerAnnotationsAndShadowFlag(annotatedClass)
 
@@ -645,13 +650,13 @@ class JapkitProcessor extends AbstractProcessor {
 	
 	
 	//TODO: Some Caching.
-	def List<Pair<AnnotationMirror, Boolean>> getTriggerAnnotationsAndShadowFlag(TypeElement annotatedClass) {
+	def List<Pair<AnnotationMirror, Boolean>> getTriggerAnnotationsAndShadowFlag(Element annotatedClass) {
 		annotatedClass.triggerAnnotations.map[it -> it.shadowAnnotation].toList
 	}
 
 	val Set<String> writtenTypeElements = newHashSet
 
-	def boolean writeSourceFile(TypeElement typeElement, TypeElement orgClass) {
+	def boolean writeSourceFile(TypeElement typeElement, QualifiedNameable orgClass) {
 		printDiagnosticMessage['''Try to write source file: «typeElement.qualifiedName»''']
 
 		if (!writtenTypeElements.contains(typeElement.qualifiedName.toString)) {

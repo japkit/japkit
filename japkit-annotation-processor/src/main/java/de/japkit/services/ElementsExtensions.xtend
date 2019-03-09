@@ -1093,7 +1093,7 @@ class ElementsExtensions {
 		'''«e.enclosingElement.uniqueName».«e.uniqueSimpleName»'''
 	}
 	
-	def String uniqueNameWithin(Element e, TypeElement enclosing) {
+	def String uniqueNameWithin(Element e, QualifiedNameable enclosing) {
 		if(e==enclosing)
 			''
 		else if (e.enclosingElement == enclosing)
