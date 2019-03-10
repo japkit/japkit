@@ -257,7 +257,12 @@ class JapkitProcessor extends AbstractProcessor {
 			.map[it.qualifiedName.toString]
 			.toSet
 		)
+		//Add the trigger annotations that have been changed indirectly due to changes in the templates, functions, ... used by them.
+		//For example, if a template class has been changed, it will appear in rootElementsWithQualifiedName and here we add the 
+		//trigger annotation(s) that use that template. 
 		changedTriggerAnnotations.addAll(getTriggerAnnotationsForMetaTypeElements(rootElementsWithQualifiedName))
+		
+		//determine the elements that have that trigger annotation
 		val elementsWithChangesInTrigger = changedTriggerAnnotations
 			.map[findAllTypeElementsWithTriggerAnnotation(it, false)] //TODO: support package elements
 			.flatten

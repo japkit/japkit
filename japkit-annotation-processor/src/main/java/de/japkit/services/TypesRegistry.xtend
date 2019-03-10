@@ -938,6 +938,9 @@ class TypesRegistry {
 		metaTypeElementsToTriggerAnnotations.getOrCreateSet(rootMetaTypeElement.qualifiedName.toString).add(triggerAnnotation.qualifiedName.toString)
 	}
 	
+	/**
+	 * Determines the trigger annotations that directly or indirectly use the given meta TypeElements (template class, function etc.).
+	 */
 	def getTriggerAnnotationsForMetaTypeElements(Iterable<QualifiedNameable> metaTypeElements){
 		metaTypeElements.map[metaTypeElementsToTriggerAnnotations.get(it.qualifiedName.toString) ?: emptySet].flatten.toSet
 	}
