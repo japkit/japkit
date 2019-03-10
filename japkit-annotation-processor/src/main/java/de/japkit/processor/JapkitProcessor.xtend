@@ -168,6 +168,9 @@ class JapkitProcessor extends AbstractProcessor {
 		var boolean roundDone = false
 		val writtenTypeElementsInCurrentRound = newHashSet
 		
+		// The annotated elements can be grouped manually in layers to optimize order of processing.
+		// The following loop processes the annotated elements layer by layer, 
+		// always processing the remaining elements with the lowest layer and deferring the elements with higher layers.
 		while(!roundDone){
 			val allElementsToProcess = new HashSet(deferredElements)
 			allElementsToProcess.addAll(newElementsToProcess)
@@ -182,8 +185,8 @@ class JapkitProcessor extends AbstractProcessor {
 				roundDone = true
 			}
 		}
-		//If the lowest layer could not be completed in this round, its remaining classes and
-		//all higher layer classes are deferred to next round
+		//If a layer could not be completed in this round, its remaining classes and
+		//all higher layer elements are deferred to next round
 
 		//defer remaining annotated elements to next round
 		deferredElements
@@ -194,7 +197,7 @@ class JapkitProcessor extends AbstractProcessor {
 
 		printDiagnosticMessage[
 			'''
-				Deferred classes: «elementsToDeferToNextRoundFqns.join(", ")»
+				Deferred elements: «elementsToDeferToNextRoundFqns.join(", ")»
 				Dependencies: 
 				«elementsToDeferToNextRoundFqns.map['''«it» depends on «getTypesByGenClassOnWhichThatAnnotatedClassDependsOn»'''].join('\n')»
 			''']
@@ -262,7 +265,7 @@ class JapkitProcessor extends AbstractProcessor {
 		//trigger annotation(s) that use that template. 
 		changedTriggerAnnotations.addAll(getTriggerAnnotationsForMetaTypeElements(rootElementsWithQualifiedName))
 		
-		//determine the elements that have that trigger annotation
+		//determine the elements that have one of that changed trigger annotations
 		val elementsWithChangesInTrigger = changedTriggerAnnotations
 			.map[findAllTypeElementsWithTriggerAnnotation(it, false)] //TODO: support package elements
 			.flatten
