@@ -159,77 +159,23 @@ class JapkitProcessor extends AbstractProcessor {
 		elementsToDeferToNextRoundFqns.clear
 
 		/**
-		 * Japkit supports only trigger annotations on elements with a qualified name (TypeElement or PackageElement).
+		 * The new elements to be processed in current round. Will be modified during the round to contain only the remaining elements not yet processed.
 		 */
-		val rootElementsWithQualifiedName = roundEnv.rootElements
-			.filter[it instanceof QualifiedNameable]
-			.map[it as QualifiedNameable]
-			.toList
-
-		/**
-		 * The root elements to be processed in current round.
-		 */
-		val rootElementsToProcess = new HashSet(rootElementsWithQualifiedName)
-
-		/**
-		 * Root elements with trigger annotations.
-		 * Key is the root element.
-		 * Value is the list of trigger annotations of the root element. 
-		 * Each entry in the list is a pair of the annotation and a boolean value, where true indicates it is a "shadow annotation" 
-		 * (a copy of a trigger annotation on a generated class).
-		 */
-		val rootElementsAndTheirTriggerAnnotations = rootElementsToProcess
-			.toInvertedMap[triggerAnnotationsAndShadowFlag]
-			.filter[ac, t|!t.empty]
-			
-		//type elements that ARE trigger annotations
-		val triggerAnnotations = new HashSet(rootElementsToProcess.filter[isTriggerAnnotation].map[it.qualifiedName.toString].toSet)
-		triggerAnnotations.addAll(getTriggerAnnotationsForMetaTypeElements(rootElementsToProcess))
-		
-		val classesWithTrigger = triggerAnnotations.map[findAllTypeElementsWithTriggerAnnotation(it, false)].flatten.toSet
-
-		//Register all classes with trigger annotations, including the ones with shadow annotations
-		rootElementsAndTheirTriggerAnnotations.forEach[ac, t|typesRegistry.registerAnnotatedClass(ac, t)]
-
-		//Retain all classes with non-shadow trigger annotations
-		rootElementsToProcess.retainAll(rootElementsAndTheirTriggerAnnotations.filter[ac, t|t.exists[!value]].keySet)		
-
-		printDiagnosticMessage(['''Annotated classes in root TypeElements: «rootElementsToProcess»'''])
-
-		//For incremental build... If the compiler re-compiles a generated class (due to a dependency to some re-generated class), 
-		//we also re-generate it to spread the changes.
-		//NOTE: This approach is at least questionable, since the annotated classes we get here are BinaryTypeBindings (without comments, parameter names and member order).
-		//However, there is no much better way to spread the changes. 
-		//For _RuntimeMetadata this can be deadly, since re-generating it based on BinaryTypeBindings would be against there purpose to preserve informtaion about
-		//comments, parameter names and member order. Thus, we filter them here. The filtering is kept simple, assuming @RuntimeMetadata is only used on templates
-		//but not on "real" application classes.
-		val annotatedClassesForUncommitedGenClasses = rootElementsWithQualifiedName.filter[!committed && !qualifiedName.toString.endsWith("_RuntimeMetadata")].map[
-			annotatedClassForGenClassOnDisk].filter[it !== null].toSet
-
-		printDiagnosticMessage(
-			['''Annotated classes for uncommited gen classes: «annotatedClassesForUncommitedGenClasses»'''])
-		rootElementsToProcess.addAll(annotatedClassesForUncommitedGenClasses)
-		
-		//For incremental build: If a trigger annotation has changed, add all classes we know to have this trigger
-		//NOTE: This approach is at least questionable, since the annotated classes we get here are BinaryTypeBindings (without comments, parameter names and member order).
-		//But we cannot do much better here.
-		printDiagnosticMessage(
-			['''Annotated classes for triggers found in root TypeElements: «classesWithTrigger»'''])
-		rootElementsToProcess.addAll(classesWithTrigger)
+		val newElementsToProcess = new HashSet(determineNewElementsToProcess(roundEnv.rootElements));
 
 		var boolean roundDone = false
 		val writtenTypeElementsInCurrentRound = newHashSet
 		
 		while(!roundDone){
 			val allClasses = new HashSet(elementsToDeferToNextRound)
-			allClasses.addAll(rootElementsToProcess)
+			allClasses.addAll(newElementsToProcess)
 			
 			if(!allClasses.empty){
-				val layerCompleted = processLayerAsFarAsPossible(elementsToDeferToNextRound, rootElementsToProcess, getMinLayer(allClasses), writtenTypeElementsInCurrentRound)
+				val layerCompleted = processLayerAsFarAsPossible(elementsToDeferToNextRound, newElementsToProcess, getMinLayer(allClasses), writtenTypeElementsInCurrentRound)
 				//The layer could not be completed in this round due to dependencies to unknown types. 
 				//Re-consider the regarding classes in next round
 				roundDone = !layerCompleted
-				rootElementsToProcess.retainAll(elementsToDeferToNextRound)			
+				newElementsToProcess.retainAll(elementsToDeferToNextRound)			
 			} else {
 				roundDone = true
 			}
@@ -238,7 +184,9 @@ class JapkitProcessor extends AbstractProcessor {
 		//all higher layer classes are deferred to next round
 
 		//defer remaining annotated classes to next round
-		elementsToDeferToNextRound.filter[it instanceof TypeElement].forEach[elementsToDeferToNextRoundFqns.add(qualifiedName.toString)]
+		elementsToDeferToNextRound
+			.filter[it instanceof TypeElement]
+			.forEach[elementsToDeferToNextRoundFqns.add(qualifiedName.toString)]
 
 		typesRegistry.cleanUpTypesAtEndOfRound //They refer types of current round and thus should not be used in next round, but re-generated. 
 
@@ -252,6 +200,70 @@ class JapkitProcessor extends AbstractProcessor {
 		printDiagnosticMessage['''Round Time (ms): «System.currentTimeMillis - startTime»''']
 
 		false
+	}
+	
+	def determineNewElementsToProcess(Set<? extends Element> rootElements) {
+		/**
+		 * Japkit supports only trigger annotations on elements with a qualified name (TypeElement or PackageElement).
+		 */
+		val rootElementsWithQualifiedName = new HashSet(rootElements
+			.filter[it instanceof QualifiedNameable]
+			.map[it as QualifiedNameable]
+			.toSet)
+
+		/**
+		 * Root elements with their trigger annotations.
+		 * Key is the root element.
+		 * Value is the list of trigger annotations of the root element. 
+		 * Each entry in the list is a pair of the annotation and a boolean value, where true indicates it is a "shadow annotation" 
+		 * (a copy of a trigger annotation on a generated class).
+		 */
+		val rootElementsAndTheirTriggerAnnotations = rootElementsWithQualifiedName
+			.toInvertedMap[triggerAnnotationsAndShadowFlag]
+			.filter[ac, t|!t.empty]
+			
+
+		//Register all classes with trigger annotations, including the ones with shadow annotations
+		rootElementsAndTheirTriggerAnnotations.forEach[ac, t|typesRegistry.registerAnnotatedClass(ac, t)]
+
+		val newElementsToProcess = new HashSet()
+		
+		//Add all classes with non-shadow trigger annotations
+		newElementsToProcess.addAll(rootElementsAndTheirTriggerAnnotations.filter[ac, t|t.exists[!value]].keySet)
+		printDiagnosticMessage(['''Root elements with trigger annotations: «newElementsToProcess»'''])
+
+		//For incremental build... If the compiler re-compiles a generated class (due to a dependency to some re-generated class), 
+		//we also re-generate it to spread the changes.
+		//NOTE: This approach is at least questionable, since the annotated classes we get here are BinaryTypeBindings (without comments, parameter names and member order).
+		//However, there is no much better way to spread the changes. 
+		//For _RuntimeMetadata this can be deadly, since re-generating it based on BinaryTypeBindings would be against there purpose to preserve information about
+		//comments, parameter names and member order. Thus, we filter them here. The filtering is kept simple, assuming @RuntimeMetadata is only used on templates
+		//but not on "real" application classes.
+		val sourceElementsForUncommitedGenClasses = rootElementsWithQualifiedName
+			.filter[!committed && !qualifiedName.toString.endsWith("_RuntimeMetadata")]
+			.map[annotatedClassForGenClassOnDisk]  //TODO: support package elements
+			.filter[it !== null]
+			.toSet
+		newElementsToProcess.addAll(sourceElementsForUncommitedGenClasses)
+		printDiagnosticMessage(['''Source elements for uncommited generated classes: «sourceElementsForUncommitedGenClasses»'''])
+		
+		//For incremental build: If a trigger annotation has changed, add all elements we know to have this trigger
+		//NOTE: This approach is at least questionable, since the annotated classes we get here are BinaryTypeBindings (without comments, parameter names and member order).
+		//But we cannot do much better here.
+		val changedTriggerAnnotations = new HashSet(rootElementsWithQualifiedName
+			.filter[isTriggerAnnotation]
+			.map[it.qualifiedName.toString]
+			.toSet
+		)
+		changedTriggerAnnotations.addAll(getTriggerAnnotationsForMetaTypeElements(rootElementsWithQualifiedName))
+		val elementsWithChangesInTrigger = changedTriggerAnnotations
+			.map[findAllTypeElementsWithTriggerAnnotation(it, false)] //TODO: support package elements
+			.flatten
+			.toSet
+		newElementsToProcess.addAll(elementsWithChangesInTrigger)
+		printDiagnosticMessage(['''Annotated elements with triggers annotations that have been changed: «elementsWithChangesInTrigger»'''])
+		
+		return newElementsToProcess
 	}
 	
 	def getMinLayer(Set<QualifiedNameable> annotatedClasses){
