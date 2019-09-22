@@ -406,8 +406,18 @@ class RuleUtils {
 		if(metaAnnotation === null) return [|template?.modifiers]
 		val modi = metaAnnotation.value("modifiers".withPrefix(avPrefix), typeof(Modifier[]));
 		val modifiersFromSrc = metaAnnotation.value("modifiersFromSrc".withPrefix(avPrefix), Boolean) ?: false;
+		
+		
+		// conditions for whether to add or remove modifier
+		val modifierConditions = #[Modifier.ABSTRACT, Modifier.PUBLIC, Modifier.PRIVATE, Modifier.PROTECTED].map [
+			val name = it.toString.toLowerCase;
+			it ->
+				new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, template, Boolean, name + "Cond",
+					name + "CondLang", name + "CondFun", null, null, false, ExpressionOrFunctionCallRule.AND_COMBINER)
+		].filter[!it.value.undefined];  
+		
+		
 
-		// TODO: Expressions for isPublic , isPrivate etc
 		[|
 			val modifiers = new HashSet(if (!modi.nullOrEmpty) {
 				modi.toSet
@@ -417,6 +427,15 @@ class RuleUtils {
 			if (modifiersFromSrc) {
 				modifiers.addAll(currentSrcElement.modifiers)
 			}
+			//if any modifier condition is set, evaluate it an add or remove the according modifier
+			modifierConditions.forEach[
+				if(it.value.apply) {
+					modifiers.add(it.key)
+				} else {
+					modifiers.remove(it.key)
+				}
+			]
+			
 			modifiers
 		]
 	}
