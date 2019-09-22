@@ -189,6 +189,91 @@ public @interface Clazz {
 	Modifier[] modifiers() default {};
 	
 	/**
+	 * A condition whether to add or remove the abstract modifier.
+	 * 
+	 * @return the boolean expression
+	 */
+	String abstractCond() default "";
+	
+	/**
+	 * The expression language for the abstractCond expression.
+	 * 
+	 * @return the expression language
+	 */
+	String abstractCondLang() default "";
+	
+	/**
+	 * As an alternative to the abstractCond expression, a boolean function can be called.
+	 * 
+	 * @return the function
+	 */
+	Class<?>[] abstractCondFun() default {};
+	
+	/**
+	 * A condition whether to add or remove the public modifier.
+	 * 
+	 * @return the boolean expression
+	 */
+	String publicCond() default "";
+	
+	/**
+	 * The expression language for the publicCond expression.
+	 * 
+	 * @return the expression language
+	 */
+	String publicCondLang() default "";
+	
+	/**
+	 * As an alternative to the publicCond expression, a boolean function can be called.
+	 * 
+	 * @return the function
+	 */
+	Class<?>[] publicCondFun() default {};
+	
+	/**
+	 * A condition whether to add or remove the private modifier.
+	 * 
+	 * @return the boolean expression
+	 */
+	String privateCond() default "";
+	
+	/**
+	 * The expression language for the privateCond expression.
+	 * 
+	 * @return the expression language
+	 */
+	String privateCondLang() default "";
+	
+	/**
+	 * As an alternative to the privateCond expression, a boolean function can be called.
+	 * 
+	 * @return the function
+	 */
+	Class<?>[] privateCondFun() default {};
+	
+	/**
+	 * A condition whether to add or remove the protected modifier.
+	 * 
+	 * @return the boolean expression
+	 */
+	String protectedCond() default "";
+	
+	/**
+	 * The expression language for the protectedCond expression.
+	 * 
+	 * @return the expression language
+	 */
+	String protectedCondLang() default "";
+	
+	/**
+	 * As an alternative to the protectedCond expression, a boolean function can be called.
+	 * 
+	 * @return the function
+	 */
+	Class<?>[] protectedCondFun() default {};
+	
+	
+	/**
 	 * By default, the abstract modifier on a class template is always removed  when generating a class. 
 	 * The rationale behind this is to allow abstract method templates (to avoid writing dummy method bodies).
 	 * This behavior can be switched off by setting this annotation value to false.

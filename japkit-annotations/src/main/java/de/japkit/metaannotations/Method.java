@@ -178,6 +178,90 @@ public @interface Method {
 	 * @return the modifiers of the method
 	 */
 	Modifier[] modifiers() default {};
+	
+	/**
+	 * A condition whether to add or remove the abstract modifier.
+	 * 
+	 * @return the boolean expression
+	 */
+	String abstractCond() default "";
+	
+	/**
+	 * The expression language for the abstractCond expression.
+	 * 
+	 * @return the expression language
+	 */
+	String abstractCondLang() default "";
+	
+	/**
+	 * As an alternative to the abstractCond expression, a boolean function can be called.
+	 * 
+	 * @return the function
+	 */
+	Class<?>[] abstractCondFun() default {};
+	
+	/**
+	 * A condition whether to add or remove the public modifier.
+	 * 
+	 * @return the boolean expression
+	 */
+	String publicCond() default "";
+	
+	/**
+	 * The expression language for the publicCond expression.
+	 * 
+	 * @return the expression language
+	 */
+	String publicCondLang() default "";
+	
+	/**
+	 * As an alternative to the publicCond expression, a boolean function can be called.
+	 * 
+	 * @return the function
+	 */
+	Class<?>[] publicCondFun() default {};
+	
+	/**
+	 * A condition whether to add or remove the private modifier.
+	 * 
+	 * @return the boolean expression
+	 */
+	String privateCond() default "";
+	
+	/**
+	 * The expression language for the privateCond expression.
+	 * 
+	 * @return the expression language
+	 */
+	String privateCondLang() default "";
+	
+	/**
+	 * As an alternative to the privateCond expression, a boolean function can be called.
+	 * 
+	 * @return the function
+	 */
+	Class<?>[] privateCondFun() default {};
+	
+	/**
+	 * A condition whether to add or remove the protected modifier.
+	 * 
+	 * @return the boolean expression
+	 */
+	String protectedCond() default "";
+	
+	/**
+	 * The expression language for the protectedCond expression.
+	 * 
+	 * @return the expression language
+	 */
+	String protectedCondLang() default "";
+	
+	/**
+	 * As an alternative to the protectedCond expression, a boolean function can be called.
+	 * 
+	 * @return the function
+	 */
+	Class<?>[] protectedCondFun() default {};
 
 	/**
 	 * How to map annotations of the source element (???) to the method
