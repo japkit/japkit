@@ -12,6 +12,7 @@ import java.util.Objects
  */
 class TypeElementFromCompilerCache {
 	val transient extension ProcessingEnvironment = ExtensionRegistry.get(ProcessingEnvironment)
+	val transient extension MessageCollector = ExtensionRegistry.get(MessageCollector)
 	
 	val Map<String, TypeElement> cache = newHashMap
 		
@@ -25,6 +26,8 @@ class TypeElementFromCompilerCache {
 			} catch (Exception e) {
 				// This should never happen, but it does in Eclipse. 
 				// For example, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=547970
+				
+				printDiagnosticMessage['''Error in getTypeElement for «name». «e» «e.stackTrace.map[toString].join('\n')»''']
 				return null;
 			}
 		} else {
