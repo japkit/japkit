@@ -136,6 +136,8 @@ class JapkitProcessor extends AbstractProcessor {
 		ruleFactory.clearCaches
 		typesRegistry.clearCaches
 		typeElementCache.clear
+		typeElementCache.init(roundEnv.rootElements.typeElements.toList)
+		
 
 		val startTime = System.currentTimeMillis
 

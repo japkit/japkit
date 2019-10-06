@@ -20,10 +20,13 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import javax.lang.model.element.QualifiedNameable
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
+import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
+import javax.lang.model.util.SimpleTypeVisitor8
 import javax.lang.model.util.Types
 import javax.tools.StandardLocation
 import org.eclipse.xtend.lib.annotations.Accessors
@@ -32,9 +35,6 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import javax.lang.model.util.SimpleTypeVisitor8
-import javax.lang.model.type.TypeKind
-import javax.lang.model.element.QualifiedNameable
 
 /**
  * Registry for generated types. Helps with the resolution of those type when they are used in other classes.
@@ -300,8 +300,18 @@ class TypesRegistry {
 			if (it == TypeElementNotFoundException.UNKNOWN_TYPE)
 				!ignoreUnknownTypes
 			else
-				!annotatedClassForGenTypeElement.containsKey(it) && elementUtils.getTypeElement(it) === null
+				!annotatedClassForGenTypeElement.containsKey(it) && typeNotFound(it)
 		]
+	}
+	
+	protected def boolean typeNotFound(String it) {
+		try {
+			elementUtils.getTypeElement(it) === null
+		} catch (Exception e) {
+			// This should never happen, but it does in Eclipse. 
+			// For example, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=547970
+			return false;
+		}
 	}
 
 	/**
