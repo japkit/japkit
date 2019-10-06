@@ -17,10 +17,16 @@ class TypeElementFromCompilerCache {
 		
 	def TypeElement getTypeElement(String name) {
 		Objects.requireNonNull(name, "FQN must be provided.");
-		if(!cache.containsKey(name)) {
-			val typeElement = elementUtils.getTypeElement(name)
-			cache.put(name, typeElement)
-			return typeElement
+		if(!cache.containsKey(name)) {	
+			try {	
+				val typeElement = elementUtils.getTypeElement(name)
+				cache.put(name, typeElement)
+				return typeElement		
+			} catch (Exception e) {
+				// This should never happen, but it does in Eclipse. 
+				// For example, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=547970
+				return null;
+			}
 		} else {
 			return cache.get(name);
 		}	
