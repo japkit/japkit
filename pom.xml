@@ -6,7 +6,7 @@
 	<groupId>com.github.japkit</groupId>
 	<artifactId>japkit-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.19</version>
+	<version>1.20</version>
 	<name>Japkit Parent</name>
 
 	<description>A declarative approach to writing Java annotation processors.</description>
@@ -70,7 +70,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
+				<version>3.8.1</version>
 				<configuration>
 					<generatedSourcesDirectory>${project.build.directory}/src/main/generated-sources</generatedSourcesDirectory>
 					<generatedTestSourcesDirectory>${project.build.directory}/src/main/generated-test-sources</generatedTestSourcesDirectory>
@@ -79,7 +79,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -93,7 +93,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.4</version>
+				<version>3.1.1</version>
 				<configuration>
 					<failOnError>false</failOnError>
 				</configuration>
@@ -144,7 +144,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
+						<version>1.6</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>

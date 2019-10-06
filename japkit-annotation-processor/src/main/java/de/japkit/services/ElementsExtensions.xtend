@@ -592,10 +592,10 @@ class ElementsExtensions {
 			Enum.valueOf(avType as Class<?> as Class<? extends Enum>, ve.simpleName.toString) as T
 
 		} else if (avType.array) {
-			val arr = Array.newInstance(avType.componentType, (value as List<AnnotationValue>).size)
+			val arr = Array.newInstance(avType.getComponentType(), (value as List<AnnotationValue>).size)
 			
 			(value as List<AnnotationValue>).forEach[avInList , i|
-				Array.set(arr, i, avInList.mapAs(avInList.valueWithErrorHandling, annotationMirror, annotatedElement, name, i, avType.componentType))
+				Array.set(arr, i, avInList.mapAs(avInList.valueWithErrorHandling, annotationMirror, annotatedElement, name, i, avType.getComponentType()))
 			]
 			arr as T
 		} else if(avType==AnnotationMirror){
