@@ -56,8 +56,8 @@ class MessageCollector {
 	def void addMessage(Kind kind, String msg, Element element, AnnotationMirror annotation, String annotationValueName) {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 		
-		val typeElement = element?.nextEnclosingTypeElement
-		val String  uniqueElementName = if (typeElement == element) null else element?.uniqueNameWithin(typeElement)
+		val typeOrPackageElement = element?.nextEnclosingTypeOrPackageElement
+		val String  uniqueElementName = if (typeOrPackageElement == element) null else element?.uniqueNameWithin(typeOrPackageElement)
 		
 		val rootAnnotation = if (annotation instanceof AnnotationAndParent) annotation?.rootAnnotation else annotation
 		
@@ -65,7 +65,7 @@ class MessageCollector {
 		
 		
 		val m = new Message(kind, msg, 
-			typeElement?.qualifiedName?.toString,
+			typeOrPackageElement?.qualifiedName?.toString,
 			uniqueElementName?.toString, 
 			(rootAnnotation?.annotationType?.asElement as TypeElement)?.qualifiedName?.toString,
 			nestedAnnotationPath,
@@ -73,12 +73,12 @@ class MessageCollector {
 		addMessage(m)
 	}
 
-	def private dispatch QualifiedNameable nextEnclosingTypeElement(QualifiedNameable e) {
+	def private dispatch QualifiedNameable nextEnclosingTypeOrPackageElement(QualifiedNameable e) {
 		e
 	}
 
-	def private dispatch QualifiedNameable nextEnclosingTypeElement(Element e) {
-		e.enclosingElement.nextEnclosingTypeElement
+	def private dispatch QualifiedNameable nextEnclosingTypeOrPackageElement(Element e) {
+		e.enclosingElement.nextEnclosingTypeOrPackageElement
 	}
 	
 	
@@ -96,8 +96,8 @@ class MessageCollector {
 			var String paramName = null;
 			
 			try{
-				if(m.typeElementFqn !== null) {
-					val typeElement = getTypeElement(m.typeElementFqn) ?: getPackageElement(m.typeElementFqn)
+				if(m.typeOrPackageElementFqn !== null) {
+					val typeElement = getTypeElement(m.typeOrPackageElementFqn) ?: getPackageElement(m.typeOrPackageElementFqn)
 					if(m.uniqueMemberName !== null){	
 						val enclosedElementsAndParams = typeElement.elementAndAllEnclosedElements(true)
 						element = enclosedElementsAndParams.findFirst[uniqueNameWithin(typeElement).contentEquals(m.uniqueMemberName)]
@@ -144,7 +144,7 @@ class MessageCollector {
 			}
 			
 			//Make it appear at least in error log...
-			messager.printMessage(m.kind, '''«m.msg» «m.typeElementFqn» «m.annotationFqn» «m.nestedAnnotationPath»''')
+			messager.printMessage(m.kind, '''«m.msg» «m.typeOrPackageElementFqn» «m.annotationFqn» «m.nestedAnnotationPath»''')
 		]
 		messagesPerAnnotatedClass.clear
 	}
