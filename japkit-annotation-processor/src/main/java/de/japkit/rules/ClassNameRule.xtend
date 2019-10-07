@@ -20,7 +20,7 @@ class ClassNameRule extends AbstractRule{
 		//TODO: Special Handling if orgClass is Package
 		val orgName = orgClass.simpleName.toString
 		if(!(classNameRule.empty)){	
-			return classNameRule.getName(orgName, orgClass)
+			return classNameRule.getName(orgName)
 		}
 		var name = orgName
 		if(!classSuffixToRemove.nullOrEmpty){
@@ -53,7 +53,7 @@ class ClassNameRule extends AbstractRule{
 	
 	def private String generatePackageName(PackageElement orgPackage){
 		var name = orgPackage.qualifiedName.toString
-		packageNameRule.getName(name, orgPackage)
+		packageNameRule.getName(name)
 	}
 	
 	def Pair<String,String> generateClassAndPackageName(QualifiedNameable orgClass){
