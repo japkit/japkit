@@ -9,6 +9,18 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import org.eclipse.xtend.lib.annotations.Data
 
+/**
+ * A NameRule describes how to derive the name of the target element from the source element.
+ * This rule is only used at the "top-level", that is, for the generated classes and resources.
+ * For members etc, the nameExprRule from RuleUtils is used instead.
+ * (TODO: can this be harmonized without breaking something?)
+ * 
+ * The rule supports:
+ * <ul>
+ * <li>creating the name by RegEx replacement of the source name
+ * <li>creating the name by evaluating an expression
+ * </ul>
+ */
 @Data
 class NameRule extends AbstractRule{
 	Pattern regEx
