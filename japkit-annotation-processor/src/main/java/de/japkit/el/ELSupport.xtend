@@ -1,9 +1,14 @@
 package de.japkit.el
 
 import com.google.common.base.Stopwatch
+import de.japkit.model.AnnotationAndParent
+import de.japkit.rules.LibraryRule
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
+import de.japkit.services.GenerateClassContext
 import de.japkit.services.MessageCollector
+import de.japkit.services.ReportedException
+import de.japkit.services.RuleException
 import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.TypesExtensions
 import java.io.Writer
@@ -15,12 +20,6 @@ import javax.lang.model.element.Element
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 import static de.japkit.util.MoreCollectionExtensions.*
-import de.japkit.services.RuleException
-import de.japkit.services.ReportedException
-import java.util.List
-import de.japkit.services.GenerateClassContext
-import de.japkit.model.AnnotationAndParent
-import de.japkit.rules.LibraryRule
 
 class ELSupport {
 	val transient extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)

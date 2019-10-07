@@ -5,6 +5,7 @@ import de.japkit.metaannotations.Constructor
 import de.japkit.metaannotations.Field
 import de.japkit.metaannotations.InnerClass
 import de.japkit.metaannotations.Method
+import de.japkit.metaannotations.Template
 import de.japkit.model.AnnotationWithDefaultAnnotation
 import de.japkit.model.GenElement
 import de.japkit.model.GenTypeElement
@@ -20,8 +21,6 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import de.japkit.metaannotations.Template
-import java.util.Objects
 
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
