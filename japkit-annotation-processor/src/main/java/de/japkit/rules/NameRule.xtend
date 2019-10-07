@@ -64,7 +64,7 @@ class NameRule extends AbstractRule{
 				}
 			
 			} else if(!expr.nullOrEmpty) {
-				//The extra scoping for src element is required here since in ElementsExtensions.generatedTypeElementAccordingToTriggerAnnotation
+				//The extra scoping for src element is required here since in ClassSelector.generatedTypeElementAccordingToTriggerAnnotation
 				//the name of the generated class for a different annotated class than the current one is determined.
 				//This has nevertheless some flaws, since there could be other context variables that were different when the other class has been generated.
 				//Maybe, the typesRegistry could be used in generatedTypeElementAccordingToTriggerAnnotation instead of calculating the name? 
