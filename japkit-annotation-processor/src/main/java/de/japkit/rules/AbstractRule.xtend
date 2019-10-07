@@ -14,7 +14,7 @@ import org.eclipse.xtend.lib.annotations.Data
 import de.japkit.services.RuleException
 
 @Data
-class AbstractRule implements Rule {
+abstract class AbstractRule implements Rule {
 	val transient protected extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val transient protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val transient protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
