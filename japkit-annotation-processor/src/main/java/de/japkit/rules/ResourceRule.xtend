@@ -81,8 +81,8 @@ class ResourceRule extends AbstractRule{
 					// filer.getResource(StandardLocation.CLASS_OUTPUT, triggerAnnotation.annotationAsTypeElement.package.qualifiedName, templateName).toUri;
 					printDiagnosticMessage['''Resoure template «templateName» «templateURL»''']
 	
-					val resourceName = resoureNameRule.getName(templateName)
-					val resourcePathName = resourePathNameRule.getName(currentAnnotatedClass.package.qualifiedName.toString.replace('.', '/'))
+					val resourceName = resoureNameRule.getName(templateName, currentAnnotatedClass)
+					val resourcePathName = resourePathNameRule.getName(currentAnnotatedClass.package.qualifiedName.toString.replace('.', '/'), currentAnnotatedClass)
 						
 					val resourceFile = resourceLocation.getFile(options, resourcePathName, resourceName)
 					resourceFile.ensureParentDirectoriesExist	
