@@ -18,7 +18,7 @@ class ValueStack implements Map<String, Object> {
 	}
 	
 	
-	public new(Map<String,  Object> values, ValueStack parent){
+	new(Map<String,  Object> values, ValueStack parent){
 		this.current = values
 		this.parent = parent
 	}
@@ -33,7 +33,7 @@ class ValueStack implements Map<String, Object> {
 		}
 	}
 	
-	def public getParent(){
+	def getParent(){
 		parent
 	}
 	

@@ -9,7 +9,7 @@ import org.eclipse.xtend.lib.annotations.Data
  * So, the message can be kept for more than one annotation processing round.
  */
 @Data
-public class Message {
+class Message {
 	Kind kind
 	
 	/**

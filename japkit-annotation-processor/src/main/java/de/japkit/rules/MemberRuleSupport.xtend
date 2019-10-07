@@ -15,7 +15,7 @@ import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.ReportedException
 
 @Data
-public abstract class MemberRuleSupport<E extends Element, T extends GenElement> extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
+abstract class MemberRuleSupport<E extends Element, T extends GenElement> extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
 
 	E template
 	String avPrefix

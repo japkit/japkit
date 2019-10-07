@@ -148,7 +148,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	 * Gets the code as CharSequence. The EmitterContext an the context element must be available on the thread local value stack.
 	 * This method is aimed to be used to include reusable code fragments into other code expressions.
 	 */
-	public def code() {
+	def code() {
 		code(valueStack.getRequired("ec") as EmitterContext)
 	}
 
@@ -207,11 +207,11 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	// TODO: ErrorResult bei den Cases??
 	}
 
-	public static def CharSequence withLinebreak(CharSequence cs) {
+	static def CharSequence withLinebreak(CharSequence cs) {
 		withLinebreak(cs, true)
 	}
 
-	public static def CharSequence withLinebreak(CharSequence cs, boolean linebreak) {
+	static def CharSequence withLinebreak(CharSequence cs, boolean linebreak) {
 		if (linebreak && cs !== null && cs.length > 0) '''«cs»
 		''' else
 			cs

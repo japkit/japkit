@@ -249,7 +249,7 @@ class BehaviorDelegationRule extends AbstractRule {
 	}
 	
 	
-	def public resolveTypeAndCreateProxy(TypeMirror selector) {
+	def resolveTypeAndCreateProxy(TypeMirror selector) {
 		try {
 
 			var tm = resolveType(selector, false)

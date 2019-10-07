@@ -55,7 +55,7 @@ class GenerateClassContext {
 	}
 	
 	
-	private val Stack<Rule> currentRules = new Stack()
+	val Stack<Rule> currentRules = new Stack()
 	
 	def getCurrentRule(){
 		if(currentRules.empty()) null else currentRules.peek

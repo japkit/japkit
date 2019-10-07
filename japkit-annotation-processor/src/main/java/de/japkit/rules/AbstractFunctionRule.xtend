@@ -97,7 +97,7 @@ abstract class AbstractFunctionRule<T> extends AbstractRule implements IParamete
 		eval(currentSrc)
 	}
 
-	private static val primitiveTypes = #{
+	static val primitiveTypes = #{
 		TypeKind.BOOLEAN -> boolean,
 		TypeKind.INT -> int,
 		TypeKind.LONG -> long,

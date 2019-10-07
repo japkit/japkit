@@ -54,7 +54,7 @@ class RuleUtils {
 	val protected transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	val protected transient extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
 
-	public static def withPrefix(CharSequence name, String prefix) {
+	static def withPrefix(CharSequence name, String prefix) {
 		(if(prefix.nullOrEmpty) name else { 
 			if(Character.isLowerCase(prefix.charAt(prefix.length -1))) 
 				'''«prefix»«name.toString.toFirstUpper»'''
@@ -69,7 +69,7 @@ class RuleUtils {
 	/**
 	 * Provides the source element(s) for rules 
 	 */
-	public def ()=>Object createSrcRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	def ()=>Object createSrcRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		createExpressionOrFunctionCallAndFilterRule(
 			metaAnnotation,
 			null,
@@ -94,7 +94,7 @@ class RuleUtils {
 	/**
 	 * Evaluates and expression and / or function(s) and optionally filters the results.
 	 */
-	public def ()=>Object createExpressionOrFunctionCallAndFilterRule(
+	def ()=>Object createExpressionOrFunctionCallAndFilterRule(
 		AnnotationMirror metaAnnotation,
 		Element metaElement,
 		String exprAV,
@@ -188,16 +188,16 @@ class RuleUtils {
 	}
 
 	/**Scope rule that gets the source element from "src" AV */
-	public def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
+	def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
 		createScopeRule(metaAnnotation, metaElement, false, avPrefix, true)
 	}
 
-	public def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary,
+	def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary,
 		String avPrefix) {
 		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, true)
 	}
 
-	public def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix,
+	def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix,
 		()=>Object srcRule) {
 		createScopeRule(metaAnnotation, metaElement, false, avPrefix, true)
 	}
@@ -205,7 +205,7 @@ class RuleUtils {
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
 	 */
-	public def <T> ScopeRule<T> createScopeRule(
+	def <T> ScopeRule<T> createScopeRule(
 		AnnotationMirror metaAnnotation,
 		Element metaElement,
 		boolean isLibrary,
@@ -223,14 +223,14 @@ class RuleUtils {
 
 	ScopeRule<Object> SCOPE_WITH_CURRENT_SRC
 
-	public def ScopeRule scopeWithCurrentSrc() {
+	def ScopeRule scopeWithCurrentSrc() {
 		if (SCOPE_WITH_CURRENT_SRC === null) {
 			SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null, null)
 		}
 		SCOPE_WITH_CURRENT_SRC
 	}
 
-	public def createELVariableRules(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
+	def createELVariableRules(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
 		val rules = newArrayList();
 		// Create VarRules from the "vars" AV
 		rules.addAll(metaAnnotation?.value("vars".withPrefix(avPrefix), typeof(AnnotationMirror[]))?.map [
@@ -255,14 +255,14 @@ class RuleUtils {
 
 	public static val ALWAYS_ACTIVE = [|true]
 
-	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		createActivationRule(metaAnnotation, avPrefix, [|true])
 	}
 
 	/**
 	 * AV "cond" to enable or disable a rule
 	 */
-	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix,
+	def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix,
 		()=>Boolean defaultValue) {
 
 		val rule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, "cond", "condLang",
@@ -280,7 +280,7 @@ class RuleUtils {
 	// In element names, "." is not allowed, so "_" can be used instead and is replaced by "."
 	static val expressionInTemplate = Pattern.compile('''\$(.+?)\$''')
 
-	public def replaceExpressionInTemplate(CharSequence template, boolean noSyntaxRestrictions, String lang,
+	def replaceExpressionInTemplate(CharSequence template, boolean noSyntaxRestrictions, String lang,
 		boolean autoCamelCase) {
 
 		val vs = ExtensionRegistry.get(ELSupport).valueStack
@@ -306,7 +306,7 @@ class RuleUtils {
 	/**
 	 * To set the name of the generated element either statically (AV: name) or dynamically (AV: nameExpr)
 	 */
-	public def ()=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
+	def ()=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		val nameFromTemplate = template?.simpleName
 		val name = metaAnnotation?.value("name".withPrefix(avPrefix), String)
 		val nameExpr = metaAnnotation?.value("nameExpr".withPrefix(avPrefix), String)
@@ -329,7 +329,7 @@ class RuleUtils {
 	/**
 	 * Copies annotations from template at first (if there are any ) and then applies the annotation mappings
 	 */
-	public def (GenElement)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
+	def (GenElement)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
 		AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 
 		val mappings = metaAnnotation?.annotationMappingRulesFromMetaAnnotation("annotations".withPrefix(avPrefix)) ?: newArrayList();
@@ -399,7 +399,7 @@ class RuleUtils {
 		}
 	]
 
-	public def ()=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template,
+	def ()=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template,
 		String avPrefix) {
 		val templateModifiers = template?.modifiers ?: emptySet
 
@@ -440,11 +440,11 @@ class RuleUtils {
 		]
 	}
 
-	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avPrefix) {
+	def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avPrefix) {
 		createTypeRule(metaAnnotation, template, "type", avPrefix, [|currentSrcElement.srcType?.resolveType])
 	}
 
-	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avName,
+	def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avName,
 		String avPrefix, ()=>TypeMirror defaultValue) {
 
 		[|
@@ -480,7 +480,7 @@ class RuleUtils {
 		[|rules.map[apply].flatten.toList]
 	}
 
-	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation,
+	def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation,
 		VariableElement template, String avPrefix) {
 		new ParamRule(paramAnnotation, template, avPrefix);
 

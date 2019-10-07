@@ -109,7 +109,7 @@ class RuleFactory {
 		getOrCreate(functionCache, element, [createFunctionInternal(element)])
 	}
 	
-	private static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, Element)=>IParameterlessFunctionRule<?>>> 
+	static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, Element)=>IParameterlessFunctionRule<?>>> 
 		functionFactories = #[
 			CodeFragment->[am, e | new CodeFragmentRule(am, e)],
 			Function->[am, e | new FunctionRule(am, e)],

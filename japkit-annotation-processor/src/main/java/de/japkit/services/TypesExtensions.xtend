@@ -34,7 +34,7 @@ class TypesExtensions /**implements Types*/{
 	val transient extension Elements elementUtils = ExtensionRegistry.get(Elements)
 	val transient extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
 	
-	public def TypeMirror getJavaLangObject(){
+	def TypeMirror getJavaLangObject(){
 		findTypeElement(Object.name).asType
 	}
 	
