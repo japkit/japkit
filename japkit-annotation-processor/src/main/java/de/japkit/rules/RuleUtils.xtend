@@ -536,9 +536,26 @@ class RuleUtils {
 		if(av !== null) av.map[createMatcherRule(it)] else emptyList
 	}
 
-	// Catches Exceptions and reports them as errors for the current meta annotation.
-	// The AV name can be provided to report the error for that AV of the meta annotation.
-	// TODO: We have this in many places with subtle differences. Refactor for harmonization?
+	/** 
+	 * Catches Exceptions and reports them as errors for the current meta annotation.
+	 * The AV name can be provided to report the error for that AV of the meta annotation.
+	 * TODO: We have this in many places with subtle differences. Refactor for harmonization? 
+	 * 
+	 * <ul>
+	 * <li>TypeElementNotFoundException is always rethrown, since they need to be handled in the the JapkitProcessor itself by deferring the code generation until the missing type becomes available.
+	 * <li>ReportedException is rethrown, unless an errorResult is given. ReporteException means, that the Exception has always been reported to the MessageCollector and does not need to be handled again.
+	 * <li>RuleException and other Exceptions are reported to the MessageCollector to be shown as error to the user later. In no errorResult is given, an ReportedException is thrown then.
+	 * </ul>
+	 * 
+	 * The errors are reported for the current context (currently processed annotated class or package and meta-element / meta-annotation of the currently processed rule )
+	 * 
+	 * @param errorResult the function that supplies the result that should be returned in case of an error. To be used if it makes sense to continue code generation for the current element after the error. 
+	 * @param avName optional. The name of the annotation value of the meta-annotation for which the error occurred or is related to.
+	 * @param closure the code to be executed within the try-catch
+	 * 
+	 * @return the result from execution of the code or (in case of error) the errorResult
+	 * 
+	 */
 	def <T> T handleException(()=>T errorResult, String avName, ()=>T closure) {
 		try {
 			closure.apply()
