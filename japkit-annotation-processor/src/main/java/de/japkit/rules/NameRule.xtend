@@ -8,6 +8,7 @@ import java.util.regex.Pattern
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import org.eclipse.xtend.lib.annotations.Data
+import de.japkit.services.RuleException
 
 /**
  * A NameRule describes how to derive the name of the target element from the source element.
@@ -22,54 +23,51 @@ import org.eclipse.xtend.lib.annotations.Data
  * </ul>
  */
 @Data
-class NameRule extends AbstractRule{
+class NameRule extends AbstractRule {
 	Pattern regEx
 	String regExReplace
 	String expr
 	String lang
+	String prefix
 
 	val transient extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val transient extension ELSupport = ExtensionRegistry.get(ELSupport)
-	
-	new(AnnotationMirror metaAnnotation, String avPrefix){
+
+	new(AnnotationMirror metaAnnotation, String avPrefix) {
 		super(metaAnnotation, null)
-		val prefix = if(avPrefix === null) "name" else avPrefix
+		prefix = if(avPrefix === null) "name" else avPrefix
 		regEx = metaAnnotation.value('''«prefix»RegEx''', Pattern)
-		regExReplace = metaAnnotation.value('''«prefix»RegExReplace''', String)		
-		expr =  metaAnnotation.value('''«prefix»Expr''', String)		
-		lang =  metaAnnotation.value('''«prefix»Lang''', String)		
+		regExReplace = metaAnnotation.value('''«prefix»RegExReplace''', String)
+		expr = metaAnnotation.value('''«prefix»Expr''', String)
+		lang = metaAnnotation.value('''«prefix»Lang''', String)
 	}
-	
-	def isEmpty(){
+
+	def isEmpty() {
 		regEx === null && expr === null
 	}
-		
-	def String getName(CharSequence orgName, Element orgElement){
+
+	def String getName(CharSequence orgName) {
 		inRule[
-			if(regEx !== null){
-			
+			if (regEx !== null) {
+
 				val matcher = regEx.matcher(orgName)
-				
-				if(!matcher.matches){
-					throw new ProcessingException('''Naming rule violated: Name "«orgName»" must match pattern "«regEx.pattern»"''', orgElement)
+
+				if (!matcher.matches) {
+					throw new RuleException('''Naming rule violated: Name "«orgName»" must match pattern "«regEx.pattern»"''', '''«prefix»RegEx''')
 				}
-				try{
-					val name =  matcher.replaceFirst(regExReplace)	
-					if(name.empty){
-						throw new ProcessingException('''Naming rule violated: Name "«orgName»" must not be empty after replacing with "«regExReplace»"''', orgElement)
+				try {
+					val name = matcher.replaceFirst(regExReplace)
+					if (name.empty) {
+						throw new RuleException('''Naming rule violated: Name "«orgName»" must not be empty after replacing with "«regExReplace»"''', '''«prefix»RegExReplace''')
 					}
 					return name
-				} catch (RuntimeException e){
-					throw new ProcessingException('''Exception when replacing RegEx "«regEx.pattern»" with "«regExReplace»": «e.message»''', orgElement)
+				} catch (RuntimeException e) {
+					throw new RuleException('''Exception when replacing RegEx "«regEx.pattern»" with "«regExReplace»": «e.message»''', '''«prefix»RegEx''')
 				}
-			
-			} else if(!expr.nullOrEmpty) {
-				//The extra scoping for src element is required here since in ClassSelector.generatedTypeElementAccordingToTriggerAnnotation
-				//the name of the generated class for a different annotated class than the current one is determined.
-				//This has nevertheless some flaws, since there could be other context variables that were different when the other class has been generated.
-				//Maybe, the typesRegistry could be used in generatedTypeElementAccordingToTriggerAnnotation instead of calculating the name? 
-				scope(orgElement)[
-					eval(expr, lang, String)			
+
+			} else if (!expr.nullOrEmpty) {
+				handleException(null, '''«prefix»Expr''') [
+					eval(expr, lang, String)
 				]
 			} else {
 				orgName.toString

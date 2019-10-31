@@ -97,7 +97,22 @@ class TriggerAnnotationRule extends AbstractRule {
 			reportRuleError('''There must be exactly one @Clazz annotation in the trigger annoation declaration to determine the name of the generated class unambgiuously.''')
 			null
 		} else {
-			classRules.head.getGeneratedTypeElementFqn(annotatedClass)
+			// TODO: Make sure the nameRule is context free. That is, it should only depend on annotatedClass. This is currently not always true, if nameExpr is used.
+		
+			// The extra scoping for src element and setting of annotatedClass
+			// is required since the name rule is called here for a different annotated class than the current one.
+			// This has nevertheless some flaws, since there could be other context variables that were different when the other class has been generated.
+			// Especially, when using nameExpr, this could lead to wrong results.
+			// Maybe, the typesRegistry could be used in generatedTypeElementAccordingToTriggerAnnotation instead of calculating the name? 
+			scope(annotatedClass) [
+				val annotatedClassBefore = currentAnnotatedClass
+				try {
+					setCurrentAnnotatedClass(annotatedClass)
+					classRules.head.getGeneratedTypeElementFqn()		
+				} finally {
+					setCurrentAnnotatedClass(annotatedClassBefore)
+				}
+			]
 		}
 	}
 	

@@ -6,6 +6,7 @@ import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
 import javax.lang.model.element.QualifiedNameable
+import de.japkit.services.RuleException
 
 @Data
 class ClassNameRule extends AbstractRule{
@@ -20,25 +21,25 @@ class ClassNameRule extends AbstractRule{
 		//TODO: Special Handling if orgClass is Package
 		val orgName = orgClass.simpleName.toString
 		if(!(classNameRule.empty)){	
-			return classNameRule.getName(orgName, orgClass)
+			return classNameRule.getName(orgName)
 		}
 		var name = orgName
 		if(!classSuffixToRemove.nullOrEmpty){
 			if(!name.endsWith(classSuffixToRemove)){
-				throw new ProcessingException('''Naming rule violated: Name "«orgName»" must end with «classSuffixToRemove»''', orgClass)
+				throw new RuleException('''Naming rule violated: Name "«orgName»" must end with «classSuffixToRemove»''', "nameSuffixToRemove")
 			}
 			name = name.substring(0, name.length-classSuffixToRemove.length)
 			if(name.empty){
-				throw new ProcessingException('''Naming rule violated: Name "«orgName»" must not be empty after removing suffix «classSuffixToRemove»''', orgClass)
+				throw new RuleException('''Naming rule violated: Name "«orgName»" must not be empty after removing suffix «classSuffixToRemove»''', "nameSuffixToRemove")
 			}
 		}
 		if(!classPrefixToRemove.nullOrEmpty){
 			if(!name.startsWith(classPrefixToRemove)){
-				throw new ProcessingException('''Naming rule violated: Name "«orgName»" must begin with «classPrefixToRemove»''', orgClass)
+				throw new RuleException('''Naming rule violated: Name "«orgName»" must begin with «classPrefixToRemove»''', "namePrefixToRemove")
 			}
 			name = name.substring(classPrefixToRemove.length)
 			if(name.empty){
-				throw new ProcessingException('''Naming rule violated: Name "«orgName»" must not be empty after removing prefix «classPrefixToRemove»''', orgClass)
+				throw new RuleException('''Naming rule violated: Name "«orgName»" must not be empty after removing prefix «classPrefixToRemove»''', "namePrefixToRemove")
 			}
 		}
 		
@@ -53,7 +54,7 @@ class ClassNameRule extends AbstractRule{
 	
 	def private String generatePackageName(PackageElement orgPackage){
 		var name = orgPackage.qualifiedName.toString
-		packageNameRule.getName(name, orgPackage)
+		packageNameRule.getName(name)
 	}
 	
 	def Pair<String,String> generateClassAndPackageName(QualifiedNameable orgClass){
@@ -62,7 +63,7 @@ class ClassNameRule extends AbstractRule{
 		]
 	}
 	
-	def String generateQualifiedName(TypeElement orgClass){
+	def String generateQualifiedName(QualifiedNameable orgClass){
 		val names = generateClassAndPackageName(orgClass)
 		'''«names.key».«names.value»'''.toString
 	}
