@@ -3,7 +3,6 @@ package de.japkit.rules
 import de.japkit.metaannotations.Clazz
 import de.japkit.metaannotations.ResourceTemplate
 import de.japkit.model.GenTypeElement
-import de.japkit.services.ProcessingException
 import de.japkit.services.TypeElementNotFoundException
 import java.util.ArrayList
 import java.util.List

@@ -12,7 +12,6 @@ import de.japkit.model.GenInterface
 import de.japkit.model.GenPackage
 import de.japkit.model.GenTypeElement
 import de.japkit.services.ExtensionRegistry
-import de.japkit.services.ProcessingException
 import de.japkit.services.TypeElementNotFoundException
 import java.util.List
 import java.util.Set

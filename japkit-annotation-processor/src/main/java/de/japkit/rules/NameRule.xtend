@@ -3,10 +3,8 @@ package de.japkit.rules
 import de.japkit.el.ELSupport
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
-import de.japkit.services.ProcessingException
 import java.util.regex.Pattern
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Element
 import org.eclipse.xtend.lib.annotations.Data
 import de.japkit.services.RuleException
 

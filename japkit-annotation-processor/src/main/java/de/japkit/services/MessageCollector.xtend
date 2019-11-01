@@ -237,49 +237,35 @@ class MessageCollector {
 	
 	
 	def reportError(CharSequence msg, Exception ex, Element element, AnnotationMirror annotation, CharSequence annotationValueName){
-		reportError(new ProcessingException('''«msg» Cause: «ex»: «ex.message»\n at «ex.stackTrace.join("\n at ")»''', element, annotation, annotationValueName, null))  //TODO: Refactor
-	}
-	
-	def reportError(CharSequence msg, Element element, AnnotationMirror annotation, CharSequence annotationValueName){
-		reportError(new ProcessingException(msg?.toString, element, annotation, annotationValueName, null))  //TODO: Refactor
-	}
-
-	def reportError(ProcessingException pe) {
+		
 
 		//Always prepend the location, so it can be found even if not in current project (f.e. annotations with meta annotations)
-		val elementStr = if (pe.element !== null) {
-				'''Element: «pe.element», '''
+		val elementStr = if (element !== null) {
+				'''Element: «element», '''
 			} else {
 				''
 			}
-		val annotationStr = if (pe.annotationMirror !== null) {
-				'''Annotation: «pe.annotationMirror», '''
+		val annotationStr = if (annotation !== null) {
+				'''Annotation: «annotation», '''
 			} else {
 				''
 			}
-		val annotationValueStr = if (pe.annotationValueName !== null) {
-				'''Annotation Value: «pe.annotationValueName»«IF pe.annotationValue !== null» ="«pe.annotationValue.value»"«ENDIF», '''
+		val annotationValueStr = if (annotationValueName !== null) {
+				'''Annotation Value: «annotationValueName», '''
 			} else {
 				''
 			}
 		
 
-		val msg = '''«elementStr»«annotationStr»«annotationValueStr»«pe.message»'''
-		var element = pe.element
-		if (element === null) {
-			element = currentAnnotatedClass //Make sure there is always an element where the error can be reported
-		}
-		var annotation = pe.annotationMirror
-		if (annotation === null) {
-			annotation = currentTriggerAnnotation
-		}
+		val fullMsg = '''«elementStr»«annotationStr»«annotationValueStr»«msg» Cause: «ex»: «ex.message»\n at «ex.stackTrace.join("\n at ")»'''
 
-		addMessage(Kind.ERROR, msg, element, annotation, pe.annotationValueName?.toString)
+
+		addMessage(Kind.ERROR, fullMsg, element ?: currentAnnotatedClass, annotation ?: currentTriggerAnnotation, annotationValueName?.toString)
 
 		if (currentAnnotatedClass !== null) {
 
 			//Make sure, the error is reported for an element within the project, even if the original cause is an element outside the project
-			addMessage(Kind.ERROR, msg, currentAnnotatedClass, currentTriggerAnnotation, null)
+			addMessage(Kind.ERROR, fullMsg, currentAnnotatedClass, currentTriggerAnnotation, null)
 		}
 
 	}

@@ -1,9 +1,7 @@
 package de.japkit.rules
 
-import de.japkit.services.ProcessingException
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
-import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
 import javax.lang.model.element.QualifiedNameable
 import de.japkit.services.RuleException
