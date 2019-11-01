@@ -76,10 +76,7 @@ class TriggerAnnotationRule extends AbstractRule {
 					classRules.forEach[generateClass(null, generatedClasses)]
 						
 					resourceRules.forEach[generateResource]
-					
-				} catch (ProcessingException pe) {
-					reportError(pe)
-					
+						
 				} catch (TypeElementNotFoundException tenfe) {
 					handleTypeElementNotFound(tenfe, annotatedClass)
 					

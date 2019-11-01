@@ -7,7 +7,6 @@ import de.japkit.model.GenAnnotationMirror
 import de.japkit.model.GenExtensions
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.GenerateClassContext
-import de.japkit.services.ProcessingException
 import de.japkit.services.ReportedException
 import de.japkit.services.RuleException
 import de.japkit.services.TypeElementNotFoundException
@@ -64,7 +63,7 @@ class AnnotationMappingRule extends AbstractRule {
 				null
 			} catch (ReportedException re){
 				null
-			} catch (RuntimeException re) {
+			} catch (Exception re) {
 				reportRuleError("Error during annotation mapping." + re)
 				null
 			}
@@ -76,11 +75,7 @@ class AnnotationMappingRule extends AbstractRule {
 	def private copyAnnotations(List<GenAnnotationMirror> annotations) {
 		if (!copyAnnotationsFqns.empty || !copyAnnotationsFromPackages.empty) {
 			currentSrcElement.annotationMirrors.filter[shallCopyAnnotation].forEach [
-				try {
-					annotations.add(copyAnnotation)
-				} catch (ProcessingException e) {
-					reportError(e)
-				}
+				annotations.add(copyAnnotation)
 			]
 		}
 	}

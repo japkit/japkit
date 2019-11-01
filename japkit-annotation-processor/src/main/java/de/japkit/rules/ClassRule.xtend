@@ -188,9 +188,6 @@ class ClassRule extends AbstractRule {
 
 					behaviorRule.createBehaviorDelegation(generatedClass)
 
-				} catch (ProcessingException pe) {
-					reportError(pe)
-
 				} catch (TypeElementNotFoundException tenfe) {
 					handleTypeElementNotFound(tenfe, currentAnnotatedClass)
 
@@ -255,7 +252,7 @@ class ClassRule extends AbstractRule {
 		} catch (TypeElementNotFoundException tenfe) {
 			handleTypeElementNotFound('''Missing type when creating shadow annotation:''', tenfe.fqn)
 		} catch (RuntimeException re) {
-			reportRuleError('''Error when creating shadow annotation: «re»''')
+			reportRuleError('''Error when creating shadow annotation: «re.message»''')
 		}
 	}
 

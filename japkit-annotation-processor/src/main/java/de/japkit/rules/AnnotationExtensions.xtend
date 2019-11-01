@@ -6,13 +6,13 @@ import de.japkit.model.GenAnnotationValue
 import de.japkit.model.GenExtensions
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
-import de.japkit.services.ProcessingException
 import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.TypesExtensions
 import java.util.ArrayList
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import de.japkit.services.RuleException
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -61,9 +61,8 @@ class AnnotationExtensions {
 
 				if (avMethod === null || !avMethod.returnType.
 					boolean) {
-					throw new ProcessingException(
-					'''The annotation value '«SHADOW_AV»' could not be set on annotation «am.annotationType», since it is not declared in the annotation type or is not boolean.''',
-						null)
+					throw new RuleException(
+					'''The annotation value '«SHADOW_AV»' could not be set on annotation «am.annotationType», since it is not declared in the annotation type or is not boolean.''')
 				}
 
 				true
