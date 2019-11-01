@@ -115,7 +115,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 
 	new(AnnotationMirror a,  Map<String, AnnotationMappingRule> mappingsWithId) {
 		super(a, null)
-		name = a.value(null, "name", String)
+		name = a.value("name", String)
 		
 		val setAvNames = newHashSet
 		

@@ -733,8 +733,9 @@ class JapkitProcessor extends AbstractProcessor {
 				«ste»
 			«ENDFOR»''');
 		val found = processingEnv.elementUtils.getTypeElement(typeElement.qualifiedName);
-		processingEnv.messager.printMessage(Kind::WARNING, '''Found TypeElement: «found» «found.kind» «found.class», Type Mirror:  «found.asType» «found.asType.kind» «found.asType.class»''');
-				
+		if(found !== null) {
+			processingEnv.messager.printMessage(Kind::WARNING, '''Found TypeElement: «found» «found.kind» «found.class», Type Mirror:  «found.asType» «found.asType.kind» «found.asType.class»''');
+		}		
 	}
 	
 	def private Throwable getRootCause(Throwable t) {
