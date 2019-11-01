@@ -126,7 +126,7 @@ class ElementsExtensions {
 		if (am === null) {
 			Integer.MAX_VALUE //elements without order go to the end
 		} else {
-			am.requiredValue(e, "value", Integer)
+			am.value(e, "value", Integer) ?: Integer.MAX_VALUE 
 		}
 	}
 
@@ -514,19 +514,13 @@ class ElementsExtensions {
 	/**
  * Gets an annotation value and casts it to a given type. The annotates element must be provided for error reporting.
  */
-	def <T> T value(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name, Class<T> avType,
-		boolean isRequired) {
+	def <T> T value(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name, Class<T> avType) {
 		val av = annotationMirror.value(name)
 
 		val value = av?.valueWithErrorHandling
 		
 		if (isNullOrEmptyAV(value)) {
-			if (isRequired) {
-				throw new ProcessingException('''Required Annotation value «name» is missing.''', annotatedElement,
-					annotationMirror, name, av);
-			} else {
-				return null
-			}
+			return null
 		}
 
 		av.mapAs(av.valueWithErrorHandling, annotationMirror, annotatedElement, name, null, avType)
@@ -650,19 +644,10 @@ class ElementsExtensions {
 		prefixedAvName
 	}
 
-	def <T> value(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name, Class<T> avType) {
-		annotationMirror.value(annotatedElement, name, avType, false)
-	}
-
 	def <T> value(AnnotationMirror annotationMirror, CharSequence name, Class<T> avType) {
-		annotationMirror.value(null, name, avType, false)
+		annotationMirror.value(null, name, avType)
 	}
 
-
-	def <T> requiredValue(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name,
-		Class<T> avType) {
-		annotationMirror.value(annotatedElement, name, avType, true)
-	}
 
 	def annotationsByName(Element e, String packageForShortNames) {
 		[ String fqnOrShortname |

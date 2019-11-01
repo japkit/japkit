@@ -26,6 +26,7 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 import java.util.Collections
 import de.japkit.services.ReportedException
+import de.japkit.services.RuleException
 
 @Data
 class ClassRule extends AbstractRule {
@@ -321,8 +322,7 @@ class ClassRule extends AbstractRule {
 			case ElementKind.ANNOTATION_TYPE:
 				new GenAnnotationType(enclosingElAndClassName.value, enclosingElAndClassName.key)
 			default:
-				throw new ProcessingException('''Invalid element kind in GenClass annotation: «kind»''',
-					currentAnnotatedClass)
+				throw new RuleException('''Invalid element kind in GenClass annotation: «kind»''')
 		}
 
 		generatedClass
