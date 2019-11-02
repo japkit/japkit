@@ -744,7 +744,7 @@ class ElementsExtensions {
 	//So, we tolerate Iterables when setting single valued AVs
 	def dispatch Object coerceSingleValue(Iterable<?> value, TypeMirror avType) {
 		if(value.size>1) {
-			throw new RuleException(''''«value»' is not a valid value or element value for type «avType», since it contains multiple elements''');
+			throw new IllegalArgumentException(''''«value»' is not a valid value or element value for type «avType», since it contains multiple elements''');
 		}
 		coerceSingleValue(value.head, avType) 
 	}
@@ -753,8 +753,7 @@ class ElementsExtensions {
 		val v = toAnnotationValue(avType, value)
 		
 		if (!avType.toAnnotationValueClass.isInstance(v)) {
-			throw new RuleException(
-				''''«v»' of type «v?.class» is not a valid value or element value for type «avType»''');
+			throw new IllegalArgumentException(''''«v»' of type «v?.class» is not a valid value or element value for type «avType»''');
 		}
 		v
 	}
@@ -795,7 +794,7 @@ class ElementsExtensions {
 			case e.kind == ElementKind.ENUM: {
 				val enumConst = avType.asTypeElement.declaredFields.findFirst[simpleName.contentEquals(s)]
 				if (enumConst === null) {
-					throw new RuleException('''«s» is not a valid enum constant for enum type «avType»''');
+					throw new IllegalArgumentException('''«s» is not a valid enum constant for enum type «avType»''');
 				}
 				enumConst
 			}
@@ -814,7 +813,7 @@ class ElementsExtensions {
 	}
 
 	def static unsupportedAVType(TypeMirror type, Object o) {
-		new RuleException('''An annotation value of type «type» cannot be created from value "«o»" of type «o?.class»''')
+		new IllegalArgumentException('''An annotation value of type «type» cannot be created from value "«o»" of type «o?.class»''')
 	}
 
 	def isAbstract(Element e) {

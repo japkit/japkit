@@ -81,7 +81,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 					} else if (expr !== null) {
 						evaluateExpression(avType, expr)
 					} else {
-						throw new IllegalStateException("Annotation value could not be determined.");
+						throw new IllegalStateException("Annotation value could not be determined, since none of value, expr or lazyAnnotationMapping is set.");
 					}
 				]?.forEach[if(it instanceof Iterable<?>) flatValues.addAll(it) else flatValues.add(it)]
 

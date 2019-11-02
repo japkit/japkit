@@ -9,14 +9,14 @@ import javax.lang.model.element.AnnotationMirror
 class RuleException extends RuntimeException {
 	
 	/**
-	 * Optionally the name of the annotation value for which the error occured. 
+	 * Optionally the name of the meta annotation value for which the error occured. 
 	 */
-	String avName;
+	String metaAnnotationValueName;
 	
 	/**
-	 * Optionally the annotation mirror for which the error occured. 
+	 * Optionally the meta annotation for which the error occured. 
 	 */
-	AnnotationMirror annotation;
+	AnnotationMirror metaAnnotation;
 	
 	new(String message){
 		this(message, null, null)
@@ -26,10 +26,10 @@ class RuleException extends RuntimeException {
 		this(message, null, avName)
 	}
 	
-	new(String message, AnnotationMirror annotation, String avName){
+	new(String message, AnnotationMirror metaAnnotation, String metaAnnotationValueName){
 		super(message)
-		this.avName=avName
-		this.annotation = annotation
+		this.metaAnnotationValueName=metaAnnotationValueName
+		this.metaAnnotation = metaAnnotation
 	}
 			
 }
