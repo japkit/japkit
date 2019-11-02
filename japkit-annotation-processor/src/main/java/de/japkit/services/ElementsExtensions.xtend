@@ -513,15 +513,20 @@ class ElementsExtensions {
 	 * Gets an annotation value and casts it to a given type. 
 	 */
 	def <T> T value(AnnotationMirror annotationMirror, CharSequence name, Class<T> avType) {
-		val av = annotationMirror.value(name)
-
-		val value = av?.valueWithErrorHandling
-		
-		if (isNullOrEmptyAV(value)) {
-			return null
+		try {
+			val av = annotationMirror.value(name)
+	
+			val value = av?.valueWithErrorHandling
+			
+			if (isNullOrEmptyAV(value)) {
+				return null
+			}	
+			av.mapAs(av.valueWithErrorHandling, annotationMirror, name, null, avType)		
+		} catch(Exception e) {
+			//Rethrow as RuleException here top provide some context.
+			//TODO: annotation and maybe cause as param...
+			throw new RuleException('''Error when getting annotation value «name»: «e.message»''', annotationMirror, name.toString);
 		}
-
-		av.mapAs(av.valueWithErrorHandling, annotationMirror, name, null, avType)
 	}
 	
 	def isNullOrEmptyAV(Object value) {

@@ -565,9 +565,6 @@ class RuleUtils {
 		} catch (ReportedException e) {
 			// Do not report the error again to avoid error flooding
 			if(errorResult !== null) return errorResult.apply() else throw e
-		} catch (RuleException e) {
-			reportRuleError(e, avName ?: e.avName)
-			if(errorResult !== null) return errorResult.apply() else throw new ReportedException(e)
 		} catch (Exception e) {
 			reportRuleError(e, avName)
 			if(errorResult !== null) return errorResult.apply() else throw new ReportedException(e)

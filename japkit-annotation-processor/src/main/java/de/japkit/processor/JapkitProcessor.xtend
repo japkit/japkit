@@ -35,6 +35,7 @@ import de.japkit.services.ReportedException
 import de.japkit.services.TypeElementFromCompilerCache
 import javax.lang.model.element.Element
 import javax.lang.model.element.QualifiedNameable
+import de.japkit.services.RuleException
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -640,8 +641,8 @@ class JapkitProcessor extends AbstractProcessor {
 	}
 
 	def Map<GenTypeElement, QualifiedNameable> processAnnotatedClass(QualifiedNameable annotatedClass) {
+		setCurrentAnnotatedClass(annotatedClass)
 		try {
-			setCurrentAnnotatedClass(annotatedClass)
 			val Map<GenTypeElement, QualifiedNameable> generatedTopLevelClasses = newHashMap;
 	
 			//Whatever messages we had so far - they will be re-created if the reason still exists
@@ -661,8 +662,8 @@ class JapkitProcessor extends AbstractProcessor {
 			//Do nothing. It has been reported as error before.
 			emptyMap
 		} catch (Exception e) {
-			//This is the last fallback when a exception has not been handled well. Especially in rule constructors, this may still occur in some cases.
-			messageCollector.reportError('Unexpected Exception when processing annotated class:', e, annotatedClass, null, null)
+			//This is the last fallback when a exception has not been handled before. Especially in rule constructors, this may still occur in some cases.
+			messageCollector.reportRuleError(e)
 			emptyMap	 
 		} finally {
 			setCurrentAnnotatedClass(null)

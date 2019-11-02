@@ -64,7 +64,7 @@ class GenerateClassContext {
 	def void pushCurrentRule(Rule rule){
 		if(currentRules.size > 30 && currentRules.filter[it===rule].size>20){
 			currentRules.groupBy[it].filter[k, v| v.size >19].keySet.forEach[			
-				ExtensionRegistry.get(MessageCollector).reportRuleError(rule, "Potential infinite recursion.", null)		
+				ExtensionRegistry.get(MessageCollector).reportRuleError(rule, "Potential infinite recursion.", null, null)		
 			]
 			
 			throw new RuleStackOverflowError("Potential infinite recursion. "+currentRules?.map[metaElement+ " " + metaAnnotation ].join("\n"))

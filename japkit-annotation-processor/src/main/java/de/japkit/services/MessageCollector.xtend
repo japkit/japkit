@@ -14,13 +14,13 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.AnnotationValue
 import javax.lang.model.element.Element
 import javax.lang.model.element.PackageElement
+import javax.lang.model.element.QualifiedNameable
 import javax.lang.model.element.TypeElement
+import javax.tools.Diagnostic
 import javax.tools.Diagnostic.Kind
 import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
-import javax.tools.Diagnostic
-import javax.lang.model.element.QualifiedNameable
 
 /** Collects error messages for annotated classes.
  * <p>
@@ -194,7 +194,7 @@ class MessageCollector {
 	}
 	
 	def dispatch void reportRuleError(CharSequence msg){
-		reportRuleError(msg, null)
+		reportRuleError(currentRule, msg, null,null)
 	}
 	
 	def dispatch void reportRuleError(Exception e){
@@ -202,71 +202,54 @@ class MessageCollector {
 	}
 	
 	def dispatch void reportRuleError(ELProviderException e, CharSequence metaAnnotationValueName){
-		reportRuleError('''«e.rootCause.message»''', metaAnnotationValueName)
+		reportRuleError(currentRule, '''«e.rootCause.message»''', null, metaAnnotationValueName)
 	}
 	
 	def dispatch void reportRuleError(RuleException e, CharSequence metaAnnotationValueName){
-		reportRuleError('''«e.message»''', metaAnnotationValueName)
+		reportRuleError(currentRule, '''«e.message»«stacktrace(e)»''', e.annotation, metaAnnotationValueName ?: e.avName)
 	}
 	
 	def dispatch void reportRuleError(Exception e, CharSequence metaAnnotationValueName){
-		reportRuleError('''«e», cause: «e.rootCause.message» 
-		«FOR ste : e.stackTrace.subList(0, Math.min(20, e.stackTrace.length))»
-			«ste»
-		«ENDFOR»''', metaAnnotationValueName)
+		reportRuleError(currentRule, '''«e»«stacktrace(e)»''', null, metaAnnotationValueName)
 	}
+	
+	protected def CharSequence stacktrace(Exception e) {
+		if (e.cause !== null)
+			''', cause: «e.rootCause.message» 
+			«FOR ste : e.stackTrace.subList(0, Math.min(20, e.stackTrace.length))»
+				«ste»
+			«ENDFOR»'''
+		else
+			''
+	}
+	
 	
 	def dispatch void reportRuleError(CharSequence msg, CharSequence metaAnnotationValueName){
-		reportRuleError(currentRule, msg, metaAnnotationValueName)
+		reportRuleError(currentRule, msg, null, metaAnnotationValueName)
 	}
 		
-	def reportRuleError(Rule rule, CharSequence msg, CharSequence metaAnnotationValueName){
+	def reportRuleError(Rule rule, CharSequence msg, AnnotationMirror metaAnnotation_,
+		CharSequence metaAnnotationValueName) {
 		val extension ELSupport = ExtensionRegistry.get(ELSupport)
-		
-		val metaAnnotation = rule?.metaAnnotation 
-		var metaElement = if (metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.rootAnnotatedElement else rule?.metaElement   //There are rules without any meta annotation. They only have a template element.
-			
-		
-		addMessage(Kind.ERROR, '''«msg?.toString» MetaElement: «metaElement», MetaAnnotation: «metaAnnotation», Src: «currentSrcOptional»''', currentAnnotatedClass, null, null)
-		
-		addMessage(Kind.ERROR, msg?.toString, metaElement, metaAnnotation, metaAnnotationValueName?.toString)
-		
-		
-	}
-	
-	
-	
-	def reportError(CharSequence msg, Exception ex, Element element, AnnotationMirror annotation, CharSequence annotationValueName){
-		
 
-		//Always prepend the location, so it can be found even if not in current project (f.e. annotations with meta annotations)
-		val elementStr = if (element !== null) {
-				'''Element: «element», '''
-			} else {
-				''
-			}
-		val annotationStr = if (annotation !== null) {
-				'''Annotation: «annotation», '''
-			} else {
-				''
-			}
-		val annotationValueStr = if (annotationValueName !== null) {
-				'''Annotation Value: «annotationValueName», '''
-			} else {
-				''
-			}
-		
+		val metaAnnotation = metaAnnotation_ ?: rule?.metaAnnotation
+		var metaElement = if(metaAnnotation instanceof AnnotationAndParent) metaAnnotation?.
+				rootAnnotatedElement else rule?.metaElement
+				
+		// There are rules without any meta annotation. They only have a template element.
+		// Always report on currentAnnotatedClass, since if the meta elements are in a different project, the errors would not be shown at all otherwise
+		addMessage(Kind.ERROR, '''
+			«msg?.toString» 
+			MetaElement: «metaElement», 
+			MetaAnnotation: «metaAnnotation»,
+			MetaAnnotationValue: «metaAnnotationValueName», 
+			Src: «currentSrcOptional ?: currentAnnotatedClass»
+			''', 
+			currentAnnotatedClass, null, null)
 
-		val fullMsg = '''«elementStr»«annotationStr»«annotationValueStr»«msg» Cause: «ex»: «ex.message»\n at «ex.stackTrace.join("\n at ")»'''
-
-
-		addMessage(Kind.ERROR, fullMsg, element ?: currentAnnotatedClass, annotation ?: currentTriggerAnnotation, annotationValueName?.toString)
-
-		if (currentAnnotatedClass !== null) {
-
-			//Make sure, the error is reported for an element within the project, even if the original cause is an element outside the project
-			addMessage(Kind.ERROR, fullMsg, currentAnnotatedClass, currentTriggerAnnotation, null)
-		}
+		addMessage(Kind.ERROR, '''«msg»''', 
+			metaElement, metaAnnotation, metaAnnotationValueName?.toString
+		)
 
 	}
 	
