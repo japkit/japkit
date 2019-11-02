@@ -522,10 +522,11 @@ class ElementsExtensions {
 				return null
 			}	
 			av.mapAs(av.valueWithErrorHandling, annotationMirror, name, null, avType)		
-		} catch(Exception e) {
-			//Rethrow as RuleException here top provide some context.
-			//TODO: annotation and maybe cause as param...
-			throw new RuleException('''Error when getting annotation value «name»: «e.message»''', annotationMirror, name.toString);
+		} catch (TypeElementNotFoundException tenfe) {
+			throw tenfe
+		} catch (Exception e) {
+			//Rethrow as AnnotationException here top provide some context.
+			throw new AnnotationException('''Error when getting annotation value «name»: «e.message»''', annotationMirror, name.toString, e);
 		}
 	}
 	

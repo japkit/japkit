@@ -35,6 +35,7 @@ import de.japkit.services.ReportedException
 import de.japkit.services.TypeElementFromCompilerCache
 import javax.lang.model.element.Element
 import javax.lang.model.element.QualifiedNameable
+import de.japkit.services.AnnotationException
 import de.japkit.services.RuleException
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
@@ -680,8 +681,12 @@ class JapkitProcessor extends AbstractProcessor {
 			try {
 				triggerAnnotationRule = createTriggerAnnotationRule(it.key.annotationAsTypeElement)
 			} catch (TypeElementNotFoundException tenfe) {
+				//TODO: Really? 
 				handleTypeElementNotFound('''Type «tenfe.fqn» not found when creating trigger annotation rule «it.key.annotationType.qualifiedName»''',
 					tenfe.fqn)
+			} catch (AnnotationException ae) {
+				//AnnotationExceptions during rule creation are related to meta annotations -> rethrow as RuleException
+				throw new RuleException(ae.message, ae.annotation, ae.annotationValueName, ae.cause)
 			}
 			triggerAnnotationRule?.processTriggerAnnotation(annotatedClass, it.key) ?: emptySet
 		].flatten.toSet

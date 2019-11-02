@@ -19,15 +19,19 @@ class RuleException extends RuntimeException {
 	AnnotationMirror metaAnnotation;
 	
 	new(String message){
-		this(message, null, null)
+		this(message, null, null, null)
 	}
 	
 	new(String message, String avName){
-		this(message, null, avName)
+		this(message, null, avName, null)
 	}
 	
 	new(String message, AnnotationMirror metaAnnotation, String metaAnnotationValueName){
-		super(message)
+		this(message,  metaAnnotation, metaAnnotationValueName, null)
+	}
+	
+	new(String message, AnnotationMirror metaAnnotation, String metaAnnotationValueName, Throwable cause){
+		super(message, cause)
 		this.metaAnnotationValueName=metaAnnotationValueName
 		this.metaAnnotation = metaAnnotation
 	}
