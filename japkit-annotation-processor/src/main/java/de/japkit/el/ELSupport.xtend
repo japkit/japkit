@@ -120,7 +120,7 @@ class ELSupport {
 	def <T> T getCurrentSrc(Class<T> clazz){
 		val currSrc = getCurrentSrc
 		if(currSrc !== null && !clazz.isInstance(currSrc)){
-			throw new RuleException('''Current src «currSrc» is of type «currSrc?.class», but type «clazz» is required here.''');
+			throw new IllegalStateException('''Current src «currSrc» is of type «currSrc?.class», but type «clazz» is required here.''');
 		}
 		clazz.cast(currSrc)
 	}
