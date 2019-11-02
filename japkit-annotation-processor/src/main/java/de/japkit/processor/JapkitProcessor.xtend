@@ -681,9 +681,8 @@ class JapkitProcessor extends AbstractProcessor {
 			try {
 				triggerAnnotationRule = createTriggerAnnotationRule(it.key.annotationAsTypeElement)
 			} catch (TypeElementNotFoundException tenfe) {
-				//TODO: Really? 
-				handleTypeElementNotFound('''Type «tenfe.fqn» not found when creating trigger annotation rule «it.key.annotationType.qualifiedName»''',
-					tenfe.fqn)
+				//We dont't register a type dependency here, since meta elements or annotations should never depend on types to be generated
+				throw new RuleException('''Type «tenfe.fqn» not found when creating trigger annotation rule for «it.key.annotationType.qualifiedName».''')
 			} catch (AnnotationException ae) {
 				//AnnotationExceptions during rule creation are related to meta annotations -> rethrow as RuleException
 				throw new RuleException(ae.message, ae.annotation, ae.annotationValueName, ae.cause)

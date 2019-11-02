@@ -123,15 +123,10 @@ class RuleFactory {
 			Not->[am, e | new BooleanOperatorRule(am, e, true, true)]
 		]
 	
-	def private createFunctionInternal(Element element){
-		try {
-			val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
-			val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key !== null]
-			factory?.value?.apply(factory.key, element)
-		} catch (TypeElementNotFoundException tenfe) {
-			//Unknown Types are never functions.
-			return null;
-		}
+	def private createFunctionInternal(Element element) {	
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+		val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key !== null]
+		factory?.value?.apply(factory.key, element)	
 	}
 	
 
