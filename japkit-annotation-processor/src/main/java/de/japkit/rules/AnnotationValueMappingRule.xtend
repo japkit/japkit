@@ -177,10 +177,10 @@ class AnnotationValueMappingRule extends AbstractRule {
 	
 	private def atMostOneAvName(Set<String> setAvNames, boolean required) {
 		if(setAvNames.size > 1) {
-			throwRuleCreationException('''At most one of the annotation values «setAvNames.join(', ')» must be set.''')
+			throw ruleException('''At most one of the annotation values «setAvNames.join(', ')» must be set.''')
 		}
 		if(required && setAvNames.empty) {
-			throwRuleCreationException('''At least one of the annotation values «setAvNames.join(', ')» must be set.''')
+			throw ruleException('''At least one of the annotation values «setAvNames.join(', ')» must be set.''')
 		}
 		setAvNames.head
 	}

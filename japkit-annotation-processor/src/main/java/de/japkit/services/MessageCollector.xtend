@@ -210,7 +210,7 @@ class MessageCollector {
 	}
 	
 	def dispatch void reportRuleError(Exception e, CharSequence metaAnnotationValueName){
-		reportRuleError(currentRule, '''«e»«stacktrace(e)»''', null, metaAnnotationValueName)
+		reportRuleError(currentRule, '''«e» «e.message» «stacktrace(e)»''', null, metaAnnotationValueName)
 	}
 	
 	protected def CharSequence stacktrace(Exception e) {

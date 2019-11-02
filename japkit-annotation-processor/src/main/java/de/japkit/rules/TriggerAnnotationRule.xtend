@@ -37,9 +37,8 @@ class TriggerAnnotationRule extends AbstractRule {
 			classTemplates.map[			
 				val clazzAnnotation = it.annotationMirror(Clazz)
 				if(clazzAnnotation === null) {
-					throwRuleCreationException('''No @Clazz annotation found on «it.simpleName» ''', "template");
-					null
-				} else
+					throw ruleException('''No @Clazz annotation found on «it.simpleName» ''', "template");
+				}
 				new ClassRule(clazzAnnotation, it, true)
 			]
 			.filter[it !== null].toList
