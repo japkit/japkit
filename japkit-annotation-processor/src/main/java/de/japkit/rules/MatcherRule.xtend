@@ -11,7 +11,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 
 @Data
 class MatcherRule extends AbstractFunctionRule<Boolean> {

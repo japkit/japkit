@@ -1,6 +1,6 @@
 package de.japkit.rules
 
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 import java.lang.reflect.Array
 import java.util.List
 import javax.lang.model.element.AnnotationMirror

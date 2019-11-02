@@ -8,7 +8,7 @@ import de.japkit.model.GenExtensions
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.GenerateClassContext
 import de.japkit.services.ReportedException
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 import de.japkit.services.TypeElementNotFoundException
 import java.util.List
 import java.util.Map

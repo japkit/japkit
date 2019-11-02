@@ -25,7 +25,7 @@ import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 import java.util.Collections
 import de.japkit.services.ReportedException
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 
 @Data
 class ClassRule extends AbstractRule {

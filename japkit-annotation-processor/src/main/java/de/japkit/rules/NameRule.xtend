@@ -6,7 +6,7 @@ import de.japkit.services.ExtensionRegistry
 import java.util.regex.Pattern
 import javax.lang.model.element.AnnotationMirror
 import org.eclipse.xtend.lib.annotations.Data
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 
 /**
  * A NameRule describes how to derive the name of the target element from the source element.

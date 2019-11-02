@@ -1,4 +1,4 @@
-package de.japkit.services
+package de.japkit.rules
 
 import java.lang.RuntimeException
 import org.eclipse.xtend.lib.annotations.Data

@@ -12,7 +12,7 @@ import java.util.ArrayList
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)

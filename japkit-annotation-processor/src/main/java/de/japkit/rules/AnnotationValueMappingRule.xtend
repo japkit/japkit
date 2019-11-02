@@ -3,7 +3,7 @@ package de.japkit.rules
 import de.japkit.metaannotations.AVMode
 import de.japkit.model.GenAnnotationMirror
 import de.japkit.model.GenAnnotationValue
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 import java.util.ArrayList
 import java.util.List
 import java.util.Map

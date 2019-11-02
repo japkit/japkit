@@ -36,7 +36,7 @@ import de.japkit.services.TypeElementFromCompilerCache
 import javax.lang.model.element.Element
 import javax.lang.model.element.QualifiedNameable
 import de.japkit.services.AnnotationException
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**

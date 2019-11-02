@@ -4,7 +4,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.PackageElement
 import org.eclipse.xtend.lib.annotations.Data
 import javax.lang.model.element.QualifiedNameable
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 
 @Data
 class ClassNameRule extends AbstractRule{

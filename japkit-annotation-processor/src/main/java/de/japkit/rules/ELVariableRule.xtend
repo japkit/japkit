@@ -5,7 +5,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 
 @Data
 class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<Object> {

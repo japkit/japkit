@@ -21,6 +21,7 @@ import javax.tools.Diagnostic.Kind
 import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
+import de.japkit.rules.RuleException
 
 /** Collects error messages for annotated classes.
  * <p>

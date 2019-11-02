@@ -4,7 +4,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
 import javax.lang.model.element.Element
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 import static extension de.japkit.rules.RuleUtils.withPrefix
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import de.japkit.services.TypeElementNotFoundException
