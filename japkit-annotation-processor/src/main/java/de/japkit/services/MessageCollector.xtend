@@ -254,9 +254,9 @@ class MessageCollector {
 		// Always report on currentAnnotatedClass, since if the meta elements are in a different project, the errors would not be shown at all otherwise
 		addMessage(Kind.ERROR, '''
 			«msg?.toString» 
-			MetaElement: «metaElement», 
-			MetaAnnotation: «metaAnnotation»,
-			MetaAnnotationValue name: «metaAnnotationValueName», 
+			«IF metaElement !== null »Meta-Element: «metaElement»,«ENDIF»
+			«IF metaAnnotation !== null »Meta-Annotation: «metaAnnotation»,«ENDIF»
+			«IF metaAnnotationValueName !== null »Meta-AnnotationValue: «metaAnnotationValueName»,«ENDIF»
 			Src: «currentSrcOptional ?: currentAnnotatedClass»
 			''', 
 			currentAnnotatedClass, null, null)
