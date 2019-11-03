@@ -457,6 +457,8 @@ class ElementsExtensions {
 		
 		val v = av?.value
 		
+		//TODO: This is far from being reliable. Replace by AST parsing.
+		//Already now we have errors, since <error> is not only used for missing types, but also for other kinds of erroneous AVs.
 		if (v == "<error>") {
 			throw new TypeElementNotFoundException(TypeElementNotFoundException.UNKNOWN_TYPE, "Error in annotation value: "+av+". Could not determine the missing type.");
 		}
@@ -524,6 +526,9 @@ class ElementsExtensions {
 			av.mapAs(av.valueWithErrorHandling, annotationMirror, name, null, avType)		
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
+		} catch (AnnotationException ae) {
+			//We already have context. No need to wrap again.
+			throw ae
 		} catch (Exception e) {
 			//Rethrow as AnnotationException here top provide some context.
 			throw new AnnotationException('''Error when getting annotation value «name»: «e.message»''', annotationMirror, name.toString, e);
@@ -576,8 +581,13 @@ class ElementsExtensions {
 			if (patternString.nullOrEmpty) {
 				return null
 			}
-			val pattern = Pattern.compile(patternString)
-			avType.cast(pattern) //"as T" does not work here. XTend bug?
+			try {
+				val pattern = Pattern.compile(patternString)
+				avType.cast(pattern) //"as T" does not work here. XTend bug?
+			} catch (PatternSyntaxException pse) {
+				throw new AnnotationException('''Invalid regular expression: «pse.message»''', annotationMirror, avName.toString)
+			}
+			
 		} else if (avType.enum) {
 			val ve = av.cast(value, VariableElement)
 						

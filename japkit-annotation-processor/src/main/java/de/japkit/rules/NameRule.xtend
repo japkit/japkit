@@ -38,6 +38,10 @@ class NameRule extends AbstractRule {
 		regExReplace = metaAnnotation.value('''«prefix»RegExReplace''', String)
 		expr = metaAnnotation.value('''«prefix»Expr''', String)
 		lang = metaAnnotation.value('''«prefix»Lang''', String)
+		
+		if(regEx !== null && regExReplace === null) {
+			throw ruleException('''If «prefix»RegEx is set, «prefix»RegExReplace must also be set.''', '''«prefix»RegEx''')
+		}
 	}
 
 	def isEmpty() {
@@ -51,17 +55,14 @@ class NameRule extends AbstractRule {
 				val matcher = regEx.matcher(orgName)
 
 				if (!matcher.matches) {
-					throw new RuleException('''Naming rule violated: Name "«orgName»" must match pattern "«regEx.pattern»"''', '''«prefix»RegEx''')
+					throw ruleException('''Naming rule violated: Name "«orgName»" must match pattern "«regEx.pattern»"''', '''«prefix»RegEx''')
 				}
-				try {
-					val name = matcher.replaceFirst(regExReplace)
-					if (name.empty) {
-						throw new RuleException('''Naming rule violated: Name "«orgName»" must not be empty after replacing with "«regExReplace»"''', '''«prefix»RegExReplace''')
-					}
-					return name
-				} catch (RuntimeException e) {
-					throw new RuleException('''Exception when replacing RegEx "«regEx.pattern»" with "«regExReplace»": «e.message»''', '''«prefix»RegEx''')
+				
+				val name = matcher.replaceFirst(regExReplace)
+				if (name.empty) {
+					throw ruleException('''Naming rule violated: Name "«orgName»" must not be empty after replacing with "«regExReplace»"''', '''«prefix»RegExReplace''')
 				}
+				return name
 
 			} else if (!expr.nullOrEmpty) {
 				handleException(null, '''«prefix»Expr''') [

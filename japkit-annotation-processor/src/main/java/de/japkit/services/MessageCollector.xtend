@@ -202,28 +202,34 @@ class MessageCollector {
 		reportRuleError(e, null)
 	}
 	
-	def dispatch void reportRuleError(ELProviderException e, CharSequence metaAnnotationValueName){
+	def dispatch void reportRuleError(ELProviderException e, CharSequence metaAnnotationValueName) {
 		reportRuleError(currentRule, '''«e.rootCause.message»''', null, metaAnnotationValueName)
 	}
 	
-	def dispatch void reportRuleError(RuleException e, CharSequence metaAnnotationValueName){
+	def dispatch void reportRuleError(RuleException e, CharSequence metaAnnotationValueName) {
+		//A RuleException is usually an "expected" exception caused by the user.
+		//Thus, no stacktrace is printed unless a cause exists in the RuleException. 
 		reportRuleError(currentRule, '''
 			«e.message»
-			«stacktrace(e)»''', 
+			«IF e.cause !== null »
+			Cause:
+			«stacktrace(e.rootCause)»
+			«ENDIF»''', 
 			e.metaAnnotation, metaAnnotationValueName ?: e.metaAnnotationValueName)
 	}
 	
-	def dispatch void reportRuleError(Exception e, CharSequence metaAnnotationValueName){
+	def dispatch void reportRuleError(Exception e, CharSequence metaAnnotationValueName) {
+		//In case of an "unknown" exception, a stacktrace is always printed. 
+		//Either the one of the root cause or the one of the exception itself. 
 		reportRuleError(currentRule, '''
-			«e.message»
-			«stacktrace(e)»''', 
+			«stacktrace(e.rootCause)»''', 
 			null, metaAnnotationValueName)
 	}
 	
-	protected def CharSequence stacktrace(Exception e) {
-		if (e.cause !== null)
+	protected def CharSequence stacktrace(Throwable e) {
+		if (e !== null)
 			'''
-			cause: «e.rootCause.class.name»: «e.rootCause.message» 
+			«e.class.name»: «e.message» 
 			«FOR ste : e.stackTrace.subList(0, Math.min(20, e.stackTrace.length))»
 				«ste»
 			«ENDFOR»'''
@@ -250,7 +256,7 @@ class MessageCollector {
 			«msg?.toString» 
 			MetaElement: «metaElement», 
 			MetaAnnotation: «metaAnnotation»,
-			MetaAnnotationValue: «metaAnnotationValueName», 
+			MetaAnnotationValue name: «metaAnnotationValueName», 
 			Src: «currentSrcOptional ?: currentAnnotatedClass»
 			''', 
 			currentAnnotatedClass, null, null)
