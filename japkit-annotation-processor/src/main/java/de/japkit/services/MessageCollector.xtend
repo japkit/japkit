@@ -144,8 +144,10 @@ class MessageCollector {
 				'''Error in parameter «paramName» (Annotation: «m.annotationFqn», AnnotationValue: «m.avName»): ''' + m.msg, enclosingExecutableElement, null, null)
 			}
 			
-			//Make it appear at least in error log...
-			messager.printMessage(m.kind, '''«m.msg» «m.typeOrPackageElementFqn» «m.annotationFqn» «m.nestedAnnotationPath»''')
+			if(element === null) {
+				//Make it appear at least in error log...
+				messager.printMessage(m.kind, '''«m.msg» «m.typeOrPackageElementFqn» «m.annotationFqn» «m.nestedAnnotationPath»''')
+			}
 		]
 		messagesPerAnnotatedClass.clear
 	}
