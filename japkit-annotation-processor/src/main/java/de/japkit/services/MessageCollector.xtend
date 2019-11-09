@@ -211,6 +211,7 @@ class MessageCollector {
 		//A RuleException is usually an "expected" exception caused by the user.
 		//Thus, no stacktrace is printed unless a cause exists in the RuleException. 
 		reportRuleError(currentRule, '''
+			«e.message»
 			«IF e.cause !== null »
 			Cause:
 			«stacktrace(e.rootCause)»
