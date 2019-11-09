@@ -3,7 +3,6 @@ package de.japkit.rules
 import de.japkit.metaannotations.Clazz
 import de.japkit.metaannotations.ResourceTemplate
 import de.japkit.model.GenTypeElement
-import de.japkit.services.ProcessingException
 import de.japkit.services.TypeElementNotFoundException
 import java.util.ArrayList
 import java.util.List
@@ -11,6 +10,7 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
+import javax.lang.model.element.QualifiedNameable
 
 @Data
 class TriggerAnnotationRule extends AbstractRule {
@@ -37,9 +37,8 @@ class TriggerAnnotationRule extends AbstractRule {
 			classTemplates.map[			
 				val clazzAnnotation = it.annotationMirror(Clazz)
 				if(clazzAnnotation === null) {
-					throwRuleCreationException('''No @Clazz annotation found on «it.simpleName» ''', "template");
-					null
-				} else
+					throw ruleException('''No @Clazz annotation found on «it.simpleName» ''', "template");
+				}
 				new ClassRule(clazzAnnotation, it, true)
 			]
 			.filter[it !== null].toList
@@ -54,7 +53,7 @@ class TriggerAnnotationRule extends AbstractRule {
 	}
 	
 	
-	def Set<GenTypeElement> processTriggerAnnotation(TypeElement annotatedClass, AnnotationMirror triggerAnnotation){
+	def Set<GenTypeElement> processTriggerAnnotation(QualifiedNameable annotatedClass, AnnotationMirror triggerAnnotation){
 		inRule[
 			scope(annotatedClass) [
 				val generatedClasses = newHashSet
@@ -75,16 +74,10 @@ class TriggerAnnotationRule extends AbstractRule {
 					classRules.forEach[generateClass(null, generatedClasses)]
 						
 					resourceRules.forEach[generateResource]
-					
-				} catch (ProcessingException pe) {
-					reportError(pe)
-					
+						
 				} catch (TypeElementNotFoundException tenfe) {
-					handleTypeElementNotFound(tenfe, annotatedClass)
-					
-				} catch(Exception e) {
-					reportRuleError(e)				
-				} 
+					handleTypeElementNotFound(tenfe, annotatedClass)	
+				}
 				generatedClasses
 			]
 		
@@ -96,7 +89,22 @@ class TriggerAnnotationRule extends AbstractRule {
 			reportRuleError('''There must be exactly one @Clazz annotation in the trigger annoation declaration to determine the name of the generated class unambgiuously.''')
 			null
 		} else {
-			classRules.head.getGeneratedTypeElementFqn(annotatedClass)
+			// TODO: Make sure the nameRule is context free. That is, it should only depend on annotatedClass. This is currently not always true, if nameExpr is used.
+		
+			// The extra scoping for src element and setting of annotatedClass
+			// is required since the name rule is called here for a different annotated class than the current one.
+			// This has nevertheless some flaws, since there could be other context variables that were different when the other class has been generated.
+			// Especially, when using nameExpr, this could lead to wrong results.
+			// Maybe, the typesRegistry could be used in generatedTypeElementAccordingToTriggerAnnotation instead of calculating the name? 
+			scope(annotatedClass) [
+				val annotatedClassBefore = currentAnnotatedClass
+				try {
+					setCurrentAnnotatedClass(annotatedClass)
+					classRules.head.getGeneratedTypeElementFqn()		
+				} finally {
+					setCurrentAnnotatedClass(annotatedClassBefore)
+				}
+			]
 		}
 	}
 	

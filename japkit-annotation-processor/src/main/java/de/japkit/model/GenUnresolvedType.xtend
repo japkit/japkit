@@ -7,13 +7,13 @@ import javax.lang.model.type.TypeVisitor
  * A type that has been created during code generation but that could not be resolved so far, sine the type element is not available or
  * has not been generated yet.
  */
-public class GenUnresolvedType extends GenDeclaredType implements ErrorType {
+class GenUnresolvedType extends GenDeclaredType implements ErrorType {
 
-	private String qualifiedName_;
-	private String simpleName_;
+	String qualifiedName_;
+	String simpleName_;
 	
 	//true, if it's known to be an inner class. False if it is not known or it is not an inner class.
-	private boolean innerClass;
+	boolean innerClass;
 	
 	new(String qualifiedName, boolean innerClass) {
 		super(null);

@@ -2,7 +2,6 @@ package de.japkit.rules
 
 import de.japkit.el.ELSupport
 import de.japkit.model.GenArrayType
-import de.japkit.model.GenDeclaredType
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
 import de.japkit.services.GenerateClassContext
@@ -13,12 +12,12 @@ import de.japkit.services.TypesRegistry
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import javax.lang.model.element.TypeParameterElement
 import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
-import javax.lang.model.element.TypeParameterElement
 import javax.lang.model.util.SimpleTypeVisitor8
 
 /**Resolves type references / class selectors from templates and annotations.*/

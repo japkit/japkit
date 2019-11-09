@@ -6,7 +6,7 @@ import de.japkit.model.GenTypeElement
 import de.japkit.rules.Rule
 import java.util.Stack
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.TypeElement
+import javax.lang.model.element.QualifiedNameable
 
 /**
  * Provides access currently generated class and annotated class.
@@ -17,12 +17,12 @@ class GenerateClassContext {
 		ExtensionRegistry.get(ELSupport).getValueStack()
 	}
 
-	def setCurrentAnnotatedClass(TypeElement annotatedClass) {	
+	def setCurrentAnnotatedClass(QualifiedNameable annotatedClass) {	
 		valueStack.put("annotatedClass" , annotatedClass)
 	}
 	
 	def currentAnnotatedClass() {
-		valueStack.get("annotatedClass") as TypeElement
+		valueStack.get("annotatedClass") as QualifiedNameable
 	}
 
 	def GenTypeElement getCurrentGeneratedClass(){
@@ -55,7 +55,7 @@ class GenerateClassContext {
 	}
 	
 	
-	private val Stack<Rule> currentRules = new Stack()
+	val Stack<Rule> currentRules = new Stack()
 	
 	def getCurrentRule(){
 		if(currentRules.empty()) null else currentRules.peek
@@ -64,7 +64,7 @@ class GenerateClassContext {
 	def void pushCurrentRule(Rule rule){
 		if(currentRules.size > 30 && currentRules.filter[it===rule].size>20){
 			currentRules.groupBy[it].filter[k, v| v.size >19].keySet.forEach[			
-				ExtensionRegistry.get(MessageCollector).reportRuleError(rule, "Potential infinite recursion.", null)		
+				ExtensionRegistry.get(MessageCollector).reportRuleError(rule, "Potential infinite recursion.", null, null)		
 			]
 			
 			throw new RuleStackOverflowError("Potential infinite recursion. "+currentRules?.map[metaElement+ " " + metaAnnotation ].join("\n"))

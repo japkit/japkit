@@ -86,7 +86,7 @@ class JavaEmitter implements de.japkit.model.EmitterContext {
 	// key is short name, value is fqn
 	public val Map<String, String> imports = newHashMap()
 
-	private TypeElement rootTypeElement;
+	TypeElement rootTypeElement;
 
 	new(TypeElement rootTypeElement) {
 		this.rootTypeElement = rootTypeElement;

@@ -38,7 +38,7 @@ abstract class GenTypeElement extends GenParameterizable implements TypeElement 
 	boolean auxClass
 
 	
-	private Name qualifiedName
+	Name qualifiedName
 	
 	@Derived
 	override getQualifiedName(){

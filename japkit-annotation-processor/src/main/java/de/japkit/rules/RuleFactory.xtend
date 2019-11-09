@@ -109,7 +109,7 @@ class RuleFactory {
 		getOrCreate(functionCache, element, [createFunctionInternal(element)])
 	}
 	
-	private static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, Element)=>IParameterlessFunctionRule<?>>> 
+	static val List<Pair<Class<? extends Annotation>, (AnnotationMirror, Element)=>IParameterlessFunctionRule<?>>> 
 		functionFactories = #[
 			CodeFragment->[am, e | new CodeFragmentRule(am, e)],
 			Function->[am, e | new FunctionRule(am, e)],
@@ -123,15 +123,10 @@ class RuleFactory {
 			Not->[am, e | new BooleanOperatorRule(am, e, true, true)]
 		]
 	
-	def private createFunctionInternal(Element element){
-		try {
-			val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
-			val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key !== null]
-			factory?.value?.apply(factory.key, element)
-		} catch (TypeElementNotFoundException tenfe) {
-			//Unknown Types are never functions.
-			return null;
-		}
+	def private createFunctionInternal(Element element) {	
+		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+		val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key !== null]
+		factory?.value?.apply(factory.key, element)	
 	}
 	
 

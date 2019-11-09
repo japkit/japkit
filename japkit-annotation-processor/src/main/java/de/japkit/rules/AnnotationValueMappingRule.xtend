@@ -3,7 +3,7 @@ package de.japkit.rules
 import de.japkit.metaannotations.AVMode
 import de.japkit.model.GenAnnotationMirror
 import de.japkit.model.GenAnnotationValue
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 import java.util.ArrayList
 import java.util.List
 import java.util.Map
@@ -28,6 +28,8 @@ class AnnotationValueMappingRule extends AbstractRule {
 	()=>AnnotationMappingRule lazyAnnotationMapping
 	AVMode mode
 	((Object)=>Object)=>Iterable<Object> scopeRule
+	
+	String avPrefix
 
 	def GenAnnotationValue mapAnnotationValue(GenAnnotationMirror annotation, TypeMirror avType) {
 		inRule[
@@ -81,7 +83,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 					} else if (expr !== null) {
 						evaluateExpression(avType, expr)
 					} else {
-						throw new IllegalStateException("Annotation value could not be determined.");
+						throw new IllegalStateException("Annotation value could not be determined, since none of value, expr or lazyAnnotationMapping is set.");
 					}
 				]?.forEach[if(it instanceof Iterable<?>) flatValues.addAll(it) else flatValues.add(it)]
 
@@ -108,14 +110,15 @@ class AnnotationValueMappingRule extends AbstractRule {
 	def private Object evaluateExpression(TypeMirror avType, String expr) {
 
 		val targetClass = if(avType.kind.isPrimitive) avType.toAnnotationValueClass else Object	
-		eval(expr, lang, targetClass)
+		eval(expr, lang, targetClass, "expr".withPrefix(avPrefix), null)
 
 	}
 
 
 	new(AnnotationMirror a,  Map<String, AnnotationMappingRule> mappingsWithId) {
 		super(a, null)
-		name = a.value(null, "name", String)
+		avPrefix=''
+		name = a.value("name", String)
 		
 		val setAvNames = newHashSet
 		
@@ -147,7 +150,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 		
 		value = a.valueAndRemember(avName, Object, setAvNames)
 
-		val avPrefix = avName+'_'
+		avPrefix = avName+'_'
 
 		expr = a.valueAndRemember("expr".withPrefix(avPrefix), String, setAvNames)
 		lang = a.value("lang".withPrefix(avPrefix), String)
@@ -177,10 +180,10 @@ class AnnotationValueMappingRule extends AbstractRule {
 	
 	private def atMostOneAvName(Set<String> setAvNames, boolean required) {
 		if(setAvNames.size > 1) {
-			throwRuleCreationException('''At most one of the annotation values «setAvNames.join(', ')» must be set.''')
+			throw ruleException('''At most one of the annotation values «setAvNames.join(', ')» must be set.''')
 		}
 		if(required && setAvNames.empty) {
-			throwRuleCreationException('''At least one of the annotation values «setAvNames.join(', ')» must be set.''')
+			throw ruleException('''At least one of the annotation values «setAvNames.join(', ')» must be set.''')
 		}
 		setAvNames.head
 	}

@@ -5,6 +5,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
+import de.japkit.rules.RuleException
 
 @Data
 class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<Object> {
@@ -20,7 +21,7 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 		val nameFromAV = elVarAnnotation.value("name", String);
 		name = if(nameFromAV.nullOrEmpty) metaElement?.simpleName?.toString?.toFirstLower else nameFromAV
 		if(name.nullOrEmpty){
-			throwRuleCreationException("Either the name annotation value must be set or the @Var annotation must be used at a member of a class.");
+			throw ruleException("Either the name annotation value must be set or the @Var annotation must be used at a member of a class.");
 		}
 		
 		ifEmpty = elVarAnnotation.value("ifEmpty", Boolean);
@@ -44,8 +45,7 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 		try{	
 			if(fqn !== null) ELVariableRule.classLoader.loadClass(fqn) else null;		
 		} catch (ClassNotFoundException cnfe) {
-			throwRuleCreationException("The class could not be loaded from annotation processor's classpath:" + cnfe.message, avName);	
-			null
+			throw ruleException("The class could not be loaded from annotation processor's classpath:" + cnfe.message, avName);
 		}
 	}
 
@@ -63,8 +63,8 @@ class ELVariableRule extends AbstractRule implements IParameterlessFunctionRule<
 	
 	def Object eval(Object src) {
 		inRule[
-			if (beanClass !== null) {
-				if(createBeanInstance) beanClass.newInstance else beanClass;
+			if (beanClass !== null) {			
+				if(createBeanInstance) handleException(null, "bean") [beanClass.newInstance] else beanClass;
 			} else
 				exprOrFunctionCallRule.apply
 		]

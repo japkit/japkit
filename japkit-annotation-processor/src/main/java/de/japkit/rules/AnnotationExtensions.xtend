@@ -6,14 +6,13 @@ import de.japkit.model.GenAnnotationValue
 import de.japkit.model.GenExtensions
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
-import de.japkit.services.ProcessingException
 import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.TypesExtensions
 import java.util.ArrayList
 import java.util.List
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import javax.lang.model.element.TypeElement
+import de.japkit.rules.RuleException
 
 class AnnotationExtensions {
 	extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
@@ -37,7 +36,13 @@ class AnnotationExtensions {
 	public val SHADOW_AV = "shadow"
 
 	def isShadowAnnotation(AnnotationMirror am) {
-		Boolean.TRUE.equals(am?.value(SHADOW_AV, Boolean))
+		try {
+			Boolean.TRUE.equals(am?.value(SHADOW_AV, Boolean))
+		} catch (Exception e) {
+			//If there are some invalid annotation values, we might not be able to get the shadow value
+			//In this case we assume it is not a shadow annotation (since we would not generate invalid AVs)
+			return false;
+		}
 	}
 
 	def setShadowIfAppropriate(GenAnnotationMirror am) {
@@ -56,9 +61,8 @@ class AnnotationExtensions {
 
 				if (avMethod === null || !avMethod.returnType.
 					boolean) {
-					throw new ProcessingException(
-					'''The annotation value '«SHADOW_AV»' could not be set on annotation «am.annotationType», since it is not declared in the annotation type or is not boolean.''',
-						null)
+					throw new RuleException(
+					'''The annotation value '«SHADOW_AV»' could not be set on annotation «am.annotationType», since it is not declared in the annotation type or is not boolean.''')
 				}
 
 				true
@@ -77,11 +81,11 @@ class AnnotationExtensions {
 		}
 	}
 
-	def isTriggerAnnotation(TypeElement te) {
+	def isTriggerAnnotation(Element te) {
 		te.annotationMirror(Trigger.name) !== null
 	}
 
-	def List<? extends AnnotationMirror> getTriggerAnnotations(TypeElement annotatedClass) {
+	def List<? extends AnnotationMirror> getTriggerAnnotations(Element annotatedClass) {
 		annotatedClass.annotationMirrors.filter[isTriggerAnnotation].toList
 	}
 

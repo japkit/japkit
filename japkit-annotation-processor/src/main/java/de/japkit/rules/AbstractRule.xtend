@@ -11,10 +11,10 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 
 @Data
-class AbstractRule implements Rule {
+abstract class AbstractRule implements Rule {
 	val transient protected extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext)
 	val transient protected extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 	val transient protected extension TypesRegistry = ExtensionRegistry.get(TypesRegistry)
@@ -23,21 +23,15 @@ class AbstractRule implements Rule {
 	val transient protected extension ELSupport = ExtensionRegistry.get(ELSupport)
 	val transient protected extension TypesExtensions = ExtensionRegistry.get(TypesExtensions)
 	val transient protected extension MessageCollector = ExtensionRegistry.get(MessageCollector)
-	
+
 	AnnotationMirror metaAnnotation
 	Element metaElement
-	RuleException[] ruleCreationException = #[null]; 
-	
-	
+
 	def protected <T> T inRule((Object)=>T closure){
 		
 		pushCurrentRule(this)
 		try{
 			handleException(null, null) [
-				//Throw Exceptions during rule creation here to get proper error reporting
-				if(ruleCreationException.get(0) !== null){
-					throw ruleCreationException.get(0);
-				}
 				metaElement?.registerMetaTypeElement
 				
 				closure.apply(null)				
@@ -47,12 +41,20 @@ class AbstractRule implements Rule {
 		}
 	}
 	
-	def protected void throwRuleCreationException(String msg) {
-		ruleCreationException.set(0, new RuleException(msg));		
+	/**
+	 * Convenience method to create a RuleException. Makes sure that the correct metaAnnotation of the rule is included. This is especially important
+	 * if the exception occurs in rule constructor, since there is no "rule context" yet when it is called.
+	 */
+	def protected RuleException ruleException(String msg) {
+		new RuleException(msg, metaAnnotation, null);		
 	}
 	
-	def protected void throwRuleCreationException(String msg, String avName) {
-		ruleCreationException.set(0, new RuleException(msg, avName));		
+	/**
+	 * Convenience method to create a RuleException. Makes sure that the correct metaAnnotation of the rule is included. This is especially important
+	 * if the exception occurs in rule constructor, since there is no "rule context" yet when it is called.
+	 */
+	def protected RuleException ruleException(String msg, String avName) {
+		new RuleException(msg, metaAnnotation, avName);		
 	}
 	
 	//registers the dependency from the rule's meta type element to the current trigger annotation.

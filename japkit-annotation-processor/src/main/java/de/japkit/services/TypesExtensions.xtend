@@ -34,7 +34,7 @@ class TypesExtensions /**implements Types*/{
 	val transient extension Elements elementUtils = ExtensionRegistry.get(Elements)
 	val transient extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
 	
-	public def TypeMirror getJavaLangObject(){
+	def TypeMirror getJavaLangObject(){
 		findTypeElement(Object.name).asType
 	}
 	
@@ -287,7 +287,7 @@ class TypesExtensions /**implements Types*/{
 	def String qualifiedName(TypeMirror type) {
 		type?.accept(new SimpleTypeVisitor8<String, Void>() {
 			override defaultAction(TypeMirror type, Void p) {
-				throw new RuleException("Unsupported Type: "+type);
+				throw new IllegalArgumentException('''Unsupported TypeMirror: «type» of kind «type.kind»''');
 			}
 			
 			override String visitPrimitive(PrimitiveType type, Void p) {
@@ -328,7 +328,7 @@ class TypesExtensions /**implements Types*/{
 	def String simpleName(TypeMirror type) {
 		type?.accept(new SimpleTypeVisitor8<String, Void>() {
 			override defaultAction(TypeMirror type, Void p) {
-				throw new RuleException("Unsupported Type: "+type);
+				throw new IllegalArgumentException('''Unsupported TypeMirror: «type» of kind «type.kind»''');
 			}
 			
 			override String visitPrimitive(PrimitiveType type, Void p) {

@@ -19,7 +19,7 @@ class ConstraintRule extends AbstractRule{
 		inRule[
 			val result = 
 			handleTypeElementNotFound(true, '''Constraint «expr» could not be evaluated.''')[
-				eval(expr, lang, Boolean, '''Constraint «expr» could not be evaluated''', true)
+				eval(expr, lang, Boolean, null, true)
 			]
 			
 			

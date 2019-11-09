@@ -7,7 +7,7 @@ import java.util.Set
 class FileExtensions {
 	val Set<File> existingDirs = newHashSet	
 	
-	def public void ensureParentDirectoriesExist(File f) throws IOException {     
+	def void ensureParentDirectoriesExist(File f) throws IOException {     
             val parent = f.getParentFile();
             
             if(existingDirs.contains(parent)) return;

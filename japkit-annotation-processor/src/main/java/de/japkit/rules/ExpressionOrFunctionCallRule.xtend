@@ -4,7 +4,7 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import org.eclipse.xtend.lib.annotations.Data
 import javax.lang.model.element.Element
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 import static extension de.japkit.rules.RuleUtils.withPrefix
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 import de.japkit.services.TypeElementNotFoundException
@@ -90,9 +90,7 @@ class ExpressionOrFunctionCallRule<T> extends AbstractRule implements Function0<
 			val UNDEFINED = new Object()
 			
 			val exprResult = if(!expr.nullOrEmpty){
-				handleException(null, exprAvName)[
-					checkNotNull(eval(expr, lang, type, true, LibraryRule.findELImports(metaElement)))									
-				]
+				checkNotNull(eval(expr, lang, type, exprAvName, null, true))									
 			} else UNDEFINED
 			
 			if(exprResult === null) return null;

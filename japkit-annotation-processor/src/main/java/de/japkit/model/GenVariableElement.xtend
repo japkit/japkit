@@ -8,7 +8,7 @@ import javax.lang.model.type.TypeMirror
 @FieldsFromInterface
 abstract class GenVariableElement extends GenElement implements VariableElement{
 	@Required
-	private TypeMirror type;
+	TypeMirror type;
 	
 	Object constantValue
 	

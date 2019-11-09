@@ -14,7 +14,7 @@ import de.japkit.services.ExtensionRegistry
 import de.japkit.services.GenerateClassContext
 import de.japkit.services.MessageCollector
 import de.japkit.services.ReportedException
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.TypesExtensions
 import de.japkit.services.TypesRegistry
@@ -54,7 +54,7 @@ class RuleUtils {
 	val protected transient extension RuleFactory = ExtensionRegistry.get(RuleFactory)
 	val protected transient extension TypesRegistry typesRegistry = ExtensionRegistry.get(TypesRegistry)
 
-	public static def withPrefix(CharSequence name, String prefix) {
+	static def withPrefix(CharSequence name, String prefix) {
 		(if(prefix.nullOrEmpty) name else { 
 			if(Character.isLowerCase(prefix.charAt(prefix.length -1))) 
 				'''«prefix»«name.toString.toFirstUpper»'''
@@ -69,7 +69,7 @@ class RuleUtils {
 	/**
 	 * Provides the source element(s) for rules 
 	 */
-	public def ()=>Object createSrcRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	def ()=>Object createSrcRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		createExpressionOrFunctionCallAndFilterRule(
 			metaAnnotation,
 			null,
@@ -94,7 +94,7 @@ class RuleUtils {
 	/**
 	 * Evaluates and expression and / or function(s) and optionally filters the results.
 	 */
-	public def ()=>Object createExpressionOrFunctionCallAndFilterRule(
+	def ()=>Object createExpressionOrFunctionCallAndFilterRule(
 		AnnotationMirror metaAnnotation,
 		Element metaElement,
 		String exprAV,
@@ -188,16 +188,16 @@ class RuleUtils {
 	}
 
 	/**Scope rule that gets the source element from "src" AV */
-	public def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
+	def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
 		createScopeRule(metaAnnotation, metaElement, false, avPrefix, true)
 	}
 
-	public def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary,
+	def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, boolean isLibrary,
 		String avPrefix) {
 		createScopeRule(metaAnnotation, metaElement, isLibrary, avPrefix, true)
 	}
 
-	public def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix,
+	def <T> ScopeRule<T> createScopeRule(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix,
 		()=>Object srcRule) {
 		createScopeRule(metaAnnotation, metaElement, false, avPrefix, true)
 	}
@@ -205,7 +205,7 @@ class RuleUtils {
 	/**Rule that creates a new scope for each src element given by the source rule and executes the given closure within that scope. 
 	 * Optionally puts EL-Variables into that scope. 
 	 */
-	public def <T> ScopeRule<T> createScopeRule(
+	def <T> ScopeRule<T> createScopeRule(
 		AnnotationMirror metaAnnotation,
 		Element metaElement,
 		boolean isLibrary,
@@ -223,14 +223,14 @@ class RuleUtils {
 
 	ScopeRule<Object> SCOPE_WITH_CURRENT_SRC
 
-	public def ScopeRule scopeWithCurrentSrc() {
+	def ScopeRule scopeWithCurrentSrc() {
 		if (SCOPE_WITH_CURRENT_SRC === null) {
 			SCOPE_WITH_CURRENT_SRC = createScopeRule(null, null, null)
 		}
 		SCOPE_WITH_CURRENT_SRC
 	}
 
-	public def createELVariableRules(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
+	def createELVariableRules(AnnotationMirror metaAnnotation, Element metaElement, String avPrefix) {
 		val rules = newArrayList();
 		// Create VarRules from the "vars" AV
 		rules.addAll(metaAnnotation?.value("vars".withPrefix(avPrefix), typeof(AnnotationMirror[]))?.map [
@@ -255,14 +255,14 @@ class RuleUtils {
 
 	public static val ALWAYS_ACTIVE = [|true]
 
-	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
+	def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix) {
 		createActivationRule(metaAnnotation, avPrefix, [|true])
 	}
 
 	/**
 	 * AV "cond" to enable or disable a rule
 	 */
-	public def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix,
+	def ()=>boolean createActivationRule(AnnotationMirror metaAnnotation, String avPrefix,
 		()=>Boolean defaultValue) {
 
 		val rule = new ExpressionOrFunctionCallRule<Boolean>(metaAnnotation, null, Boolean, "cond", "condLang",
@@ -280,7 +280,7 @@ class RuleUtils {
 	// In element names, "." is not allowed, so "_" can be used instead and is replaced by "."
 	static val expressionInTemplate = Pattern.compile('''\$(.+?)\$''')
 
-	public def replaceExpressionInTemplate(CharSequence template, boolean noSyntaxRestrictions, String lang,
+	def replaceExpressionInTemplate(CharSequence template, boolean noSyntaxRestrictions, String lang,
 		boolean autoCamelCase) {
 
 		val vs = ExtensionRegistry.get(ELSupport).valueStack
@@ -294,7 +294,7 @@ class RuleUtils {
 				else {
 					val exprToEvaluate = '''#{«if(noSyntaxRestrictions) expr else expr.replace('_','.')»}'''
 					eval(exprToEvaluate, lang,
-						CharSequence, '''Expression «expr» in "«template»"" could not be resolved.''', expr)?.toString
+						CharSequence, null, expr)?.toString
 				}
 			matcher.appendReplacement(sb,
 				if(autoCamelCase && matcher.start > 0 &&
@@ -306,7 +306,7 @@ class RuleUtils {
 	/**
 	 * To set the name of the generated element either statically (AV: name) or dynamically (AV: nameExpr)
 	 */
-	public def ()=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
+	def ()=>String createNameExprRule(AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 		val nameFromTemplate = template?.simpleName
 		val name = metaAnnotation?.value("name".withPrefix(avPrefix), String)
 		val nameExpr = metaAnnotation?.value("nameExpr".withPrefix(avPrefix), String)
@@ -315,7 +315,7 @@ class RuleUtils {
 		[|
 			val nameFromTemplateResolved = nameFromTemplate?.replaceExpressionInTemplate(false, null, true)?.toString
 			val result = if (!nameExpr.nullOrEmpty) {
-					eval(nameExpr, nameLang, String, '''Member name could not be generated''',
+					eval(nameExpr, nameLang, String, "nameExpr".withPrefix(avPrefix),
 						nameFromTemplateResolved ?: 'invalidMemberName')
 				} else if (!name.nullOrEmpty) {
 					name
@@ -329,7 +329,7 @@ class RuleUtils {
 	/**
 	 * Copies annotations from template at first (if there are any ) and then applies the annotation mappings
 	 */
-	public def (GenElement)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
+	def (GenElement)=>List<? extends AnnotationMirror> createAnnotationMappingRules(
 		AnnotationMirror metaAnnotation, Element template, String avPrefix) {
 
 		val mappings = metaAnnotation?.annotationMappingRulesFromMetaAnnotation("annotations".withPrefix(avPrefix)) ?: newArrayList();
@@ -399,7 +399,7 @@ class RuleUtils {
 		}
 	]
 
-	public def ()=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template,
+	def ()=>Set<Modifier> createModifiersRule(AnnotationMirror metaAnnotation, Element template,
 		String avPrefix) {
 		val templateModifiers = template?.modifiers ?: emptySet
 
@@ -440,11 +440,11 @@ class RuleUtils {
 		]
 	}
 
-	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avPrefix) {
+	def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avPrefix) {
 		createTypeRule(metaAnnotation, template, "type", avPrefix, [|currentSrcElement.srcType?.resolveType])
 	}
 
-	public def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avName,
+	def ()=>TypeMirror createTypeRule(AnnotationMirror metaAnnotation, TypeMirror template, String avName,
 		String avPrefix, ()=>TypeMirror defaultValue) {
 
 		[|
@@ -480,7 +480,7 @@ class RuleUtils {
 		[|rules.map[apply].flatten.toList]
 	}
 
-	public def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation,
+	def ()=>List<? extends GenParameter> createParamRule(AnnotationMirror paramAnnotation,
 		VariableElement template, String avPrefix) {
 		new ParamRule(paramAnnotation, template, avPrefix);
 
@@ -499,7 +499,7 @@ class RuleUtils {
 			if (copyFromSrc)
 				currentSrcElement.docComment
 			else if (!expr.nullOrEmpty)
-				eval(expr, commentLang, CharSequence, '''Comment could not be generated''', 'invalidComment')
+				eval(expr, commentLang, CharSequence, "commentExpr".withPrefix(avPrefix), 'invalidComment')
 			else
 				defaultComment?.apply
 		]
@@ -514,7 +514,7 @@ class RuleUtils {
 			null
 		else
 			[
-				val nameSet = eval(expr, lang, Iterable, '''Name set expression could not be evaluated.''', emptySet).
+				val nameSet = eval(expr, lang, Iterable, avName, emptySet).
 					map [
 						if (it instanceof Element) {
 							it.simpleName.toString
@@ -536,9 +536,26 @@ class RuleUtils {
 		if(av !== null) av.map[createMatcherRule(it)] else emptyList
 	}
 
-	// Catches Exceptions and reports them as errors for the current meta annotation.
-	// The AV name can be provided to report the error for that AV of the meta annotation.
-	// TODO: We have this in many places with subtle differences. Refactor for harmonization?
+	/** 
+	 * Catches Exceptions and reports them as errors for the current meta annotation.
+	 * The AV name can be provided to report the error for that AV of the meta annotation.
+	 * TODO: We have this in many places with subtle differences. Refactor for harmonization? 
+	 * 
+	 * <ul>
+	 * <li>TypeElementNotFoundException is always rethrown, since they need to be handled in the the JapkitProcessor itself by deferring the code generation until the missing type becomes available.
+	 * <li>ReportedException is rethrown, unless an errorResult is given. ReporteException means, that the Exception has always been reported to the MessageCollector and does not need to be handled again.
+	 * <li>RuleException and other Exceptions are reported to the MessageCollector to be shown as error to the user later. In no errorResult is given, an ReportedException is thrown then.
+	 * </ul>
+	 * 
+	 * The errors are reported for the current context (currently processed annotated class or package and meta-element / meta-annotation of the currently processed rule )
+	 * 
+	 * @param errorResult the function that supplies the result that should be returned in case of an error. To be used if it makes sense to continue code generation for the current element after the error. 
+	 * @param avName optional. The name of the annotation value of the meta-annotation for which the error occurred or is related to.
+	 * @param closure the code to be executed within the try-catch
+	 * 
+	 * @return the result from execution of the code or (in case of error) the errorResult
+	 * 
+	 */
 	def <T> T handleException(()=>T errorResult, String avName, ()=>T closure) {
 		try {
 			closure.apply()
@@ -548,9 +565,6 @@ class RuleUtils {
 		} catch (ReportedException e) {
 			// Do not report the error again to avoid error flooding
 			if(errorResult !== null) return errorResult.apply() else throw e
-		} catch (RuleException e) {
-			reportRuleError(e, avName ?: e.avName)
-			if(errorResult !== null) return errorResult.apply() else throw new ReportedException(e)
 		} catch (Exception e) {
 			reportRuleError(e, avName)
 			if(errorResult !== null) return errorResult.apply() else throw new ReportedException(e)

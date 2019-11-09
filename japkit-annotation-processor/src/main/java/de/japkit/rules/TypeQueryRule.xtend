@@ -43,7 +43,7 @@ class TypeQueryRule extends AbstractFunctionRule<Object> {
 		val inTypesSet = if (filterAV.nullOrEmpty)
 				emptySet
 			else {
-				val inTypes = if(inExpr.nullOrEmpty) currentSrc else  eval(inExpr, inExprLang, Object)
+				val inTypes = if(inExpr.nullOrEmpty) currentSrc else  eval(inExpr, inExprLang, Object, "inExpr", null)
 				
 				//TODO: Error reporting, if wrong type
 				//TODO: Support for type element?

@@ -1,9 +1,14 @@
 package de.japkit.el
 
 import com.google.common.base.Stopwatch
+import de.japkit.model.AnnotationAndParent
+import de.japkit.rules.LibraryRule
 import de.japkit.services.ElementsExtensions
 import de.japkit.services.ExtensionRegistry
+import de.japkit.services.GenerateClassContext
 import de.japkit.services.MessageCollector
+import de.japkit.services.ReportedException
+import de.japkit.rules.RuleException
 import de.japkit.services.TypeElementNotFoundException
 import de.japkit.services.TypesExtensions
 import java.io.Writer
@@ -15,12 +20,6 @@ import javax.lang.model.element.Element
 import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 import static de.japkit.util.MoreCollectionExtensions.*
-import de.japkit.services.RuleException
-import de.japkit.services.ReportedException
-import java.util.List
-import de.japkit.services.GenerateClassContext
-import de.japkit.model.AnnotationAndParent
-import de.japkit.rules.LibraryRule
 
 class ELSupport {
 	val transient extension ElementsExtensions elements = ExtensionRegistry.get(ElementsExtensions)
@@ -121,7 +120,7 @@ class ELSupport {
 	def <T> T getCurrentSrc(Class<T> clazz){
 		val currSrc = getCurrentSrc
 		if(currSrc !== null && !clazz.isInstance(currSrc)){
-			throw new RuleException('''Current src «currSrc» is of type «currSrc?.class», but type «clazz» is required here.''');
+			throw new IllegalStateException('''Current src «currSrc» is of type «currSrc?.class», but type «clazz» is required here.''');
 		}
 		clazz.cast(currSrc)
 	}
@@ -143,17 +142,23 @@ class ELSupport {
 		if(src instanceof Element) src else vs.parent?.nearestSrcElement
 	}
 
-	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
+	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence avName,
 		T errorResult) {
+		eval(expr, lang, expectedType, avName, errorResult, true)	
+	}
+	
+	//TODO: Move to rule package.
+	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence avName,
+		T errorResult, boolean evalFromValueStackFirst) {
 		try {			
-			eval(expr, lang, expectedType, true)
+			eval(expr, lang, expectedType, evalFromValueStackFirst, findElImports())
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
 		} catch(ReportedException e){
 			//Do not report the error again to avoid error flooding
-			errorResult
+			if(errorResult !== null) return errorResult else throw e
 		} catch (Exception e) {
-			reportRuleError(e)
+			reportRuleError(e, avName)
 			if(errorResult !== null) return errorResult else throw new ReportedException(e)
 		}
 	}
@@ -175,16 +180,6 @@ class ELSupport {
 		} else null
 	}
 
-	def <T> T eval(String expr, String lang, Class<T> expectedType) {
-		eval(expr, lang, expectedType, false)
-	}
-	
-	def <T> T eval(String expr, String lang, Class<T> expectedType, boolean evalFromValueStackFirst) {
-		eval(expr, lang, expectedType, evalFromValueStackFirst, findElImports())
-	}
-	
-	//find current Meta-Element and determine ElImports of it. 
-	//TODO: Should be done in rule package instead. (Factoring out some ExpressionRule, like already done for other rules. See ExpressionOrFunctionCallRule) 
 	private def findElImports() {
 		val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext);
 		val rule = currentRule

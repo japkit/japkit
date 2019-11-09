@@ -87,7 +87,7 @@ class JavadocUtil {
 		}
 	}
 	
-	def public static void main(String[] params){
+	def static void main(String[] params){
 		System.out.println(getCode("@japkit.code1 \n <code>testbar1</code> @japkit.code2 \n <pre><code>testbar2</code></pre>"))
 	}
 	

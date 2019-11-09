@@ -11,7 +11,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
-import de.japkit.services.RuleException
+import de.japkit.rules.RuleException
 
 @Data
 class MatcherRule extends AbstractFunctionRule<Boolean> {
@@ -125,7 +125,7 @@ class MatcherRule extends AbstractFunctionRule<Boolean> {
 			src
 		else
 			eval(srcExpr, srcLang,
-				Object, '''Could not evaluate source element expression '«srcExpr»' in element matcher. ''', null)
+				Object, 'src', null)
 
 	}
 
@@ -176,7 +176,7 @@ class MatcherRule extends AbstractFunctionRule<Boolean> {
 	def private boolean fulfillsConditionExpression() {
 		condition.nullOrEmpty ||
 			eval(condition, conditionLang,
-				Boolean, '''Could not evaluate condition '«condition»' in element matcher. ''', false)
+				Boolean, 'condition', false)
 	}
 
 	def private boolean hasAllAnnotations(TypeMirror type, DeclaredType[] annotations) {

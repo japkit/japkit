@@ -40,7 +40,6 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.ErrorType
 import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
@@ -127,7 +126,7 @@ class ElementsExtensions {
 		if (am === null) {
 			Integer.MAX_VALUE //elements without order go to the end
 		} else {
-			am.requiredValue(e, "value", Integer)
+			am.value("value", Integer) ?: Integer.MAX_VALUE 
 		}
 	}
 
@@ -458,6 +457,8 @@ class ElementsExtensions {
 		
 		val v = av?.value
 		
+		//TODO: This is far from being reliable. Replace by AST parsing.
+		//Already now we have errors, since <error> is not only used for missing types, but also for other kinds of erroneous AVs.
 		if (v == "<error>") {
 			throw new TypeElementNotFoundException(TypeElementNotFoundException.UNKNOWN_TYPE, "Error in annotation value: "+av+". Could not determine the missing type.");
 		}
@@ -509,28 +510,29 @@ class ElementsExtensions {
 		annotationMirror.annotationAsTypeElement.declaredMethods.map[simpleName].toSet
 	}
 
-	//	def valueAsTypeElement(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name) {
-	//		annotationMirror.value(annotatedElement, name, TypeElement)
-	//	}
+
 	/**
- * Gets an annotation value and casts it to a given type. The annotates element must be provided for error reporting.
- */
-	def <T> T value(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name, Class<T> avType,
-		boolean isRequired) {
-		val av = annotationMirror.value(name)
-
-		val value = av?.valueWithErrorHandling
-		
-		if (isNullOrEmptyAV(value)) {
-			if (isRequired) {
-				throw new ProcessingException('''Required Annotation value «name» is missing.''', annotatedElement,
-					annotationMirror, name, av);
-			} else {
+	 * Gets an annotation value and casts it to a given type. 
+	 */
+	def <T> T value(AnnotationMirror annotationMirror, CharSequence name, Class<T> avType) {
+		try {
+			val av = annotationMirror.value(name)
+	
+			val value = av?.valueWithErrorHandling
+			
+			if (isNullOrEmptyAV(value)) {
 				return null
-			}
+			}	
+			av.mapAs(av.valueWithErrorHandling, annotationMirror, name, null, avType)		
+		} catch (TypeElementNotFoundException tenfe) {
+			throw tenfe
+		} catch (AnnotationException ae) {
+			//We already have context. No need to wrap again.
+			throw ae
+		} catch (Exception e) {
+			//Rethrow as AnnotationException here top provide some context.
+			throw new AnnotationException('''Error when getting annotation value «name»: «e.message»''', annotationMirror, name.toString, e);
 		}
-
-		av.mapAs(av.valueWithErrorHandling, annotationMirror, annotatedElement, name, null, avType)
 	}
 	
 	def isNullOrEmptyAV(Object value) {
@@ -561,33 +563,33 @@ class ElementsExtensions {
 	}
 
 	private def <T> T mapAs(AnnotationValue av, Object value, AnnotationMirror annotationMirror,
-		Element annotatedElement, CharSequence name, Integer index, Class<T> avType) {
+		CharSequence avName, Integer index, Class<T> avType) {
 		
 		if(value === null) {return null;}
 
 		//Arrays can be converted to single values to support optionality. The array may contain zero or one element then.
 		if (!avType.array && value instanceof Iterable<?>) {	
-			return av.mapAs(singleAV(value as Iterable<AnnotationValue>), annotationMirror, annotatedElement, name, 0, avType)
+			return av.mapAs(singleAV(value as Iterable<AnnotationValue>), annotationMirror, avName, 0, avType)
 		}
 		
 
 		if (avType == TypeElement) {
-			val tm = av.cast(value, annotationMirror, annotatedElement, name, TypeMirror)
+			val tm = av.cast(value, TypeMirror)
 			tm?.asTypeElement as T
 		} else if (avType == Pattern) {
+			val patternString = av.cast(value, String)
+			if (patternString.nullOrEmpty) {
+				return null
+			}
 			try {
-				val patternString = av.cast(value, annotationMirror, annotatedElement, name, String)
-				if (patternString.nullOrEmpty) {
-					return null
-				}
 				val pattern = Pattern.compile(patternString)
 				avType.cast(pattern) //"as T" does not work here. XTend bug?
 			} catch (PatternSyntaxException pse) {
-				throw new ProcessingException('''Exception when compiling regular expression: «pse.message»''',
-					annotatedElement, annotationMirror, name, av)
+				throw new AnnotationException('''Invalid regular expression: «pse.message»''', annotationMirror, avName.toString)
 			}
+			
 		} else if (avType.enum) {
-			val ve = av.cast(value, annotationMirror, annotatedElement, name, VariableElement)
+			val ve = av.cast(value, VariableElement)
 						
 			Enum.valueOf(avType as Class<?> as Class<? extends Enum>, ve.simpleName.toString) as T
 
@@ -595,29 +597,29 @@ class ElementsExtensions {
 			val arr = Array.newInstance(avType.getComponentType(), (value as List<AnnotationValue>).size)
 			
 			(value as List<AnnotationValue>).forEach[avInList , i|
-				Array.set(arr, i, avInList.mapAs(avInList.valueWithErrorHandling, annotationMirror, annotatedElement, name, i, avType.getComponentType()))
+				Array.set(arr, i, avInList.mapAs(avInList.valueWithErrorHandling, annotationMirror, avName, i, avType.getComponentType()))
 			]
 			arr as T
 		} else if(avType==AnnotationMirror){
-			val avAsAnnotation = av.cast(value, annotationMirror, annotatedElement, name, AnnotationMirror)			
-			createAnnotationAndParent(annotationMirror, avAsAnnotation, name, index) as T			
+			val avAsAnnotation = av.cast(value, AnnotationMirror)			
+			createAnnotationAndParent(annotationMirror, avAsAnnotation, avName, index) as T			
 		} else {
 
-			av.cast(value, annotationMirror, annotatedElement, name, avType)
+			av.cast(value, avType)
 		}
 	}
 	
 	
 	
-	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationAndParent annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
-		new AnnotationAndParent(avAsAnnotation, new Path.Segment(name.toString, index), annotationMirror, null)
+	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationAndParent annotationMirror, AnnotationMirror avAsAnnotation, CharSequence avName, Integer index) {
+		new AnnotationAndParent(avAsAnnotation, new Path.Segment(avName.toString, index), annotationMirror, null)
 	}
 	
-	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationWithDefaultAnnotation annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
-		createAnnotationAndParent(annotationMirror.annotation, avAsAnnotation, name, index)
+	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationWithDefaultAnnotation annotationMirror, AnnotationMirror avAsAnnotation, CharSequence avName, Integer index) {
+		createAnnotationAndParent(annotationMirror.annotation, avAsAnnotation, avName, index)
 	}
 	
-	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationMirror annotationMirror, AnnotationMirror avAsAnnotation, CharSequence name, Integer index) {
+	private def dispatch AnnotationMirror createAnnotationAndParent(AnnotationMirror annotationMirror, AnnotationMirror avAsAnnotation, CharSequence avName, Integer index) {
 		avAsAnnotation
 	}
 
@@ -626,20 +628,13 @@ class ElementsExtensions {
 	}
 	
 
-	private def <T> T cast(AnnotationValue av, Object value, AnnotationMirror annotationMirror, Element annotatedElement,
-		CharSequence name, Class<T> avType) {
+	private def <T> T cast(AnnotationValue av, Object value, Class<T> avType) {
 
 		var Class<?> targetType = avType
 		if (avType.primitive) {
 			targetType = avType.boxedType
 		}
-		try {
-			targetType.cast(value) as T
-		} catch (RuntimeException re) {
-			throw new ProcessingException(
-				'''Exception when casting annotation value '«name»' (value : '«value»'): «re.message»''',
-				annotatedElement, annotationMirror, name, av);
-		}
+		targetType.cast(value) as T	
 	}		
 
 	def getPrefixedAvName(AnnotationMirror metaAnnotation, CharSequence name) {
@@ -651,19 +646,6 @@ class ElementsExtensions {
 		prefixedAvName
 	}
 
-	def <T> value(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name, Class<T> avType) {
-		annotationMirror.value(annotatedElement, name, avType, false)
-	}
-
-	def <T> value(AnnotationMirror annotationMirror, CharSequence name, Class<T> avType) {
-		annotationMirror.value(null, name, avType, false)
-	}
-
-
-	def <T> requiredValue(AnnotationMirror annotationMirror, Element annotatedElement, CharSequence name,
-		Class<T> avType) {
-		annotationMirror.value(annotatedElement, name, avType, true)
-	}
 
 	def annotationsByName(Element e, String packageForShortNames) {
 		[ String fqnOrShortname |
@@ -773,7 +755,7 @@ class ElementsExtensions {
 	//So, we tolerate Iterables when setting single valued AVs
 	def dispatch Object coerceSingleValue(Iterable<?> value, TypeMirror avType) {
 		if(value.size>1) {
-			throw new RuleException(''''«value»' is not a valid value or element value for type «avType», since it contains multiple elements''');
+			throw new IllegalArgumentException(''''«value»' is not a valid value or element value for type «avType», since it contains multiple elements''');
 		}
 		coerceSingleValue(value.head, avType) 
 	}
@@ -782,8 +764,7 @@ class ElementsExtensions {
 		val v = toAnnotationValue(avType, value)
 		
 		if (!avType.toAnnotationValueClass.isInstance(v)) {
-			throw new RuleException(
-				''''«v»' of type «v?.class» is not a valid value or element value for type «avType»''');
+			throw new IllegalArgumentException(''''«v»' of type «v?.class» is not a valid value or element value for type «avType»''');
 		}
 		v
 	}
@@ -824,7 +805,7 @@ class ElementsExtensions {
 			case e.kind == ElementKind.ENUM: {
 				val enumConst = avType.asTypeElement.declaredFields.findFirst[simpleName.contentEquals(s)]
 				if (enumConst === null) {
-					throw new RuleException('''«s» is not a valid enum constant for enum type «avType»''');
+					throw new IllegalArgumentException('''«s» is not a valid enum constant for enum type «avType»''');
 				}
 				enumConst
 			}
@@ -843,7 +824,7 @@ class ElementsExtensions {
 	}
 
 	def static unsupportedAVType(TypeMirror type, Object o) {
-		new RuleException('''An annotation value of type «type» cannot be created from value "«o»" of type «o?.class»''')
+		new IllegalArgumentException('''An annotation value of type «type» cannot be created from value "«o»" of type «o?.class»''')
 	}
 
 	def isAbstract(Element e) {
@@ -1093,7 +1074,7 @@ class ElementsExtensions {
 		'''«e.enclosingElement.uniqueName».«e.uniqueSimpleName»'''
 	}
 	
-	def String uniqueNameWithin(Element e, TypeElement enclosing) {
+	def String uniqueNameWithin(Element e, QualifiedNameable enclosing) {
 		if(e==enclosing)
 			''
 		else if (e.enclosingElement == enclosing)

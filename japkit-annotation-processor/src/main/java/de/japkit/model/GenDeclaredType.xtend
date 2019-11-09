@@ -14,7 +14,7 @@ class GenDeclaredType extends GenTypeMirror implements DeclaredType {
 	public static val kind = TypeKind.DECLARED
 	
 	@Required
-	private TypeElement element
+	TypeElement element
 	
 	TypeMirror enclosingType
 	

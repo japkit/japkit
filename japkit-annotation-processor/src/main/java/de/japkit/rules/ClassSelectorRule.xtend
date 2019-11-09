@@ -9,8 +9,6 @@ import java.util.Set
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeMirror
 import org.eclipse.xtend.lib.annotations.Data
 
@@ -134,8 +132,7 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 		
 		if(expr.nullOrEmpty) return null
 		
-		ExtensionRegistry.get(ELSupport).eval(expr, lang, targetType,
-			'''Error when evaluating class selector expression '«expr»'  ''', null			
+		ExtensionRegistry.get(ELSupport).eval(expr, lang, targetType,'expr', null			
 		)	
 		
 	}

@@ -19,12 +19,12 @@ import java.util.Set
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.QualifiedNameable
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.util.Elements
 import javax.lang.model.util.SimpleTypeVisitor8
 import javax.lang.model.util.Types
 import javax.tools.StandardLocation
@@ -57,7 +57,7 @@ class TypesRegistry {
 		Generated.name
 	}
 
-	def markAsGenerated(GenTypeElement typeElement, TypeElement original) {
+	def markAsGenerated(GenTypeElement typeElement, QualifiedNameable original) {
 		val genAnno = new GenAnnotationMirror(typeElementCache.getTypeElement(getGenAnnotationFqn()).asType as DeclaredType) => [
 			setValue("src", new GenAnnotationValue(original.qualifiedName.toString))
 		]
@@ -68,13 +68,13 @@ class TypesRegistry {
 		(typeElement instanceof GenTypeElement) || (typeElement instanceof GenUnresolvedTypeElement) || findGenAnnotation(typeElement) !== null
 	}
 
-	def findGenAnnotation(TypeElement typeElement) {
+	def findGenAnnotation(Element typeElement) {
 		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions)
 		
 		typeElement.annotationMirror(getGenAnnotationFqn())
 	}
 
-	def getAnnotatedClassForGenClassOnDisk(TypeElement typeElement) {
+	def getAnnotatedClassForGenClassOnDisk(Element typeElement) {
 		val am = typeElement.findGenAnnotation
 		if (am === null) {
 			return null
@@ -189,7 +189,7 @@ class TypesRegistry {
 	
 	val Map<Pair<String,Boolean>, Set<String>> allAnnotatedClassesByTrigger = newHashMap;
 	
-	def registerAnnotatedClass(TypeElement annotatedClass, List<Pair<AnnotationMirror,Boolean>> triggers){
+	def registerAnnotatedClass(QualifiedNameable annotatedClass, List<Pair<AnnotationMirror,Boolean>> triggers){
 		val triggerFqns = triggers.map[trigger| (trigger.key.annotationType.asElement as TypeElement).qualifiedName.toString->trigger.value]
 		val acFqn = annotatedClass.qualifiedName.toString
 		
@@ -340,7 +340,7 @@ class TypesRegistry {
 		registerGeneratedTypeElement(genTypeElement, currentAnnotatedClass, currentTriggerAnnotation)
 	}
 	
-	def registerGeneratedTypeElement(GenTypeElement genTypeElement, TypeElement annotatedClass, AnnotationMirror trigger) {
+	def registerGeneratedTypeElement(GenTypeElement genTypeElement, QualifiedNameable annotatedClass, AnnotationMirror trigger) {
 		val genTypeFqn = genTypeElement.qualifiedName.toString
 		val genTypeSimpleName = getSimpleOrPartiallyQualifiedName(genTypeElement).toString
 		val acFqn = annotatedClass.qualifiedName.toString
@@ -512,7 +512,7 @@ class TypesRegistry {
 		]
 	}
 
-	def isCommitted(TypeElement typeElement) {
+	def isCommitted(QualifiedNameable typeElement) {
 		commitedGenTypeElements.contains(typeElement.qualifiedName.toString)
 	}
 
@@ -530,7 +530,7 @@ class TypesRegistry {
 		result
 	}
 
-	def dispatch void registerTypeDependencyForAnnotatedClass(TypeElement annotatedClass, DeclaredType type) {
+	def dispatch void registerTypeDependencyForAnnotatedClass(QualifiedNameable annotatedClass, DeclaredType type) {
 		if(type === null || type.kind != TypeKind.DECLARED && type.kind != TypeKind.ERROR ) {
 			return
 		}
@@ -653,7 +653,7 @@ class TypesRegistry {
 		}
 	}
 
-	def <T> T handleTypeElementNotFound(T defaultValue, CharSequence msg, TypeElement annotatedClass,
+	def <T> T handleTypeElementNotFound(T defaultValue, CharSequence msg, QualifiedNameable annotatedClass,
 		(Object)=>T closure) {
 		try {
 			closure.apply(null)
@@ -668,7 +668,7 @@ class TypesRegistry {
 		handleTypeElementNotFound(defaultValue, msg, annotatedClass, closure)
 	}
 
-	def handleTypeElementNotFound(TypeElementNotFoundException e, TypeElement annotatedClass) {
+	def handleTypeElementNotFound(TypeElementNotFoundException e, QualifiedNameable annotatedClass) {
 		handleTypeElementNotFound(e.message, e.fqn, annotatedClass)
 	}
 
@@ -684,7 +684,7 @@ class TypesRegistry {
 		handleTypeElementNotFound(msg, typeFqnOrShortname, currentAnnotatedClass)
 	}
 	
-	def handleTypeElementNotFound(CharSequence msg, String typeFqnOrShortname, TypeElement annotatedClass) {
+	def handleTypeElementNotFound(CharSequence msg, String typeFqnOrShortname, QualifiedNameable annotatedClass) {
 		if(annotatedClass !== null) { //Null check is for corner cases where annotation types are missing, since they are to be generated (f.e. annotation templates).
 			val errorMsg = '''«msg» Missing type: «typeFqnOrShortname»'''		
 			registerTypeDependencyForAnnotatedClassByFqn(annotatedClass.qualifiedName.toString, typeFqnOrShortname, msg)		
@@ -791,7 +791,7 @@ class TypesRegistry {
 	//if anything changes regarding the classes with the trigger annotation. 
 	val Map<Pair<String, Boolean>, Set<String>> genericTriggerDependencies = newHashMap
 	
-	def boolean hasGenericDependencyOnTriggerShadowAnnotation(TypeElement annotatedClass, Iterable<AnnotationMirror> triggers){
+	def boolean hasGenericDependencyOnTriggerShadowAnnotation(QualifiedNameable annotatedClass, Iterable<AnnotationMirror> triggers){
 		val acFqn = annotatedClass.qualifiedName.toString
 		triggers.exists[
 			val triggerFqn = annotationType.asTypeElement.qualifiedName.toString;
@@ -826,7 +826,7 @@ class TypesRegistry {
 	
 	//finds type elements with a given trigger annotation and registers a depnedency to re-consider the annotated class again
 	//when more such types are discoverd / generated
-	def findAllTypeElementsWithTriggerAnnotation(TypeElement annotatedClass, String triggerFqn, boolean shadow){
+	def findAllTypeElementsWithTriggerAnnotation(QualifiedNameable annotatedClass, String triggerFqn, boolean shadow){
 		val acFqn = annotatedClass?.qualifiedName?.toString
 		findAllTypeElementsWithTriggerAnnotation(acFqn, triggerFqn, shadow)
 	}
@@ -947,7 +947,10 @@ class TypesRegistry {
 		metaTypeElementsToTriggerAnnotations.getOrCreateSet(rootMetaTypeElement.qualifiedName.toString).add(triggerAnnotation.qualifiedName.toString)
 	}
 	
-	def getTriggerAnnotationsForMetaTypeElements(Iterable<TypeElement> metaTypeElements){
+	/**
+	 * Determines the trigger annotations that directly or indirectly use the given meta TypeElements (template class, function etc.).
+	 */
+	def getTriggerAnnotationsForMetaTypeElements(Iterable<QualifiedNameable> metaTypeElements){
 		metaTypeElements.map[metaTypeElementsToTriggerAnnotations.get(it.qualifiedName.toString) ?: emptySet].flatten.toSet
 	}
 

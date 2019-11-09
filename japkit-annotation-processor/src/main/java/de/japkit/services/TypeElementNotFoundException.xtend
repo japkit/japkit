@@ -12,7 +12,7 @@ import org.eclipse.xtend.lib.annotations.Data
  *
  */
 @Data
-public class TypeElementNotFoundException extends RuntimeException {
+class TypeElementNotFoundException extends RuntimeException {
 	/**
 	 * 
 	 */
