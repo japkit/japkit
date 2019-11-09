@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.github.japkit</groupId>
+		<artifactId>japkit-parent</artifactId>
+		<version>1.22-SNAPSHOT</version>
+	</parent>
+	<name>Japkit Tests</name>
+	<description>Tests and documentation for japkit.</description>
+	<artifactId>japkit-tests</artifactId>
+
+	<properties>
+		<japkit.version>1.22-SNAPSHOT</japkit.version>
+		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>com.github.japkit</groupId>
+							<artifactId>japkit-all-javael3</artifactId>
+							<version>${japkit.version}</version>
+						</path>
+					</annotationProcessorPaths>
+					<compilerArgs>
+						<compilerArg>
+							-Aannotations=de.japkit.tests.*
+						</compilerArg>
+						<compilerArg>
+							-AdiagnosticMessages=false
+						</compilerArg>
+
+					</compilerArgs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.japkit</groupId>
+			<artifactId>japkit-annotations</artifactId>
+			<version>${japkit.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>
