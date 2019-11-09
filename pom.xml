@@ -59,6 +59,7 @@
 		<module>japkit-all-javael3</module>
 		<module>japkit-all-nogroovy</module>
 		<module>japkit-annotationtemplates</module>
+		<module>japkit-test</module>
 	</modules>
 
 	<properties>

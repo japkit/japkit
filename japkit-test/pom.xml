@@ -9,7 +9,7 @@
 	</parent>
 	<name>Japkit Tests</name>
 	<description>Tests and documentation for japkit.</description>
-	<artifactId>japkit-tests</artifactId>
+	<artifactId>japkit-test</artifactId>
 
 	<properties>
 		<japkit.version>1.22-SNAPSHOT</japkit.version>
@@ -30,7 +30,7 @@
 					</annotationProcessorPaths>
 					<compilerArgs>
 						<compilerArg>
-							-Aannotations=de.japkit.tests.*
+							-Aannotations=de.japkit.test.*
 						</compilerArg>
 						<compilerArg>
 							-AdiagnosticMessages=false
