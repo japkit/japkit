@@ -38,6 +38,8 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	boolean linebreak
 	boolean indentAfterLinebreak
 	
+	String avPrefix
+	
 	val LINE_DELIM = StringConcatenation.DEFAULT_LINE_DELIMITER;
 
 	new(AnnotationMirror metaAnnotation, String avPrefix) {
@@ -47,6 +49,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 	new(AnnotationMirror metaAnnotation, Element template, String avPrefix, String errorValue) {
 		super(metaAnnotation, template)
 		this.template = template
+		this.avPrefix = avPrefix
 
 		val codeFromJavadoc = JavadocUtil.getCode(template?.getDocCommentUsingRuntimeMetadata)
 
@@ -168,10 +171,10 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 							code(bodyCases, bodyExpr, lang, errorValue)
 						} else {
 							val bodyIterator = eval(iteratorExpr, iteratorLang,
-								Iterable, '''Error in code body iterator expression.''', emptyList)
+								Iterable, "iterator".withPrefix(avPrefix), emptyList)
 							if (!bodyIterator.nullOrEmpty) {
 								val before = eval(beforeExpr, lang,
-									CharSequence, '''Error in code body before expression.''', '').
+									CharSequence, "beforeIteratorCode".withPrefix(avPrefix), '').
 									withLinebreak(linebreak) + if(linebreak && indentAfterLinebreak) '\t' else ''
 								
 								//If there shall be linebreak, it is also added after the last iteration (== before the 'after'-code)
@@ -179,11 +182,11 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 								val after =
 									(if(linebreak && !indentAfterLinebreak) LINE_DELIM else '') + 
 									eval(afterExpr, lang,
-										CharSequence, '''Error in code body after expression.''', '').withLinebreak(linebreak)
+										CharSequence, "afterIteratorCode".withPrefix(avPrefix), '').withLinebreak(linebreak)
 								val sep = separator + if(linebreak) LINE_DELIM + (if(indentAfterLinebreak)'\t' else '') else '';
 								'''«FOR e : bodyIterator BEFORE before SEPARATOR sep AFTER after»«scope(e as Element) [code(bodyCases, bodyExpr, lang, '')]»«ENDFOR»'''
 							} else {
-								eval(emptyExpr, lang, CharSequence, '''Error in code body empty expression.''',
+								eval(emptyExpr, lang, CharSequence,  "emptyIteratorCode".withPrefix(avPrefix),
 									errorValue)
 							}
 						}
@@ -203,7 +206,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 
 	private def CharSequence code(List<CaseRule<String>> bodyCases, String bodyExpr, String lang, String errorResult) {
 		CaseRule.findFirstMatching(bodyCases)?.apply ?:
-			eval(bodyExpr, lang, CharSequence, "Error in code body expression.", errorResult)
+			eval(bodyExpr, lang, CharSequence, "code".withPrefix(avPrefix), errorResult)
 	// TODO: ErrorResult bei den Cases??
 	}
 

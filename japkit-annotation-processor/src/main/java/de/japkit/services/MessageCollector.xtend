@@ -207,15 +207,15 @@ class MessageCollector {
 	}
 	
 	def dispatch void reportRuleError(RuleException e, CharSequence metaAnnotationValueName) {
+		val avName = metaAnnotationValueName ?: e.metaAnnotationValueName
 		//A RuleException is usually an "expected" exception caused by the user.
 		//Thus, no stacktrace is printed unless a cause exists in the RuleException. 
 		reportRuleError(currentRule, '''
-			«e.message»
 			«IF e.cause !== null »
 			Cause:
 			«stacktrace(e.rootCause)»
 			«ENDIF»''', 
-			e.metaAnnotation, metaAnnotationValueName ?: e.metaAnnotationValueName)
+			e.metaAnnotation, avName)
 	}
 	
 	def dispatch void reportRuleError(Exception e, CharSequence metaAnnotationValueName) {
@@ -261,7 +261,7 @@ class MessageCollector {
 			''', 
 			currentAnnotatedClass, null, null)
 
-		addMessage(Kind.ERROR, '''«msg»''', 
+		addMessage(Kind.ERROR, '''«IF metaAnnotationValueName !== null »«metaAnnotationValueName»: «ENDIF»«msg»''', 
 			metaElement, metaAnnotation, metaAnnotationValueName?.toString
 		)
 

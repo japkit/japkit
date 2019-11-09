@@ -142,7 +142,7 @@ class ELSupport {
 		if(src instanceof Element) src else vs.parent?.nearestSrcElement
 	}
 
-	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence errorMessage,
+	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence avName,
 		T errorResult) {
 		try {			
 			eval(expr, lang, expectedType, true)
@@ -152,7 +152,7 @@ class ELSupport {
 			//Do not report the error again to avoid error flooding
 			errorResult
 		} catch (Exception e) {
-			reportRuleError(e)
+			reportRuleError(e, avName)
 			if(errorResult !== null) return errorResult else throw new ReportedException(e)
 		}
 	}

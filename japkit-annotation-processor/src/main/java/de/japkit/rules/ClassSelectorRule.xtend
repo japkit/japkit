@@ -132,8 +132,7 @@ class ClassSelectorRule extends AbstractFunctionRule<TypeMirror> {
 		
 		if(expr.nullOrEmpty) return null
 		
-		ExtensionRegistry.get(ELSupport).eval(expr, lang, targetType,
-			'''Error when evaluating class selector expression '«expr»'  ''', null			
+		ExtensionRegistry.get(ELSupport).eval(expr, lang, targetType,'expr', null			
 		)	
 		
 	}

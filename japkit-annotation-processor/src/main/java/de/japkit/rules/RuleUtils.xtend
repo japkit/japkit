@@ -294,7 +294,7 @@ class RuleUtils {
 				else {
 					val exprToEvaluate = '''#{«if(noSyntaxRestrictions) expr else expr.replace('_','.')»}'''
 					eval(exprToEvaluate, lang,
-						CharSequence, '''Expression «expr» in "«template»"" could not be resolved.''', expr)?.toString
+						CharSequence, null, expr)?.toString
 				}
 			matcher.appendReplacement(sb,
 				if(autoCamelCase && matcher.start > 0 &&
@@ -315,7 +315,7 @@ class RuleUtils {
 		[|
 			val nameFromTemplateResolved = nameFromTemplate?.replaceExpressionInTemplate(false, null, true)?.toString
 			val result = if (!nameExpr.nullOrEmpty) {
-					eval(nameExpr, nameLang, String, '''Member name could not be generated''',
+					eval(nameExpr, nameLang, String, "nameExpr".withPrefix(avPrefix),
 						nameFromTemplateResolved ?: 'invalidMemberName')
 				} else if (!name.nullOrEmpty) {
 					name
@@ -499,7 +499,7 @@ class RuleUtils {
 			if (copyFromSrc)
 				currentSrcElement.docComment
 			else if (!expr.nullOrEmpty)
-				eval(expr, commentLang, CharSequence, '''Comment could not be generated''', 'invalidComment')
+				eval(expr, commentLang, CharSequence, "commentExpr".withPrefix(avPrefix), 'invalidComment')
 			else
 				defaultComment?.apply
 		]
@@ -514,7 +514,7 @@ class RuleUtils {
 			null
 		else
 			[
-				val nameSet = eval(expr, lang, Iterable, '''Name set expression could not be evaluated.''', emptySet).
+				val nameSet = eval(expr, lang, Iterable, avName, emptySet).
 					map [
 						if (it instanceof Element) {
 							it.simpleName.toString
