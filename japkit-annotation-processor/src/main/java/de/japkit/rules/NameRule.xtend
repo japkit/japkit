@@ -65,9 +65,7 @@ class NameRule extends AbstractRule {
 				return name
 
 			} else if (!expr.nullOrEmpty) {
-				handleException(null, '''«prefix»Expr''') [
-					eval(expr, lang, String)
-				]
+				eval(expr, lang, String, '''«prefix»Expr''', null, false)
 			} else {
 				orgName.toString
 			}

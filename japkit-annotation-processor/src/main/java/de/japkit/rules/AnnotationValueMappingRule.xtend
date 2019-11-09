@@ -28,6 +28,8 @@ class AnnotationValueMappingRule extends AbstractRule {
 	()=>AnnotationMappingRule lazyAnnotationMapping
 	AVMode mode
 	((Object)=>Object)=>Iterable<Object> scopeRule
+	
+	String avPrefix
 
 	def GenAnnotationValue mapAnnotationValue(GenAnnotationMirror annotation, TypeMirror avType) {
 		inRule[
@@ -108,13 +110,14 @@ class AnnotationValueMappingRule extends AbstractRule {
 	def private Object evaluateExpression(TypeMirror avType, String expr) {
 
 		val targetClass = if(avType.kind.isPrimitive) avType.toAnnotationValueClass else Object	
-		eval(expr, lang, targetClass)
+		eval(expr, lang, targetClass, "expr".withPrefix(avPrefix), null)
 
 	}
 
 
 	new(AnnotationMirror a,  Map<String, AnnotationMappingRule> mappingsWithId) {
 		super(a, null)
+		avPrefix=''
 		name = a.value("name", String)
 		
 		val setAvNames = newHashSet
@@ -147,7 +150,7 @@ class AnnotationValueMappingRule extends AbstractRule {
 		
 		value = a.valueAndRemember(avName, Object, setAvNames)
 
-		val avPrefix = avName+'_'
+		avPrefix = avName+'_'
 
 		expr = a.valueAndRemember("expr".withPrefix(avPrefix), String, setAvNames)
 		lang = a.value("lang".withPrefix(avPrefix), String)

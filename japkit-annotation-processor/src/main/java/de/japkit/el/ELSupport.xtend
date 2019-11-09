@@ -144,13 +144,19 @@ class ELSupport {
 
 	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence avName,
 		T errorResult) {
+		eval(expr, lang, expectedType, avName, errorResult, true)	
+	}
+	
+	//TODO: Move to rule package.
+	def <T extends Object> T eval(String expr, String lang, Class<T> expectedType, CharSequence avName,
+		T errorResult, boolean evalFromValueStackFirst) {
 		try {			
-			eval(expr, lang, expectedType, true)
+			eval(expr, lang, expectedType, evalFromValueStackFirst, findElImports())
 		} catch (TypeElementNotFoundException tenfe) {
 			throw tenfe
 		} catch(ReportedException e){
 			//Do not report the error again to avoid error flooding
-			errorResult
+			if(errorResult !== null) return errorResult else throw e
 		} catch (Exception e) {
 			reportRuleError(e, avName)
 			if(errorResult !== null) return errorResult else throw new ReportedException(e)
@@ -174,16 +180,6 @@ class ELSupport {
 		} else null
 	}
 
-	def <T> T eval(String expr, String lang, Class<T> expectedType) {
-		eval(expr, lang, expectedType, false)
-	}
-	
-	def <T> T eval(String expr, String lang, Class<T> expectedType, boolean evalFromValueStackFirst) {
-		eval(expr, lang, expectedType, evalFromValueStackFirst, findElImports())
-	}
-	
-	//find current Meta-Element and determine ElImports of it. 
-	//TODO: Should be done in rule package instead. (Factoring out some ExpressionRule, like already done for other rules. See ExpressionOrFunctionCallRule) 
 	private def findElImports() {
 		val extension GenerateClassContext = ExtensionRegistry.get(GenerateClassContext);
 		val rule = currentRule
