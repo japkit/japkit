@@ -144,8 +144,10 @@ class MessageCollector {
 				'''Error in parameter «paramName» (Annotation: «m.annotationFqn», AnnotationValue: «m.avName»): ''' + m.msg, enclosingExecutableElement, null, null)
 			}
 			
-			//Make it appear at least in error log...
-			messager.printMessage(m.kind, '''«m.msg» «m.typeOrPackageElementFqn» «m.annotationFqn» «m.nestedAnnotationPath»''')
+			if(element === null) {
+				//Make it appear at least in error log...
+				messager.printMessage(m.kind, '''«m.msg» «m.typeOrPackageElementFqn» «m.annotationFqn» «m.nestedAnnotationPath»''')
+			}
 		]
 		messagesPerAnnotatedClass.clear
 	}
@@ -211,6 +213,7 @@ class MessageCollector {
 		//A RuleException is usually an "expected" exception caused by the user.
 		//Thus, no stacktrace is printed unless a cause exists in the RuleException. 
 		reportRuleError(currentRule, '''
+			«e.message»
 			«IF e.cause !== null »
 			Cause:
 			«stacktrace(e.rootCause)»

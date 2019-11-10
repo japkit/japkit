@@ -6,7 +6,7 @@
 	<groupId>com.github.japkit</groupId>
 	<artifactId>japkit-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.21</version>
+	<version>1.22</version>
 	<name>Japkit Parent</name>
 
 	<description>A declarative approach to writing Java annotation processors.</description>
@@ -59,6 +59,7 @@
 		<module>japkit-all-javael3</module>
 		<module>japkit-all-nogroovy</module>
 		<module>japkit-annotationtemplates</module>
+		<module>japkit-test</module>
 	</modules>
 
 	<properties>
