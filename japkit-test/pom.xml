@@ -37,6 +37,96 @@
 					</compilerArgs>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+
+				<configuration>
+					<show>private</show>
+					<!-- render custom japkit tags -->
+					<tags>
+						<tag>
+							<name>japkit.initBeforeIteratorCode</name>
+							<placement>a</placement>
+							<head>@japkit.initBeforeIteratorCode</head>
+						</tag>
+						<tag>
+							<name>japkit.initCode</name>
+							<placement>a</placement>
+							<head>@japkit.initCode</head>
+						</tag>
+						<tag>
+							<name>japkit.initSeparator</name>
+							<placement>a</placement>
+							<head>@japkit.initSeparator</head>
+						</tag>
+						<tag>
+							<name>japkit.initAfterIteratorCode</name>
+							<placement>a</placement>
+							<head>@japkit.initAfterIteratorCode</head>
+						</tag>
+						<tag>
+							<name>japkit.initEmptyIteratorCode</name>
+							<placement>a</placement>
+							<head>@japkit.initEmptyIteratorCode</head>
+						</tag>
+
+						<tag>
+							<name>japkit.bodyBeforeIteratorCode</name>
+							<placement>a</placement>
+							<head>@japkit.bodyBeforeIteratorCode</head>
+						</tag>
+						<tag>
+							<name>japkit.bodyCode</name>
+							<placement>a</placement>
+							<head>@japkit.bodyCode</head>
+						</tag>
+						<tag>
+							<name>japkit.bodySeparator</name>
+							<placement>a</placement>
+							<head>@japkit.bodySeparator</head>
+						</tag>
+						<tag>
+							<name>japkit.bodyAfterIteratorCode</name>
+							<placement>a</placement>
+							<head>@japkit.bodyAfterIteratorCode</head>
+						</tag>
+						<tag>
+							<name>japkit.bodyEmptyIteratorCode</name>
+							<placement>a</placement>
+							<head>@japkit.bodyEmptyIteratorCode</head>
+						</tag>
+						
+						<tag>
+							<name>japkit.beforeIteratorCode</name>
+							<placement>a</placement>
+							<head>@japkit.beforeIteratorCode</head>
+						</tag>
+						<tag>
+							<name>japkit.code</name>
+							<placement>a</placement>
+							<head>@japkit.code</head>
+						</tag>
+						<tag>
+							<name>japkit.separator</name>
+							<placement>a</placement>
+							<head>@japkit.separator</head>
+						</tag>
+						<tag>
+							<name>japkit.afterIteratorCode</name>
+							<placement>a</placement>
+							<head>@japkit.afterIteratorCode</head>
+						</tag>
+						<tag>
+							<name>japkit.emptyIteratorCode</name>
+							<placement>a</placement>
+							<head>@japkit.emptyIteratorCode</head>
+						</tag>
+					</tags>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 
@@ -45,6 +135,12 @@
 			<groupId>com.github.japkit</groupId>
 			<artifactId>japkit-annotations</artifactId>
 			<version>${japkit.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 

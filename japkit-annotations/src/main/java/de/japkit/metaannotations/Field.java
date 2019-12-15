@@ -1,5 +1,6 @@
 package de.japkit.metaannotations;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
@@ -14,6 +15,7 @@ import de.japkit.metaannotations.classselectors.None;
  * @author stefan
  * 
  */
+@Documented
 @Target(ElementType.FIELD)
 public @interface Field {
 	/**

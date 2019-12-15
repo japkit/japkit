@@ -1,6 +1,7 @@
 package de.japkit.metaannotations;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
@@ -11,53 +12,62 @@ import javax.lang.model.element.Modifier;
  * processing.
  * 
  * @author stefan
- * 
  */
+@Documented
 public @interface Matcher {
 	/**
-	 * Optional expression to determine the element to which the checks of the matcher are applied to. By default this is the current source element (#{src}). 
+	 * Optional expression to determine the element to which the checks of the
+	 * matcher are applied to. By default this is the current source element
+	 * (#{src}).
+	 * 
 	 * @return the expression
 	 */
 	String src() default "";
 
 	/**
-	 * As an alternative to the src expression, a function can be called to determine the source object.
+	 * As an alternative to the src expression, a function can be called to
+	 * determine the source object.
 	 * 
 	 * @return
 	 */
 	Class<?>[] srcFun() default {};
-	
+
 	/**
-	 * 
 	 * @return language for the src expression. Defaults to Java EL.
 	 */
 	String srcLang() default "";
-	
-	
+
 	/**
 	 * If set, the src element must have this simpleName.
+	 * 
 	 * @return
 	 */
 	String name() default "";
-	
+
 	/**
-	 * If set, the source element must have a name that is amongst the names given by the expression. The expression must evaluate to an Iterable of 
-	 * CharSequence or to an Iterable of Element. In the latter case, the simple names of the elements are considered.
+	 * If set, the source element must have a name that is amongst the names
+	 * given by the expression. The expression must evaluate to an Iterable of
+	 * CharSequence or to an Iterable of Element. In the latter case, the simple
+	 * names of the elements are considered.
+	 * 
 	 * @return
 	 */
 	String nameIn() default "";
-	
+
 	String nameInLang() default "";
-	
+
 	/**
-	 * If set, the source element must have a name that is not amongst the names given by the expression. The expression must evaluate to an Iterable of 
-	 * CharSequence or to an Iterable of Element. In the latter case, the simple names of the elements are considered.
+	 * If set, the source element must have a name that is not amongst the names
+	 * given by the expression. The expression must evaluate to an Iterable of
+	 * CharSequence or to an Iterable of Element. In the latter case, the simple
+	 * names of the elements are considered.
+	 * 
 	 * @return
 	 */
 	String nameNotIn() default "";
-	
+
 	String nameNotInLang() default "";
-	
+
 	/**
 	 * All of those modifiers must be present at the source element for the rule
 	 * to apply.
@@ -251,7 +261,6 @@ public @interface Matcher {
 	String condition() default "";
 
 	/**
-	 * 
 	 * @return language for the condition expression. Defaults to Java EL.
 	 */
 	String conditionLang() default "";

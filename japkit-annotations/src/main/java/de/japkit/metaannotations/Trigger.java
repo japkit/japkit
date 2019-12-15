@@ -2,6 +2,7 @@ package de.japkit.metaannotations;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Target;
 
 /**
@@ -12,6 +13,7 @@ import java.lang.annotation.Target;
  * @author stefan
  *
  */
+@Documented 
 @Target(value = ANNOTATION_TYPE)
 public @interface Trigger {
 	

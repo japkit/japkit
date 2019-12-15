@@ -1,5 +1,7 @@
 package de.japkit.annotations;
 
+import java.lang.annotation.Documented;
+
 /**
  * This annotation is used to mark generated classes (or other elements).
  * <p>
@@ -10,6 +12,7 @@ package de.japkit.annotations;
  * @author stefan
  *
  */
+@Documented
 public @interface Generated {
 	/**Identifies the source the code has been generated from. For generated classes, this is the FQN of the annotated class.*/
 	String src();

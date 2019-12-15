@@ -21,7 +21,13 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 import static extension de.japkit.util.MoreCollectionExtensions.*
+import de.japkit.metaannotations.TemplateCall
 
+/**
+ * The Template rule generates class members based on field, method, constructor and inner class templates.
+ * <p>
+ * It also supports to add interfaces and annotations to the generated class.
+ */
 @Data
 class TemplateRule extends AbstractRule implements Function1<GenTypeElement, List<? extends GenElement>>{
 
@@ -104,9 +110,15 @@ class TemplateRule extends AbstractRule implements Function1<GenTypeElement, Lis
 	}
 	
 	def private dispatch (GenTypeElement)=> List<? extends GenElement> createRuleForMember(VariableElement member){
-		val annotation =  member.annotationMirror(Field)
-		if(annotation !== null || allFieldsAreTemplates)
-			new FieldRule(AnnotationWithDefaultAnnotation.createIfNecessary(annotation, fieldDefaults), member)
+		//A field can represent a call to a Template
+		val templateCallAnnotation  =  member.annotationMirror(TemplateCall)
+		if(templateCallAnnotation !== null) {
+			return new TemplateCallRule(templateCallAnnotation, member);
+		}
+		
+		val fieldAnnotation =  member.annotationMirror(Field)
+		if(fieldAnnotation !== null || allFieldsAreTemplates)
+			new FieldRule(AnnotationWithDefaultAnnotation.createIfNecessary(fieldAnnotation, fieldDefaults), member)
 		else null
 	}
 	
