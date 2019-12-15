@@ -6,6 +6,7 @@ import de.japkit.annotations.RuntimeMetadata;
 import de.japkit.functions.SrcType;
 import de.japkit.metaannotations.Clazz;
 import de.japkit.metaannotations.Constructor;
+import de.japkit.metaannotations.Field;
 import de.japkit.metaannotations.Function;
 import de.japkit.metaannotations.Param;
 import de.japkit.test.members.MembersExample;
@@ -43,16 +44,47 @@ public class ConstructorTemplate {
 	 * The {@link Constructor} annotation is required for disambiguation when
 	 * generating a default constructor.
 	 */
-	@Constructor
+	@Constructor(bodyCode = "this.field1 = 5;")
 	public ConstructorTemplate() {
 	}
 
 	/**
-	 * A constructor that has the fields of the annotated class
-	 * ({@link MembersExample}) as parameters.
+	 * For constructors with at least one parameter, the {@link Constructor}
+	 * annotation is not necessary.
+	 * 
+	 * @japkit.bodyCode this.field2 = field2;
 	 */
+	public ConstructorTemplate(String field2) {
+	}
+
+	/**
+	 * A constructor that has the fields of the annotated class
+	 * ({@link MembersExample}) as parameters and assigns them to the according
+	 * generated fields.
+	 * <p>
+	 * The parameter order depends on the result of
+	 * {@link TypeElement#getEnclosedElements()}, which is used in
+	 * {@link fields} function. Usually, this will be the same order as in the
+	 * source code of {@link ConstructorExample}. However, during incremental
+	 * build in Eclipse, you may sometimes experience a different order. If this
+	 * happens, please do a clean build.
+	 * 
+	 * @see <a
+	 *      href=" https://bugs.eclipse.org/bugs/show_bug.cgi?id=300408">Eclipse
+	 *      Bug 300408</a>
+	 * @see <a
+	 *      href=" https://bugs.eclipse.org/bugs/show_bug.cgi?id=500589">Eclipse
+	 *      Bug 500589</a>
+	 */
+	@Constructor(bodyIterator = "#{fields()}", bodyBeforeIteratorCode = "super();", bodyCode = "this.#{name} = #{name};")
 	public ConstructorTemplate(@Param(srcFun = fields.class) SrcType $name$) {
 	}
+
+	/**
+	 * Copies the fields from {@link ConstructorExample}.
+	 */
+	@Field(srcFun = fields.class)
+	SrcType $name$;
 
 	/**
 	 * A function to get the fields of a {@link TypeElement}.
