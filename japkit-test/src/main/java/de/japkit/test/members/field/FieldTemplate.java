@@ -131,10 +131,16 @@ public class FieldTemplate {
 	@Switch
 	class setterDefensiveCopy {
 
+		/**
+		 * The code fragment for creating a defensive copy of a List.
+		 */
 		@isList
 		@CodeFragment(imports = ArrayList.class, code = "new ArrayList<>(#{surrounded})")
 		String copyList;
 
+		/**
+		 * The code fragment for the default case, without defensive copy.
+		 */
 		@DefaultCase
 		@CodeFragment(code = "#{surrounded}")
 		String deflt;
