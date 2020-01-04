@@ -39,7 +39,7 @@ class CodeFragmentRules implements Function0<CharSequence>, ICodeFragmentRule{
 		var result = surrounded
 		for(n : fragmentNames) {
 			val fragments = valueStack.getRequired(n) as  ICodeFragmentRule
-			result = fragments.surround(surrounded)		
+			result = fragments.surround(result)		
 		}
 		result
 	
