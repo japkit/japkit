@@ -80,7 +80,7 @@ public class ConstructorTemplate {
 	 *      href=" https://bugs.eclipse.org/bugs/show_bug.cgi?id=500589">Eclipse
 	 *      Bug 500589</a>
 	 */
-	@Constructor(bodyIterator = "#{fields()}", bodyBeforeIteratorCode = "super();", bodyCode = "this.#{name} = #{name};")
+	@Constructor(bodyIteratorFun = fields.class, bodyBeforeIteratorCode = "super();", bodyCode = "this.#{name} = #{name};")
 	public ConstructorTemplate(@Param(srcFun = fields.class) SrcType $name$) {
 	}
 
@@ -100,7 +100,7 @@ public class ConstructorTemplate {
 	 * So, do not use simple string functions when generating method or
 	 * constructor bodies, but always CodeFragments.
 	 */
-	@Constructor(bodyIterator = "#{fields()}", bodyBeforeIteratorCode = "super();", bodyCode = "#{fieldAssignment()}")
+	@Constructor(bodyIteratorFun = fields.class, bodyBeforeIteratorCode = "super();", bodyCode = "#{fieldAssignment()}")
 	public ConstructorTemplate(int dummy, @Param(srcFun = fields.class) SrcType $name$) {
 	}
 

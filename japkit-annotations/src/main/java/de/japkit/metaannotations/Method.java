@@ -321,6 +321,14 @@ public @interface Method {
 	String bodyIterator() default "";
 
 	/**
+	 * As an alternative to the bodyIterator expression, a function can be
+	 * called.
+	 * 
+	 * @return
+	 */
+	Class<?>[] bodyIteratorFun() default {};
+
+	/**
 	 * @return the language of the body iterator expression. Default is Java EL.
 	 */
 	String bodyIteratorLang() default "";

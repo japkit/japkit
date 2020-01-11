@@ -24,8 +24,7 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 
 	Element template
 	List<DeclaredType> imports
-	String iteratorExpr
-	String iteratorLang
+	ExpressionOrFunctionCallRule<Iterable> iterator
 	String bodyExpr
 	List<CaseRule<String>> bodyCases
 	String lang
@@ -70,8 +69,8 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 		this.errorValue = errorValue;
 
 		// body iterator
-		iteratorExpr = metaAnnotation?.value("iterator".withPrefix(avPrefix), String)
-		iteratorLang = metaAnnotation?.value("iteratorLang".withPrefix(avPrefix), String)
+		iterator = new ExpressionOrFunctionCallRule<Iterable>(metaAnnotation, template, Iterable, "iterator", "iteratorLang",
+			"iteratorFun", avPrefix, null, false, null);
 
 		imports = metaAnnotation?.value("imports", typeof(DeclaredType[]))?.toList ?: emptyList
 
@@ -167,11 +166,10 @@ class CodeRule extends AbstractRule implements IParameterlessFunctionRule<CharSe
 					}
 				]
 				handleTypeElementNotFound(null, errorValue) [
-					val result = if (iteratorExpr.nullOrEmpty) {
+					val result = if (iterator.isUndefined()) {
 							code(bodyCases, bodyExpr, lang, errorValue)
 						} else {
-							val bodyIterator = eval(iteratorExpr, iteratorLang,
-								Iterable, "iterator".withPrefix(avPrefix), emptyList)
+							val bodyIterator = iterator.apply();
 							if (!bodyIterator.nullOrEmpty) {
 								val before = eval(beforeExpr, lang,
 									CharSequence, "beforeIteratorCode".withPrefix(avPrefix), '').

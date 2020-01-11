@@ -92,7 +92,7 @@ public class MethodTemplate {
 	 */
 	@Method(
 		imports = Objects.class,
-		bodyIterator = "#{fields()}",
+		bodyIteratorFun = fields.class,
 		bodyBeforeIteratorCode = "return Objects.hash(",
 		bodyCode = "#{name}",
 		bodySeparator = ", ",

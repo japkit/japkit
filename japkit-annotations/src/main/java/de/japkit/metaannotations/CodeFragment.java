@@ -60,6 +60,13 @@ public @interface CodeFragment {
 	String iterator() default "";
 
 	/**
+	 * As an alternative to the iterator expression, a function can be called.
+	 * 
+	 * @return
+	 */
+	Class<?>[] iteratorFun() default {};
+
+	/**
 	 * @return the language of the body iterator expression. Default is Java EL.
 	 */
 	String iteratorLang() default "";
@@ -81,8 +88,8 @@ public @interface CodeFragment {
 	Case[] cases() default {};
 
 	/**
-	 * @return if bodyIterator is set, this code is inserted between each
-	 *         iteration of bodyExpr.
+	 * @return if iterator is set, this code is inserted between each iteration
+	 *         of bodyExpr.
 	 */
 	String separator() default "";
 
