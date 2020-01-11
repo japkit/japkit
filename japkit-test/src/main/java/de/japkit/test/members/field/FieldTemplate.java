@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import de.japkit.annotations.RuntimeMetadata;
 import de.japkit.functions.SrcType;
+import de.japkit.metaannotations.Case;
 import de.japkit.metaannotations.Clazz;
 import de.japkit.metaannotations.CodeFragment;
 import de.japkit.metaannotations.DefaultCase;
@@ -19,7 +20,6 @@ import de.japkit.metaannotations.Matcher;
 import de.japkit.metaannotations.Setter;
 import de.japkit.metaannotations.Switch;
 import de.japkit.test.members.common.annotations.AnnotationsTemplate;
-import de.japkit.test.members.common.body.BodyTemplate;
 import de.japkit.test.members.common.condition.ConditionTemplate;
 import de.japkit.test.members.common.modifiers.ModifiersTemplate;
 import de.japkit.test.members.common.name.MemberNameTemplate;
@@ -43,8 +43,6 @@ import de.japkit.test.members.method.MethodTemplate;
  * {@link TypeTemplate}.
  * <li>For more details on how to set the name of the field, see
  * {@link MemberNameTemplate}.
- * <li>For more details on how to generate the initializer code of the field,
- * see {@link BodyTemplate}.
  * </ul>
  */
 @Clazz(commentExpr = "The generated class for the example.")
@@ -127,6 +125,17 @@ public class FieldTemplate {
 	 * <p>
 	 * Here, only List is supported, but more cases could be added (Set, Map,
 	 * Date, ...).
+	 * <p>
+	 * In a Switch the first case that evaluates to true is applied. A case can
+	 * either be annotated by a boolean function (like {@link isList} below) or
+	 * by {@link Case}.
+	 * <p>
+	 * Since the Switch shall provide a code fragment here, each case needs to
+	 * be annotated with {@link CodeFragment}.
+	 * <p>
+	 * Since setterDefensiveCopy is used as a fragment that surrounds other
+	 * code, there is some special EL variable "surrounded" available here that
+	 * contains the code to be surrounded.
 	 */
 	@Switch
 	class setterDefensiveCopy {
