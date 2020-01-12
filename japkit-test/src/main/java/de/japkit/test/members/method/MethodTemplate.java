@@ -7,6 +7,8 @@ import javax.lang.model.element.TypeElement;
 import de.japkit.annotations.RuntimeMetadata;
 import de.japkit.functions.SrcType;
 import de.japkit.metaannotations.Clazz;
+import de.japkit.metaannotations.CodeFragment;
+import de.japkit.metaannotations.Constructor;
 import de.japkit.metaannotations.Field;
 import de.japkit.metaannotations.Function;
 import de.japkit.metaannotations.Getter;
@@ -66,8 +68,12 @@ public class MethodTemplate {
 	 * Since the method has a non-void return type, the method template returns
 	 * 0 as dummy value. Alternatively, the method template can be made
 	 * abstract.
+	 * <p>
+	 * To demonstrate the usage of surrounding code fragments, the code body is
+	 * wrapped into a try-catch that catches every Exception and rethrows it is
+	 * RuntimeException. See {@link rethrowAsRuntimeException}.
 	 */
-	@Method(bodyCode = "return number1 + number2;")
+	@Method(bodyCode = "return number1 + number2;", bodySurroundingFragments = "rethrowAsRuntimeException")
 	public int add(int number1, int number2) {
 		return 0;
 	};
@@ -147,10 +153,33 @@ public class MethodTemplate {
 	 * <li>japkit.bodyAfterIteratorCode ;
 	 * </ul>
 	 */
-	@Method(imports = Objects.class, bodyIterator = "#{fields()}", bodySeparator = " &&", bodyIndentAfterLinebreak = true)
+	@Method(imports = Objects.class, bodyIteratorFun = fields.class, bodySeparator = " &&", bodyIndentAfterLinebreak = true)
 	@Override
 	public boolean equals(Object obj) {
 		return true;
+	}
+
+	/**
+	 * A code fragment that that catches every Exception and rethrows it is
+	 * RuntimeException. To be used as surrounding fragment in
+	 * {@link Method#bodySurroundingFragments()},
+	 * {@link Constructor#bodySurroundingFragments()} or
+	 * {@link CodeFragment#surroundingFragments()}. The code to be surrounded is
+	 * provided as EL variable 'surrounded' to the fragment.
+	 * <ul>
+	 * <li>japkit.code
+	 * 
+	 * <pre>
+	 * try {
+	 * 	#{surrounded}
+	 * } catch (Exception e) {
+	 * 	throw new RuntimeException(e);
+	 * }
+	 * </pre>
+	 * </ul>
+	 */
+	@CodeFragment
+	class rethrowAsRuntimeException {
 	}
 
 	/**

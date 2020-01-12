@@ -391,21 +391,23 @@ public @interface Method {
 	String bodyLang() default "";
 
 	/**
-	 * @return names of the fragments to surround the generated code body.
+	 * @return names of the fragments to surround the generated code body. The
+	 *         code to be surrounded is provides as EL variable 'surrounded' to
+	 *         the fragment.
 	 */
-	String[] surroundingFragments() default {};
+	String[] bodySurroundingFragments() default {};
 
 	/**
 	 * @return names of the fragments to be inserted before the generated code
 	 *         body.
 	 */
-	String[] beforeFragments() default {};
+	String[] bodyBeforeFragments() default {};
 
 	/**
-	 * @return names of the fragments to be inserted before the generated code
+	 * @return names of the fragments to be inserted after the generated code
 	 *         body.
 	 */
-	String[] afterFragments() default {};
+	String[] bodyAfterFragments() default {};
 
 	/**
 	 * @return true means to copy the JavaDoc comment from the rule source
