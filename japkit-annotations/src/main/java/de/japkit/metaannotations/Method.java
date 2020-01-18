@@ -1,5 +1,6 @@
 package de.japkit.metaannotations;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
@@ -11,8 +12,8 @@ import de.japkit.metaannotations.classselectors.None;
  * Annotation to add a method to a generated class.
  * 
  * @author stefan
- * 
  */
+@Documented
 @Target(ElementType.METHOD)
 public @interface Method {
 	/**
@@ -36,82 +37,100 @@ public @interface Method {
 	 * @return
 	 */
 	String src() default "";
-	
+
 	/**
-	 * As an alternative to the src expression, a function can be called to determine the source object.
+	 * As an alternative to the src expression, a function can be called to
+	 * determine the source object.
 	 * 
 	 * @return
 	 */
 	Class<?>[] srcFun() default {};
-	
+
 	/**
-	 * A filter expression to be applied to src in case it is a collection. Must be boolean. 
-	 * The variable name for the current collection element to be filtered is "src". 
+	 * A filter expression to be applied to src in case it is a collection. Must
+	 * be boolean. The variable name for the current collection element to be
+	 * filtered is "src".
+	 * 
 	 * @return
 	 */
 	String srcFilter() default "";
 
 	/**
-	 * As an alternative to srcFilter, one or more boolean functions can be called. 
-	 * Only if the conjunction of their results is true, the rule is applied for the considered element of the src collection.
+	 * As an alternative to srcFilter, one or more boolean functions can be
+	 * called. Only if the conjunction of their results is true, the rule is
+	 * applied for the considered element of the src collection.
 	 * 
 	 * @return
 	 */
 	Class<?>[] srcFilterFun() default {};
-	
+
 	/**
-	 * An expression to be applied to the result of the expression or function(s) in case it is a collection. It's applied to each element.
-	 * The variable name for the current collection element is "src". Collect is applied after filtering.
+	 * An expression to be applied to the result of the expression or
+	 * function(s) in case it is a collection. It's applied to each element. The
+	 * variable name for the current collection element is "src". Collect is
+	 * applied after filtering.
 	 * 
 	 * @return
 	 */
 	String srcCollect() default "";
 
 	/**
-	 * As an alternative or additionally to the collect expression, one or more functions can be called. 
-	 * In case of more than one function, they are called in a "fluent" style. That is each one is applied to the result of the previous one. 
-	 * The first function is always applied to the result of the collect expression or to the current collection element if collect expression is empty.
-	 *  
+	 * As an alternative or additionally to the collect expression, one or more
+	 * functions can be called. In case of more than one function, they are
+	 * called in a "fluent" style. That is each one is applied to the result of
+	 * the previous one. The first function is always applied to the result of
+	 * the collect expression or to the current collection element if collect
+	 * expression is empty.
+	 * 
 	 * @return
 	 */
 	Class<?>[] srcCollectFun() default {};
-	
+
 	/**
-	 * If true, and src is a collection, it is transformed to a LinkedHashSet to remove duplicates while preserving order.
+	 * If true, and src is a collection, it is transformed to a LinkedHashSet to
+	 * remove duplicates while preserving order.
 	 * 
 	 * @return
 	 */
 	boolean srcToSet() default false;
-	
+
 	/**
-	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set, the collection elements are grouped as a map, where 
-	 * the keys are the results of applying srcGroupBy and / or srcGroupByFun to the collection elements and the values are lists 
-	 * of collection elements with same key. SrcGroupBy is an expression and srcGroupByFun is a list of functions. 
-	 * They are applied in a fluent style (like src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
+	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set,
+	 * the collection elements are grouped as a map, where the keys are the
+	 * results of applying srcGroupBy and / or srcGroupByFun to the collection
+	 * elements and the values are lists of collection elements with same key.
+	 * SrcGroupBy is an expression and srcGroupByFun is a list of functions.
+	 * They are applied in a fluent style (like
+	 * src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
 	 * 
-	 * @return the expression to derive the key from a collection element. The collection element is provided as "src".
+	 * @return the expression to derive the key from a collection element. The
+	 *         collection element is provided as "src".
 	 */
 	String srcGroupBy() default "";
-	
+
 	/**
-	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set, the collection elements are grouped as a map, where 
-	 * the keys are the results of applying srcGroupBy and / or srcGroupByFun to the collection elements and the values are lists 
-	 * of collection elements with same key. SrcGroupBy is an expression and srcGroupByFun is a list of functions. 
-	 * They are applied in a fluent style (like src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
+	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set,
+	 * the collection elements are grouped as a map, where the keys are the
+	 * results of applying srcGroupBy and / or srcGroupByFun to the collection
+	 * elements and the values are lists of collection elements with same key.
+	 * SrcGroupBy is an expression and srcGroupByFun is a list of functions.
+	 * They are applied in a fluent style (like
+	 * src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
 	 * 
-	 * @return function(s) to derive the key from a collection element. The collection element is provided as "src".
+	 * @return function(s) to derive the key from a collection element. The
+	 *         collection element is provided as "src".
 	 */
 	Class<?>[] srcGroupByFun() default {};
-		
+
 	/**
-	 * 
 	 * @return the language of the src expression. Defaults to Java EL.
 	 */
 	String srcLang() default "";
-	
+
 	/**
-	 * By default, the current source object has the name "src" on the value stack.
-	 * If this annotation value is set, the source object will additionally provided under the given name.  
+	 * By default, the current source object has the name "src" on the value
+	 * stack. If this annotation value is set, the source object will
+	 * additionally provided under the given name.
 	 * 
 	 * @return the name of the source variable
 	 */
@@ -125,48 +144,47 @@ public @interface Method {
 	Var[] vars() default {};
 
 	/**
-	 * By default, this rule is active.
-	 * To switch it on or of case by case, a boolean expression can be used here. 
+	 * By default, this rule is active. To switch it on or of case by case, a
+	 * boolean expression can be used here.
 	 * 
-	 * @return 
+	 * @return
 	 */
 	String cond() default "";
-	
+
 	/**
 	 * The expression language for the cond expression.
+	 * 
 	 * @return
 	 */
 	String condLang() default "";
-	
+
 	/**
-	 * As an alternative to the cond expression, a boolean function can be called.
+	 * As an alternative to the cond expression, a boolean function can be
+	 * called.
 	 * 
 	 * @return
 	 */
 	Class<?>[] condFun() default {};
 
 	/**
-	 * 
 	 * @return the name of the method. If not empty, nameExpr is ignored.
 	 */
 	String name() default "";
 
 	/**
 	 * For more complex cases: a Java EL expression to generate the name of the
-	 * method. 
+	 * method.
 	 * 
 	 * @return
 	 */
 	String nameExpr() default "";
 
 	/**
-	 * 
 	 * @return the language of the name expression. Defaults to Java EL.
 	 */
 	String nameLang() default "";
 
 	/**
-	 * 
 	 * @return the return type of the method.
 	 */
 	Class<?> returnType() default None.class;
@@ -174,90 +192,93 @@ public @interface Method {
 	Class<?>[] returnTypeArgs() default {};
 
 	/**
-	 * 
 	 * @return the modifiers of the method
 	 */
 	Modifier[] modifiers() default {};
-	
+
 	/**
 	 * A condition whether to add or remove the abstract modifier.
 	 * 
 	 * @return the boolean expression
 	 */
 	String abstractCond() default "";
-	
+
 	/**
 	 * The expression language for the abstractCond expression.
 	 * 
 	 * @return the expression language
 	 */
 	String abstractCondLang() default "";
-	
+
 	/**
-	 * As an alternative to the abstractCond expression, a boolean function can be called.
+	 * As an alternative to the abstractCond expression, a boolean function can
+	 * be called.
 	 * 
 	 * @return the function
 	 */
 	Class<?>[] abstractCondFun() default {};
-	
+
 	/**
 	 * A condition whether to add or remove the public modifier.
 	 * 
 	 * @return the boolean expression
 	 */
 	String publicCond() default "";
-	
+
 	/**
 	 * The expression language for the publicCond expression.
 	 * 
 	 * @return the expression language
 	 */
 	String publicCondLang() default "";
-	
+
 	/**
-	 * As an alternative to the publicCond expression, a boolean function can be called.
+	 * As an alternative to the publicCond expression, a boolean function can be
+	 * called.
 	 * 
 	 * @return the function
 	 */
 	Class<?>[] publicCondFun() default {};
-	
+
 	/**
 	 * A condition whether to add or remove the private modifier.
 	 * 
 	 * @return the boolean expression
 	 */
 	String privateCond() default "";
-	
+
 	/**
 	 * The expression language for the privateCond expression.
 	 * 
 	 * @return the expression language
 	 */
 	String privateCondLang() default "";
-	
+
 	/**
-	 * As an alternative to the privateCond expression, a boolean function can be called.
+	 * As an alternative to the privateCond expression, a boolean function can
+	 * be called.
 	 * 
 	 * @return the function
 	 */
 	Class<?>[] privateCondFun() default {};
-	
+
 	/**
 	 * A condition whether to add or remove the protected modifier.
 	 * 
 	 * @return the boolean expression
 	 */
 	String protectedCond() default "";
-	
+
 	/**
 	 * The expression language for the protectedCond expression.
 	 * 
 	 * @return the expression language
 	 */
 	String protectedCondLang() default "";
-	
+
 	/**
-	 * As an alternative to the protectedCond expression, a boolean function can be called.
+	 * As an alternative to the protectedCond expression, a boolean function can
+	 * be called.
 	 * 
 	 * @return the function
 	 */
@@ -272,7 +293,6 @@ public @interface Method {
 	Annotation[] annotations() default {};
 
 	/**
-	 * 
 	 * @return the parameters of the method
 	 */
 	Param[] parameters() default {};
@@ -296,19 +316,24 @@ public @interface Method {
 	 * A typical example is to iterate over the properties of the class, to
 	 * generate methods like toString or equals / hashcode.
 	 * 
-	 * 
 	 * @return
 	 */
 	String bodyIterator() default "";
 
 	/**
+	 * As an alternative to the bodyIterator expression, a function can be
+	 * called.
 	 * 
+	 * @return
+	 */
+	Class<?>[] bodyIteratorFun() default {};
+
+	/**
 	 * @return the language of the body iterator expression. Default is Java EL.
 	 */
 	String bodyIteratorLang() default "";
 
 	/**
-	 * 
 	 * @return an expression to generate the body. The root property "src"
 	 *         refers to the generated method or, if a bodyIterator is used, the
 	 *         current iterator element.
@@ -325,22 +350,22 @@ public @interface Method {
 	Case[] bodyCases() default {};
 
 	/**
-	 * 
 	 * @return if bodyIterator is set, this code is inserted between each
 	 *         iteration of bodyExpr.
 	 */
 	String bodySeparator() default "";
-	
+
 	/**
-	 * If true, a linebreak is inserted after the "before expression", the "body expression" and the "after expression".
+	 * If true, a linebreak is inserted after the "before expression", the "body
+	 * expression" and the "after expression".
+	 * 
 	 * @return
 	 */
 	boolean bodyLinebreak() default true;
-	
+
 	boolean bodyIndentAfterLinebreak() default false;
 
 	/**
-	 * 
 	 * @return an expression for the code to be generated before the repetitive
 	 *         bodyCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
@@ -348,7 +373,6 @@ public @interface Method {
 	String bodyBeforeIteratorCode() default "";
 
 	/**
-	 * 
 	 * @return an expression for the code to be generated after the repetitive
 	 *         bodyCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
@@ -356,71 +380,68 @@ public @interface Method {
 	String bodyAfterIteratorCode() default "";
 
 	/**
-	 * 
 	 * @return an expression for the code to be generated if the iterator
 	 *         expression is set but does result in an empty iterator.
 	 */
 	String bodyEmptyIteratorCode() default "";
 
 	/**
-	 * 
 	 * @return the language of the body expression(s). Default is Java EL.
 	 */
 	String bodyLang() default "";
 
 	/**
-	 * 
-	 * @return names of the fragments to surround the generated code body.
+	 * @return names of the fragments to surround the generated code body. The
+	 *         code to be surrounded is provides as EL variable 'surrounded' to
+	 *         the fragment.
 	 */
-	String[] surroundingFragments() default {};
+	String[] bodySurroundingFragments() default {};
 
 	/**
-	 * 
 	 * @return names of the fragments to be inserted before the generated code
 	 *         body.
 	 */
-	String[] beforeFragments() default {};
+	String[] bodyBeforeFragments() default {};
 
 	/**
-	 * 
-	 * @return names of the fragments to be inserted before the generated code
+	 * @return names of the fragments to be inserted after the generated code
 	 *         body.
 	 */
-	String[] afterFragments() default {};
+	String[] bodyAfterFragments() default {};
 
 	/**
-	 * 
 	 * @return true means to copy the JavaDoc comment from the rule source
 	 *         element
 	 */
 	boolean commentFromSrc() default false;
 
 	/**
-	 * 
 	 * @return an expression to create the JavaDoc comment
 	 */
 	String commentExpr() default "";
 
 	/**
-	 * 
 	 * @return the expression language for commentExpr
 	 */
 	String commentLang() default "";
-	
-	
-	/**
-	 * If the method is an annotation value declaration, this is the default value. 
-	 * @return
-	 */
-	AV[] defaultAnnotationValue() default {}; 
 
 	/**
-	 * If dependent members are created, the generated method by default becomes the src element for the according rules.
-	 * If the original src shall be used instead, set this AV to false. 
+	 * If the method is an annotation value declaration, this is the default
+	 * value.
+	 * 
+	 * @return
+	 */
+	AV[] defaultAnnotationValue() default {};
+
+	/**
+	 * If dependent members are created, the generated method by default becomes
+	 * the src element for the according rules. If the original src shall be
+	 * used instead, set this AV to false.
+	 * 
 	 * @return
 	 */
 	boolean genElementIsSrcForDependentRules() default true;
-	
+
 	/**
 	 * The delegate methods to create. The delegate is the return value of the
 	 * generated method.
@@ -429,5 +450,4 @@ public @interface Method {
 	 */
 	DelegateMethods[] delegateMethods() default {};
 
-	
 }

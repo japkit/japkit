@@ -1,5 +1,6 @@
 package de.japkit.metaannotations;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
@@ -12,8 +13,8 @@ import de.japkit.metaannotations.classselectors.None;
  * Anntoation to add a field to a generated class.
  * 
  * @author stefan
- * 
  */
+@Documented
 @Target(ElementType.FIELD)
 public @interface Field {
 	/**
@@ -37,82 +38,100 @@ public @interface Field {
 	 * @return
 	 */
 	String src() default "";
-	
+
 	/**
-	 * As an alternative to the src expression, a function can be called to determine the source object.
+	 * As an alternative to the src expression, a function can be called to
+	 * determine the source object.
 	 * 
 	 * @return
 	 */
 	Class<?>[] srcFun() default {};
-	
+
 	/**
-	 * A filter expression to be applied to src in case it is a collection. Must be boolean. 
-	 * The variable name for the current collection element to be filtered is "src". 
+	 * A filter expression to be applied to src in case it is a collection. Must
+	 * be boolean. The variable name for the current collection element to be
+	 * filtered is "src".
+	 * 
 	 * @return
 	 */
 	String srcFilter() default "";
 
 	/**
-	 * As an alternative to srcFilter, one or more boolean functions can be called. 
-	 * Only if the conjunction of their results is true, the rule is applied for the considered element of the src collection.
+	 * As an alternative to srcFilter, one or more boolean functions can be
+	 * called. Only if the conjunction of their results is true, the rule is
+	 * applied for the considered element of the src collection.
 	 * 
 	 * @return
 	 */
 	Class<?>[] srcFilterFun() default {};
-	
+
 	/**
-	 * An expression to be applied to the result of the expression or function(s) in case it is a collection. It's applied to each element.
-	 * The variable name for the current collection element is "src". Collect is applied after filtering.
+	 * An expression to be applied to the result of the expression or
+	 * function(s) in case it is a collection. It's applied to each element. The
+	 * variable name for the current collection element is "src". Collect is
+	 * applied after filtering.
 	 * 
 	 * @return
 	 */
 	String srcCollect() default "";
 
 	/**
-	 * As an alternative or additionally to the collect expression, one or more functions can be called. 
-	 * In case of more than one function, they are called in a "fluent" style. That is each one is applied to the result of the previous one. 
-	 * The first function is always applied to the result of the collect expression or to the current collection element if collect expression is empty.
-	 *  
+	 * As an alternative or additionally to the collect expression, one or more
+	 * functions can be called. In case of more than one function, they are
+	 * called in a "fluent" style. That is each one is applied to the result of
+	 * the previous one. The first function is always applied to the result of
+	 * the collect expression or to the current collection element if collect
+	 * expression is empty.
+	 * 
 	 * @return
 	 */
 	Class<?>[] srcCollectFun() default {};
-	
+
 	/**
-	 * If true, and src is a collection, it is transformed to a LinkedHashSet to remove duplicates while preserving order.
+	 * If true, and src is a collection, it is transformed to a LinkedHashSet to
+	 * remove duplicates while preserving order.
 	 * 
 	 * @return
 	 */
 	boolean srcToSet() default false;
-	
+
 	/**
-	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set, the collection elements are grouped as a map, where 
-	 * the keys are the results of applying srcGroupBy and / or srcGroupByFun to the collection elements and the values are lists 
-	 * of collection elements with same key. SrcGroupBy is an expression and srcGroupByFun is a list of functions. 
-	 * They are applied in a fluent style (like src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
+	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set,
+	 * the collection elements are grouped as a map, where the keys are the
+	 * results of applying srcGroupBy and / or srcGroupByFun to the collection
+	 * elements and the values are lists of collection elements with same key.
+	 * SrcGroupBy is an expression and srcGroupByFun is a list of functions.
+	 * They are applied in a fluent style (like
+	 * src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
 	 * 
-	 * @return the expression to derive the key from a collection element. The collection element is provided as "src".
+	 * @return the expression to derive the key from a collection element. The
+	 *         collection element is provided as "src".
 	 */
 	String srcGroupBy() default "";
-	
+
 	/**
-	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set, the collection elements are grouped as a map, where 
-	 * the keys are the results of applying srcGroupBy and / or srcGroupByFun to the collection elements and the values are lists 
-	 * of collection elements with same key. SrcGroupBy is an expression and srcGroupByFun is a list of functions. 
-	 * They are applied in a fluent style (like src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
+	 * If src is a collection, and srcGroupBy and / or srcGroupByFun are set,
+	 * the collection elements are grouped as a map, where the keys are the
+	 * results of applying srcGroupBy and / or srcGroupByFun to the collection
+	 * elements and the values are lists of collection elements with same key.
+	 * SrcGroupBy is an expression and srcGroupByFun is a list of functions.
+	 * They are applied in a fluent style (like
+	 * src.srcGroupBy().srcGroupByFun[0]().srcGroupByFun[1]()...).
 	 * 
-	 * @return function(s) to derive the key from a collection element. The collection element is provided as "src".
+	 * @return function(s) to derive the key from a collection element. The
+	 *         collection element is provided as "src".
 	 */
 	Class<?>[] srcGroupByFun() default {};
-		
+
 	/**
-	 * 
 	 * @return the language of the src expression. Defaults to Java EL.
 	 */
 	String srcLang() default "";
-	
+
 	/**
-	 * By default, the current source object has the name "src" on the value stack.
-	 * If this annotation value is set, the source object will additionally provided under the given name.  
+	 * By default, the current source object has the name "src" on the value
+	 * stack. If this annotation value is set, the source object will
+	 * additionally provided under the given name.
 	 * 
 	 * @return the name of the source variable
 	 */
@@ -126,28 +145,29 @@ public @interface Field {
 	Var[] vars() default {};
 
 	/**
-	 * By default, this rule is active.
-	 * To switch it on or of case by case, a boolean expression can be used here. 
+	 * By default, this rule is active. To switch it on or of case by case, a
+	 * boolean expression can be used here.
 	 * 
-	 * @return 
+	 * @return
 	 */
 	String cond() default "";
-	
+
 	/**
 	 * The expression language for the cond expression.
+	 * 
 	 * @return
 	 */
 	String condLang() default "";
-	
+
 	/**
-	 * As an alternative to the cond expression, a boolean function can be called.
+	 * As an alternative to the cond expression, a boolean function can be
+	 * called.
 	 * 
 	 * @return
 	 */
 	Class<?>[] condFun() default {};
 
 	/**
-	 * 
 	 * @return the name of the method. If not empty, nameExpr is ignored.
 	 */
 	String name() default "";
@@ -161,13 +181,11 @@ public @interface Field {
 	String nameExpr() default "";
 
 	/**
-	 * 
 	 * @return the language of the name expression. Defaults to Java EL.
 	 */
 	String nameLang() default "";
 
 	/**
-	 * 
 	 * @return the type of the field.
 	 */
 	Class<?> type() default None.class;
@@ -175,74 +193,75 @@ public @interface Field {
 	Class<?>[] typeArgs() default {};
 
 	/**
-	 * 
 	 * @return the modifiers of the field
 	 */
 	Modifier[] modifiers() default {};
-	
+
 	/**
 	 * A condition whether to add or remove the public modifier.
 	 * 
 	 * @return the boolean expression
 	 */
 	String publicCond() default "";
-	
+
 	/**
 	 * The expression language for the publicCond expression.
 	 * 
 	 * @return the expression language
 	 */
 	String publicCondLang() default "";
-	
+
 	/**
-	 * As an alternative to the publicCond expression, a boolean function can be called.
+	 * As an alternative to the publicCond expression, a boolean function can be
+	 * called.
 	 * 
 	 * @return the function
 	 */
 	Class<?>[] publicCondFun() default {};
-	
+
 	/**
 	 * A condition whether to add or remove the private modifier.
 	 * 
 	 * @return the boolean expression
 	 */
 	String privateCond() default "";
-	
+
 	/**
 	 * The expression language for the privateCond expression.
 	 * 
 	 * @return the expression language
 	 */
 	String privateCondLang() default "";
-	
+
 	/**
-	 * As an alternative to the privateCond expression, a boolean function can be called.
+	 * As an alternative to the privateCond expression, a boolean function can
+	 * be called.
 	 * 
 	 * @return the function
 	 */
 	Class<?>[] privateCondFun() default {};
-	
+
 	/**
 	 * A condition whether to add or remove the protected modifier.
 	 * 
 	 * @return the boolean expression
 	 */
 	String protectedCond() default "";
-	
+
 	/**
 	 * The expression language for the protectedCond expression.
 	 * 
 	 * @return the expression language
 	 */
 	String protectedCondLang() default "";
-	
+
 	/**
-	 * As an alternative to the protectedCond expression, a boolean function can be called.
+	 * As an alternative to the protectedCond expression, a boolean function can
+	 * be called.
 	 * 
 	 * @return the function
 	 */
 	Class<?>[] protectedCondFun() default {};
-	
 
 	/**
 	 * How to map annotations of the source element (???) to the field
@@ -271,32 +290,37 @@ public @interface Field {
 	 * A typical example is to initialize some array with the names of the
 	 * properties of the class.
 	 * 
-	 * 
 	 * @return
 	 */
 	String initIterator() default "";
 
 	/**
+	 * As an alternative to the iterator expression, a function can be called.
 	 * 
+	 * @return
+	 */
+	Class<?>[] initIteratorFun() default {};
+
+	/**
 	 * @return the language of the init iterator expression. Default is Java EL.
 	 */
 	String initIteratorLang() default "";
 
 	/**
-	 * 
 	 * @return if inityIterator is set, this code is inserted between each
 	 *         iteration of initExpr.
 	 */
 	String initSeparator() default "";
-	
+
 	/**
-	 * If true, a linebreak is inserted after the "before expression", the "init expression" and the "after expression".
+	 * If true, a linebreak is inserted after the "before expression", the "init
+	 * expression" and the "after expression".
+	 * 
 	 * @return
 	 */
 	boolean initLinebreak() default false;
 
 	/**
-	 * 
 	 * @return an expression for the code to be generated before the repetitive
 	 *         initCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
@@ -304,7 +328,6 @@ public @interface Field {
 	String initBeforeIteratorCode() default "";
 
 	/**
-	 * 
 	 * @return an expression for the code to be generated after the repetitive
 	 *         initCode. Only rendered, if the iterator expression is set and
 	 *         does not result in an empty iterator.
@@ -312,29 +335,28 @@ public @interface Field {
 	String initAfterIteratorCode() default "";
 
 	/**
-	 * 
 	 * @return an expression for the code to be generated if the iterator
 	 *         expression is set but does result in an empty iterator.
 	 */
 	String initEmptyIteratorCode() default "";
 
 	/**
-	 * 
 	 * @return a Java EL expression to generate the initializer. The root
-	 *         property "src" refers to the generated field or to the iterator variable.
+	 *         property "src" refers to the generated field or to the iterator
+	 *         variable.
 	 */
 	String initCode() default "";
-	
+
 	/**
-	 * If there is at least one of the given cases, where all matcher match, the according expression is use instead of initExpr.
-	 * If no case matches, the default is initExpr.
+	 * If there is at least one of the given cases, where all matcher match, the
+	 * according expression is use instead of initExpr. If no case matches, the
+	 * default is initExpr.
 	 * 
 	 * @return
 	 */
-	Case[] initCases() default{};
+	Case[] initCases() default {};
 
 	/**
-	 * 
 	 * @return the language of the init expression. Default is Java EL.
 	 */
 	String initLang() default "";
@@ -345,32 +367,32 @@ public @interface Field {
 	 * @return
 	 */
 	DelegateMethods[] delegateMethods() default {};
-	
+
 	/**
-	 * 
-	 * @return true means to copy the JavaDoc comment from the rule source element 
+	 * @return true means to copy the JavaDoc comment from the rule source
+	 *         element
 	 */
 	boolean commentFromSrc() default false;
+
 	/**
-	 * 
 	 * @return an expression to create the JavaDoc comment
 	 */
 	String commentExpr() default "";
-	
+
 	/**
-	 * 
 	 * @return the expression language for commentExpr
 	 */
 	String commentLang() default "";
-	
+
 	/**
-	 * If dependent members are created, the generated field by default becomes the src element for the according rules.
-	 * If the original src shall be used instead, set this AV to false. 
+	 * If dependent members are created, the generated field by default becomes
+	 * the src element for the according rules. If the original src shall be
+	 * used instead, set this AV to false.
+	 * 
 	 * @return
 	 */
 	boolean genElementIsSrcForDependentRules() default true;
-	
-	
+
 	/**
 	 * A Setter annotation here means to generate a setter for the field. The
 	 * annotation can be used to further customize the setter, but all values
@@ -388,13 +410,13 @@ public @interface Field {
 	 * @return the setter annotation
 	 */
 	Getter[] getter() default {};
-	
+
 	/**
-	 * A class to customize the generated fields. So far, you can override the annotations of the field or add new annotations.
+	 * A class to customize the generated fields. So far, you can override the
+	 * annotations of the field or add new annotations.
 	 * <p>
-	 * TODO: Remove annotations?  f.e.  @Not({NotNull.class, ...}) 
-	 * Enforce Field order? 
-	 * Complex annotation mapping modes?
+	 * TODO: Remove annotations? f.e. @Not({NotNull.class, ...}) Enforce Field
+	 * order? Complex annotation mapping modes?
 	 * 
 	 * @return
 	 */
@@ -409,6 +431,5 @@ public @interface Field {
 	 * @return
 	 */
 	Matcher manualOverridesMatcher() default @Matcher(kind = ElementKind.FIELD);
-	
 
 }
