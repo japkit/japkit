@@ -87,8 +87,7 @@ public class FieldTemplate {
 	 * result in
 	 * 
 	 * <pre>
-	 * this.someStringList = new ArrayList<>(someStringList);
-	 * 
+	 * {@code this.someStringList = new ArrayList<>(someStringList); }
 	 * </pre>
 	 */
 	@Field(
@@ -168,7 +167,7 @@ public class FieldTemplate {
 	 * iteration ends.
 	 * <li>The initCode is the code to be generated for each iteration. Here, it
 	 * is the name of the field from the annotated class in double quotes.
-	 * <ul>
+	 * </ul>
 	 * 
 	 * @japkit.initBeforeIteratorCode new String[] {
 	 * @japkit.initCode "#{name}"
