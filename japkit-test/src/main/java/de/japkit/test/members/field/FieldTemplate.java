@@ -159,7 +159,7 @@ public class FieldTemplate {
 	 * To show some more complex initializer code, a constant field is generated
 	 * here that has the array of all field names as value.
 	 * <ul>
-	 * <li>The initIterator tells to iterate over the fields of the annotated
+	 * <li>The initIteratorFun tells to iterate over the fields of the annotated
 	 * class.
 	 * <li>The initBeforeIteratorCode is the code to be generated before the
 	 * iteration starts.
@@ -174,7 +174,7 @@ public class FieldTemplate {
 	 * @japkit.initSeparator ,
 	 * @japkit.initAfterIteratorCode }
 	 */
-	@Field(initIterator = "#{fields()}")
+	@Field(initIteratorFun = fields.class)
 	public static final String[] FIELD_NAMES = new String[0];
 
 	/**
