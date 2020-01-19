@@ -73,12 +73,10 @@ public class ConstructorTemplate {
 	 * build in Eclipse, you may sometimes experience a different order. If this
 	 * happens, please do a clean build.
 	 * 
-	 * @see <a
-	 *      href=" https://bugs.eclipse.org/bugs/show_bug.cgi?id=300408">Eclipse
-	 *      Bug 300408</a>
-	 * @see <a
-	 *      href=" https://bugs.eclipse.org/bugs/show_bug.cgi?id=500589">Eclipse
-	 *      Bug 500589</a>
+	 * @see <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=300408">
+	 *      Eclipse Bug 300408</a>
+	 * @see <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=500589">
+	 *      Eclipse Bug 500589</a>
 	 */
 	@Constructor(bodyIteratorFun = fields.class, bodyBeforeIteratorCode = "super();", bodyCode = "this.#{name} = #{name};")
 	public ConstructorTemplate(@Param(srcFun = fields.class) SrcType $name$) {

@@ -7,7 +7,6 @@ import de.japkit.metaannotations.Function;
 import de.japkit.metaannotations.InnerClass;
 import de.japkit.metaannotations.Method;
 import de.japkit.metaannotations.Template;
-import de.japkit.test.members.common.source.SourceTemplate;
 
 /**
  * Class members can be generated conditionally by setting cond or condFun.
@@ -29,8 +28,9 @@ public abstract class ConditionTemplate {
 
 	/**
 	 * The condition is evaluated before the src variable (see
-	 * {@link SourceTemplate}) is set. So if the src variable is used in the
-	 * condition it will be the one of the surrounding template.
+	 * {@link de.japkit.test.members.common.source.SourceTemplate}) is set. So
+	 * if the src variable is used in the condition it will be the one of the
+	 * surrounding template.
 	 * <p>
 	 * So, "someField2" will be generated, if the src name is
 	 * "ConditionExampleTrue" which is exactly the case if that is the name of

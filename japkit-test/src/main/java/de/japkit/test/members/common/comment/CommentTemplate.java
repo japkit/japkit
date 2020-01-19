@@ -30,7 +30,10 @@ public class CommentTemplate {
 	 * class: #{src.simpleName}.
 	 * <p>
 	 * This is also a nice debugging tool for showing the result expressions:
-	 * #{src.enclosedElements.stream().filter(e -> e.kind == 'FIELD').toList()}
+	 * 
+	 * <pre>
+	 * {@code  #{src.enclosedElements.stream().filter(e -> e.kind == 'FIELD').toList()}}
+	 * </pre>
 	 */
 	String someString2;
 

@@ -137,7 +137,6 @@ public class MethodTemplate {
 	 * Also note that the complete <code>&#60;ul&#62;</code> Block will be
 	 * removed by japkit when the method comment is generated. So, it is only in
 	 * the template, where it belongs.
-	 * <p>
 	 * <ul>
 	 * <li>japkit.bodyBeforeIteratorCode
 	 * 
