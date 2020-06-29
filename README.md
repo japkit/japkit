@@ -4,7 +4,7 @@ japkit
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.japkit/japkit-parent.svg)](http://mvnrepository.com/artifact/com.github.japkit)
 [![Build Status](https://travis-ci.org/japkit/japkit.svg?branch=master)](https://travis-ci.org/japkit/japkit)
 
-Japkit is an annotation processor that allows to develop Java code generators by using natural templates. That is, a code template that is written in Java (with some annotations) describes what to generate. There is no need to write any imperative code. This makes the code generators short and concise and so eases their maintenance. 
+Japkit is an annotation processor that allows to develop Java code generators by using natural templates. Code templates written in Java with some annotations describe what to generate. There is no need to write any imperative code. This makes the code generators short and concise and so eases their maintenance. 
 	
 Huh?
 Okay, an example will help... We will develop a code generator for a simple DTO. The full example can be found [here](https://github.com/stefanocke/japkit-examples/tree/master/japkit-examples-simpledto).
