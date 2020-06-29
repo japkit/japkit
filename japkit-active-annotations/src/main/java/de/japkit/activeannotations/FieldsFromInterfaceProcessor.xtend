@@ -49,7 +49,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 			val property = m.propertyName
 			val propertyType = m.returnType
 			val existingGetter = annotatedClass.findMostSpecificMethod(m)
-			val existingField = annotatedClass.findDeclaredField(property)
+			val existingField = annotatedClass.findDeclaredField(property) ?: annotatedClass.findDeclaredField(property+"_")
 			
 			//Determines if the interfaces of the superclass already contain getter (and so, this processor will generate a getter in a superclass at later point in time)
 			//val existingGetterInSuperClassInterfaces = annotatedClass.superClass?.findMethodInInterfaces(m)			
@@ -72,15 +72,16 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 				//TODO: Default value support
 				]
 			}
+			val fieldName = generateField ? property : existingField?.simpleName
 			//generate accessors if there is a field (generated or existing)
-			if (generateField || existingField !== null) {
+			if (fieldName !== null) {
 				if (shallGenerateGetter(annotatedClass, existingField, existingGetter)) {
 					annotatedClass.addMethod(m.simpleName) [
 						it.returnType = propertyType
 						if(!propertyType.isCollection){
-							body = ['''return «property»;''']
+							body = ['''return «fieldName»;''']
 						} else {
-							body = ['''return java.util.Collections.unmodifiable«propertyType.type.simpleName»(«property»);''']
+							body = ['''return java.util.Collections.unmodifiable«propertyType.type.simpleName»(«fieldName»);''']
 						}
 						
 					]
@@ -91,9 +92,9 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 					if (shallGenerateSetter(annotatedClass, existingField, existingSetter)) {
 
 						annotatedClass.addMethod(property.setterName) [
-							addParameter(property, propertyType)
+							addParameter(fieldName, propertyType)
 							visibility = if(existingSetter !== null) existingSetter.visibility else Visibility.PUBLIC
-							body = ['''this.«property» = «property»;''']
+							body = ['''this.«fieldName» = «fieldName»;''']
 						]
 
 					}
@@ -106,7 +107,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 						annotatedClass.addMethod('''«property.adderName»''') [
 							val singular = 'a'+property.singular.toFirstUpper + '_' //The underscore is a quick workaround for reserved words
 							addParameter(singular, elementType)
-							body = ['''this.«property».add(«singular»);''']
+							body = ['''this.«fieldName».add(«singular»);''']
 						]
 					}
 					
@@ -115,7 +116,7 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 						annotatedClass.addMethod('''«property.removerName»''') [
 							val singular = 'a'+property.singular.toFirstUpper + '_' //The underscore is a quick workaround for reserved words
 							addParameter(singular, elementType)
-							body = ['''this.«property».remove(«singular»);''']
+							body = ['''this.«fieldName».remove(«singular»);''']
 						]
 					}
 					
@@ -123,11 +124,11 @@ class FieldsFromInterfaceProcessor extends AbstractClassProcessor {
 					val existingSetter = annotatedClass.findMostSpecificMethod(property.setterName, propertyType)
 					if (existingSetter?.declaringType != annotatedClass) {
 						annotatedClass.addMethod(property.setterName) [
-							addParameter(property, propertyType)
+							addParameter(fieldName, propertyType)
 							val singular = 'a'+property.singular.toFirstUpper + '_'
 							body = ['''
-								this.«property».clear();
-								for(«elementType» «singular» : «property»){
+								this.«fieldName».clear();
+								for(«elementType» «singular» : «fieldName»){
 									«property.adderName»(«singular»);
 								}
 							''']	
