@@ -3,14 +3,14 @@
 	<parent>
 		<groupId>com.github.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.24</version>
+		<version>1.25-SNAPSHOT</version>
 	</parent>
 	<name>Japkit Tests</name>
 	<description>Tests and documentation for japkit.</description>
 	<artifactId>japkit-test</artifactId>
 
 	<properties>
-		<japkit.version>1.24</japkit.version>
+		<japkit.version>1.25-SNAPSHOT</japkit.version>
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 	</properties>
 
