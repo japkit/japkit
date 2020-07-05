@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.24-SNAPSHOT</version>
+		<version>1.24</version>
 	</parent>
 	<artifactId>japkit-groovy</artifactId>
 	<name>Japkit Annotation Processor - Groovy EL Provider</name>
@@ -66,7 +66,7 @@
 		<dependency>
 			<groupId>com.github.japkit</groupId>
 			<artifactId>japkit-annotation-processor</artifactId>
-			<version>1.24-SNAPSHOT</version>
+			<version>1.24</version>
 		</dependency>
 
 		<dependency>
