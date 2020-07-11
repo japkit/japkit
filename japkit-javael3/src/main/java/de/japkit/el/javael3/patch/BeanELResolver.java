@@ -228,11 +228,14 @@ public class BeanELResolver extends ELResolver {
 					for (PropertyDescriptor pd : pds) {
 						this.properties.put(pd.getName(), new BeanProperty(type, pd));
 					}
-				} catch (Exception e) {
-					// Patch: If introspecction fails, like in case of
+				} catch (Throwable t) {
+					// Patch: If introspection fails, like in case of
 					// Impl-Classes from JDT that contain types from later JDKs,
 					// we ignore this and try to inspect the interfaces instead
 					// (for example javax.model)
+					// We intentionally catch Throwable, since it Eclipse we
+					// got:
+					// java.lang.UnsupportedClassVersionError
 					introspectionFailed = true;
 				}
 				if (introspectionFailed || System.getSecurityManager() != null) {
