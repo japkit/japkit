@@ -4,7 +4,6 @@ import de.japkit.el.ElExtensions
 import de.japkit.el.javael3.JapkitImportHandler.ValueStackPseudoClass
 import java.util.Map
 import javax.el.ArrayELResolver
-import javax.el.BeanELResolver
 import javax.el.CompositeELResolver
 import javax.el.ELClass
 import javax.el.ELContext
@@ -31,7 +30,7 @@ class JapkitELResolver extends ELResolver {
 		add(new ResourceBundleELResolver());
 		add(new ListELResolver(true));
 		add(new ArrayELResolver(true));
-		add(new BeanELResolver(true));
+		add(new de.japkit.el.javael3.patch.BeanELResolver(true));
 	]
 
 	new(ExpressionFactory factory, Map<String, ? extends Object> valueStack) {
