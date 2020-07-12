@@ -34,7 +34,11 @@ class TypeElementFromCompilerCache {
 					val parentName = name.substring(0, dotIndex)
 					val simpleName = name.substring(dotIndex + 1)
 					val parent = getTypeElement(parentName)
-					return parent?.enclosedElements.findFirst[it.simpleName.toString == simpleName && (it.kind.isClass || it.kind.isInterface)] as TypeElement;
+					val result = parent?.enclosedElements?.findFirst[it.simpleName.toString == simpleName && (it.kind.isClass || it.kind.isInterface)] as TypeElement;
+					if(result === null) {
+						printDiagnosticMessage['''Error in getTypeElement (Eclispe Workaround) for «name». «e» «e.stackTrace.map[toString].join('\n')»''']
+					}
+					result
 				
 				} else {
 					printDiagnosticMessage['''Error in getTypeElement for «name». «e» «e.stackTrace.map[toString].join('\n')»''']
