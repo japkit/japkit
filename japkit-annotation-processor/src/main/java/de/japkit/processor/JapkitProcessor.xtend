@@ -37,6 +37,8 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.QualifiedNameable
 import de.japkit.services.AnnotationException
 import de.japkit.rules.RuleException
+import java.io.StringWriter
+import java.io.PrintWriter
 
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 /**
@@ -128,8 +130,23 @@ class JapkitProcessor extends AbstractProcessor {
 	override getSupportedOptions() {
 		#{"annotations", "diagnosticMessages", "templateDir"}
 	}
+	
+	override process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+		try {
+			return  processInternal(annotations,roundEnv)
+		} catch (Exception e) {
+			// At least ecj does not provide full stack trace here.
+			// So, as a last resource for Exceptions we did not handle properly,
+			
+			val sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+			messager.printMessage(Kind.ERROR, sw.toString());
+			// rethrow to abort compilation
+			throw e
+		}
+	}
 
-	override process(Set<? extends TypeElement> annotations, extension RoundEnvironment roundEnv) {
+	def processInternal(Set<? extends TypeElement> annotations, extension RoundEnvironment roundEnv) {
 		//Necessary here, since we cleanup in the last round, but in Eclipse, there are multiple "last rounds" during incremental build.
 		initServices();
 		
