@@ -3,14 +3,14 @@
 	<parent>
 		<groupId>com.github.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.24</version>
+		<version>1.25</version>
 	</parent>
 	<name>Japkit Annotation Templates</name>
 	<description>Provides a code generator for Annotation Templates. Annotation Templates provide an easy way to generate annotations.</description>
 	<artifactId>japkit-annotationtemplates</artifactId>
 
 	<properties>
-		<japkit.version>1.24</japkit.version>
+		<japkit.version>1.25</japkit.version>
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 	</properties>
 
@@ -22,7 +22,7 @@
 					<annotationProcessorPaths>
 						<path>
 							<groupId>com.github.japkit</groupId>
-							<artifactId>japkit-all</artifactId>
+							<artifactId>japkit-all-nogroovy</artifactId>
 							<version>${japkit.version}</version>
 						</path>
 					</annotationProcessorPaths>
@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>19.0</version>
+			<version>29.0-jre</version>
 			<optional>true</optional>
 		</dependency>
 

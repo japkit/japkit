@@ -584,6 +584,7 @@ class TypesRegistry {
 
 	private def registerTypeDependencyForAnnotatedClassByFqn(String annotatedClassFqn, String typeFqnOrSimpleName,
 		CharSequence causeMsg) {
+		
 		val typeFqn = typeElementSimpleNameToFqn.get(typeFqnOrSimpleName) ?: typeFqnOrSimpleName
 
 		annotatedClassesThatDependOnThatType.getOrCreateSet(typeFqn).add(annotatedClassFqn)
@@ -685,6 +686,10 @@ class TypesRegistry {
 	}
 	
 	def handleTypeElementNotFound(CharSequence msg, String typeFqnOrShortname, QualifiedNameable annotatedClass) {
+		// Workaround for some strange Eclipse behavior where we get annotations like "jdk.Profile+Annotation"
+		if(typeFqnOrShortname.startsWith('jdk.')) {
+			return;
+		}
 		if(annotatedClass !== null) { //Null check is for corner cases where annotation types are missing, since they are to be generated (f.e. annotation templates).
 			val errorMsg = '''«msg» Missing type: «typeFqnOrShortname»'''		
 			registerTypeDependencyForAnnotatedClassByFqn(annotatedClass.qualifiedName.toString, typeFqnOrShortname, msg)		

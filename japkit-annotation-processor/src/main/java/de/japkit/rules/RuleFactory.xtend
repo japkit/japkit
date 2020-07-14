@@ -123,10 +123,18 @@ class RuleFactory {
 			Not->[am, e | new BooleanOperatorRule(am, e, true, true)]
 		]
 	
-	def private createFunctionInternal(Element element) {	
-		val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
-		val factory = functionFactories.map[element.annotationMirror(key)->value].findFirst[key !== null]
-		factory?.value?.apply(factory.key, element)	
+	def private createFunctionInternal(Element element) {
+		try {
+			val extension ElementsExtensions = ExtensionRegistry.get(ElementsExtensions);
+			val factory = functionFactories.map[element.annotationMirror(key) -> value].findFirst[key !== null]
+			factory?.value?.apply(factory.key, element)
+
+		} catch (TypeElementNotFoundException tenfe) {
+			// If there are type errors here, we don't consider it a function
+			// In https://github.com/japkit/japkit/issues/59 we had the strange case that Integer
+			// has (in Eclipse) some Annotation "@jdk.Profile+Annotation"
+			return null
+		}
 	}
 	
 
