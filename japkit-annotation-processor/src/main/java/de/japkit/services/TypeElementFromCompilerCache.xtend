@@ -19,12 +19,6 @@ class TypeElementFromCompilerCache {
 		
 	def TypeElement getTypeElement(String name) {
 		Objects.requireNonNull(name, "FQN must be provided.");
-		
-		// Workaround for some strange Eclipse behavior where we get annotations like "jdk.Profile+Annotation"
-		if(name.startsWith('jdk.')) {
-			return null;
-		}
-		
 		if(!cache.containsKey(name)) {	
 			try {	
 				val typeElement = elementUtils.getTypeElement(name)
