@@ -10,18 +10,34 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.DeclaredType;
 
-import org.eclipse.xtend.lib.annotations.Data;
-import org.eclipse.xtext.xbase.lib.Pure;
-
-@Data
-@SuppressWarnings("all")
+/**
+ * Wraps an annotation to allow to navigate to its parent(s).
+ * 
+ * @author stefan
+ */
 public class AnnotationAndParent implements AnnotationWrapper {
+	/**
+	 * The original annotation.
+	 */
 	private final AnnotationMirror annotation;
 
+	/**
+	 * The path of the annotation within its parent annotation. The name is the
+	 * annotation value name which has this annotation as value. If it is part
+	 * of an array, index is also set.
+	 */
 	private final Path.Segment pathSegment;
 
+	/**
+	 * The parent annotation that contains this annotation in one of its values.
+	 * Null if this annotation is a root annotation, that is if it is not
+	 * contained within an annotation value of another annotation.
+	 */
 	private final AnnotationAndParent parentAnnotation;
 
+	/**
+	 * The annotated element. Null if this annotation is not a root annotation.
+	 */
 	private final Element annotatedElement;
 
 	@Override
@@ -34,64 +50,54 @@ public class AnnotationAndParent implements AnnotationWrapper {
 		return this.annotation.getElementValues();
 	}
 
-	public Element getRootAnnotatedElement() {
-		Element _elvis = null;
-		Element _rootAnnotatedElement = null;
-		if (this.parentAnnotation != null) {
-			_rootAnnotatedElement = this.parentAnnotation.getRootAnnotatedElement();
-		}
-		if (_rootAnnotatedElement != null) {
-			_elvis = _rootAnnotatedElement;
-		} else {
-			_elvis = this.annotatedElement;
-		}
-		return _elvis;
-	}
-
+	/**
+	 * @return the root annotation of this annotation. This is the one that has
+	 *         no parent annotation but is directly placed on an element.
+	 */
 	public AnnotationMirror getRootAnnotation() {
-		AnnotationMirror _elvis = null;
-		AnnotationMirror _rootAnnotation = null;
-		if (this.parentAnnotation != null) {
-			_rootAnnotation = this.parentAnnotation.getRootAnnotation();
-		}
-		if (_rootAnnotation != null) {
-			_elvis = _rootAnnotation;
-		} else {
-			_elvis = this.annotation;
-		}
-		return _elvis;
+		return parentAnnotation == null ? this : parentAnnotation.getRootAnnotation();
 	}
 
+	/**
+	 * @return the element which the {@link #getRootAnnotation()} of this
+	 *         annotation is placed on.
+	 */
+	public Element getRootAnnotatedElement() {
+		return parentAnnotation == null ? annotatedElement : parentAnnotation.getRootAnnotatedElement();
+	}
+
+	/**
+	 * @return the complete path from the root annotation to this annotation. It
+	 *         consists of annotation value names and - in case of array values
+	 *         - indexes.
+	 */
 	public Path getPathFromRootAnnotation() {
-		List<Path.Segment> _pathFromRootAnnotation_ = this.getPathFromRootAnnotation_();
-		return new Path(_pathFromRootAnnotation_);
+		return new Path(this.getPathFromRootAnnotation_());
 	}
 
 	private List<Path.Segment> getPathFromRootAnnotation_() {
-		List<Path.Segment> _xifexpression = null;
+
 		if ((this.parentAnnotation == null)) {
-			_xifexpression = new ArrayList<>();
+			return new ArrayList<>();
 		} else {
-			List<Path.Segment> _xblockexpression = null;
-			{
-				final List<Path.Segment> path = this.parentAnnotation.getPathFromRootAnnotation_();
-				path.add(this.pathSegment);
-				_xblockexpression = path;
-			}
-			_xifexpression = _xblockexpression;
+			final List<Path.Segment> path = this.parentAnnotation.getPathFromRootAnnotation_();
+			path.add(this.pathSegment);
+			return path;
 		}
-		return _xifexpression;
+
 	}
 
 	@Override
 	public String toString() {
-		String _string = null;
-		if (this.annotation != null) {
-			_string = this.annotation.toString();
-		}
-		return _string;
+		return annotation == null ? null : annotation.toString();
 	}
 
+	/**
+	 * @param annotation see {@link #annotation}
+	 * @param pathSegment see {@link #pathSegment}
+	 * @param parentAnnotation see {@link #parentAnnotation}
+	 * @param annotatedElement see {@link #annotatedElement}
+	 */
 	public AnnotationAndParent(final AnnotationMirror annotation, final Path.Segment pathSegment,
 			final AnnotationAndParent parentAnnotation, final Element annotatedElement) {
 		super();
@@ -101,8 +107,36 @@ public class AnnotationAndParent implements AnnotationWrapper {
 		this.annotatedElement = annotatedElement;
 	}
 
+	/**
+	 * @return see {@link #annotation}.
+	 */
 	@Override
-	@Pure
+	public AnnotationMirror getAnnotation() {
+		return this.annotation;
+	}
+
+	/**
+	 * @return see {@link #pathSegment}
+	 */
+	public Path.Segment getPathSegment() {
+		return this.pathSegment;
+	}
+
+	/**
+	 * @return see {@link #parentAnnotation}
+	 */
+	public AnnotationAndParent getParentAnnotation() {
+		return this.parentAnnotation;
+	}
+
+	/**
+	 * @return see {@link #annotatedElement}
+	 */
+	public Element getAnnotatedElement() {
+		return this.annotatedElement;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -113,7 +147,6 @@ public class AnnotationAndParent implements AnnotationWrapper {
 	}
 
 	@Override
-	@Pure
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
@@ -145,24 +178,4 @@ public class AnnotationAndParent implements AnnotationWrapper {
 		return true;
 	}
 
-	@Override
-	@Pure
-	public AnnotationMirror getAnnotation() {
-		return this.annotation;
-	}
-
-	@Pure
-	public Path.Segment getPathSegment() {
-		return this.pathSegment;
-	}
-
-	@Pure
-	public AnnotationAndParent getParentAnnotation() {
-		return this.parentAnnotation;
-	}
-
-	@Pure
-	public Element getAnnotatedElement() {
-		return this.annotatedElement;
-	}
 }
