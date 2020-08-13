@@ -1,7 +1,12 @@
 package de.japkit.model;
 
+import static java.util.Arrays.asList;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +27,6 @@ import javax.lang.model.type.TypeVariable;
 
 import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.ExclusiveRange;
 import org.eclipse.xtext.xbase.lib.Extension;
@@ -41,14 +45,14 @@ import de.japkit.services.ExtensionRegistry;
 import de.japkit.services.TypesExtensions;
 
 public abstract class GenTypeElement extends GenParameterizable implements TypeElement {
-	private List<TypeMirror> interfaces = CollectionLiterals.newArrayList();
+	private List<TypeMirror> interfaces = new ArrayList<>();
 
 	private NestingKind nestingKind;
 
 	private TypeMirror superclass;
 
 	@Accessors
-	private Set<GenTypeElement> auxTopLevelClasses = CollectionLiterals.newHashSet();
+	private Set<GenTypeElement> auxTopLevelClasses = new HashSet<>();
 
 	@Accessors
 	private boolean auxClass;
@@ -181,8 +185,7 @@ public abstract class GenTypeElement extends GenParameterizable implements TypeE
 	 * How are the type arguments of superclass and interfaces resolved in this
 	 * type?
 	 */
-	private final Map<TypeParameterElement, TypeMirror> resolvedTypeArgsMap = CollectionLiterals
-			.<TypeParameterElement, TypeMirror> newHashMap();
+	private final Map<TypeParameterElement, TypeMirror> resolvedTypeArgsMap = new HashMap<>();
 
 	public Map<TypeParameterElement, TypeMirror> getResolvedTypeArgsMap() {
 		return this.resolvedTypeArgsMap;
@@ -264,8 +267,8 @@ public abstract class GenTypeElement extends GenParameterizable implements TypeE
 				.valueOf(Integer.valueOf(GenTypeElement.memberOrderOf(e1)).compareTo(Integer.valueOf(GenTypeElement.memberOrderOf(e2))));
 	});
 
-	private static final List<ElementKind> memberOrder = Collections.<ElementKind> unmodifiableList(CollectionLiterals
-			.<ElementKind> newArrayList(ElementKind.ENUM_CONSTANT, ElementKind.FIELD, ElementKind.STATIC_INIT, ElementKind.INSTANCE_INIT,
+	private static final List<ElementKind> memberOrder = Collections
+			.unmodifiableList(asList(ElementKind.ENUM_CONSTANT, ElementKind.FIELD, ElementKind.STATIC_INIT, ElementKind.INSTANCE_INIT,
 					ElementKind.CONSTRUCTOR, ElementKind.METHOD, ElementKind.ENUM, ElementKind.INTERFACE, ElementKind.CLASS));
 
 	public static int memberOrderOf(final Element e) {
@@ -302,7 +305,7 @@ public abstract class GenTypeElement extends GenParameterizable implements TypeE
 			@Extension
 			final ElementsExtensions ElementsExtensions = ExtensionRegistry.<de.japkit.services.ElementsExtensions> get(
 					de.japkit.services.ElementsExtensions.class);
-			final List<ExecutableElement> methods = CollectionLiterals.<ExecutableElement> newArrayList();
+			final List<ExecutableElement> methods = new ArrayList<>();
 			final GenTypeElement te = this;
 			if ((this.superclass != null)) {
 				final Function1<ExecutableElement, Boolean> _function = (ExecutableElement m) -> {

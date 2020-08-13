@@ -1,5 +1,6 @@
 package de.japkit.model;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -10,7 +11,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 
@@ -19,11 +19,11 @@ import de.japkit.services.ExtensionRegistry;
 
 public class GenAnnotationMirror implements AnnotationMirror {
 	@Extension
-	protected ElementsExtensions _elementsExtensions = ExtensionRegistry.<ElementsExtensions> get(ElementsExtensions.class);
+	protected ElementsExtensions _elementsExtensions = ExtensionRegistry.get(ElementsExtensions.class);
 
 	private DeclaredType annotationType;
 
-	private Map<ExecutableElement, GenAnnotationValue> elementValues = CollectionLiterals.newLinkedHashMap();
+	private Map<ExecutableElement, GenAnnotationValue> elementValues = new LinkedHashMap<>();
 
 	public GenAnnotationValue setValue(final String name, final Function1<? super TypeMirror, ? extends GenAnnotationValue> valueFactory) {
 		GenAnnotationValue _xblockexpression = null;

@@ -1,5 +1,6 @@
 package de.japkit.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Element;
@@ -13,7 +14,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.SimpleTypeVisitor8;
 
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
@@ -24,7 +24,7 @@ import de.japkit.services.ExtensionRegistry;
 import de.japkit.services.TypesExtensions;
 
 public abstract class GenParameterizable extends GenElement implements Parameterizable {
-	private List<TypeParameterElement> typeParameters = CollectionLiterals.<TypeParameterElement> newArrayList();
+	private List<TypeParameterElement> typeParameters = new ArrayList<>();
 
 	public DeclaredType getDeclaredType(final DeclaredType prototype, final Iterable<TypeMirror> resolvedTypeArgs) {
 		DeclaredType _xifexpression = null;

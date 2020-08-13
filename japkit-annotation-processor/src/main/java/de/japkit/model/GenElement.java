@@ -1,7 +1,9 @@
 package de.japkit.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -15,7 +17,6 @@ import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeMirror;
 
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Conversions;
 
 import com.google.common.base.Objects;
@@ -25,13 +26,13 @@ import de.japkit.services.ElementsExtensions;
 public abstract class GenElement extends GenAnnotatedConstruct implements Element {
 	private Name simpleName;
 
-	private List<AnnotationMirror> annotationMirrors = CollectionLiterals.newArrayList();
+	private List<AnnotationMirror> annotationMirrors = new ArrayList<>();
 
-	private List<Element> enclosedElements = CollectionLiterals.newArrayList();
+	private List<Element> enclosedElements = new ArrayList<>();
 
 	private Element enclosingElement;
 
-	private Set<Modifier> modifiers = CollectionLiterals.newHashSet();
+	private Set<Modifier> modifiers = new HashSet<>();
 
 	private CharSequence comment;
 

@@ -1,5 +1,6 @@
 package de.japkit.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Element;
@@ -10,7 +11,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVisitor;
 
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 
 public class GenDeclaredType extends GenTypeMirror implements DeclaredType {
@@ -18,7 +18,7 @@ public class GenDeclaredType extends GenTypeMirror implements DeclaredType {
 
 	private TypeMirror enclosingType;
 
-	private List<TypeMirror> typeArguments = CollectionLiterals.newArrayList();
+	private List<TypeMirror> typeArguments = new ArrayList<>();
 
 	@Override
 	public Element asElement() {

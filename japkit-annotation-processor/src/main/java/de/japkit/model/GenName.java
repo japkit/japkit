@@ -1,9 +1,11 @@
 package de.japkit.model;
 
-import com.google.common.base.Objects;
 import javax.lang.model.element.Name;
+
 import org.eclipse.xtend.lib.annotations.Data;
 import org.eclipse.xtext.xbase.lib.Pure;
+
+import com.google.common.base.Objects;
 
 @Data
 @SuppressWarnings("all")

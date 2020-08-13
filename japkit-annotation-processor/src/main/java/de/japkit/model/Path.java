@@ -2,6 +2,7 @@ package de.japkit.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.xtend.lib.annotations.Data;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;

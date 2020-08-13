@@ -1,5 +1,6 @@
 package de.japkit.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -14,7 +15,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Functions.Function0;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
@@ -29,7 +29,7 @@ public abstract class GenExecutableElement extends GenParameterizable implements
 
 	private AnnotationValue defaultValue;
 
-	private List<VariableElement> parameters = CollectionLiterals.newArrayList();
+	private List<VariableElement> parameters = new ArrayList<>();
 
 	private TypeMirror returnType = new Function0<TypeMirror>() {
 		@Override
@@ -38,7 +38,7 @@ public abstract class GenExecutableElement extends GenParameterizable implements
 		}
 	}.apply();
 
-	private List<TypeMirror> thrownTypes = CollectionLiterals.newArrayList();
+	private List<TypeMirror> thrownTypes = new ArrayList<>();
 
 	private boolean varArgs;
 

@@ -1,24 +1,24 @@
 package de.japkit.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 
 import de.japkit.util.MoreCollectionExtensions;
 
 public class GenPackage extends GenElement implements PackageElement {
-	private static final String simpleName_default = null;
+	;
 
 	private Name qualifiedName;
 
 	private boolean unnamed;
 
-	private static final Map<CharSequence, GenPackage> packageForName = CollectionLiterals.newHashMap();
+	private static final Map<CharSequence, GenPackage> packageForName = new HashMap<>();
 
 	public GenPackage(final CharSequence qualifiedName) {
 		super();

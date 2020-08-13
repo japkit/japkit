@@ -1,5 +1,6 @@
 package de.japkit.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Element;
@@ -8,14 +9,12 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
 
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
-
 public class GenTypeParameter extends GenElement implements TypeParameterElement {
 	public static final ElementKind kind = ElementKind.TYPE_PARAMETER;
 
 	private TypeMirror typeVariable;
 
-	private List<TypeMirror> bounds = CollectionLiterals.newArrayList();
+	private List<TypeMirror> bounds = new ArrayList<>();
 
 	private Element genericElement;
 

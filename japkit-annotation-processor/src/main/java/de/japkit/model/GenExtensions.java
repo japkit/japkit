@@ -1,8 +1,11 @@
 package de.japkit.model;
 
+import static java.util.Collections.unmodifiableSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +25,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
@@ -188,7 +190,7 @@ public class GenExtensions {
 	public GenMethod asInterfaceMethod(final ExecutableElement m) {
 		GenMethod _copyFrom = this.copyFrom(m);
 		final Procedure1<GenMethod> _function = (GenMethod it) -> {
-			it.setModifiers(CollectionLiterals.<Modifier> emptySet());
+			it.setModifiers(Collections.emptySet());
 			it.setBody(null);
 		};
 		return ObjectExtensions.<GenMethod> operator_doubleArrow(_copyFrom, _function);
@@ -203,8 +205,8 @@ public class GenExtensions {
 		return ObjectExtensions.<GenMethod> operator_doubleArrow(_copyFrom, _function);
 	}
 
-	private final Set<String> japkitAnnotationPackages = Collections.<String> unmodifiableSet(CollectionLiterals.<String> newHashSet(
-			Clazz.class.getPackage().getName(), Order.class.getPackage().getName(), ClassSelector.class.getPackage().getName()));
+	private final Set<String> japkitAnnotationPackages = unmodifiableSet(new HashSet<>(Arrays.asList(Clazz.class.getPackage().getName(),
+			Order.class.getPackage().getName(), ClassSelector.class.getPackage().getName())));
 
 	public boolean isJapkitAnnotation(final AnnotationMirror am) {
 		return this.japkitAnnotationPackages.contains(
