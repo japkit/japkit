@@ -2,95 +2,38 @@ package de.japkit.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Name;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-
-import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.Extension;
-import org.eclipse.xtext.xbase.lib.Functions.Function1;
 
 import de.japkit.services.ElementsExtensions;
 import de.japkit.services.ExtensionRegistry;
 
 public class GenAnnotationMirror implements AnnotationMirror {
-	@Extension
-	protected ElementsExtensions _elementsExtensions = ExtensionRegistry.get(ElementsExtensions.class);
 
-	private DeclaredType annotationType;
-
-	private Map<ExecutableElement, GenAnnotationValue> elementValues = new LinkedHashMap<>();
-
-	public GenAnnotationValue setValue(final String name, final Function1<? super TypeMirror, ? extends GenAnnotationValue> valueFactory) {
-		GenAnnotationValue _xblockexpression = null;
-		{
-			final ExecutableElement exEl = this.getAVMethod(name, true);
-			final GenAnnotationValue v = valueFactory.apply(exEl.getReturnType());
-			_xblockexpression = this.setValueInternal(exEl, v);
-		}
-		return _xblockexpression;
-	}
-
-	public GenAnnotationValue setValue(final String name, final GenAnnotationValue v) {
-		GenAnnotationValue _xblockexpression = null;
-		{
-			final ExecutableElement exEl = this.getAVMethod(name, true);
-			_xblockexpression = this.setValueInternal(exEl, v);
-		}
-		return _xblockexpression;
-	}
+	private ElementsExtensions _elementsExtensions = ExtensionRegistry.get(ElementsExtensions.class);
 
 	/**
-	 * Test
+	 * The type of the annotation.
 	 */
-	private GenAnnotationValue setValueInternal(final ExecutableElement exEl, final GenAnnotationValue v) {
-		GenAnnotationValue _xifexpression = null;
-		if ((v == null)) {
-			_xifexpression = this.elementValues.remove(exEl);
-		} else {
-			_xifexpression = this.elementValues.put(exEl, v);
-		}
-		return _xifexpression;
-	}
+	private DeclaredType annotationType;
 
-	public GenAnnotationValue getValueWithoutDefault(final String name) {
-		GenAnnotationValue _xblockexpression = null;
-		{
-			final ExecutableElement exEl = this.getAVMethod(name, true);
-			_xblockexpression = this.elementValues.get(exEl);
-		}
-		return _xblockexpression;
-	}
+	/**
+	 * The annotation values. The keys are the according AV methods from
+	 * {@link #annotationType}.
+	 */
+	private Map<ExecutableElement, GenAnnotationValue> elementValues = new LinkedHashMap<>();
 
-	public ExecutableElement getAVMethod(final String name, final boolean required) {
-		ExecutableElement _elvis = null;
-		ExecutableElement _aVMethod = this._elementsExtensions.getAVMethod(this, name);
-		if (_aVMethod != null) {
-			_elvis = _aVMethod;
-		} else {
-			Object _xifexpression = null;
-			if (required) {
-				StringConcatenation _builder = new StringConcatenation();
-				_builder.append("Annotation value \'");
-				_builder.append(name);
-				_builder.append("\' is not defined in annotation type ");
-				Name _qualifiedName = this._elementsExtensions.annotationAsTypeElement(this).getQualifiedName();
-				_builder.append(_qualifiedName);
-				throw new IllegalArgumentException(_builder.toString());
-			} else {
-				_xifexpression = null;
-			}
-			_elvis = ((ExecutableElement) _xifexpression);
-		}
-		return _elvis;
-	}
-
-	public void setElementValues(final Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues) {
-		throw new UnsupportedOperationException("Please use setValue instead");
+	/**
+	 * @param annotationType see {@link #annotationType}.
+	 */
+	public GenAnnotationMirror(final DeclaredType annotationType) {
+		super();
+		this.annotationType = annotationType;
 	}
 
 	@Override
@@ -98,17 +41,73 @@ public class GenAnnotationMirror implements AnnotationMirror {
 		return annotationType;
 	}
 
-	public void setAnnotationType(final DeclaredType annotationType) {
-		this.annotationType = annotationType;
-	}
-
 	@Override
 	public Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValues() {
 		return elementValues;
 	}
 
-	public GenAnnotationMirror(final DeclaredType annotationType) {
-		super();
-		this.annotationType = annotationType;
+	/**
+	 * Gets an annotation value as explicitly present in the annotation. Default
+	 * values from the annotation's definition are not considered.
+	 * 
+	 * @param name the name of the annotation value
+	 * @return the annotation value or null if not present in the annotation
+	 */
+	public GenAnnotationValue getValueWithoutDefault(final String name) {
+		return elementValues.get(this.getAVMethod(name, true));
+	}
+
+	/**
+	 * Sets an annotation value. The required type for the annotation value is
+	 * provided as argument to a value factory.
+	 * 
+	 * @param name the name of the annotation value
+	 * @param valueFactory the factory which provides the value. The value may
+	 *            be null to remove the annotation value.
+	 */
+	public void setValue(final String name, final Function<? super TypeMirror, ? extends GenAnnotationValue> valueFactory) {
+		final ExecutableElement avMethod = getAVMethod(name, true);
+		final GenAnnotationValue v = valueFactory.apply(avMethod.getReturnType());
+		setValueInternal(avMethod, v);
+	}
+
+	/**
+	 * Sets an annotation value.
+	 * 
+	 * @param name the name of the annotation value
+	 * @param v the value. The value may be null to remove the annotation value.
+	 */
+	public void setValue(final String name, final GenAnnotationValue v) {
+		final ExecutableElement avMethod = getAVMethod(name, true);
+		setValueInternal(avMethod, v);
+	}
+
+	private void setValueInternal(final ExecutableElement exEl, final GenAnnotationValue v) {
+		if (v == null) {
+			elementValues.remove(exEl);
+		} else {
+			elementValues.put(exEl, v);
+		}
+	}
+
+	/**
+	 * Gets the according method in the annotation's definition for an
+	 * annotation value.
+	 * 
+	 * @param name the name of the annotation value
+	 * @param required true means that an exception is thrown if the method is
+	 *            not found
+	 * @return the method or null
+	 */
+	public ExecutableElement getAVMethod(final String name, final boolean required) {
+		ExecutableElement avMethod = this._elementsExtensions.getAVMethod(this, name);
+		if (avMethod != null) {
+			return avMethod;
+		}
+		if (required) {
+			throw new IllegalArgumentException("Annotation value \'" + name + "\' is not defined in annotation type "
+					+ this._elementsExtensions.annotationAsTypeElement(this).getQualifiedName());
+		}
+		return null;
 	}
 }
