@@ -8,104 +8,114 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.DeclaredType;
 
-import org.eclipse.xtend.lib.annotations.Data;
-import org.eclipse.xtext.xbase.lib.Pure;
-import org.eclipse.xtext.xbase.lib.util.ToStringBuilder;
-
-@Data
-@SuppressWarnings("all")
+/**
+ * Sometimes a (meta-)annotation is used many times within a template and some
+ * of its values are always the same. For such cases, japkit allows for some
+ * rules to define a default annotation to hold those common values. This class
+ * comprises the annotation and its according default annotation.
+ * <p>
+ * Note that the default values from the annotation declaration are not
+ * considered here (in accordance with the specification of
+ * {@link #getElementValues()}).
+ * 
+ * @author stefan
+ */
 public class AnnotationWithDefaultAnnotation implements AnnotationMirror {
-  private final AnnotationMirror annotation;
-  
-  private final AnnotationMirror defaultAnnotation;
-  
-  @Override
-  public DeclaredType getAnnotationType() {
-    return this.annotation.getAnnotationType();
-  }
-  
-  @Override
-  public Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValues() {
-    HashMap<ExecutableElement, AnnotationValue> _xblockexpression = null;
-    {
-      Map<? extends ExecutableElement, ? extends AnnotationValue> _elementValues = this.defaultAnnotation.getElementValues();
-      final HashMap<ExecutableElement, AnnotationValue> result = new HashMap<ExecutableElement, AnnotationValue>(_elementValues);
-      result.putAll(this.annotation.getElementValues());
-      _xblockexpression = result;
-    }
-    return _xblockexpression;
-  }
-  
-  public static AnnotationMirror createIfNecessary(final AnnotationMirror annotation, final AnnotationMirror defaultAnnotation) {
-    AnnotationMirror _xifexpression = null;
-    if (((annotation != null) && (defaultAnnotation != null))) {
-      _xifexpression = new AnnotationWithDefaultAnnotation(annotation, defaultAnnotation);
-    } else {
-      AnnotationMirror _elvis = null;
-      if (annotation != null) {
-        _elvis = annotation;
-      } else {
-        _elvis = defaultAnnotation;
-      }
-      _xifexpression = _elvis;
-    }
-    return _xifexpression;
-  }
-  
-  public AnnotationWithDefaultAnnotation(final AnnotationMirror annotation, final AnnotationMirror defaultAnnotation) {
-    super();
-    this.annotation = annotation;
-    this.defaultAnnotation = defaultAnnotation;
-  }
-  
-  @Override
-  @Pure
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((this.annotation== null) ? 0 : this.annotation.hashCode());
-    return prime * result + ((this.defaultAnnotation== null) ? 0 : this.defaultAnnotation.hashCode());
-  }
-  
-  @Override
-  @Pure
-  public boolean equals(final Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    AnnotationWithDefaultAnnotation other = (AnnotationWithDefaultAnnotation) obj;
-    if (this.annotation == null) {
-      if (other.annotation != null)
-        return false;
-    } else if (!this.annotation.equals(other.annotation))
-      return false;
-    if (this.defaultAnnotation == null) {
-      if (other.defaultAnnotation != null)
-        return false;
-    } else if (!this.defaultAnnotation.equals(other.defaultAnnotation))
-      return false;
-    return true;
-  }
-  
-  @Override
-  @Pure
-  public String toString() {
-    ToStringBuilder b = new ToStringBuilder(this);
-    b.add("annotation", this.annotation);
-    b.add("defaultAnnotation", this.defaultAnnotation);
-    return b.toString();
-  }
-  
-  @Pure
-  public AnnotationMirror getAnnotation() {
-    return this.annotation;
-  }
-  
-  @Pure
-  public AnnotationMirror getDefaultAnnotation() {
-    return this.defaultAnnotation;
-  }
+	/**
+	 * The annotation.
+	 */
+	private final AnnotationMirror annotation;
+
+	/**
+	 * The default annotation that defines defaults for values of
+	 * {@link #annotation}, as long as they are not defined there.
+	 */
+	private final AnnotationMirror defaultAnnotation;
+
+	@Override
+	public DeclaredType getAnnotationType() {
+		return this.annotation.getAnnotationType();
+	}
+
+	@Override
+	public Map<? extends ExecutableElement, ? extends AnnotationValue> getElementValues() {
+		final Map<ExecutableElement, AnnotationValue> result = new HashMap<>(defaultAnnotation.getElementValues());
+		result.putAll(this.annotation.getElementValues());
+		return result;
+	}
+
+	/**
+	 * Creates an AnnotationWithDefaultAnnotation if and only if annotation and
+	 * defaultAnnotation are not null. Otherwise it returns the one of both
+	 * which is not null.
+	 * 
+	 * @param annotation see {@link #annotation}
+	 * @param defaultAnnotation see {@link #defaultAnnotation}
+	 * @return the AnnotationWithDefaultAnnotation or the annotation or the
+	 *         defaultAnnotation or null
+	 */
+	public static AnnotationMirror createIfNecessary(final AnnotationMirror annotation, final AnnotationMirror defaultAnnotation) {
+		return annotation == null ? defaultAnnotation
+				: (defaultAnnotation == null ? annotation : new AnnotationWithDefaultAnnotation(annotation, defaultAnnotation));
+
+	}
+
+	/**
+	 * @param annotation see {@link #annotation}
+	 * @param defaultAnnotation see {@link #defaultAnnotation}
+	 */
+	private AnnotationWithDefaultAnnotation(final AnnotationMirror annotation, final AnnotationMirror defaultAnnotation) {
+		this.annotation = annotation;
+		this.defaultAnnotation = defaultAnnotation;
+	}
+
+	/**
+	 * @return see {@link #annotation}
+	 */
+	public AnnotationMirror getAnnotation() {
+		return this.annotation;
+	}
+
+	/**
+	 * @return see {@link #defaultAnnotation}
+	 */
+	public AnnotationMirror getDefaultAnnotation() {
+		return this.defaultAnnotation;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.annotation == null) ? 0 : this.annotation.hashCode());
+		return prime * result + ((this.defaultAnnotation == null) ? 0 : this.defaultAnnotation.hashCode());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AnnotationWithDefaultAnnotation other = (AnnotationWithDefaultAnnotation) obj;
+		if (this.annotation == null) {
+			if (other.annotation != null)
+				return false;
+		} else if (!this.annotation.equals(other.annotation))
+			return false;
+		if (this.defaultAnnotation == null) {
+			if (other.defaultAnnotation != null)
+				return false;
+		} else if (!this.defaultAnnotation.equals(other.defaultAnnotation))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "AnnotationWithDefaultAnnotation [annotation=" + annotation + ", defaultAnnotation=" + defaultAnnotation + "]";
+	}
+
 }
