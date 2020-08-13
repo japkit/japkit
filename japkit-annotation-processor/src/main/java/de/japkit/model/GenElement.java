@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ElementVisitor;
@@ -25,8 +24,6 @@ import de.japkit.services.ElementsExtensions;
 
 public abstract class GenElement extends GenAnnotatedConstruct implements Element {
 	private Name simpleName;
-
-	private List<AnnotationMirror> annotationMirrors = new ArrayList<>();
 
 	private List<Element> enclosedElements = new ArrayList<>();
 
@@ -160,26 +157,6 @@ public abstract class GenElement extends GenAnnotatedConstruct implements Elemen
 
 	public GenElement(final String simpleName) {
 		this(new GenName(simpleName));
-	}
-
-	@Override
-	public List<? extends AnnotationMirror> getAnnotationMirrors() {
-		return java.util.Collections.unmodifiableList(annotationMirrors);
-	}
-
-	public void addAnnotationMirror(final AnnotationMirror aAnnotationMirror_) {
-		this.annotationMirrors.add(aAnnotationMirror_);
-	}
-
-	public void removeAnnotationMirror(final AnnotationMirror aAnnotationMirror_) {
-		this.annotationMirrors.remove(aAnnotationMirror_);
-	}
-
-	public void setAnnotationMirrors(final List<? extends AnnotationMirror> annotationMirrors) {
-		this.annotationMirrors.clear();
-		for (AnnotationMirror aAnnotationMirror_ : annotationMirrors) {
-			addAnnotationMirror(aAnnotationMirror_);
-		}
 	}
 
 	@Override
