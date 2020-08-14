@@ -1,6 +1,7 @@
 package de.japkit.model;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -28,13 +30,10 @@ import javax.lang.model.type.TypeVariable;
 import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.xbase.lib.Conversions;
-import org.eclipse.xtext.xbase.lib.ExclusiveRange;
 import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.Functions.Function2;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
-import org.eclipse.xtext.xbase.lib.ListExtensions;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.eclipse.xtext.xbase.lib.Pure;
 
 import com.google.common.base.Objects;
@@ -231,8 +230,7 @@ public abstract class GenTypeElement extends GenParameterizable implements TypeE
 				}
 				return _xblockexpression_1;
 			};
-			final Iterable<TypeMirror> resolvedTypeArgs = IterableExtensions.<Integer, TypeMirror> map(new ExclusiveRange(0, _size, true),
-					_function);
+			final List<TypeMirror> resolvedTypeArgs = IntStream.range(0, _size).mapToObj(_function::apply).collect(toList());
 			_xblockexpression = this.getDeclaredType(prototype, resolvedTypeArgs);
 		}
 		return _xblockexpression;
@@ -337,13 +335,8 @@ public abstract class GenTypeElement extends GenParameterizable implements TypeE
 
 	@Override
 	public TypeMirror asType() {
-		final Procedure1<GenDeclaredType> _function = (GenDeclaredType it) -> {
-			final Function1<TypeParameterElement, TypeMirror> _function_1 = (TypeParameterElement it_1) -> {
-				return it_1.asType();
-			};
-			it.setTypeArguments(ListExtensions.map(this.getTypeParameters(), _function_1));
-		};
-		return new GenDeclaredType(this, _function);
+		// create the type. potentially prototypical
+		return new GenDeclaredType(this, getTypeParameters().stream().map(p -> p.asType()).collect(toList()));
 	}
 
 	public GenTypeElement(final String name) {

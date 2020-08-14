@@ -1,5 +1,7 @@
 package de.japkit.model;
 
+import static java.util.Collections.unmodifiableList;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,6 @@ import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 
 import de.japkit.services.ExtensionRegistry;
 import de.japkit.services.TypesExtensions;
@@ -26,14 +27,10 @@ import de.japkit.services.TypesExtensions;
 public abstract class GenParameterizable extends GenElement implements Parameterizable {
 	private List<TypeParameterElement> typeParameters = new ArrayList<>();
 
-	public DeclaredType getDeclaredType(final DeclaredType prototype, final Iterable<TypeMirror> resolvedTypeArgs) {
+	public DeclaredType getDeclaredType(final DeclaredType prototype, final List<? extends TypeMirror> resolvedTypeArgs) {
 		DeclaredType _xifexpression = null;
 		if ((prototype instanceof GenDeclaredType)) {
-			Element _asElement = ((GenDeclaredType) prototype).asElement();
-			final Procedure1<GenDeclaredType> _function = (GenDeclaredType it) -> {
-				it.setTypeArguments(IterableExtensions.<TypeMirror> toList(resolvedTypeArgs));
-			};
-			_xifexpression = new GenDeclaredType(((TypeElement) _asElement), _function);
+			_xifexpression = new GenDeclaredType((TypeElement) prototype.asElement(), resolvedTypeArgs);
 		} else {
 			Element _asElement_1 = prototype.asElement();
 			_xifexpression = ExtensionRegistry.<TypesExtensions> get(TypesExtensions.class).getDeclaredType(((TypeElement) _asElement_1),
@@ -130,7 +127,7 @@ public abstract class GenParameterizable extends GenElement implements Parameter
 
 	@Override
 	public List<? extends TypeParameterElement> getTypeParameters() {
-		return java.util.Collections.unmodifiableList(typeParameters);
+		return unmodifiableList(typeParameters);
 	}
 
 	public void addTypeParameter(final TypeParameterElement aTypeParameter_) {

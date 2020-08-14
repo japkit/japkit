@@ -1,5 +1,8 @@
 package de.japkit.model;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.joining;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,64 +12,45 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVisitor;
+import javax.lang.model.util.Types;
 
-import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
-
+/**
+ * A generated declared type.
+ * 
+ * @author stefan
+ */
 public class GenDeclaredType extends GenTypeMirror implements DeclaredType {
+	/**
+	 * The type element corresponding to this type.
+	 */
 	private TypeElement element;
 
+	/**
+	 * The type of the innermost enclosing instance. Only types corresponding to
+	 * inner classes have an enclosing instance.
+	 */
 	private TypeMirror enclosingType;
 
+	/**
+	 * The actual type arguments of this type.
+	 */
 	private List<TypeMirror> typeArguments = new ArrayList<>();
 
-	@Override
-	public Element asElement() {
-		return this.element;
-	}
-
-	@Override
-	public String toString() {
-		StringConcatenation _builder = new StringConcatenation();
-		String _qualifiedName = this.qualifiedName();
-		_builder.append(_qualifiedName);
-		{
-			boolean _hasElements = false;
-			for (final TypeMirror a : this.typeArguments) {
-				if (!_hasElements) {
-					_hasElements = true;
-					_builder.append("<");
-				} else {
-					_builder.appendImmediate(",", "");
-				}
-				_builder.append(a);
-			}
-			if (_hasElements) {
-				_builder.append(">");
-			}
-		}
-		return _builder.toString();
-	}
-
-	public String qualifiedName() {
-		return this.element.getQualifiedName().toString();
-	}
-
-	public String simpleName() {
-		return this.element.getSimpleName().toString();
-	}
-
+	/**
+	 * @param element see {@link #element}.
+	 */
 	public GenDeclaredType(final TypeElement element) {
 		this.element = element;
 	}
 
-	public GenDeclaredType(final TypeElement element, final Procedure1<? super GenDeclaredType> initializer) {
+	/**
+	 * @param element see {@link #element}
+	 * @param typeArguments see {@link #typeArguments}
+	 */
+	public GenDeclaredType(final TypeElement element, final List<? extends TypeMirror> typeArguments) {
+		// TODO: Proper handling of enclosing type?
 		this.element = element;
-		initializer.apply(this);
-	}
-
-	public GenDeclaredType erasure() {
-		return new GenDeclaredType(this.element);
+		this.typeArguments = new ArrayList<>(typeArguments);
 	}
 
 	@Override
@@ -75,36 +59,51 @@ public class GenDeclaredType extends GenTypeMirror implements DeclaredType {
 	}
 
 	@Override
-	public TypeMirror getEnclosingType() {
-		return enclosingType;
+	public Element asElement() {
+		return this.element;
 	}
 
-	public void setEnclosingType(final TypeMirror enclosingType) {
-		this.enclosingType = enclosingType;
+	/**
+	 * @return the erasure of this type. See also
+	 *         {@link Types#erasure(TypeMirror)}.
+	 */
+	public GenDeclaredType erasure() {
+		// TODO: Proper handling of enclosing type?
+		return new GenDeclaredType(this.element);
 	}
 
 	@Override
-	public List<? extends TypeMirror> getTypeArguments() {
-		return java.util.Collections.unmodifiableList(typeArguments);
-	}
-
-	public void addTypeArgument(final TypeMirror aTypeArgument_) {
-		this.typeArguments.add(aTypeArgument_);
-	}
-
-	public void removeTypeArgument(final TypeMirror aTypeArgument_) {
-		this.typeArguments.remove(aTypeArgument_);
-	}
-
-	public void setTypeArguments(final List<? extends TypeMirror> typeArguments) {
-		this.typeArguments.clear();
-		for (TypeMirror aTypeArgument_ : typeArguments) {
-			addTypeArgument(aTypeArgument_);
-		}
+	public TypeMirror getEnclosingType() {
+		return enclosingType;
 	}
 
 	@Override
 	public TypeKind getKind() {
 		return TypeKind.DECLARED;
+	}
+
+	@Override
+	public List<? extends TypeMirror> getTypeArguments() {
+		return unmodifiableList(typeArguments);
+	}
+
+	/**
+	 * @return the qualified name of the corresponding type element.
+	 */
+	public String qualifiedName() {
+		return this.element.getQualifiedName().toString();
+	}
+
+	/**
+	 * @return the simple name of the corresponding type element.
+	 */
+	public String simpleName() {
+		return this.element.getSimpleName().toString();
+	}
+
+	@Override
+	public String toString() {
+		String argsString = typeArguments.isEmpty() ? "" : "<" + typeArguments.stream().map(a -> a.toString()).collect(joining(",")) + ">";
+		return qualifiedName() + argsString;
 	}
 }
