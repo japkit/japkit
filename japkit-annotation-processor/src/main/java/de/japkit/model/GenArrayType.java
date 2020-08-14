@@ -5,18 +5,22 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVisitor;
 
-import org.eclipse.xtend2.lib.StringConcatenation;
-
-@SuppressWarnings("all")
+/**
+ * A generated array type.
+ * 
+ * @author stefan
+ */
 public class GenArrayType extends GenTypeMirror implements ArrayType {
+	/**
+	 * The type of the array elements.
+	 */
 	private TypeMirror componentType;
 
-	@Override
-	public String toString() {
-		StringConcatenation _builder = new StringConcatenation();
-		_builder.append(this.componentType);
-		_builder.append(" []");
-		return _builder.toString();
+	/**
+	 * @param componentType see {@link #componentType}
+	 */
+	public GenArrayType(final TypeMirror componentType) {
+		this.componentType = componentType;
 	}
 
 	@Override
@@ -29,17 +33,13 @@ public class GenArrayType extends GenTypeMirror implements ArrayType {
 		return componentType;
 	}
 
-	public void setComponentType(final TypeMirror componentType) {
-		this.componentType = componentType;
-	}
-
 	@Override
 	public TypeKind getKind() {
 		return TypeKind.ARRAY;
 	}
 
-	public GenArrayType(final TypeMirror componentType) {
-		super();
-		this.componentType = componentType;
+	@Override
+	public String toString() {
+		return componentType + " []";
 	}
 }
