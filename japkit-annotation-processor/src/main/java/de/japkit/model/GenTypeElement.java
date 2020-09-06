@@ -254,9 +254,9 @@ public abstract class GenTypeElement extends GenParameterizable implements TypeE
 	}
 
 	@Override
-	public void addEnclosedElement(final Element enclosed) {
+	protected void addEnclosedElement(final GenElement enclosed) {
 		super.addEnclosedElement(enclosed);
-		((GenElement) enclosed).resolveContainedTypeVariables(this);
+		enclosed.resolveContainedTypeVariables(this);
 	}
 
 	private static final Function2<Element, Element, Integer> memberComparator = ((Function2<Element, Element, Integer>) (Element e1,
