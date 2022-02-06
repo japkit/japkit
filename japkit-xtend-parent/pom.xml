@@ -10,7 +10,7 @@
 	<name>Japkit Annotation Processor - Xtend modules parent pom</name>
 	<packaging>pom</packaging>
 	<properties>
-		<xtend.version>2.22.0</xtend.version>
+		<xtend.version>2.25.0</xtend.version>
 	</properties>
 	<build>
 		<plugins>
