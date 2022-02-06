@@ -4,5 +4,6 @@ jdk:
   - openjdk11
   - openjdk13
   - openjdk14
+  - openjdk17
   
 
