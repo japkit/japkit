@@ -210,5 +210,3 @@ What next?
 - The [wiki](https://github.com/stefanocke/japkit/wiki) contains more details on how to get started.
 - The [japkit-test](https://github.com/japkit/japkit/tree/master/japkit-test) project contains detailed examples for most of the features of japkit. They serve as test and as documentation. You can also browse the [javadoc](https://japkit.github.io/japkit-javadoc/overview-summary.html) online.
 - A complex example for generating whole applications like Spring Petclinic can be found in the [examples repository](https://github.com/stefanocke/japkit-examples/tree/master/japkit-examples-roo-petclinic).
-
-
