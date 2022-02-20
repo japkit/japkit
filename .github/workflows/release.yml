@@ -37,9 +37,9 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         mvn -B jgitflow:release-start jgitflow:release-finish -DnoDeploy=false -Dgpg=true --file pom.xml
-        git push releases
-        git push --tags
-        git push master
+        git push origin releases
+        git push origin --tags
+        git push origin master
       if: github.ref == 'refs/heads/master'
       env:
         OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
