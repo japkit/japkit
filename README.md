@@ -2,7 +2,7 @@ japkit
 ======
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.japkit/japkit-parent.svg)](http://mvnrepository.com/artifact/com.github.japkit)
-[![Build Status](https://travis-ci.org/japkit/japkit.svg?branch=master)](https://travis-ci.org/japkit/japkit)
+[![Java CI with Maven](https://github.com/japkit/japkit/actions/workflows/maven.yml/badge.svg)](https://github.com/japkit/japkit/actions/workflows/maven.yml)
 
 Japkit is an annotation processor that allows to develop Java code generators by using natural templates. Code templates written in Java with some annotations describe what to generate. There is no need to write any imperative code. This makes the code generators short and concise and so eases their maintenance. 
 	
@@ -210,5 +210,3 @@ What next?
 - The [wiki](https://github.com/stefanocke/japkit/wiki) contains more details on how to get started.
 - The [japkit-test](https://github.com/japkit/japkit/tree/master/japkit-test) project contains detailed examples for most of the features of japkit. They serve as test and as documentation. You can also browse the [javadoc](https://japkit.github.io/japkit-javadoc/overview-summary.html) online.
 - A complex example for generating whole applications like Spring Petclinic can be found in the [examples repository](https://github.com/stefanocke/japkit-examples/tree/master/japkit-examples-roo-petclinic).
-
-

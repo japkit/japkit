@@ -1,0 +1,44 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Build and deploy snapshot
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [11]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: 'temurin'
+        cache: maven
+        server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
+        server-username: OSSRH_USERNAME # env variable for username in deploy
+        server-password: OSSRH_TOKEN # env variable for token in deploy
+        gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+        
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+      if: github.event_name == 'pull_request'
+       
+    - name: Build with Maven and deploy snapshot to Sonatype OSSRH
+      run: mvn -B deploy -Dgpg=true --file pom.xml
+      if: github.event_name == 'push'
+      env:
+        OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}

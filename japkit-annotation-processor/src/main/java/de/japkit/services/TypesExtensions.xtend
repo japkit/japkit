@@ -425,9 +425,7 @@ class TypesExtensions /**implements Types*/{
 	
 	def getDeclaredType(TypeElement typeElem, TypeMirror... args) {
 		if(typeElem instanceof GenTypeElement || args.exists[it instanceof GenTypeMirror || it.isVoid]){
-			new GenDeclaredType(typeElem) [
-				typeArguments = args 
-			]
+			new GenDeclaredType(typeElem, args)
 		} else {
 			typeUtils.getDeclaredType(typeElem, args)		
 		}
