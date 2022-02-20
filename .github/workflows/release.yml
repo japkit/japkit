@@ -32,7 +32,14 @@ jobs:
         gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
 
     - name: Release with Maven gitflow plugin and deploy to Sonatype OSSRH
-      run: mvn -B jgitflow:release-start jgitflow:release-finish -DnoDeploy=false -DpushReleases=true -Dgpg=true --file pom.xml
+      # git according to https://github.com/actions/checkout#push-a-commit-using-the-built-in-token 
+      run:  |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        mvn -B jgitflow:release-start jgitflow:release-finish -DnoDeploy=false -Dgpg=true --file pom.xml
+        git push releases
+        git push --tags
+        git push master
       if: github.ref == 'refs/heads/master'
       env:
         OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
