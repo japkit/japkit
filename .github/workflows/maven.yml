@@ -25,5 +25,10 @@ jobs:
         java-version: ${{ matrix.java-version }}
         distribution: 'temurin'
         cache: maven
+        gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+        
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package -Dgpg=true --file pom.xml
+      env:
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
