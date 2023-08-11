@@ -3,7 +3,7 @@ package de.japkit.groovy
 import groovy.text.GStringTemplateEngine
 import groovy.text.Template
 import groovy.text.XmlTemplateEngine
-
+import groovy.xml.XmlParser
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.eclipse.xtext.xbase.lib.Pair
