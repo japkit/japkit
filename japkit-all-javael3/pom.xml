@@ -6,29 +6,13 @@
 		<version>2.0-SNAPSHOT</version>
 	</parent>
 	<name>Japkit All - Java EL 3</name>
-	<description>All dependencies that can be used in the annotation processor path. For convenience and due to https://issues.apache.org/jira/browse/MCOMPILER-272.
-	Tomcat's Java EL 3 implementation is used.
+	<description>DEPRECATED. Please use japkit-all or japkit-all-nogroovy artifact.
 	</description>
 	<artifactId>japkit-all-javael3</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.japkit</groupId>
-			<artifactId>japkit-annotation-processor</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.japkit</groupId>
-			<artifactId>japkit-javael3</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tomcat.embed</groupId>
-			<artifactId>tomcat-embed-el</artifactId>
-			<version>9.0.59</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.japkit</groupId>
-			<artifactId>japkit-groovy</artifactId>
+			<artifactId>japkit-all</artifactId>
 			<version>2.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

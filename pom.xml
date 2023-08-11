@@ -51,7 +51,6 @@
 		<module>japkit-xtend-parent</module>
 		<module>japkit-annotation-processor</module>
 		<module>japkit-annotations</module>
-		<module>japkit-juel</module>
 		<module>japkit-javael3</module>
 		<module>japkit-groovy</module>
 		<module>japkit-all</module>
