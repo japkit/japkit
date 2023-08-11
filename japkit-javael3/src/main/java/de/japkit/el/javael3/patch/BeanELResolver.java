@@ -33,16 +33,16 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.ELManager;
-import javax.el.ELResolver;
-import javax.el.ExpressionFactory;
-import javax.el.PropertyNotFoundException;
-import javax.el.PropertyNotWritableException;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ELManager;
+import jakarta.el.ELResolver;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.PropertyNotWritableException;
 
 /**
- * Copy of same class in javax.el.*. With patches regarding Eclipse:
+ * Copy of same class in jakarta.el.*. With patches regarding Eclipse:
  * https://github.com/japkit/japkit/issues/57
  * 
  * @author stefan

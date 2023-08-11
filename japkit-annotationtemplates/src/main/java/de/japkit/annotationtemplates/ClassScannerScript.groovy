@@ -1,8 +1,8 @@
 package de.japkit.annotationtemplates
 
-import javax.persistence.Entity
-import javax.validation.Valid
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Entity
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull;
 
 import com.google.common.reflect.ClassPath;
 

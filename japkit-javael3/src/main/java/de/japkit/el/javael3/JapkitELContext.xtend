@@ -1,13 +1,13 @@
 package de.japkit.el.javael3
 
 import java.util.Map
-import javax.el.ELContext
-import javax.el.ELResolver
-import javax.el.ExpressionFactory
-import javax.el.FunctionMapper
-import javax.el.ImportHandler
-import javax.el.VariableMapper
-import javax.el.ValueExpression
+import jakarta.el.ELContext
+import jakarta.el.ELResolver
+import jakarta.el.ExpressionFactory
+import jakarta.el.FunctionMapper
+import jakarta.el.ImportHandler
+import jakarta.el.VariableMapper
+import jakarta.el.ValueExpression
 
 /**
  * ELContext that uses JapkitELResolver and DynamicFunctionMapper.

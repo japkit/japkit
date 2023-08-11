@@ -32,9 +32,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>javax.el-api</artifactId>
-			<version>3.0.1-b04</version>
+		    <groupId>jakarta.el</groupId>
+		    <artifactId>jakarta.el-api</artifactId>
+		    <version>5.0.1</version>
 			<!-- The API comes with the EL implementation and usually has a hardwired default impl set in ExpressionFactory. -->
 			<scope>provided</scope>
 		</dependency>

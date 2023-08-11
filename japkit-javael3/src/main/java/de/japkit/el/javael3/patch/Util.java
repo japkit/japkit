@@ -37,10 +37,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.ExpressionFactory;
-import javax.el.MethodNotFoundException;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.MethodNotFoundException;
 
 class Util {
 
@@ -74,7 +74,7 @@ class Util {
 				return "";
 			}
 		}
-		ResourceBundle bundle = ResourceBundle.getBundle("javax.el.LocalStrings", locale);
+		ResourceBundle bundle = ResourceBundle.getBundle("jakarta.el.LocalStrings", locale);
 		try {
 			String template = bundle.getString(name);
 			if (props != null) {

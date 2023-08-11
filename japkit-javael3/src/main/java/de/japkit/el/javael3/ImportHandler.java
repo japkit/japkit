@@ -29,8 +29,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.el.ELContext;
-import javax.el.ELException;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
 
 
 /**
@@ -38,7 +38,7 @@ import javax.el.ELException;
  * 
  * @since EL 3.0
  */
-public class ImportHandler extends javax.el.ImportHandler{
+public class ImportHandler extends jakarta.el.ImportHandler{
 
     private List<String> packageNames = new ArrayList<>();
     private ConcurrentHashMap<String,String> classNames = new ConcurrentHashMap<>();
@@ -51,7 +51,7 @@ public class ImportHandler extends javax.el.ImportHandler{
     }
 
 
-    public void importStatic(String name) throws javax.el.ELException {
+    public void importStatic(String name) throws jakarta.el.ELException {
         int lastPeriod = name.lastIndexOf('.');
 
         if (lastPeriod < 0) {
@@ -113,7 +113,7 @@ public class ImportHandler extends javax.el.ImportHandler{
     }
 
 
-    public void importClass(String name) throws javax.el.ELException {
+    public void importClass(String name) throws jakarta.el.ELException {
         int lastPeriodIndex = name.lastIndexOf('.');
 
         if (lastPeriodIndex < 0) {
@@ -259,7 +259,7 @@ public class ImportHandler extends javax.el.ImportHandler{
             }
         }
         ResourceBundle bundle = ResourceBundle.getBundle(
-                "javax.el.LocalStrings", locale);
+                "jakarta.el.LocalStrings", locale);
         try {
             String template = bundle.getString(name);
             if (props != null) {

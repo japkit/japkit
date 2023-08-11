@@ -3,7 +3,7 @@ package de.japkit.test.members.constructor;
 import java.util.Objects;
 
 import javax.lang.model.element.TypeElement;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 
