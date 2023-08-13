@@ -1,8 +1,8 @@
 package de.japkit.el.javael3
 
 import java.util.Map
-import javax.el.ELContext
-import javax.el.ELResolver
+import jakarta.el.ELContext
+import jakarta.el.ELResolver
 
 /**
  * Resolves root properties (base === null) from a map. 

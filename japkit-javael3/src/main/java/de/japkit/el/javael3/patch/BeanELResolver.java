@@ -14,7 +14,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package de.japkit.el.javael3.patch;
 
 import java.beans.BeanInfo;
@@ -34,16 +33,16 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.ELManager;
-import javax.el.ELResolver;
-import javax.el.ExpressionFactory;
-import javax.el.PropertyNotFoundException;
-import javax.el.PropertyNotWritableException;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ELManager;
+import jakarta.el.ELResolver;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.PropertyNotWritableException;
 
 /**
- * Copy of same class in javax.el.*. With patches regarding Eclipse:
+ * Copy of same class in jakarta.el.*. With patches regarding Eclipse:
  * https://github.com/japkit/japkit/issues/57
  * 
  * @author stefan
@@ -58,13 +57,7 @@ public class BeanELResolver extends ELResolver {
 		if (System.getSecurityManager() == null) {
 			cacheSizeStr = System.getProperty(CACHE_SIZE_PROP, "1000");
 		} else {
-			cacheSizeStr = AccessController.doPrivileged(new PrivilegedAction<String>() {
-
-				@Override
-				public String run() {
-					return System.getProperty(CACHE_SIZE_PROP, "1000");
-				}
-			});
+			cacheSizeStr = AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(CACHE_SIZE_PROP, "1000"));
 		}
 		CACHE_SIZE = Integer.parseInt(cacheSizeStr);
 	}
@@ -122,7 +115,7 @@ public class BeanELResolver extends ELResolver {
 		context.setPropertyResolved(base, property);
 
 		if (this.readOnly) {
-			throw new PropertyNotWritableException(Util.message(context, "resolverNotWriteable", base.getClass().getName()));
+			throw new PropertyNotWritableException(Util.message(context, "resolverNotWritable", base.getClass().getName()));
 		}
 
 		Method m = this.property(context, base, property).write(context, base);

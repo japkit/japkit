@@ -4,11 +4,12 @@
 	<parent>
 		<groupId>com.github.japkit</groupId>
 		<artifactId>japkit-parent</artifactId>
-		<version>1.26</version>
+		<version>2.0</version>
 	</parent>
 	<artifactId>japkit-groovy</artifactId>
 	<name>Japkit Annotation Processor - Groovy EL Provider</name>
-	<description>Include this dependency to use Grovy expressions in your code templates.</description>
+	<description>Include this dependency to use Grovy expressions in your code
+		templates.</description>
 
 	<build>
 		<plugins>
@@ -16,14 +17,16 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 
-
+				<!--
+				https://github.com/groovy/groovy-eclipse/wiki/Groovy-Eclipse-Maven-plugin -->
 				<configuration>
 					<compilerId>groovy-eclipse-compiler</compilerId>
-					<!-- set verbose to be true if you want lots of uninteresting messages -->
+					<!-- set verbose to be true if you want lots of
+					uninteresting messages -->
 					<!-- <verbose>true</verbose> -->
-					<compilerArgs>
-						<arg>indy</arg>
-					</compilerArgs>
+					<compilerArguments>
+						<indy />
+					</compilerArguments>
 					<!-- To prevent the annotation processor to call itself... -->
 					<proc>none</proc>
 				</configuration>
@@ -31,15 +34,13 @@
 					<dependency>
 						<groupId>org.codehaus.groovy</groupId>
 						<artifactId>groovy-eclipse-compiler</artifactId>
-						<version>3.6.0-03</version>
+						<version>3.9.0</version>
 					</dependency>
-					<!-- for 2.8.0-01 and later you must have an explicit dependency on 
-						groovy-eclipse-batch -->
 
 					<dependency>
 						<groupId>org.codehaus.groovy</groupId>
 						<artifactId>groovy-eclipse-batch</artifactId>
-						<version>2.5.12-01</version>
+						<version>4.0.13-03</version>
 					</dependency>
 
 				</dependencies>
@@ -49,7 +50,7 @@
 			<plugin>
 				<groupId>com.bluetrainsoftware.maven</groupId>
 				<artifactId>groovydoc-maven-plugin</artifactId>
-				<version>1.3</version>
+				<version>2.1</version>
 				<executions>
 					<execution>
 						<id>attach-docs</id>
@@ -66,28 +67,21 @@
 		<dependency>
 			<groupId>com.github.japkit</groupId>
 			<artifactId>japkit-annotation-processor</artifactId>
-			<version>1.26</version>
+			<version>2.0</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-			<version>2.5.12</version>
+			<version>4.0.13</version>
 			<type>pom</type>
 		</dependency>
 	</dependencies>
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>bintray</id>
-			<name>Groovy Bintray</name>
-			<url>https://dl.bintray.com/groovy/maven</url>
-			<releases>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+			<id>groovy-plugins-release</id>
+			<url>https://groovy.jfrog.io/artifactory/plugins-release</url>
 		</pluginRepository>
 	</pluginRepositories>
 </project>

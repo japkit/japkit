@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.TypeElement;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import de.japkit.annotations.RuntimeMetadata;
 import de.japkit.functions.SrcType;

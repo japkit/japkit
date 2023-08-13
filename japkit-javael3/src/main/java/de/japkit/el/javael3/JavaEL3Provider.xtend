@@ -5,8 +5,8 @@ import de.japkit.el.ELProviderException
 import de.japkit.el.ValueStack
 import java.io.Writer
 import java.net.URL
-import javax.el.ELException
-import javax.el.ELManager
+import jakarta.el.ELException
+import jakarta.el.ELManager
 import java.util.List
 
 class JavaEL3Provider implements ELProvider {

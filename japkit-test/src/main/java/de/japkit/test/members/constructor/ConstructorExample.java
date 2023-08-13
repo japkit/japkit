@@ -1,6 +1,6 @@
 package de.japkit.test.members.constructor;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * The annotated class for the example.

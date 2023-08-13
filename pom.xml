@@ -6,7 +6,7 @@
 	<groupId>com.github.japkit</groupId>
 	<artifactId>japkit-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.26</version>
+	<version>2.0</version>
 	<name>Japkit Parent</name>
 
 	<description>A declarative approach to writing Java annotation processors.</description>
@@ -51,7 +51,6 @@
 		<module>japkit-xtend-parent</module>
 		<module>japkit-annotation-processor</module>
 		<module>japkit-annotations</module>
-		<module>japkit-juel</module>
 		<module>japkit-javael3</module>
 		<module>japkit-groovy</module>
 		<module>japkit-all</module>
@@ -63,14 +62,13 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>3.11.0</version>
 				<configuration>
 					<generatedSourcesDirectory>${project.build.directory}/src/main/generated-sources</generatedSourcesDirectory>
 					<generatedTestSourcesDirectory>${project.build.directory}/src/main/generated-test-sources</generatedTestSourcesDirectory>
@@ -79,7 +77,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -93,7 +91,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.5.0</version>
 				<configuration>
 					<failOnError>false</failOnError>
 				</configuration>
@@ -125,7 +123,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
+			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -144,7 +142,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>3.0.1</version>
+						<version>3.1.0</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
